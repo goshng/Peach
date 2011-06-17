@@ -227,8 +227,8 @@ static    SG_FileType GetFileTypeS(const char * a_pszPath) {
 
 static    void SetArgvArrayType(ARG_ARRAY_TYPE a_nNewType);
 
-static int Init(unsigned int a_uiFlags, int a_nReservedSlots);
 int FileCount() { return m_nArgsLen; }
+static int Init(unsigned int a_uiFlags, int a_nReservedSlots);
 char ** Files() {
         SetArgvArrayType(POINTERS);
         return m_rgpArgs;
@@ -272,7 +272,7 @@ void CSimpleGlobFinalize()
 }
 
 
-static int Init(
+int Init(
     unsigned int    a_uiFlags,
     int             a_nReservedSlots
     )

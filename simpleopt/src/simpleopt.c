@@ -22,8 +22,6 @@ static void ShuffleArg(int a_nStartIdx, int a_nCount);
 static int LookupOption(const char * a_pszOption);
 static int CalcMatch(const char *a_pszSource, const char *a_pszTest);
 static int IsEqual(char a_cLeft, char a_cRight, int a_nArgType);
-static char ** MultiArg(int n);
-static void Stop();
 
 static char * FindEquals(char *s) {
         while (*s && *s != (char)'=') ++s;
@@ -33,12 +31,6 @@ static char * FindEquals(char *s) {
 
 
 
-static int Init(
-        int             a_argc, 
-        char *        a_argv[], 
-        const SOption * a_rgOptions, 
-        int             a_nFlags 
-        );
 
 static void SetOptions(const SOption * a_rgOptions) { 
         m_rgOptions = a_rgOptions; 
@@ -60,7 +52,7 @@ static char * File(int n) {
     }
 static char ** Files() { return &m_argv[m_nLastArg]; }
 
-static int Init(
+int Init(
     int             a_argc,
     char *        a_argv[],
     const SOption * a_rgOptions,
@@ -281,7 +273,7 @@ int Next()
     return 1;
 }
 
-static void Stop()
+void Stop()
 {
     if (m_nNextOption < m_nLastArg) {
         ShuffleArg(m_nNextOption, m_nLastArg - m_nNextOption);
@@ -488,7 +480,7 @@ static int IsEqual(
 
 // calculate the number of characters that match (case-sensitive)
 // 0 = no match, > 0 == number of characters, -1 == perfect match
-static char ** MultiArg(
+char ** MultiArg(
     int a_nCount
     )
 {

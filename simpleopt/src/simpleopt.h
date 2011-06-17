@@ -359,5 +359,13 @@ void CSimpleOpt (
         );
 
 void CSimpleOptFinalize (); 
+int Init(
+        int             a_argc, 
+        char *        a_argv[], 
+        const SOption * a_rgOptions, 
+        int             a_nFlags 
+        );
+void Stop();
+char ** MultiArg(int n);
 
 #endif // INCLUDED_SimpleOpt

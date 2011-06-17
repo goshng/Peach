@@ -9,3 +9,20 @@ Introduction
 A C++ source code was found at
 http://code.jellycan.com/simpleopt/ that processes command line options. A
 spin-off from the C++ code is made in C.
+
+Compilation
+-----------
+
+.To build 
+----
+mkdir release
+cd release
+cmake ../src/
+----
+
+.To build DEBUG
+----
+mkdir debug
+cd debug
+cmake ../src/ -DCMAKE_BUILD_TYPE:STRING=Debug
+----
