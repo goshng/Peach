@@ -42,6 +42,7 @@
 #include <locale.h>
 
 #include "simpleopt.h"
+#include "simpleglob.h"
 
 // define the ID values to indentify the option
 enum { OPT_HELP, OPT_FLAG, OPT_ARG };
@@ -71,6 +72,7 @@ void ShowUsage() {
 }
 
 int main(int argc, TCHAR * argv[]) {
+int n;
     // declare our options parser, pass in the arguments from main
     // as well as our array of valid options.
     CSimpleOpt (argc, argv, g_rgOptions, 0);
@@ -92,6 +94,19 @@ int main(int argc, TCHAR * argv[]) {
         }
     }
     CSimpleOptFinalize (); 
+
+    CSimpleGlob (SG_GLOB_NODOT|SG_GLOB_NOCHECK, 0);
+    if (SG_SUCCESS != Add2(FileCount(), Files())) {
+        printf("Error while globbing files\n");
+        return 1;
+    }
+
+    // dump all of the details, the script that was passed on the
+    // command line and the expanded file names
+    for (n = 0; n < FileCount(); ++n) {
+        printf("file %d: '%s'\n", n, File(n));
+    }
+    CSimpleGlobFinalize ();
 
     return 0;
 }

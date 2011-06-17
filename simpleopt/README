@@ -1,0 +1,11 @@
+Simple option in C
+==================
+Sang Chul Choi <goshng@yahoo.co.kr>
+v1.0, June 2011:
+Rewritten for verson 1.0 relase.
+
+Introduction
+------------
+A C++ source code was found at
+http://code.jellycan.com/simpleopt/ that processes command line options. A
+spin-off from the C++ code is made in C.
