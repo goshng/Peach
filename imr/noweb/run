@@ -1,0 +1,15 @@
+#!/bin/bash
+
+rm -rf build
+mkdir build
+cp imr??.pdf build/
+cp imr.bst build/
+cp imr.bib build/
+cd build
+noweave -delay ../imr.nw > imr.tex
+pdflatex imr
+bibtex imr
+pdflatex imr
+pdflatex imr
+cd ..
+open build/imr.pdf
