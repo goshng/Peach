@@ -1,0 +1,67 @@
+
+
+Processing matrix "matrix1"...
+
+Unique rows matrix is
+000100 (row 1)
+100100 (row 2)
+001001 (row 3)
+101000 (row 4)
+011001 (row 5)
+011011 (row 6)
+001011 (row 7)
+
+
+
+The galled tree is...
+root (row 1) 000100
+  Gall interval = [2,3] recombination node = 100100 (row 2)
+    Prefix side
+    3,4 (row ?) 001000
+      6 (row 3) 001001
+        Gall interval = [3,5] recombination node = 011001 (row 5)
+          Prefix side
+          5 (row 7) 001011
+          2 (row 6) 011011
+          Suffix side
+          Below recombination node
+    1 (row 4) 101000
+    Suffix side
+    Below recombination node
+
+
+Processing matrix "matrix2"...
+
+Unique rows matrix is
+0101001 (row 1)
+0111001 (row 2)
+0100001 (row 3)
+0111101 (row 4)
+0100011 (row 5)
+0011011 (row 6)
+0011010 (row 7)
+1111011 (row 8)
+1111010 (row 9)
+
+
+
+The galled tree is...
+root (row 1) 0101001
+  Gall interval = [5,6] recombination node = 0100011 (row 5)
+    Prefix side
+    4 (row 3) 0100001
+    Suffix side
+    3 (row 2) 0111001
+      5 (row 4) 0111101
+    6 (row ?) 0111011
+      Gall interval = [3,7] recombination node = 0011010 (row 7)
+        Prefix side
+        2 (row 6) 0011011
+        Suffix side
+        1 (row 8) 1111011
+        7 (row 9) 1111010
+        Below recombination node
+    Below recombination node
+
+
+Result : 2/2 have galled trees (including 0 perfect phylogenies)

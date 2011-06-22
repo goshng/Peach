@@ -10,13 +10,13 @@
 \setlength{\pdfpageheight}{\paperheight}
 \pagestyle{noweb}
 \begin{document}
-%\nwfilename{IMa}
-%\nwbegindocs{0}
 
 \title{Isolation, Migration, and Recombination Model}
 \author{Sang Chul Choi\\
 Dept.\ of Genetics, Rutgers University,\\
-Piscataway, NJ 08854}
+Piscataway, NJ 08854,\\
+Dept.\ of Biological Statistics & Computational Biology, Cornell University,\\
+Ithaca, NY 14853}
 
 \maketitle
 

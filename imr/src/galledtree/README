@@ -1,0 +1,546 @@
+
+Optimal, Efficient Reconstruction of Phylogenetic Networks with
+Constrained and Structured Recombination - Single and Multiple Crossovers
+
+Programs galledtree.pl and  multicross.pl
+
+Written by Satish Eddhu at UC Davis Computer Science
+Department (2003-2004), under the supervision of Dan Gusfield, supported
+by NSF Grant EIA-0220154
+
+These two programs are related and will be described together.  Other
+programs related to galledtree.pl and multicross.pl will be distributed
+later. The programs are written in Perl, and so a Perl interpreter must be
+installed in order to run these programs.
+
+---------------
+
+Program galledtree.pl is a program to determine if a set of binary sequences 
+(SNP haplotypes for example) can be derived on a galled-tree, i.e., a
+phylogenetic network where the recombination cycles are node disjoint
+(non-intersecting).  See [1] for an introduction to the problem and
+solution when a specific ancestral sequence is specified by the user,
+and see [2] for a discussion of the problem when no specific ancestral
+sequence is specified in advance.  Program galledtree.pl solves both of
+these problems. The default case is that no ancestral sequences is
+specified and the program determines if there is a galled-tree with
+some ancestral sequence (the program finds a sequence that works as the
+ancestral sequence, if there is one).
+
+When there is a galled-tree for the input sequences, the program is
+guaranteed to produce one that minimizes the number of
+(single-crossover) recombinations over all possible phylogenetic
+networks (even ones where the cycles can intersect) and over all
+possible ancestral sequences. Thus, when there is a galled-tree for the
+data, the solution solves the NP-hard problem defined by J. Hein of
+finding an evolutionary history of a set of binary sequences minimizing
+the number of (single-crossover) recombinations. See [2] for a proof of
+this fact.
+
+----
+Usage of galledtree.pl
+
+Usage in the default case that no ancestral sequence is specified
+
+perl galledtree.pl <inputfile>
+
+or
+
+perl galledtree.pl <inputfile> > <outputfile>
+
+As an example, try
+
+perl galledtree.pl example > exampleout
+
+There is a detailed explanation of the output for that example at the
+end of this file.
+
+Try the input file ``junk" for an example where there is no galled-tree
+for the input matrix.
+
+The input file can have multiple input matrices.  Each input matrix
+must be preceded with an identifier (any name you choose).  This is
+true even in files that only have a single matrix.
+
+
+-------
+Results
+
+Program galledtree.pl tests each matrix in the input file to see if the
+sequences in it can be derived on a galled-tree, where the ancestral
+sequence is not specified in advance.  It is known that if there is a
+galled-tree for an input matrix, then there is an optimal galled-tree
+(one that uses the fewest possible number of recombination nodes over
+all phylogenetic networks and all ancestral sequences) where the
+ancestral sequence is one of the input sequences. It is not true that
+every input sequence can be used as the ancestral sequence of a
+galled-tree for the sequences.
+
+If the program finds a galled-tree for a matrix, it displays an optimal
+galled-tree using a recursive format. A detailed explanation of this
+recursive format is found at the end of this file.  The program also
+states how many matrices in the input file have a galled-tree, and how
+many have a perfect phylogeny with some ancestral sequence.
+
+If there is no galled-tree for a matrix, the program describes the tree
+T_bar for the distinct columns in the matrix (see [2] or [3] for an
+explanation).
+
+---------
+Specifying an ancestral sequence in galledtree.pl
+
+If you want to specify a particular ancestral sequence, then add the
+flag ``r" or ``R" after the datafile, and the name of a file containing
+the specified ancestral sequence, unless the desired sequence is the
+all-0 sequence.
+
+Usage
+	perl galledtree.pl datafile [ [r | R] [file-specifying-root] ]
+
+A shortcut to all 0s root is
+	perl galledtree.pl data [r | R]
+
+Try the following for a demonstration
+
+1. perl galledtree.pl data r root1 
+2. perl galledtree.pl data r root2
+3. perl galledtree.pl data
+
+Note that there may not be a galled-tree with a particular ancestral
+sequence specified, but there is one with a different ancestral
+sequence, and hence there is one when no ancestral sequence is
+specified.
+
+--------- 
+Multiple Crossover Recombination 
+
+If you want to allow
+multiple crossovers at any recombination node, use program
+``multicross.pl" It may happen that multicross.pl  will find a
+galled-tree for an input matrix, while galledtree.pl will not.
+
+
+When multiple crossovers are allowed at a recombination event (node),
+there is a wider range of possible solutions and the program allows the
+user a choice between minimizing the total number of crossovers, and
+minimizing the maximum number of crossovers at any recombination event.
+Note that the number of recombination events (or recombination nodes in
+the network) is the same in either case, and is always equal to the
+number of non-trivial connected components in the incompatibility graph
+(see [2]).  When there is a galled-tree (with multiple crossovers) for
+the data, the number of recombination nodes is the minimum over all
+possible phylogenetic networks for the data.
+
+For example, suppose there are two galled-trees for some data, both
+with two galls, where the number of crossovers is (7,2) in the first
+solution and (5,5) in the second solution. Then,
+
+    (7,2) is the solution that minimizes the total number of
+    crossovers, and
+
+    (5,5) is the solution that minimizes the maximum number of
+    crossovers in any gall.
+
+---------
+Usage of multicross.pl 
+
+1) To get the solution that minimizes that the total number of
+crossover over all the galls, use:
+
+	    perl multicross.pl datafile > outputfile
+
+2) To get the solution that minimizes the maximum number of crossovers
+in any gall, use:
+
+		perl multicross.pl datafile 0 > outputfile
+
+For an example, try
+
+	    perl multicross.pl multidata > outputfile
+
+
+Try galledtree.pl on this data to see that this is a case where the
+data has no single crossover galled-tree, but it does have a multiple
+crossover galled-tree. Also, the two multicross.pl options give the
+same result in this case.
+
+----------
+Output of multicross.pl 
+
+The program produces a galled-tree in
+which the recombination sequence in a gall is produced as a result of
+one or more crossovers between the last nodes on the two sides of the
+gall. More than one binary data matrix can be in a file.  The output
+summarizes the number of matrices that have a solution and also the
+number of matrices with either a perfect phylogeny or single cross-over
+galled tree.
+
+Any galled-tree found by multicross.pl is described in essentially the
+same way as galled-trees found by galledtree.pl, except for the
+crossover(s) at a recombination node. Instead of specifying an interval
+where a single-crossover could occur (which is what galledtree.pl
+specifies), multicross.pl specifies a list of locations  where the
+sequence of crossovers could occur.
+
+----------------------
+
+
+A DETAILED EXPLANATION OF THE OUTPUT AND THE RECURSIVE FORMAT USED 
+TO DESCRIBE A GALLED TREE
+
+All of our programs use a recursive format to describe a galled tree.
+This recursive description generalizes a natural recursive way to
+describe trees (i.e., without cycles). This recursive
+description is fairly easy to read, but may be difficult to understand
+at first. Below we give a detailed explanation of the output of program
+galledtree.pl when run with the input file ``example", that contains
+two input matrices. A drawing of the galled tree for the first matrix is
+found in the file ``matrix1.pdf", and a drawing of the second galled
+tree is found in the file ``matrix2.pdf".  The actual output of program
+galledtree.pl run on file ``example" is in the file ``exampleout".
+After discussing these two examples, we give a more abstract
+explanation of the recursive format, and another, more elaborate, example.
+
+------------------------------------------------
+
+The output of galledtree.pl begins with a listing of one copy of each distinct
+row in the input.  The program removes duplicate rows and works with distinct rows.
+Sorry, if you want to put back the duplicate rows in the output, that
+is a simple (Perl, say) addon that you will have to write.
+
+Processing matrix "matrix1"...
+
+Unique rows matrix is
+000100 (row 1)
+100100 (row 2)
+001001 (row 3)
+101000 (row 4)
+011001 (row 5)
+011011 (row 6)
+001011 (row 7)
+
+
+The program then either states that there is no galled tree for the input, 
+or it describes the galled tree in a recursive format. When the program determines
+that there is no galled tree for the input, it gives one of several reasons why 
+there is no galled tree (the reasons may look like error messages, but they are not), 
+and it displays the tree T_bar (that part of the output will only be meaningful to 
+you if you have read the paper [2] on the algorithm behind the program). Try input
+file ``junk" for an example where there is no galled tree for the input.
+
+Below is the description of the galled tree found for matrix1 in file ``example". 
+
+The galled tree is...
+root (row 1) 000100
+  Gall interval = [2,3] recombination node = 100100 (row 2)
+    Prefix side
+    3,4 (row ?) 001000
+      6 (row 3) 001001
+        Gall interval = [3,5] recombination node = 011001 (row 5)
+          Prefix side
+          5 (row 7) 001011
+          2 (row 6) 011011
+          Suffix side
+          Below recombination node
+    1 (row 4) 101000
+    Suffix side
+    Below recombination node
+
+
+Below is the same recursive description, but now we have added lines and dashes 
+to help explain the description.  The key to understanding the output is to pay 
+attention to the (nested) indentations and the ``blocks".  
+
+The galled tree is...
+root (row 1) 000100
+   Gall interval = [2,3] recombination node = 100100 (row 2)
+    |Prefix side
+    |3,4 (row ?) 001000
+    |-|6 (row 3) 001001
+    |-|--Gall interval = [3,5] recombination node = 011001 (row 5)
+    |-|---|Prefix side
+    |-|---|5 (row 7) 001011
+    |-|---|2 (row 6) 011011
+    |-|---|Suffix side
+    |-|---|Below recombination node
+    |1 (row 4) 101000
+    |Suffix side
+    |Below recombination node
+
+The ancestral sequence at the
+root is 000100 which is the row 1 sequence in the matrix given above
+(not necessarily the input matrix because duplicate rows have been
+removed). Then before any mutations occur, a gall is started at the
+root of the network (indicated by gall header line: ``Gall interval =
+..."). The gall header starts a new ``block" that ends with the line
+``Below recombination node". The gall header line also states that the
+gall creates a recombinant sequence (at the recombination node of the
+gall) of 100100, which is row 2 of the matrix. The recombination
+interval for that gall is [2,3], meaning that the (single)
+recombination crossover could happen just before site 2 or just before
+site 3. The gall consists of a prefix side and a suffix side. The
+recombinant sequence is created by a recombination between the last
+sequence on the prefix side of the gall and the last sequence on the
+suffix side of the gall.  The description of the Prefix side of the
+gall starts with a prefix header line ``Prefix Side" and is indented
+from the gall header line. Similarly, the description of the Suffix
+side of the gall starts with a suffix header line and is indented from
+the gall header line, at the same level of indentation as the
+matching Prefix header.  
+
+The prefix side of the first gall has
+mutations at sites 3 and 4 on one edge of the gall, creating sequence
+001000, which is not any of the input sequences, and this is noted by
+the question mark in ``row ?". Then there is an indentation before the
+next line in the output, meaning that there is a branch off the gall at
+the end node of the edge with the mutations 3 and 4. This begins a new
+block. In this case, the block first contains an edge with a mutation
+at site 6, creating sequence 001001, which is row 3 of the matrix.
+Then there is an edge branching off the edge with the mutation for site
+6, leading to a second gall, and there is a new nested block in the
+output to describe the second gall.  The recombinant sequence of that
+second gall is 011001, which is row 5 in the matrix. The recombination
+interval is [3,5], meaning that the crossover could be just before site
+3, or site 4, or site 5. The prefix side of the second gall contains a
+mutation on one edge of the gall at site 5, creating row 7, followed by
+a mutation on another edge of the gall at site 2, creating row 6. There
+are no mutations noted between the suffix header ``Suffix side" and the
+``Below recombination node" line in the nesting for the second gall,
+meaning that there are no mutations on the suffix side of the  second
+gall.  Hence the recombination on the second gall is between sequences
+011011 (i.e, the last sequence on the prefix side) and sequence 001001,
+the ``last" sequence on the suffix side, which in this case is also the
+sequence at the coalescent node of the second gall. As claimed, the
+recombinant sequence 011011 results from a recombination between 011011
+and 001001, with the crossover just before sites 3,4, or 5.  Also,
+there is nothing in the second gall block below the ``Below
+recombination node", and so, there is nothing below the recombination
+node of the second gall, other than the leaf for the recombinant
+sequence.  
+
+The next line returns to the block for the first gall. It
+indicates a mutation at site 1 on the last edge on the prefix side of
+the FIRST gall. Again, there are no mutations on the suffix side of the
+first gall, and again the recombination node of the first gall only
+leads to a leaf node.
+
+The galled tree described above is drawn out in file matrix1.pdf. However, in
+the figure, if an edge out of a recombination node does not have a mutation on
+it, then it has been contracted, so that the galls are not shown as node disjoint, 
+although they are edge disjoint.
+
+Below is a more complex example, matrix2, where the galled-tree again contains
+two galls, but now both galls have mutations on both their prefix and
+the suffix sides. The galled tree described below is drawn out in file matrix2.pdf.
+On the prefix side of the first gall, there is a
+single edge with mutation 4, and an edge branching from that endpoint
+to a leaf labeled by row 3.  On the suffix side there is an edge with a
+mutation at site 3, and a branching edge at that point going to a leaf
+representing row 2. There is also an edge branching off the gall at
+that point containing mutation at site 5. That branching edge goes to a
+leaf representing row 4. Then back on the suffix side of the first
+gall, there is an edge with a mutation at site 6, creating a sequence
+that is not part of the input, and a branch off the gall at that point
+going to the start of a second gall. The second gall has a mutation at
+site 2 on the prefix side, and a branch off the gall at that point to a
+leaf for row 6; on the suffix side it has mutations at site 1 and 7,
+and two branching edges to leaves for rows 8 and 9.  After the
+description of the second gall is finished, the recursive description
+returns to the first gall, noting that its description is now
+finished.
+
+Processing matrix "matrix2"...
+
+Unique rows matrix is
+0101001 (row 1)
+0111001 (row 2)
+0100001 (row 3)
+0111101 (row 4)
+0100011 (row 5)
+0011011 (row 6)
+0011010 (row 7)
+1111011 (row 8)
+1111010 (row 9)
+
+
+
+The galled tree is...
+root (row 1) 0101001
+  Gall interval = [5,6] recombination node = 0100011 (row 5)
+    Prefix side
+    4 (row 3) 0100001
+    Suffix side
+    3 (row 2) 0111001
+      5 (row 4) 0111101
+    6 (row ?) 0111011
+      Gall interval = [3,7] recombination node = 0011010 (row 7)
+        Prefix side
+        2 (row 6) 0011011
+        Suffix side
+        1 (row 8) 1111011
+        7 (row 9) 1111010
+        Below recombination node
+    Below recombination node
+
+
+
+
+Result : 2/2 have galled trees (including 0 perfect phylogenies)
+
+The end of the output summarizes how many of the input matrices have
+galled trees, and specifically states how many of the input matrixes
+had perfect phylogenies.
+
+-----------------------------------------
+
+ANOTHER EXPLANATION OF THE RECURSIVE FORMAT
+
+In a simple tree with no recombinations, and hence no galls, the basic
+element is simply a node, and a parent-child relationship exists
+between adjacent nodes in the tree. A child node is indented to the
+right of the parent node. So, the extent of indentation of a node
+represents the depth of the node in the tree. The same idea is used to
+describe a galled tree. We could say that the basic element of a galled
+tree is either a node or a gall. If a gall is a child of a node, it is
+indented to the right of the node. Also, a gall could be a child of
+another gall, and the indentation rule still applies. The structure of
+a node (in the text output) is   "s (row R) <sequence>".
+
+ This means that the edge entering the node has a site mutation 's' and
+that there is a leaf (corresponding to row 'R' in input) for the
+sequence <sequence>. When a node has '(row ?)', it means that it does
+not correspond to any sequence in the input and that there is no edge
+branching from it that runs directly to a leaf.  Also, "root (row R)
+<sequence>" implies that the node is the root node and hence has no
+parent node or edge entering it. Consider the following portion of a
+galled tree output.
+
+    s (row A) <sequence1>
+      t (row B) <sequence2>
+
+This implies that the node corresponding to row B is an immediate
+child of the node corresponding to row A and that it is derived from
+its parent node after the mutation of site 't'. The structure of a gall
+is illustrated as follows.
+
+s (row A) <coalescent sequence>
+   Gall interval = [l,r] recombination node = <recombination sequence> (row R)
+     |Prefix side
+     |t (row B) <sequence1>
+     |u (row C) <sequence2>
+     |Suffix side
+     |v (row D) <sequence3>
+     |  vA (row E) <sequence4>
+     |    vAA (row F) <sequence5>
+     |w (row G) <sequence6>
+     |  Gall interval = [l2,r2] recombination node = <recombination sequence2> (row L)
+     |    Prefix side
+     |    y (row J) <sequence9>
+     |    Suffix side
+     |    z (row K) <sequence10>
+     |    Below recombination node
+     |Below recombination node
+     |x (row H) <sequence7>
+     |   xA (row I) <sequence8>
+
+
+The above portion of the output describes a gall with the
+coalescent sequence <coalescent sequence> corresponding to row A.
+The prefix side of the gall has two nodes <sequence1> and <sequence2>.
+The nodes on the same side of a gall are ordered sequentially and the
+adjacent nodes have a parent-child relationship. Note that although the
+node <sequence1> is the parent of the node <sequence2> in the prefix
+side, they are NOT indented in the output. This is the one major way
+that the description of the edges on a gall differ from the general
+parent-child format in a tree. The reason for not indenting is that it
+is clear that those edges are on a gall, and hence are sequential, and
+indentation is reserved for edges off of any gall. The suffix side of
+the gall also has two nodes <sequence3> and <sequence6>.  However,
+there is a subtree branching below <sequence3>. <sequence4> branches
+away from the gall and is the child of <sequence3>. Also, <sequence5>
+is the child of <sequence4>.  Also, there is another gall branching
+below <sequence6> and away from the gall under discussion. At this
+point, notice how the galled tree can be defined in terms of
+sub-galled trees, which in turn are small galled trees themselves. The
+last leaf sequence on the prefix and suffix sides (i.e, <sequence2> and
+<sequence3>) recombine (with a single crossover) in any intersite
+interval just before any site in the interval from l (that is ``ell")
+to r (``arr").  The recombinant sequence that is generated is written
+sequence <recombination sequence>. Note that <sequence5> does not
+branch off of the first gall, but rather is part of a tree structure
+that itself has branched off of the first gall.  The last mutation on
+the suffix side of  the first gall is at site w, and mutation is
+described after the description of the edges that lead to <sequence
+5>.  Note that the subtree that leaves the recombination node of the
+first gall, generating <sequence7> and <sequence8> is described after
+the description of the second gall.
+
+Sometimes, there may not be any nodes on the prefix or suffix side of a
+gall. For example,
+
+s (row A) <coalescent sequence>
+   Gall interval = [l,r] recombination node = <recombination sequence> (row R)
+     Prefix side t (row B) <sequence1> Suffix side Below recombination
+     node
+
+denotes a gall with no node on the suffix side. In this case, the
+<coalescent sequence> is considered as the last sequence on the suffix
+side.  Also, there may not be any node below the recombination node as
+shown above.  There could also be one or more nodes/galls immediately
+below the recombination node.
+
+For a more elaborate example, see elaborate.txt for the input, elaborateout
+for the output, and elaborate.pdf for a drawing of the output. In this example,
+the galled tree has five galls.
+
+-------------------------
+
+BIBLIOGRAPHY
+
+[1]     2004    D. Gusfield and S. Eddhu and C. Langley.  
+OPTIMAL, EFFICIENT RECONSTRUCTION OF PHYLOGENETIC NETWORKS WITH CONSTRAINED RECOMBINATION.  
+Journal of Bioinformatics and Computational Biology, vol 2, No 1. p. 173-213
+
+[2]    2004  D. Gusfield. 
+OPTIMAL, EFFICIENT RECONSTRUCTION OF ROOT-UNKNOWN PHYLOGENETIC NETWORKS WITH 
+CONSTRAINED AND STRUCTURED RECOMBINATION. - UCD Technical Report CSE-2004-32
+
+[3]    2004  D. Gusfield.
+A Fundamental Decomposition Theory for Phylogenetic Networks and Incompatible Characters.
+UCD Technical Report CSE-2004-33
+
+Papers of related interest:
+
+D. Gusfield and D. Hickerson. 
+A New Fundamental, Efficiently-Computed Lower Bound on the Number of Recombinations
+Needed in Phylogenetic Networks - UCD Technical Report CS-2004-6
+
+and
+
+D. Gusfield and S. Eddhu and C. Langley.
+The Fine Structure of Galls in Phylogenetic Networks.  
+to appear in  INFORMS J. on Computing, special issue on computational biology.
+
+------------------------
+
+LEGAL DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS OF THE UNIVERSITY OF
+CALIFORNIA AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT  NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE. NO COMMERCIAL USE OR COMMERCIAL 
+REDISTRIBUTION OF THIS SOFTWARE IS AUTHORIZED. ANY PUBLICATION
+BASED ON THE USE OF THIS SOFTWARE MUST EXPLICITLY ACKNOWLEDGE ITS
+USE AND SHOULD CITE THE APPROPRIATE PAPER(S) LISTED IN THE README
+FILE.
+
+October 11, 2004
