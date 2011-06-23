@@ -59,6 +59,7 @@ SET (imr_SRCS
   "imrEdge.h"
   "imrSequence.cpp"
   "imrSequence.h"
+  "imrType.h"
 )
 
 SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wwrite-strings -g3 -ggdb -O0")
@@ -84,6 +85,8 @@ pushd ..;./c;popd;cmake ..;make
 \section{Overview of IMR}
 \subsection{To Do}
 \begin{enumerate}
+\item Use fastsimcoal or Excoffier2011 method to simulate data and test it.
+\item Convert fastsimcoal output to XML input files using PERL.
 \item Code the structure of recombinant branches. 
 \item Code the update of recombinant branches using Kuhner2000 method.
 \item Build an initial recombinant tree using Gusfield2004 method.
@@ -93,8 +96,6 @@ pushd ..;./c;popd;cmake ..;make
 \item Recode the computation of prior of recombinant trees.
 \item Code the update of splitting time using Rannala2003 method.
 \item Code the update of migration events using Beerli1999 method.
-\item Use fastsimcoal or Excoffier2011 method to simulate data and test it.
-\item Convert fastsimcoal output to XML input files using PERL.
 \item Convert galledtree output to XML input file for recombinant tree.
 \item Find examples with long sequences to work with.
 \item Write a manuscript.
@@ -151,11 +152,13 @@ I need to compute the probability of data given a recombinant tree.
 <<imr.cpp>>=
 <<imr gnu copyright>>
 #include <iostream>
+#include "imrTree.h"
 using namespace std;
+using namespace imr;
 
 int main ()
 {
-  cout << "Hello World!";
+  Tree t("Hello World!");
   return 0;
 }
 
@@ -164,30 +167,54 @@ int main ()
 
 @
 \subsection{recombinant tree}
-A recombinant tree.
+A recombinant tree. 
+
+Tree() creates a tree with nothing.
+
+Tree(NUMBER numLeaf) creates a tree with numLeaf-many terminal nodes.
+
+Tree(const char* filename) creates a tree using the file. A file is in XML
+format.
+
+~Tree() should destroy all edges.
 <<imrTree.h>>=
 <<imr gnu copyright>>
+#include "imrType.h"
 #include "imrEdge.h"
-
 namespace imr {
 class Tree {
   private:
     Edge* root;
   public:
     Tree();
+    Tree(NUMBER numLeaf);
+    Tree(const char* filename);
     ~Tree();
 };
 }
 
 <<imrTree.cpp>>=
 <<imr gnu copyright>>
+#include <iostream>
+#include "imrTree.h"
 namespace imr {
 Tree::Tree()
 {
 }
+
+Tree::Tree(NUMBER numLeaf)
+{
+}
+
+Tree::Tree(const char* filename)
+{
+  std::cout << filename << std::endl;
+}
+
 Tree::~Tree()
 {
 }
+
 }
 
 @
@@ -211,6 +238,7 @@ class Edge {
 
 <<imrEdge.cpp>>=
 <<imr gnu copyright>>
+#include "imrEdge.h"
 namespace imr {
 Edge::Edge()
 {
@@ -234,7 +262,12 @@ namespace imr {
 namespace imr {
 
 }
-
+@
+\subsection{Data types}
+A few data types are redefined.
+<<imrType.h>>=
+<<imr gnu copyright>>
+typedef unsigned int NUMBER;
 @
 \section{Manuscript}
 

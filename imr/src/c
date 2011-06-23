@@ -9,7 +9,8 @@ CPPFILE=( imr.cpp \
 HPPFILE=( imr.h \
           imrTree.h \
           imrEdge.h \
-          imrSequence.h )
+          imrSequence.h \
+          imrType.h )
 
 notangle -RCMakeLists.txt $NOWEBFILE > CMakeLists.txt
 
