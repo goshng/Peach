@@ -1,0 +1,25 @@
+#!/bin/bash
+
+NOWEBFILE=/Users/goshng/Documents/Projects/peach/imr/noweb/imr.nw
+
+CPPFILE=( imr.cpp \
+          imrTree.cpp \
+          imrEdge.cpp \
+          imrSequence.cpp )
+HPPFILE=( imr.h \
+          imrTree.h \
+          imrEdge.h \
+          imrSequence.h )
+
+notangle -RCMakeLists.txt $NOWEBFILE > CMakeLists.txt
+
+for f in ${CPPFILE[@]}; do
+  notangle -L -R$f $NOWEBFILE > $f
+done
+
+for f in ${HPPFILE[@]}; do
+  notangle -R$f $NOWEBFILE | cpif $f
+done
+
+
+# sed s/DATETIME/$(date +%m%d%y%H%M%S)/g < config-common.h.in > config-common.h

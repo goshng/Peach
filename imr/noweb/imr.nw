@@ -13,10 +13,8 @@
 
 \title{Isolation, Migration, and Recombination Model}
 \author{Sang Chul Choi\\
-Dept.\ of Genetics, Rutgers University,\\
-Piscataway, NJ 08854,\\
-Dept.\ of Biological Statistics & Computational Biology, Cornell University,\\
-Ithaca, NY 14853}
+\\
+Rutgers University, and Cornell University}
 
 \maketitle
 
@@ -25,7 +23,9 @@ Ithaca, NY 14853}
 \newpage{}
 \section{History}
 \begin{enumerate}
-\item Wed Mar  3 12:24:01 EST 2010: I started to code recombinant trees.
+\item Wed Jun 22 14:54:40 EDT 2011: I started to focus on infinite-sites
+mutation model.
+\item Wed Mar  3 18:44:01 EST 2010: I started to code recombinant trees.
 \end{enumerate}
 
 \newpage{}
@@ -39,19 +39,63 @@ $ cd debug
 $ cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
 \end{Verbatim}
 
+\subsection{Build imr}
+<<CMakeLists.txt>>=
+PROJECT (imr)
+SET (imr_SRCS 
+  "SimpleGlob.h"
+  "SimpleOpt.h"
+  "tinystr.cpp"
+  "tinystr.h"
+  "tinyxml"
+  "tinyxml.cpp"
+  "tinyxml.h"
+  "tinyxmlerror.cpp"
+  "tinyxmlparser.cpp"
+  "imr.cpp"
+  "imrTree.cpp"
+  "imrTree.h"
+  "imrEdge.cpp"
+  "imrEdge.h"
+  "imrSequence.cpp"
+  "imrSequence.h"
+)
+
+SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wwrite-strings -g3 -ggdb -O0")
+
+ADD_EXECUTABLE (imr ${imr_SRCS})
+
+@
+\subsection{Debug imr}
+When you add a new source file, change [[CMakeLists.txt]].
+
+Create a [[build]] directory at the src directory.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+mkdir build
+\end{Verbatim}
+
+In the [[build]] execute the following line to build imr.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+pushd ..;./c;popd;cmake ..;make
+\end{Verbatim}
+
+@
 \newpage{}
 \section{Overview of IMR}
 \subsection{To Do}
 \begin{enumerate}
+\item Code the structure of recombinant branches. 
+\item Code the update of recombinant branches using Kuhner2000 method.
+\item Build an initial recombinant tree using Gusfield2004 method.
 \item Specify the XML input/output file format, and code it using tinyXML.
 \item Code the recombinant tree parameter.
 \item Code the species tree parameter.
-\item Build an initial recombinant tree using Gusfield2004 method.
 \item Recode the computation of prior of recombinant trees.
 \item Code the update of splitting time using Rannala2003 method.
-\item Code the update of recombinant branches using Kuhner2000 method.
 \item Code the update of migration events using Beerli1999 method.
 \item Use fastsimcoal or Excoffier2011 method to simulate data and test it.
+\item Convert fastsimcoal output to XML input files using PERL.
+\item Convert galledtree output to XML input file for recombinant tree.
 \item Find examples with long sequences to work with.
 \item Write a manuscript.
 \item Publish the code with the submission of the manuscript.
@@ -62,9 +106,153 @@ We present the features developed during the development of IMR.
 All test data sets and command lines are provided in each of subsections that
 follow.
 \begin{enumerate}
-\item A single population model of IMR, and
-\item Two-population demographics.
+\item A single population model of IMR with infinite-sites data, and
+\item Two-population demographics of IMR with infinite-sites data.
 \end{enumerate}
+
+
+\section{Commmand line options}
+
+\section{Simulations}
+
+\section{Real Data}
+
+\section{Demographics: species or population tree}
+
+\section{Recombinant tree}
+I build a recombinant tree and construct ways of changing the recombinant tree.
+
+\section{Likelihood of data given a recombinant tree}
+I need to compute the probability of data given a recombinant tree.
+
+\section{Probability of a recombinant tree given a species tree}
+
+\section{Code}
+\subsection{Copyright}
+<<imr gnu copyright>>=
+// This file is a part of IMR.
+//
+// IMR is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+// 
+// IMamp is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with IMR.  If not, see <http://www.gnu.org/licenses/>.
+
+@
+\subsection{The main program: imr}
+
+<<imr.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+using namespace std;
+
+int main ()
+{
+  cout << "Hello World!";
+  return 0;
+}
+
+<<imr.h>>=
+<<imr gnu copyright>>
+
+@
+\subsection{recombinant tree}
+A recombinant tree.
+<<imrTree.h>>=
+<<imr gnu copyright>>
+#include "imrEdge.h"
+
+namespace imr {
+class Tree {
+  private:
+    Edge* root;
+  public:
+    Tree();
+    ~Tree();
+};
+}
+
+<<imrTree.cpp>>=
+<<imr gnu copyright>>
+namespace imr {
+Tree::Tree()
+{
+}
+Tree::~Tree()
+{
+}
+}
+
+@
+\subsection{recombinant edge}
+A recombinant edge.
+<<imrEdge.h>>=
+<<imr gnu copyright>>
+namespace imr {
+class Edge {
+  private:
+    Edge* left;
+    Edge* right;
+    Edge* downLeft;
+    Edge* downRight;
+    double time;
+  public:
+    Edge();
+    ~Edge();
+};
+}
+
+<<imrEdge.cpp>>=
+<<imr gnu copyright>>
+namespace imr {
+Edge::Edge()
+{
+}
+Edge::~Edge()
+{
+}
+}
+
+@
+\subsection{Sequence}
+A sequence data for each node.
+<<imrSequence.h>>=
+<<imr gnu copyright>>
+namespace imr {
+
+}
+
+<<imrSequence.cpp>>=
+<<imr gnu copyright>>
+namespace imr {
+
+}
+
+@
+\section{Manuscript}
+
+@
+\pagebreak{}
+
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{imr}
+\bibliography{imr}
+
+\end{document}
+
+Some sites
+http://ooc-lang.org
+github 
+http://www.parrot.org
+http://rakudo.org
+
 
 \paragraph{sim2 run ima2 with assignment single}
 This is IMa2 command line options for two population.
@@ -2739,24 +2927,6 @@ __END_DECLS
 
 <<hey nielsen copyright>>=
 /* IMa2  2007-2009 Jody Hey, Rasmus Nielsen and Sang Chul Choi */
-
-<<ima gnu copyright>>=
-/**
- * This file is a part of IMamp.
- * 
- * IMamp is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
- * 
- * IMamp is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with IMamp.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 @
 \subsection{Useful commands for working with this noweb file}
@@ -20413,19 +20583,3 @@ imaFileTiAppend (const char *fname, int gi)
   return 0; 
 
 }
-
-@
-\pagebreak{}
-
-\addcontentsline{toc}{section}{References}
-\bibliographystyle{imr}
-\bibliography{imr}
-
-\end{document}
-
-Some sites
-http://ooc-lang.org
-github 
-http://www.parrot.org
-http://rakudo.org
-
