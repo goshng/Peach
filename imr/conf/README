@@ -1,0 +1,27 @@
+# Main Configuration File
+# =======================
+# Edit the following
+#
+PROJECTNAME:[STRING with no spaces]
+#
+# Local Machine
+# -------------
+NUMBERCPU:[POSITIVE INTEGER]
+#
+# Cluster ID setup
+# ----------------
+CAC_USERNAME:[USER ID]
+CAC_LOGIN:[URL for SSH login]
+CAC_ROOT:[Directory relative to home]
+#
+# Cluster access for job submission
+# --------------------------------
+BATCHEMAIL:[Email Address]
+BATCHACCESS:[Access ID]
+QUEUENAME:[Queue Name]
+
+#
+# Global setup
+# ------------
+IMR:src/build/imr
+FSC:fastsimcoal

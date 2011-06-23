@@ -80,8 +80,6 @@ In the [[build]] execute the following line to build imr.
 pushd ..;./c;popd;cmake ..;make
 \end{Verbatim}
 
-@
-\newpage{}
 \section{Overview of IMR}
 \subsection{To Do}
 \begin{enumerate}
@@ -115,6 +113,10 @@ follow.
 \section{Commmand line options}
 
 \section{Simulations}
+
+\subsection{fastsimcoal}
+
+
 
 \section{Real Data}
 
