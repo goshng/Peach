@@ -23,6 +23,9 @@ Rutgers University, and Cornell University}
 \newpage{}
 \section{History}
 \begin{enumerate}
+\item Sat Jul  9 00:32:06 EDT 2011: TinyXML packages are used.
+\item Tue Jul  5 20:58:13 EDT 2011: A recombinant tree is created using
+sequentially sampled gene trees.
 \item Wed Jun 22 14:54:40 EDT 2011: I started to focus on infinite-sites
 mutation model.
 \item Wed Mar  3 18:44:01 EST 2010: I started to code recombinant trees.
@@ -47,7 +50,6 @@ SET (imr_SRCS
   "SimpleOpt.h"
   "tinystr.cpp"
   "tinystr.h"
-  "tinyxml"
   "tinyxml.cpp"
   "tinyxml.h"
   "tinyxmlerror.cpp"
@@ -60,6 +62,18 @@ SET (imr_SRCS
   "imrSequence.cpp"
   "imrSequence.h"
   "imrType.h"
+  "imrHelp.cpp"
+  "imrHelp.h"
+  "imrXmlFastsimcoal.cpp"
+  "imrXmlFastsimcoal.h"
+  "imrXmlImrInput.cpp"
+  "imrXmlImrInput.h"
+  "imrXmlImrOutput.cpp"
+  "imrXmlImrOutput.h"
+  "imrDefault.cpp"
+  "imrDefault.h"
+  "imrXml.cpp"
+  "imrXml.h"
 )
 
 SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wwrite-strings -g3 -ggdb -O0")
@@ -68,7 +82,8 @@ ADD_EXECUTABLE (imr ${imr_SRCS})
 
 @
 \subsection{Debug imr}
-When you add a new source file, change [[CMakeLists.txt]].
+When you add a new source file, change [[CMakeLists.txt]]. You also need to
+change [[c]] file in the [[src]] directory.
 
 Create a [[build]] directory at the src directory.
 \begin{Verbatim}[frame=lines,framesep=5mm]
@@ -83,21 +98,27 @@ pushd ..;./c;popd;cmake ..;make
 \section{Overview of IMR}
 \subsection{To Do}
 \begin{enumerate}
-\item Use fastsimcoal or Excoffier2011 method to simulate data and test it.
-\item Convert fastsimcoal output to XML input files using PERL.
 \item Code the structure of recombinant branches. 
 \item Code the update of recombinant branches using Kuhner2000 method.
-\item Build an initial recombinant tree using Gusfield2004 method.
-\item Specify the XML input/output file format, and code it using tinyXML.
+\item Use fastsimcoal or Excoffier2011 method to simulate data and test it.
 \item Code the recombinant tree parameter.
 \item Code the species tree parameter.
 \item Recode the computation of prior of recombinant trees.
 \item Code the update of splitting time using Rannala2003 method.
 \item Code the update of migration events using Beerli1999 method.
-\item Convert galledtree output to XML input file for recombinant tree.
 \item Find examples with long sequences to work with.
 \item Write a manuscript.
 \item Publish the code with the submission of the manuscript.
+\item Build an initial recombinant tree using Gusfield2004 method (not
+work).
+\item Convert galledtree output to XML input file for recombinant tree. (not
+work)
+\item Specify the XML input/output file format, and code it using tinyXML.
+(tried)
+\item Convert fastsimcoal output to XML input files using PERL. I can easily
+parse a simple XML file. Let's convert fastsimcoal output files into an imr
+input file. I will use a perl script for that. Two input files and one output
+file. (tried)
 \end{enumerate}
 
 \subsection{Features of IMR}
@@ -115,8 +136,7 @@ follow.
 \section{Simulations}
 
 \subsection{fastsimcoal}
-
-
+Use menu *convert-fsc-to-imr* to convert a Fastsimcoal file to an imr input file.
 
 \section{Real Data}
 
@@ -149,31 +169,179 @@ I need to compute the probability of data given a recombinant tree.
 // along with IMR.  If not, see <http://www.gnu.org/licenses/>.
 
 @
-\subsection{The main program: imr}
+\subsection{Main program [[imr]]}
 
 <<imr.cpp>>=
 <<imr gnu copyright>>
 #include <iostream>
+#include "SimpleOpt.h"
+#include "SimpleGlob.h"
 #include "imrTree.h"
+#include "imrHelp.h"
+#include "imrXmlFastsimcoal.h"
+#include "imrXmlImrInput.h"
+#include "imrXmlImrOutput.h"
+#include "imrDefault.h"
+#include "imrXml.h"
 using namespace std;
 using namespace imr;
 
-int main ()
+static string sInfile;
+static string sOutfile;
+static int sCommand;
+static int sXmlPrint = 0;
+
+enum 
 {
-  Tree t("Hello World!");
+  OPT_XML_PRINT_DEFAULT = 1,
+  OPT_XML_PRINT_FASTSIMCOAL,
+  OPT_XML_PRINT_IMRINPUT,
+  OPT_XML_PRINT_IMROUTPUT
+};
+
+enum { 
+    OPT_HELP, 
+    OPT_INFILE,
+    OPT_OUTFILE,
+    OPT_VERSION,
+    OPT_MCMC,
+    OPT_SUMMARIZE,
+    OPT_LIKELIHOOD,
+    OPT_PRIOR,
+    OPT_XML,
+    OPT_PRINT,
+    OPT_FOO, 
+    OPT_BAR, 
+    OPT_HOGE 
+};
+CSimpleOpt::SOption g_rgOptions[] = {
+    // ID       TEXT          TYPE
+    { OPT_FOO,  "-a",     SO_NONE    }, // "-a"
+    { OPT_BAR,  "-b",     SO_NONE    }, // "-b"
+    { OPT_HOGE, "-f",     SO_REQ_SEP }, // "-f ARG"
+    { OPT_PRINT, "-p",     SO_REQ_SEP },
+    { OPT_PRINT, "--print", SO_REQ_SEP },
+    { OPT_HELP, "-?",     SO_NONE    },
+    { OPT_HELP, "--help", SO_NONE    },
+    { OPT_INFILE, "-i",     SO_REQ_SEP },
+    { OPT_INFILE, "--infile",   SO_REQ_SEP },
+    { OPT_OUTFILE, "-o",     SO_REQ_SEP },
+    { OPT_OUTFILE, "--outfile",   SO_REQ_SEP },
+    { OPT_VERSION, "--version", SO_NONE },
+    // Commands
+    { OPT_MCMC, "mcmc", SO_NONE },
+    { OPT_SUMMARIZE, "summarize", SO_NONE },
+    { OPT_LIKELIHOOD, "likelihood", SO_NONE },
+    { OPT_PRIOR, "prior", SO_NONE },
+    { OPT_XML, "xml", SO_NONE },
+    SO_END_OF_OPTIONS                       // END
+};
+
+int 
+main (int argc, char* argv[])
+{
+  if (argc == 1)
+    {
+      Help::full ();
+      return 0;
+    }
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_HELP) 
+            {
+              Help::full ();
+              return 0;
+            }
+          else if (args.OptionId() == OPT_VERSION) 
+            {
+              Help::version ();
+            }
+          else if (args.OptionId() == OPT_OUTFILE) 
+            {
+              sOutfile = args.OptionArg();
+            }
+          else if (args.OptionId() == OPT_INFILE) 
+            {
+              sInfile = args.OptionArg();
+            }
+          else if (args.OptionId() == OPT_MCMC) 
+            {
+              cout << "Start MCMC ..." << endl;
+            }
+          else if (args.OptionId() == OPT_SUMMARIZE) 
+            {
+              cout << "Summarizing a posterior sample ..." << endl;
+            }
+          else if (args.OptionId() == OPT_LIKELIHOOD) 
+            {
+              cout << "Computing the likelihood of a recombinant tree ..." << endl;
+            }
+          else if (args.OptionId() == OPT_PRIOR) 
+            {
+              cout << "Computing the prior of a recombinant tree..." << endl;
+            }
+          else if (args.OptionId() == OPT_XML) 
+            {
+              sCommand = OPT_XML;
+            }
+          else if (args.OptionId() == OPT_PRINT) 
+            {
+              sXmlPrint = atoi(args.OptionArg());
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+
+  switch (sCommand)
+    {
+    case OPT_XML:
+      if (sXmlPrint == OPT_XML_PRINT_DEFAULT) 
+        {
+          Default::save (sOutfile.c_str());
+        }
+      else if (sXmlPrint == OPT_XML_PRINT_FASTSIMCOAL) 
+        {
+          XmlFastsimcoal::save (sOutfile.c_str());
+        }
+      else if (sXmlPrint == OPT_XML_PRINT_IMRINPUT) 
+        {
+          XmlImrInput::save (sOutfile.c_str());
+        }
+      else if (sXmlPrint == OPT_XML_PRINT_IMROUTPUT) 
+        {
+          XmlImrOutput::save (sOutfile.c_str());
+        }
+      else
+        {
+          Xml::readFastsimcoal (sInfile);
+        }
+      
+      break;
+    default:
+      break;
+    }
   return 0;
 }
 
 <<imr.h>>=
 <<imr gnu copyright>>
+#ifndef _IMR_H_
+#define _IMR_H_
 
+#endif // _IMR_H_
 @
-\subsection{recombinant tree}
+\subsection{Recombinant tree}
 A recombinant tree. 
 
 Tree() creates a tree with nothing.
 
-Tree(NUMBER numLeaf) creates a tree with numLeaf-many terminal nodes.
+Tree(NUMBER numLeaf) creates a tree with [[numLeaf]]-many terminal nodes.
 
 Tree(const char* filename) creates a tree using the file. A file is in XML
 format.
@@ -181,6 +349,8 @@ format.
 ~Tree() should destroy all edges.
 <<imrTree.h>>=
 <<imr gnu copyright>>
+#ifndef _IMRTREE_H_
+#define _IMRTREE_H_
 #include "imrType.h"
 #include "imrEdge.h"
 namespace imr {
@@ -194,7 +364,7 @@ class Tree {
     ~Tree();
 };
 }
-
+#endif // _IMRTREE_H_
 <<imrTree.cpp>>=
 <<imr gnu copyright>>
 #include <iostream>
@@ -224,6 +394,8 @@ Tree::~Tree()
 A recombinant edge.
 <<imrEdge.h>>=
 <<imr gnu copyright>>
+#ifndef _IMREDGE_H_
+#define _IMREDGE_H_
 namespace imr {
 class Edge {
   private:
@@ -237,7 +409,7 @@ class Edge {
     ~Edge();
 };
 }
-
+#endif // _IMREDGE_H_
 <<imrEdge.cpp>>=
 <<imr gnu copyright>>
 #include "imrEdge.h"
@@ -255,10 +427,12 @@ Edge::~Edge()
 A sequence data for each node.
 <<imrSequence.h>>=
 <<imr gnu copyright>>
+#ifndef _IMRSEQUENCE_H_
+#define _IMRSEQUENCE_H_
 namespace imr {
 
 }
-
+#endif // _IMRSEQUENCE_H_
 <<imrSequence.cpp>>=
 <<imr gnu copyright>>
 namespace imr {
@@ -269,10 +443,825 @@ namespace imr {
 A few data types are redefined.
 <<imrType.h>>=
 <<imr gnu copyright>>
+#ifndef _IMRTYPE_H_
+#define _IMRTYPE_H_
 typedef unsigned int NUMBER;
+#endif // _IMRTYPE_H_
+@
+\subsection{Online help}
+
+<<imrHelp.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRHELP_H_
+#define _IMRHELP_H_
+namespace imr {
+class Help {
+public:
+  static void full ();
+  static void version ();
+};
+}
+#endif // _IMRHELP_H_
+<<imrHelp.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include "imrHelp.h"
+using namespace std;
+namespace imr {
+void 
+Help::full ()
+{
+  cout << ""
+"IMR(1)                          IMR Commands Manual                       IMR(1)\n"
+"\n"
+"NAME\n"
+"   imr -- Isolation, migration, and recombination\n"
+"\n"
+"SYNOPSIS\n"
+"   imr [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The program implements a statistical method of estimating population sizes,\n"
+"   migration rates, and recombination rates using infinite-sites data.\n"
+"   The method is described in papers (Choi 2011).\n"
+"\n"
+"   Options:\n"
+"      -h --help -?\n"
+"         Shows this help message.\n"
+"      --version\n"
+"         Shows the version.\n"
+"      -i --infile [INFILE]\n"
+"         Reads in an input file.\n"
+"      --type\n"
+"         Input and output files are in XML format.\n" 
+"\n"
+"   Commands:\n"
+"      mcmc\n"
+"         Samples recombinant trees.\n"
+"      summarize\n"
+"         Summarizes a posterior sample of recombinant trees.\n"
+"      likelihood\n"
+"         Computes the likelihod of a recombinant tree given data.\n"
+"      prior\n"
+"         Computes the prior of a recombinant tree given model parameters.\n"
+"      xml\n"
+"         Reads and writes XML files.\n"
+"\n"
+"   Command xml options:\n"
+"      -p --print [NUMBER]\n"
+"         1 Default setting\n"
+"         2 fastsimcoal file\n"
+"         3 imr input file\n"
+"         4 imr output file\n"
+"\n"
+"   Files:\n"
+"      INFILE\n"
+"         Different commands can be combined with different formats of input\n"
+"         files. An input file with command xml is an XML file.\n" 
+"      OUTFILE\n"
+"\n"
+"   Usages:\n"
+"      imr xml --infile INFILE\n"
+"         Reads in an XML file, and prints it out to standard output.\n"
+"      imr xml --print 1 -o default.xml\n" 
+"         Prints the imr default setting\n"
+"\n"
+"AUTHOR\n"
+"   Written by Sang Chul Choi, and Jody Hey\n"
+"\n"
+"REPORTING BUGS\n"
+"   Report bugs to google group of Isolation with Migration\n"
+"   at http://groups.google.com/group/isolation-with-migration\n"
+"\n"
+"VERSION\n"
+"   imr 1.0 - Build IMRBUILDDATETIME\n"
+"\n"
+"COPYRIGHT\n"
+"   Copyright (C) 2011- Sang Chul Choi, and Jody Hey\n"
+"   See the source for copying conditions.\n"
+"   There is NO warranty; not even for MERCHANTABILITY\n"
+"\n"
+"GNU imr 1.0                     December 2011                             IMR(1)\n"
+"";
+}
+void 
+Help::version ()
+{
+  cout << ""
+"imr 1.0 - Build IMRBUILDDATETIME\n"
+"Written by Sang Chul Choi, and Jody Hey.\n"
+"\n"
+"Copyright (c) 2011- Sang Chul Choi, and Jody Hey\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"";
+}
+}
+@
+\subsection{XML files}
+<<imrXml.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRXML_H_
+#define _IMRXML_H_
+#include <string>
+#include "tinystr.h"
+#include "tinyxml.h"
+namespace imr {
+class Xml {
+private:
+  static const unsigned int NUM_INDENTS_PER_SPACE=2;
+  
+public:
+  static int readFastsimcoal (const std::string&);
+  static void build_simple_doc ();
+  static void write_app_settings_doc ();
+  static void dump_to_stdout(const char* pFilename);
+  static void dump_to_stdout( TiXmlNode* pParent, unsigned int indent = 0 );
+  static int dump_attribs_to_stdout(TiXmlElement* pElement, unsigned int indent);
+  static const char * getIndentAlt( unsigned int numIndents );
+  static const char * getIndent( unsigned int numIndents );
+};
+}
+#endif // _IMRXML_H_
+<<imrXml.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include <string>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrXml.h"
+using namespace std;
+namespace imr {
+int 
+Xml::readFastsimcoal (const string& f)
+{
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+  TiXmlElement * element = new TiXmlElement( "Hello" );
+  TiXmlText * text = new TiXmlText( "World" );
+  element->LinkEndChild( text );
+  doc.LinkEndChild( decl );
+  doc.LinkEndChild( element );
+  doc.SaveFile (f.c_str());
+  return 0;
+}
+void 
+Xml::build_simple_doc ()
+{
+  // Make xml: <?xml ..><Hello>World</Hello>
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+  TiXmlElement * element = new TiXmlElement( "Hello" );
+  TiXmlText * text = new TiXmlText( "World" );
+  element->LinkEndChild( text );
+  doc.LinkEndChild( decl );
+  doc.LinkEndChild( element );
+  doc.SaveFile( "madeByHand.xml" );
+}
+void 
+Xml::write_app_settings_doc( )  
+{  
+  TiXmlDocument doc;  
+  TiXmlElement* msg;
+  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );  
+  doc.LinkEndChild( decl );  
+ 
+  TiXmlElement * root = new TiXmlElement( "MyApp" );  
+  doc.LinkEndChild( root );  
+
+  TiXmlComment * comment = new TiXmlComment();
+  comment->SetValue(" Settings for MyApp " );  
+  root->LinkEndChild( comment );  
+ 
+  TiXmlElement * msgs = new TiXmlElement( "Messages" );  
+  root->LinkEndChild( msgs );  
+ 
+  msg = new TiXmlElement( "Welcome" );  
+  msg->LinkEndChild( new TiXmlText( "Welcome to MyApp" ));  
+  msgs->LinkEndChild( msg );  
+ 
+  msg = new TiXmlElement( "Farewell" );  
+  msg->LinkEndChild( new TiXmlText( "Thank you for using MyApp" ));  
+  msgs->LinkEndChild( msg );  
+ 
+  TiXmlElement * windows = new TiXmlElement( "Windows" );  
+  root->LinkEndChild( windows );  
+
+  TiXmlElement * window;
+  window = new TiXmlElement( "Window" );  
+  windows->LinkEndChild( window );  
+  window->SetAttribute("name", "MainFrame");
+  window->SetAttribute("x", 5);
+  window->SetAttribute("y", 15);
+  window->SetAttribute("w", 400);
+  window->SetAttribute("h", 250);
+
+  TiXmlElement * cxn = new TiXmlElement( "Connection" );  
+  root->LinkEndChild( cxn );  
+  cxn->SetAttribute("ip", "192.168.0.1");
+  cxn->SetDoubleAttribute("timeout", 123.456); // floating point attrib
+  
+  dump_to_stdout( &doc );
+  doc.SaveFile( "appsettings.xml" );  
+} 
+// ----------------------------------------------------------------------
+// STDOUT dump and indenting utility functions
+// ----------------------------------------------------------------------
+
+const char * 
+Xml::getIndent( unsigned int numIndents )
+{
+  static const char * pINDENT="                                      + ";
+  static const unsigned int LENGTH=strlen( pINDENT );
+  unsigned int n=numIndents*NUM_INDENTS_PER_SPACE;
+  if ( n > LENGTH ) n = LENGTH;
+
+  return &pINDENT[ LENGTH-n ];
+}
+
+// same as getIndent but no "+" at the end
+const char * 
+Xml::getIndentAlt( unsigned int numIndents )
+{
+  static const char * pINDENT="                                        ";
+  static const unsigned int LENGTH=strlen( pINDENT );
+  unsigned int n=numIndents*NUM_INDENTS_PER_SPACE;
+  if ( n > LENGTH ) n = LENGTH;
+
+  return &pINDENT[ LENGTH-n ];
+}
+
+int 
+Xml::dump_attribs_to_stdout(TiXmlElement* pElement, unsigned int indent)
+{
+  if ( !pElement ) return 0;
+
+  TiXmlAttribute* pAttrib=pElement->FirstAttribute();
+  int i=0;
+  int ival;
+  double dval;
+  const char* pIndent=getIndent(indent);
+  cout << endl;
+  while (pAttrib)
+  {
+    cout << pIndent << pAttrib->Name() << ": value=[" << pAttrib->Value() 
+         << "]";
+
+    if (pAttrib->QueryIntValue(&ival)==TIXML_SUCCESS)  
+    {
+      cout << " int=" << ival;
+    }
+    if (pAttrib->QueryDoubleValue(&dval)==TIXML_SUCCESS) 
+    {
+      cout << " d=" << dval;
+    } 
+    cout << endl;
+    i++;
+    pAttrib=pAttrib->Next();
+  }
+  return i; 
+}
+
+void 
+Xml::dump_to_stdout( TiXmlNode* pParent, unsigned int indent )
+{
+  if ( !pParent ) return;
+
+  TiXmlNode* pChild;
+  TiXmlText* pText;
+  int t = pParent->Type();
+  cout << getIndent(indent);
+  int num;
+
+  switch ( t )
+  {
+  case TiXmlNode::TINYXML_DOCUMENT:
+    cout << "Document";
+    break;
+
+  case TiXmlNode::TINYXML_ELEMENT:
+    cout << "Element [" << pParent->Value() << "]";
+    num=dump_attribs_to_stdout(pParent->ToElement(), indent+1);
+    switch(num)
+    {
+      case 0:  cout << " (No attributes)"; break;
+      case 1:  cout << getIndentAlt(indent) << "1 attribute"; break;
+      default: cout << getIndentAlt(indent) << num << " attributes"; break;
+    }
+    break;
+
+  case TiXmlNode::TINYXML_COMMENT:
+    cout << "Comment: [" << pParent->Value() << "]";
+    break;
+
+  case TiXmlNode::TINYXML_UNKNOWN:
+    cout << "Unknown";
+    break;
+
+  case TiXmlNode::TINYXML_TEXT:
+    pText = pParent->ToText();
+    cout << "Text: [" << pText->Value() << "]";
+    break;
+
+  case TiXmlNode::TINYXML_DECLARATION:
+    cout << "Declaration";
+    break;
+  default:
+    break;
+  }
+  cout << endl;
+  for ( pChild = pParent->FirstChild(); pChild != 0; pChild = pChild->NextSibling()) 
+  {
+    dump_to_stdout( pChild, indent+1 );
+  }
+}
+
+// load the named file and dump its structure to STDOUT
+void 
+Xml::dump_to_stdout(const char* pFilename)
+{
+  TiXmlDocument doc(pFilename);
+  bool loadOkay = doc.LoadFile();
+  if (loadOkay)
+  {
+    cout << "\n" << pFilename << ":\n" <<  pFilename;
+    dump_to_stdout( &doc ); // defined later in the tutorial
+  }
+  else
+  {
+    cout << "Failed to load file \"" << pFilename << "\"" << endl;
+  }
+}
+}
+@
+\subsection{Default setting file}
+<<imrDefault.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRDEFAULT_H_
+#define _IMRDEFAULT_H_
+namespace imr {
+class Default {
+public:
+  static unsigned int mMajorVersion;
+  static unsigned int mMinorVersion;
+  static void save (const char*);
+  static void load (const char*);
+};
+}
+#endif // _IMRDEFAULT_H_
+<<imrDefault.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrDefault.h"
+using namespace std;
+namespace imr {
+unsigned int Default::mMajorVersion = 1;
+unsigned int Default::mMinorVersion = 0;
+void
+Default::save (const char* f)
+{
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration ("1.0", "", "");
+  doc.LinkEndChild (decl);
+  TiXmlElement * root = new TiXmlElement ("Default");
+  doc.LinkEndChild (root);
+  TiXmlElement * version = new TiXmlElement ("Version");
+  root->LinkEndChild (version);
+  version->SetAttribute("major", mMajorVersion); 
+  version->SetAttribute("minor", mMinorVersion); 
+  doc.SaveFile (f);
+}
+void
+Default::load (const char* f)
+{
+}
+}
+@
+\subsection{fastsimcoal file}
+A Fastsimcoal output file is created in XML format. Use the following command to
+create one.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+imr xml --print 2 -o fastsimcoal.xml
+\end{Verbatim}
+<<imrXmlFastsimcoal.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRXMLFASTSIMCOAL_H_
+#define _IMRXMLFASTSIMCOAL_H_
+namespace imr {
+class XmlFastsimcoal {
+public:
+  static void save (const char*);
+  static void load (const char*);
+};
+}
+#endif // _IMRXMLFASTSIMCOAL_H_
+<<imrXmlFastsimcoal.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrXmlFastsimcoal.h"
+using namespace std;
+namespace imr {
+void
+XmlFastsimcoal::save (const char* f)
+{
+  TiXmlElement * sequence;
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration ("1.0", "", "");
+  doc.LinkEndChild (decl);
+  TiXmlElement * root = new TiXmlElement ("Fastsimcoal");
+  doc.LinkEndChild (root);
+  // Profile
+  TiXmlElement * profile = new TiXmlElement ("Profile");
+  root->LinkEndChild (profile);
+  profile->SetAttribute("Title", "A series of simulated samples");
+  profile->SetAttribute("NbSamples", 1);
+  profile->SetAttribute("GenotypicData", 0);
+  profile->SetAttribute("GameticPhase", 0);
+  profile->SetAttribute("RecessiveData", 0);
+  profile->SetAttribute("DataType", "DNA");
+  profile->SetAttribute("LocusSeparator", "NONE");
+  profile->SetAttribute("MissingData", "?");
+  // Data
+  TiXmlElement * data = new TiXmlElement ("Data");
+  root->LinkEndChild (data);
+  TiXmlElement * sample = new TiXmlElement ("Sample");
+  data->LinkEndChild (sample);
+  sample->SetAttribute("SampleName", "Sample 1");
+  sample->SetAttribute("SampleSize", 5);
+  TiXmlElement * sampledata = new TiXmlElement ("SampleData");
+  data->LinkEndChild (sampledata);
+  // Sequence 1
+  sequence = new TiXmlElement ("Sequence");
+  sampledata->LinkEndChild (sequence);
+  sequence->SetAttribute("Name", "1_1");
+  sequence->SetAttribute("Population", 1);
+  sequence->LinkEndChild (new TiXmlText ("ACTGCC")); 
+  // Sequence 2
+  sequence = new TiXmlElement ("Sequence");
+  sampledata->LinkEndChild (sequence);
+  sequence->SetAttribute("Name", "1_2");
+  sequence->SetAttribute("Population", 1);
+  sequence->LinkEndChild (new TiXmlText ("TAATCC")); 
+  // Sequence 3
+  sequence = new TiXmlElement ("Sequence");
+  sampledata->LinkEndChild (sequence);
+  sequence->SetAttribute("Name", "1_3");
+  sequence->SetAttribute("Population", 1);
+  sequence->LinkEndChild (new TiXmlText ("TAATCT")); 
+  // Sequence 4 
+  sequence = new TiXmlElement ("Sequence");
+  sampledata->LinkEndChild (sequence);
+  sequence->SetAttribute("Name", "1_4");
+  sequence->SetAttribute("Population", 1);
+  sequence->LinkEndChild (new TiXmlText ("ACTGCT")); 
+  // Sequence 5
+  sequence = new TiXmlElement ("Sequence");
+  sampledata->LinkEndChild (sequence);
+  sequence->SetAttribute("Name", "1_5");
+  sequence->SetAttribute("Population", 1);
+  sequence->LinkEndChild (new TiXmlText ("ACTGGC")); 
+  // Structure
+  TiXmlElement * structure = new TiXmlElement ("Structure");
+  root->LinkEndChild (structure);
+  structure->SetAttribute("StructureName", "Simulated data");
+  structure->SetAttribute("NbGroups", 1);
+  
+  doc.SaveFile (f);
+}
+void
+XmlFastsimcoal::load (const char* f)
+{
+}
+}
+@
+\subsection{imr input file}
+Let's list things that are necessary in an imr input file. 
+Total generation, Burnin length, Thin length.
+Number of chains, MC3 scheme, MC3 parameters.
+Populations: population names and population ID.
+Individuals: individual names and individual ID.
+Population tree.
+Prior on splitting time.
+Prior on migration rate.
+Prior on population sizes.
+Running mode: mcmc or likelihood.
+Random number seed.
+Generation time in years.
+Trace plots.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+imr xml --print 3 -o imrinput.xml
+\end{Verbatim}
+<<imrXmlImrInput.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRXMLIMRINPUT_H_
+#define _IMRXMLIMRINPUT_H_
+namespace imr {
+class XmlImrInput {
+public:
+  static void save (const char*);
+  static void load (const char*);
+};
+}
+#endif // _IMRXMLIMRINPUT_H_
+<<imrXmlImrInput.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrXmlImrInput.h"
+using namespace std;
+namespace imr {
+void
+XmlImrInput::save (const char* f)
+{
+  TiXmlElement * population;
+  TiXmlElement * individual;
+  TiXmlElement * locus;
+  TiXmlElement * position;
+  TiXmlElement * sequence;
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration ("1.0", "", "");
+  doc.LinkEndChild (decl);
+  TiXmlElement * root = new TiXmlElement ("ImrInput");
+  doc.LinkEndChild (root);
+  // Random number generator seed
+  TiXmlElement * seed = new TiXmlElement ("Seed");
+  root->LinkEndChild (seed);
+  seed->SetAttribute("Value", 12423467);
+  // Generation time in years
+  TiXmlElement * generationTime = new TiXmlElement ("GenerationTime");
+  root->LinkEndChild (generationTime);
+  generationTime->SetAttribute("year", 25);
+  // Chain
+  TiXmlElement * chain = new TiXmlElement ("Chain");
+  root->LinkEndChild (chain);
+  chain->SetAttribute("Length", 100000);
+  chain->SetAttribute("Burnin", 50000);
+  chain->SetAttribute("Thin", 100);
+  // MC3
+  TiXmlElement * mc3 = new TiXmlElement ("MC3");
+  root->LinkEndChild (mc3);
+  mc3->SetAttribute("Number", 25);
+  mc3->SetDoubleAttribute("A", 0.995);
+  mc3->SetDoubleAttribute("B", 0.5);
+  TiXmlElement * populations = new TiXmlElement ("Populations");
+  root->LinkEndChild (populations);
+  populations->SetAttribute("Number", 3);
+  // Population 1
+  population = new TiXmlElement ("Population");
+  populations->LinkEndChild (population);
+  population->SetAttribute("Name", "East");
+  population->SetAttribute("ID", 1);
+  // Population 2
+  population = new TiXmlElement ("Population");
+  populations->LinkEndChild (population);
+  population->SetAttribute("Name", "West");
+  population->SetAttribute("ID", 2);
+  // Population 3
+  population = new TiXmlElement ("Population");
+  populations->LinkEndChild (population);
+  population->SetAttribute("Name", "Central");
+  population->SetAttribute("ID", 3);
+  // Individuals
+  TiXmlElement * individuals = new TiXmlElement ("Individuals");
+  root->LinkEndChild (individuals);
+  individuals->SetAttribute("Number", 2);
+  // Individual 1
+  individual = new TiXmlElement ("Individual");
+  individuals->LinkEndChild (individual);
+  individual->SetAttribute("Name", "Alice");
+  individual->SetAttribute("ID", 1);
+  individual->SetAttribute("Population", 1);
+  // Individual 2
+  individual = new TiXmlElement ("Individual");
+  individuals->LinkEndChild (individual);
+  individual->SetAttribute("Name", "Bob");
+  individual->SetAttribute("ID", 2);
+  individual->SetAttribute("Population", 2);
+  // Demographic Model
+  TiXmlElement * demographicModel = new TiXmlElement ("DemographicModel");
+  root->LinkEndChild (demographicModel);
+  demographicModel->SetAttribute("Model", "Tree");
+  demographicModel->SetAttribute("Tree", "((1,2)4,3)5");
+  // Prior on split time
+  TiXmlElement * priorSplitTime = new TiXmlElement ("PriorSplitTime");
+  demographicModel->LinkEndChild (priorSplitTime);
+  priorSplitTime->LinkEndChild (new TiXmlText ("((1:1,2:1)4:2,3:2)5")); 
+  // Prior on population sizes
+  TiXmlElement * priorPopulationSize = new TiXmlElement ("PriorPopulationSize");
+  demographicModel->LinkEndChild (priorPopulationSize);
+  priorPopulationSize->LinkEndChild (new TiXmlText ("((1:5,2:5)4:5,3:5)5:2")); 
+  // Prior on migration rates
+  TiXmlElement * priorMigration = new TiXmlElement ("PriorMigration");
+  demographicModel->LinkEndChild (priorMigration);
+  priorMigration->LinkEndChild (new TiXmlText ("0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0")); 
+   // Data
+  TiXmlElement * data = new TiXmlElement ("Data");
+  root->LinkEndChild (data);
+  data->SetAttribute("NumberLoci", 1);
+  // Locus
+  locus = new TiXmlElement ("Locus");
+  locus->SetAttribute("Name", "locus1");
+  locus->SetAttribute("NumberSequence", 2);
+  locus->SetAttribute("NumberSite", 6);
+  data->LinkEndChild (locus);
+  // Positions
+  position = new TiXmlElement ("Position");
+  locus->LinkEndChild (position);
+  position->SetAttribute("Length", 10000);
+  position->LinkEndChild (new TiXmlText ("4926 4935 5171 6649 6911 9819")); 
+  // Sequence 1
+  sequence = new TiXmlElement ("Sequence");
+  locus->LinkEndChild (sequence);
+  sequence->SetAttribute("IndividualID", 1);
+  sequence->LinkEndChild (new TiXmlText ("ACTGCC")); 
+  // Sequence 2
+  sequence = new TiXmlElement ("Sequence");
+  locus->LinkEndChild (sequence);
+  sequence->SetAttribute("IndividualID", 2);
+  sequence->LinkEndChild (new TiXmlText ("TAATCC")); 
+  doc.SaveFile (f);
+}
+void
+XmlImrInput::load (const char* f)
+{
+}
+}
+@
+\subsection{imr output file}
+Let's list things that are necessary in an imr output file. 
+\begin{Verbatim}[frame=lines,framesep=5mm]
+imr xml --print 4 -o imroutput.xml
+\end{Verbatim}
+<<imrXmlImrOutput.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRXMLIMROUTPUT_H_
+#define _IMRXMLIMROUTPUT_H_
+namespace imr {
+class XmlImrOutput {
+public:
+  static void save (const char*);
+  static void load (const char*);
+};
+}
+#endif // _IMRXMLIMROUTPUT_H_
+<<imrXmlImrOutput.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrXmlImrOutput.h"
+using namespace std;
+namespace imr {
+void
+XmlImrOutput::save (const char* f)
+{
+  TiXmlElement * population;
+  TiXmlElement * individual;
+  TiXmlElement * locus;
+  TiXmlElement * position;
+  TiXmlElement * sequence;
+  TiXmlElement * recombinantTree;
+  TiXmlElement * localTree;
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration ("1.0", "", "");
+  doc.LinkEndChild (decl);
+  TiXmlElement * root = new TiXmlElement ("ImrOutput");
+  doc.LinkEndChild (root);
+  
+  // Random number generator seed
+  TiXmlElement * seed = new TiXmlElement ("Seed");
+  root->LinkEndChild (seed);
+  seed->SetAttribute("Value", 12423467);
+  // Generation time in years
+  TiXmlElement * generationTime = new TiXmlElement ("GenerationTime");
+  root->LinkEndChild (generationTime);
+  generationTime->SetAttribute("year", 25);
+  // Chain
+  TiXmlElement * chain = new TiXmlElement ("Chain");
+  root->LinkEndChild (chain);
+  chain->SetAttribute("Length", 100000);
+  chain->SetAttribute("Burnin", 50000);
+  chain->SetAttribute("Thin", 100);
+  // MC3
+  TiXmlElement * mc3 = new TiXmlElement ("MC3");
+  root->LinkEndChild (mc3);
+  mc3->SetAttribute("Number", 25);
+  mc3->SetDoubleAttribute("A", 0.995);
+  mc3->SetDoubleAttribute("B", 0.5);
+  TiXmlElement * populations = new TiXmlElement ("Populations");
+  root->LinkEndChild (populations);
+  populations->SetAttribute("Number", 3);
+  // Population 1
+  population = new TiXmlElement ("Population");
+  populations->LinkEndChild (population);
+  population->SetAttribute("Name", "East");
+  population->SetAttribute("ID", 1);
+  // Population 2
+  population = new TiXmlElement ("Population");
+  populations->LinkEndChild (population);
+  population->SetAttribute("Name", "West");
+  population->SetAttribute("ID", 2);
+  // Population 3
+  population = new TiXmlElement ("Population");
+  populations->LinkEndChild (population);
+  population->SetAttribute("Name", "Central");
+  population->SetAttribute("ID", 3);
+  // Individuals
+  TiXmlElement * individuals = new TiXmlElement ("Individuals");
+  root->LinkEndChild (individuals);
+  individuals->SetAttribute("Number", 2);
+  // Individual 1
+  individual = new TiXmlElement ("Individual");
+  individuals->LinkEndChild (individual);
+  individual->SetAttribute("Name", "Alice");
+  individual->SetAttribute("ID", 1);
+  individual->SetAttribute("Population", 1);
+  // Individual 2
+  individual = new TiXmlElement ("Individual");
+  individuals->LinkEndChild (individual);
+  individual->SetAttribute("Name", "Bob");
+  individual->SetAttribute("ID", 2);
+  individual->SetAttribute("Population", 2);
+  // Demographic Model
+  TiXmlElement * demographicModel = new TiXmlElement ("DemographicModel");
+  root->LinkEndChild (demographicModel);
+  demographicModel->SetAttribute("Model", "Tree");
+  demographicModel->SetAttribute("Tree", "((1,2)4,3)5");
+  // Prior on split time
+  TiXmlElement * priorSplitTime = new TiXmlElement ("PriorSplitTime");
+  demographicModel->LinkEndChild (priorSplitTime);
+  priorSplitTime->LinkEndChild (new TiXmlText ("((1:1,2:1)4:2,3:2)5")); 
+  // Prior on population sizes
+  TiXmlElement * priorPopulationSize = new TiXmlElement ("PriorPopulationSize");
+  demographicModel->LinkEndChild (priorPopulationSize);
+  priorPopulationSize->LinkEndChild (new TiXmlText ("((1:5,2:5)4:5,3:5)5:2")); 
+  // Prior on migration rates
+  TiXmlElement * priorMigration = new TiXmlElement ("PriorMigration");
+  demographicModel->LinkEndChild (priorMigration);
+  priorMigration->LinkEndChild (new TiXmlText ("0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0")); 
+   // Data
+  TiXmlElement * data = new TiXmlElement ("Data");
+  root->LinkEndChild (data);
+  data->SetAttribute("NumberLoci", 1);
+  // Locus
+  locus = new TiXmlElement ("Locus");
+  locus->SetAttribute("Name", "locus1");
+  locus->SetAttribute("NumberSequence", 2);
+  locus->SetAttribute("NumberSite", 6);
+  data->LinkEndChild (locus);
+  // Positions
+  position = new TiXmlElement ("Position");
+  locus->LinkEndChild (position);
+  position->SetAttribute("Length", 10000);
+  position->LinkEndChild (new TiXmlText ("4926 4935 5171 6649 6911 9819")); 
+  // Sequence 1
+  sequence = new TiXmlElement ("Sequence");
+  locus->LinkEndChild (sequence);
+  sequence->SetAttribute("IndividualID", 1);
+  sequence->LinkEndChild (new TiXmlText ("ACTGCC")); 
+  // Sequence 2
+  sequence = new TiXmlElement ("Sequence");
+  locus->LinkEndChild (sequence);
+  sequence->SetAttribute("IndividualID", 2);
+  sequence->LinkEndChild (new TiXmlText ("TAATCC")); 
+
+  // RecombinantTrees
+  TiXmlElement * recombinantTrees = new TiXmlElement ("RecombinantTrees");
+  root->LinkEndChild (recombinantTrees);
+  recombinantTrees->SetAttribute("Number", 1);
+  // RecombinantTree
+  recombinantTree = new TiXmlElement ("RecombinantTree");
+  recombinantTrees->LinkEndChild (recombinantTree);
+  recombinantTree->SetAttribute("Length", 10000);
+  // Local tree 1
+  localTree = new TiXmlElement ("LocalTree");
+  recombinantTree->LinkEndChild (localTree);
+  localTree->SetAttribute("Position", 1);
+  localTree->LinkEndChild (new TiXmlText ("(((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):29956, 4.1:49217);")); 
+  // Local tree 2
+  localTree = new TiXmlElement ("LocalTree");
+  recombinantTree->LinkEndChild (localTree);
+  localTree->SetAttribute("Position", 37);
+  localTree->LinkEndChild (new TiXmlText ("(((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):19792, 4.1:39053);")); 
+  // Local tree 3
+  localTree = new TiXmlElement ("LocalTree");
+  recombinantTree->LinkEndChild (localTree);
+  localTree->SetAttribute("Position", 215);
+  localTree->LinkEndChild (new TiXmlText ("(((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):19792, 4.1:39053);")); 
+  doc.SaveFile (f);
+}
+void
+XmlImrOutput::load (const char* f)
+{
+}
+}
 @
 \section{Manuscript}
-
 @
 \pagebreak{}
 
@@ -281,6 +1270,22 @@ typedef unsigned int NUMBER;
 \bibliography{imr}
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Some sites
 http://ooc-lang.org

@@ -1,3 +1,11 @@
-REPETITION1-Burnin:100000
-REPETITION1-ChainLength:1000
-REPETITION1-Thin:100
+List of Analyses
+================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+sim1
+----
+A base simulation.
+
+sim2
+----
+A recombinant tree is simulated using +-T+ option of *fastsimcoal*.

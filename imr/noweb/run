@@ -2,7 +2,7 @@
 
 rm -rf build
 mkdir build
-cp imr??.pdf build/
+cp *.pdf build/
 cp imr.bst build/
 cp imr.bib build/
 cd build

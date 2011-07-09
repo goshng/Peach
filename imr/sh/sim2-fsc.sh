@@ -1,4 +1,4 @@
-function sim1-fsc {
+function sim2-fsc {
   REPETITION=1
   global-variable $SPECIES $REPETITION
 
@@ -30,14 +30,4 @@ function sim1-fsc {
   # Simulate data using the par file.
   $FSC -T -I -q -i $FSCPAR -n $NUMREP
   echo "Check $FSCPAR and fsc simulated output files"
-
-  # Convert the simulated files.
-  for g in $(eval echo {1..$NUMREP}); do
-    ARPFILE=$FSCDIR/${OUTFILE}_1_$g.arp
-    GALFILE=$FSCDIR/${OUTFILE}_1_$g.gal
-    echo perl pl/convert-fsc.pl \
-      -outputformat galledtree \
-      -in $ARPFILE \
-      -out $GALFILE
-  done
 }

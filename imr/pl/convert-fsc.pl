@@ -26,7 +26,10 @@ GetOptions( \%params,
             'version' => sub { print $VERSION."\n"; exit; },
             'outputformat=s',
             'in=s',
-            'out=s'
+            'inTree=s',
+            'out=s',
+            'length=i',
+            'repetition=i'
             ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -44,7 +47,10 @@ convert-fsc.pl 1.0
 perl convert-fsc.pl.pl [-h] [-help] [-version] [-verbose]
   [-outputformat string] 
   [-in file] 
+  [-inTree file] 
   [-out file] 
+  [-length number] 
+  [-repetition number] 
 
 =head1 DESCRIPTION
 
@@ -82,6 +88,18 @@ An output file.
 =item B<-in> <file>
 
 An input file.
+
+=item B<-inTree> <file>
+
+The true tree file created by Fastsimcoal along with the sequence data.
+
+=item B<-length> <number>
+
+The length of a block.
+
+=item B<-repetition> <number>
+
+The index of repetition in Fastsimcoal.
 
 =back
 
@@ -121,14 +139,15 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 require "pl/sub-error.pl";
 require "pl/sub-fsc.pl";
 
-my $outputformat;
+my $outputformat = "imr";
 my $in;
+my $inTree = "";
 my $out;
+my $length;
+my $repetition;
 
 if (exists $params{outputformat}) {
   $outputformat = $params{outputformat};
-} else {
-  &printError("you did not specify an output format");
 }
 
 if (exists $params{in}) {
@@ -137,10 +156,26 @@ if (exists $params{in}) {
   &printError("you did not specify an in file name");
 }
 
+if (exists $params{inTree}) {
+  $inTree = $params{inTree};
+} 
+
+if (exists $params{repetition}) {
+  $repetition = $params{repetition};
+} else {
+  &printError("you did not specify a repetition");
+}
+
 if (exists $params{out}) {
   $out = $params{out};
 } else {
-  &printError("you did not specify an output file name");
+  &printError("you did not specify an out file name");
+}
+
+if (exists $params{length}) {
+  $length = $params{length};
+} else {
+  &printError("you did not specify a length file name");
 }
 
 ################################################################################
@@ -153,7 +188,14 @@ if ($outputformat eq "galledtree")
 }
 elsif ($outputformat eq "imr")
 {
-
+  if ($inTree eq "")
+  {
+    fsc_convert2imr ($in, $out, $length);
+  }
+  else
+  {
+    fsc_convert2imrWithTree ($in, $inTree, $out, $length, $repetition);
+  }
 }
 else
 {

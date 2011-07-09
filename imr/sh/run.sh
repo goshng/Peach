@@ -16,7 +16,10 @@ source sh/choose-species.sh
 source sh/sim-fsc.sh
 source sh/sim-imr.sh
 source sh/sim1-fsc.sh
+source sh/sim2-fsc.sh
 source sh/sim1-imr.sh
+
+source sh/convert-fsc-to-imr.sh
 # source sh/xxx.sh
 
 #####################################################################
@@ -42,6 +45,7 @@ CHOICES=( init-file-system \
           sim-fsc \
           sim-imr \
           ---EXTRA--- \
+          convert-fsc-to-imr \
           xxx
           )
 select CHOICE in ${CHOICES[@]}; do 
@@ -52,6 +56,7 @@ select CHOICE in ${CHOICES[@]}; do
   elif [ "$CHOICE" == "choose-species" ]; then $CHOICE; break
   elif [ "$CHOICE" == "sim-fsc" ]; then $CHOICE; break
   elif [ "$CHOICE" == "sim-imr" ]; then $CHOICE; break
+  elif [ "$CHOICE" == "convert-fsc-to-imr" ]; then $CHOICE; break
   elif [ "$CHOICE" == "xxx" ]; then $CHOICE; break
   else
     echo -e "You need to enter something\n"

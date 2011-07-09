@@ -2,10 +2,29 @@ IMR Analysis User Manual
 ========================
 Sang Chul Choi <goshng@yahoo.co.kr>
 
+Kick-start
+----------
+
+.Create an imr input file
+. Execute menu *convert-fsc-to-imr*
+
+Introduction
+------------
+
+
+Installation
+------------
+
+
+
+
+
+
 Initialization of the analysis
 ------------------------------
 Menu *init-file-system* must be called after the checkout of the source code and
 before executions of any other menus.
+
 
 Test examples
 -------------
@@ -19,6 +38,7 @@ Simulation of three-population with infinite-site model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Execute menu *sim2-simdiv* and *sim2-imaa*. 
 
+
 Choice of a spcies
 ------------------
 The directory +species+ at the root analysis directory contains text files that
@@ -27,88 +47,4 @@ to have a project that is related to a species. I call +species+ the directory.
 A species is a project with a particular data. Menu *choose-species* must be
 executed before analyzing any data.
 
-Summarize-sequence-data
------------------------
-The rice data set has 630 FASTA files. We summarize the files so that we can use
-it. An IMa2 input file is produced.
 
-Check the integrity of an IMa2 input file
------------------------------------------
-Menu *examine-ima2-data* checks the file produced by menu
-*summarize-sequence-data*.
-
-Make a prior file
------------------
-
-
-# Prerequisites
-# -------------
-# . You need a user ID in a linux cluster: edit $CACUSERNAME, and $CACLOGIN.
-# . You need a user ID in a linux machine with X Window: edit $X11USERNAME,
-# and $X11LOGIN.
-# . Create a directory in the linux cluster, and put the name in $CACBASE: edit
-# $CACBASE.
-# . Create a directory in the linux machine with X Window, and put the name
-# X11BASE: edit $X11BASE.
-# . Prepare automatic ssh login for the two machines.
-# . Edit BATCHEMAIL to your email address to which you will be notified fo jobs
-# status.
-# . Edit BATCHACCESS to your access queue. Note that should different cluster batch
-# system be used you have to change much part of this script.
-# . Download unix version of progressiveMauve and install it in the cluster:
-# edit BATCHPROGRESSIVEMAUVE. In the example, I installed it usr/bin of my home
-# directory of my cluster account. The BATCHPROGRESSIVEMAUVE looks like this:
-# BATCHPROGRESSIVEMAUVE=usr/bin/progressiveMauve
-# . Install stripSubsetLCBs at $HOME/usr/bin/stripSubsetLCBs of the local
-# computer. It must be a part of progressiveMauve.
-# . Download unix version of ClonalFrame and install it into the cluster:
-# edit BATCHCLONALFRAME. In the example, I installed it usr/bin of my home
-# directory of my cluster account. The BATCHCLONALFRAME looks like this:
-# BATCHCLONALFRAME=usr/bin/ClonalFrame
-
-# User Manual
-# -----------
-# You should be able to download the source code from codaset repository called
-# mauve-analysis. 
-#
-# .To pull the source code 
-# ----
-# $ git clone git@codaset.com:goshng/mauve-analysis.git
-# $ cd mauve-analysis
-# ----
-#
-# .Execution of menus for simulation study s1
-# ----
-# init-file-system
-# choose-simulation
-# simulate-data
-# prepare-run-clonalorigin
-# receive-run-clonalorigin-simulation
-# ----
-# 
-# Menu: init-file-system
-# ~~~~~~~~~~~~~~~~~~~~~
-# Choose the menu for the first time only.
-#
-# Menu: choose-simulation
-# ~~~~~~~~~~~~~~~~~~~~~~~
-# This must be executed before selecting simulate-data.
-#
-# Menu: simulate-data
-# ~~~~~~~~~~~~~~~~~~~
-# The directory src/clonalorigin contains the source code of ClonalOrigin that
-# was modified. Compile it before simulating data. Refer to README in the
-# directory to build it.
-#
-# Simulation s1
-# ^^^^^^^^^^^^^
-# 
-# 
-# 
-# The output directory
-# ~~~~~~~~~~~~~~~~~~~~
-# Use the menu init-file-system to create output 
-#
-# Dependency of menus
-# ~~~~~~~~~~~~~~~~~~~
-#

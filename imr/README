@@ -2,4 +2,300 @@ Isolation, Migration, and Recombination
 =======================================
 Sang Chul Choi <goshng@yahoo.co.kr>
 
+History
+-------
 
+Tue Jul  5 16:05:49 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.How to find departure and arrival points?
+I compare two gene trees that are different by one recombinant edge.
+I assume that event time values can be
+compared although they are real numbers. Two gene trees are different in only
+two coalescent events. All of the other coalescent event times must be the same
+in the two gene trees. The gene tree on the left is the one before I add a
+recombinant edge, and one on the right is the one after I add a recombinant edge
+to the left one. Sort coalescent events in the left tree, and those in the right
+one. I should be able to identify departure and arrival points in the left tree
+by comparing events from the two sorted list of coalescent events. 
+
+.How to update a recombinant tree?
+. Choose a coalescent event of _R_ or an external node.
+. Remove all of the coalescent events and recombination events including the
+final coalescent. This is analogous to removing an edge in a gene tree.
+
+.How to compute likelihood of data given a recombinant tree?
+. A recombinant tree edge has a width.
+. If theta is the total rate of mutation, an edge with 0.5 width or 50% of
+active sites would have half of the theta rate of mutation.
+
+.How to compute prior of a recombinant tree?
+. The form of prior for the part of recombination is similar to that for
+migration. The total rate of recombination should be considered by taking
+account of active sites or proportion of active sites during time intervals.
+
+Sat Jul  2 11:02:24 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I have been thinking how to build a recombinant tree. I do not know yet how to
+build a recombinant tree. A sequentially sampled recombinant tree that is
+created with a simulation using *fastsimcoal* can be used to make one.
+Eventually I will need to build one from a data set that could have been created
+with the recombinant tree. Now, I want to focus on mechanistic parts of
+creating, modifying, using recombinant trees. The simulator *fastsimcoal* has an
+option, +-T+ or +--tree+ to create sequentially sampled trees. I might use 
+following steps to build the tree of a list of sequentially sampled trees.
+
+.To build the recombinant tree of a sequentially ordered trees
+. Build the left-most tree that is called _T1_.
+. Set the recombinant tree _R_ to _T1_.
+. _T1_ is the recombinant tree if no more trees are available next to _T1_.
+Otherwise, go to the next step.
+. Build the tree next to _T1_ that is called _T2_.
+. Compare _T1_ and _T2_ to find the recombinant edge, and add the edge to _R_.
+. Set _T1_ to _T2_.
+. Go to step 3 and repeat building the next tree _T2_ of the new _T1_.
+
+The recombinant tree that is built must be compatible with the infinite-sites
+data. Mutation events can be mapped to lineages in the recombinant tree using
+the data. I use Fitch algorithm to find the lineage where a mutation happens
+using a single tree with a single site. The basic idea is that I can find a
+unique edge in the bipartite tree with two disjoint sets of nucleotides. The
+following algorithm can be used to find the unique edge.
+
+.To find a unique edge in a tree with two disjoint sets of binary characters
+. A tree _T_ is a set of edges, each of which has its length downward and two
+points upward. External edges at the top of the tree has two points upward with
+null. The top of each external edge is already labelled one of two characters.
+A unique edge at the bottom of the tree has its infinite length downward.
+Internal edges including the root edge are not labelled at their top. My goal is
+to find parsimoniously a unique edge where the label at the top of the edge and
+another label at the bottom are different.
+. Add all of the internal edges to a list _L_.
+. An edge is popped from the list. Repeat following steps until no edges are
+available in the list.
+. Look at the three surrounding nodes of the top of the edge. Count the number
+of nodes with unknown labels. Note that the root edge has only two nodes around
+the top of the edge.
+. Label the top of the edge the same value of known label either if only one node is
+unknown or if all nodes are labelled. Remove the edge from the list.
+. Leave the edge in the list if there are multiple nodes with unknown labels.
+. Go to step 3 if the list is empty.
+. Use the last one edge in the list to find the unique edge with a mutation
+event.
+
+I am wondering if the procedure of finding a unique mutation event can be
+modified to be used with a recombinant tree. 
+
+.To find edges in a recombinant tree with mutation events
+. A tree _R_ is a set of edges. An edge can represent either a coalescent event
+or a recombination event. 
+. Add all of the internal recombinant edges to a list _L_.
+. Let's consider an edge due to recombination. Examine the surrounding nodes site-by-site. 
+The root edge cannot be an edge with recombination because a recombinant tree is
+complete with a final coalescent.
+Consider two nodes for a site because the recombination event divides a daughter
+edge into two parents, and only one of two parents shares the same character as
+the daughter's edge.  Skip a site of the edge if neither of two nodes are
+labelled. Label the same value as the two srounding edges state if the two edges
+are labelled the same. Label also the same value as one of the two if either one
+is labelled. 
+. Let's consider an edge due to mutation. 
+Look at the three surrounding nodes of the top of the edge. Count the number
+of nodes with unknown labels. Ignore inactive sites.
+Label the top of the edge the same value of known label either if only one node is
+unknown or if all nodes are labelled. 
+Remove the edge from the list only after all of the active sites are considered.
+
+Let's use an example to learn features of a recombinant tree.
+
+.A recombinant tree created with fastsimcoal
+----
+#NEXUS
+begin trees;  [Treefile generated by fastsimcoal.exe (Laurent Excoffier)]
+
+        tree NumGen_tree_2_1_pos_0 = [&U] ((1.1:14409, 3.1:14409):12534, 2.1:26943);
+        tree NumGen_tree_2_2_pos_346 = [&U] ((1.1:14409, 3.1:14409):37471, 2.1:51880);
+        tree NumGen_tree_2_3_pos_3195 = [&U] ((1.1:14409, 3.1:14409):37471, 2.1:51880);
+        tree NumGen_tree_2_4_pos_8360 = [&U] ((2.1:14339, 1.1:14339):70, 3.1:14409);
+end;
+----
+
+.A data set created with the recombinant tree
+----
+#Number of independent chromosomes: 1
+# 6 polymorphic positions on chromosome 1
+#1182, 1524, 3875, 4267, 5165, 7415
+
+                SampleName="Sample 1"
+                SampleSize=3
+                SampleData= {
+1_1     1       CCAGGC
+1_2     1       AGGTTA
+1_3     1       CCAGGC
+
+}
+----
+
+
+fastsimcoal seed initialized with 130583
+
+----
+#NEXUS
+begin trees;  [Treefile generated by fastsimcoal.exe (Laurent Excoffier)]
+	tree 2_1_pos_0 = [&U] (((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):29956, 4.1:49217);
+	tree 2_2_pos_37 = [&U] (((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):19792, 4.1:39053);
+	tree 2_3_pos_215 = [&U] (((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):19792, 4.1:39053);
+	tree 2_4_pos_223 = [&U] (((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):19792, 4.1:39053);
+	tree 2_5_pos_281 = [&U] (4.1:48599, ((1.1:2626, (3.1:61, 2.1:61):2565):16635, 5.1:19261):29338);
+	tree 2_6_pos_452 = [&U] ((5.1:39842, 4.1:39842):8757, (1.1:2626, (3.1:61, 2.1:61):2565):45973);
+	tree 2_7_pos_526 = [&U] (5.1:87561, (4.1:48599, (1.1:2626, (3.1:61, 2.1:61):2565):45973):38962);
+	tree 2_8_pos_536 = [&U] (5.1:87561, (4.1:48599, (1.1:2626, (3.1:61, 2.1:61):2565):45973):38962);
+	tree 2_9_pos_624 = [&U] (5.1:87561, ((1.1:2626, (3.1:61, 2.1:61):2565):20329, 4.1:22955):64606);
+	tree 2_10_pos_642 = [&U] (((1.1:2626, (3.1:61, 2.1:61):2565):20329, 4.1:22955):60166, 5.1:83121);
+	tree 2_11_pos_659 = [&U] (4.1:83121, ((1.1:2626, (3.1:61, 2.1:61):2565):19827, 5.1:22453):60668);
+	tree 2_12_pos_721 = [&U] (4.1:27234, ((1.1:2626, (3.1:61, 2.1:61):2565):19827, 5.1:22453):4781);
+	tree 2_13_pos_882 = [&U] ((4.1:4442, (1.1:2626, (3.1:61, 2.1:61):2565):1816):18011, 5.1:22453);
+	tree 2_14_pos_1039 = [&U] ((4.1:4442, (1.1:2626, (3.1:61, 2.1:61):2565):1816):11614, 5.1:16056);
+	tree 2_15_pos_1243 = [&U] (((1.1:2626, (3.1:61, 2.1:61):2565):3930, 4.1:6556):9500, 5.1:16056);
+	tree 2_16_pos_1290 = [&U] (4.1:16056, ((1.1:2626, (3.1:61, 2.1:61):2565):5011, 5.1:7637):8419);
+	tree 2_17_pos_1768 = [&U] (4.1:16056, ((1.1:2626, (3.1:61, 2.1:61):2565):2054, 5.1:4680):11376);
+	tree 2_18_pos_1877 = [&U] (4.1:16056, ((1.1:2626, (3.1:61, 2.1:61):2565):2054, 5.1:4680):11376);
+	tree 2_19_pos_2112 = [&U] (4.1:16056, ((1.1:2626, (3.1:61, 2.1:61):2565):5020, 5.1:7646):8410);
+	tree 2_20_pos_2402 = [&U] ((1.1:2626, (3.1:61, 2.1:61):2565):16444, (4.1:16056, 5.1:16056):3014);
+	tree 2_21_pos_2472 = [&U] ((4.1:8346, (1.1:2626, (3.1:61, 2.1:61):2565):5720):10724, 5.1:19070);
+	tree 2_22_pos_2525 = [&U] ((4.1:8346, (1.1:2626, (3.1:61, 2.1:61):2565):5720):7251, 5.1:15597);
+	tree 2_23_pos_3247 = [&U] (5.1:33781, (4.1:8346, (1.1:2626, (3.1:61, 2.1:61):2565):5720):25435);
+	tree 2_24_pos_3329 = [&U] (5.1:33781, (4.1:8346, (1.1:2626, (3.1:61, 2.1:61):2565):5720):25435);
+	tree 2_25_pos_3336 = [&U] (5.1:33781, (4.1:8346, (1.1:2626, (3.1:61, 2.1:61):2565):5720):25435);
+	tree 2_26_pos_3403 = [&U] (5.1:30206, (4.1:8346, (1.1:2626, (3.1:61, 2.1:61):2565):5720):21860);
+	tree 2_27_pos_3535 = [&U] ((5.1:1066, 4.1:1066):7280, (1.1:2626, (3.1:61, 2.1:61):2565):5720);
+	tree 2_28_pos_3788 = [&U] ((5.1:1066, 4.1:1066):13375, (1.1:2626, (3.1:61, 2.1:61):2565):11815);
+	tree 2_29_pos_4054 = [&U] ((5.1:1066, 4.1:1066):13375, (1.1:2626, (3.1:61, 2.1:61):2565):11815);
+	tree 2_30_pos_4190 = [&U] ((5.1:1066, 4.1:1066):13375, (1.1:2626, (3.1:61, 2.1:61):2565):11815);
+	tree 2_31_pos_4353 = [&U] ((5.1:1066, 4.1:1066):42963, (1.1:2626, (3.1:61, 2.1:61):2565):41403);
+	tree 2_32_pos_4355 = [&U] ((1.1:2626, (3.1:61, 2.1:61):2565):31567, (5.1:1066, 4.1:1066):33127);
+	tree 2_33_pos_4414 = [&U] ((1.1:2626, (3.1:61, 2.1:61):2565):31567, (5.1:1066, 4.1:1066):33127);
+	tree 2_34_pos_4518 = [&U] ((5.1:1066, 4.1:1066):32264, (1.1:2626, (3.1:61, 2.1:61):2565):30704);
+	tree 2_35_pos_4521 = [&U] ((5.1:1066, 4.1:1066):32264, (1.1:2626, (3.1:61, 2.1:61):2565):30704);
+	tree 2_36_pos_4660 = [&U] ((5.1:1066, 4.1:1066):32264, (1.1:2626, (3.1:61, 2.1:61):2565):30704);
+	tree 2_37_pos_4674 = [&U] ((1.1:5379, (5.1:1066, 4.1:1066):4313):27951, (3.1:61, 2.1:61):33269);
+	tree 2_38_pos_4686 = [&U] ((1.1:5379, (5.1:1066, 4.1:1066):4313):54712, (3.1:61, 2.1:61):60030);
+	tree 2_39_pos_4692 = [&U] ((3.1:61, 2.1:61):40190, (1.1:5379, (5.1:1066, 4.1:1066):4313):34872);
+	tree 2_40_pos_4794 = [&U] ((3.1:61, 2.1:61):40190, (1.1:23456, (5.1:1066, 4.1:1066):22390):16795);
+	tree 2_41_pos_4853 = [&U] ((3.1:61, 2.1:61):40190, (1.1:23456, (5.1:1066, 4.1:1066):22390):16795);
+	tree 2_42_pos_5082 = [&U] ((1.1:23456, (5.1:1066, 4.1:1066):22390):47754, (3.1:61, 2.1:61):71149);
+	tree 2_43_pos_5179 = [&U] ((1.1:23456, (5.1:1066, 4.1:1066):22390):47754, (3.1:61, 2.1:61):71149);
+	tree 2_44_pos_5294 = [&U] (((3.1:61, 2.1:61):17158, 1.1:17219):6237, (5.1:1066, 4.1:1066):22390);
+	tree 2_45_pos_5307 = [&U] (1.1:23456, ((3.1:61, 2.1:61):13054, (5.1:1066, 4.1:1066):12049):10341);
+	tree 2_46_pos_5544 = [&U] (((5.1:1066, 4.1:1066):13357, 1.1:14423):9033, (3.1:61, 2.1:61):23395);
+	tree 2_47_pos_5615 = [&U] ((3.1:61, 2.1:61):62147, ((5.1:1066, 4.1:1066):13357, 1.1:14423):47785);
+	tree 2_48_pos_5654 = [&U] ((3.1:61, 2.1:61):62147, ((5.1:1066, 4.1:1066):13357, 1.1:14423):47785);
+	tree 2_49_pos_5665 = [&U] ((3.1:61, 2.1:61):65455, ((5.1:1066, 4.1:1066):13357, 1.1:14423):51093);
+	tree 2_50_pos_5761 = [&U] ((3.1:61, 2.1:61):65455, ((5.1:1066, 4.1:1066):13357, 1.1:14423):51093);
+	tree 2_51_pos_5789 = [&U] (((3.1:61, 2.1:61):11894, (5.1:1066, 4.1:1066):10889):2468, 1.1:14423);
+	tree 2_52_pos_6028 = [&U] (((3.1:61, 2.1:61):7560, (5.1:1066, 4.1:1066):6555):6802, 1.1:14423);
+	tree 2_53_pos_6104 = [&U] (((3.1:61, 2.1:61):9749, (5.1:1066, 4.1:1066):8744):4613, 1.1:14423);
+	tree 2_54_pos_6216 = [&U] (((3.1:61, 2.1:61):9749, (4.1:3524, 5.1:3524):6286):4613, 1.1:14423);
+	tree 2_55_pos_6413 = [&U] (((3.1:61, 2.1:61):9749, (4.1:3524, 5.1:3524):6286):35149, 1.1:44959);
+	tree 2_56_pos_6414 = [&U] (((3.1:61, 2.1:61):12812, (4.1:3524, 5.1:3524):9349):32086, 1.1:44959);
+	tree 2_57_pos_6690 = [&U] (((3.1:61, 2.1:61):12812, 5.1:12873):32086, (4.1:5259, 1.1:5259):39700);
+	tree 2_58_pos_6691 = [&U] ((3.1:61, 2.1:61):44898, (5.1:34141, (4.1:5259, 1.1:5259):28882):10818);
+	tree 2_59_pos_6696 = [&U] (5.1:34141, (4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):28882);
+	tree 2_60_pos_6713 = [&U] (5.1:39287, (4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):34028);
+	tree 2_61_pos_6810 = [&U] (5.1:39287, (4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):34028);
+	tree 2_62_pos_6950 = [&U] (5.1:39287, (4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):34028);
+	tree 2_63_pos_7001 = [&U] (5.1:39287, (4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):34028);
+	tree 2_64_pos_7018 = [&U] (5.1:39287, (4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):34028);
+	tree 2_65_pos_7084 = [&U] ((4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):49996, 5.1:55255);
+	tree 2_66_pos_7135 = [&U] ((4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):49996, 5.1:55255);
+	tree 2_67_pos_7137 = [&U] ((4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):35612, 5.1:40871);
+	tree 2_68_pos_7562 = [&U] ((4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):48951, 5.1:54210);
+	tree 2_69_pos_7599 = [&U] ((4.1:5259, ((3.1:61, 2.1:61):4302, 1.1:4363):896):48951, 5.1:54210);
+	tree 2_70_pos_7680 = [&U] (((3.1:61, 2.1:61):4302, 1.1:4363):49847, (4.1:32179, 5.1:32179):22031);
+	tree 2_71_pos_7701 = [&U] (((3.1:61, 2.1:61):4302, 1.1:4363):71773, (4.1:32179, 5.1:32179):43957);
+	tree 2_72_pos_7782 = [&U] ((4.1:32179, 5.1:32179):44161, ((3.1:61, 2.1:61):4302, 1.1:4363):71977);
+	tree 2_73_pos_7797 = [&U] (((3.1:61, 2.1:61):4302, 1.1:4363):42743, (4.1:32179, 5.1:32179):14927);
+	tree 2_74_pos_7815 = [&U] ((3.1:4363, 1.1:4363):42743, ((2.1:13700, 4.1:13700):18479, 5.1:32179):14927);
+	tree 2_75_pos_7891 = [&U] ((((3.1:4363, 1.1:4363):656, 2.1:5019):8681, 4.1:13700):18479, 5.1:32179);
+	tree 2_76_pos_7960 = [&U] (4.1:32179, (((3.1:4363, 1.1:4363):656, 2.1:5019):12062, 5.1:17081):15098);
+	tree 2_77_pos_8085 = [&U] (4.1:32179, (5.1:22529, ((3.1:4363, 1.1:4363):656, 2.1:5019):17510):9650);
+	tree 2_78_pos_8181 = [&U] (4.1:32805, (5.1:22529, ((3.1:4363, 1.1:4363):656, 2.1:5019):17510):10276);
+	tree 2_79_pos_8214 = [&U] (4.1:32805, ((3.1:4363, (5.1:2209, 1.1:2209):2154):656, 2.1:5019):27786);
+	tree 2_80_pos_8228 = [&U] (4.1:32805, ((3.1:4363, (5.1:2209, 1.1:2209):2154):656, 2.1:5019):27786);
+	tree 2_81_pos_8296 = [&U] (4.1:28193, ((3.1:4363, (5.1:2209, 1.1:2209):2154):656, 2.1:5019):23174);
+	tree 2_82_pos_8552 = [&U] (4.1:28193, ((3.1:4363, (5.1:2209, 1.1:2209):2154):656, 2.1:5019):23174);
+	tree 2_83_pos_8562 = [&U] (4.1:28193, ((3.1:4363, 1.1:4363):656, (5.1:2715, 2.1:2715):2304):23174);
+	tree 2_84_pos_8885 = [&U] ((3.1:4425, 4.1:4425):23768, (1.1:5019, (5.1:2715, 2.1:2715):2304):23174);
+	tree 2_85_pos_8892 = [&U] ((1.1:5019, (5.1:2715, 2.1:2715):2304):27722, (3.1:4425, 4.1:4425):28316);
+	tree 2_86_pos_8913 = [&U] ((1.1:5019, (5.1:2715, 2.1:2715):2304):27722, (3.1:4425, 4.1:4425):28316);
+	tree 2_87_pos_9107 = [&U] ((3.1:10348, (1.1:5019, (5.1:2715, 2.1:2715):2304):5329):22393, 4.1:32741);
+	tree 2_88_pos_9182 = [&U] ((3.1:10348, (1.1:5019, (5.1:2715, 2.1:2715):2304):5329):22393, 4.1:32741);
+	tree 2_89_pos_9242 = [&U] ((3.1:10348, (1.1:5019, (5.1:2715, 2.1:2715):2304):5329):22393, 4.1:32741);
+	tree 2_90_pos_9293 = [&U] ((3.1:10348, (1.1:5019, (5.1:2715, 2.1:2715):2304):5329):22393, 4.1:32741);
+	tree 2_91_pos_9778 = [&U] (((1.1:5019, (5.1:2715, 2.1:2715):2304):16627, 3.1:21646):11095, 4.1:32741);
+	tree 2_92_pos_9852 = [&U] (((1.1:5019, (5.1:2715, 2.1:2715):2304):16627, 3.1:21646):11095, 4.1:32741);
+	tree 2_93_pos_9867 = [&U] (((4.1:2829, 1.1:2829):2190, (5.1:2715, 2.1:2715):2304):16627, 3.1:21646);
+end;
+----
+
+.A data set that fails the four-gamete test.
+----
+#Number of independent chromosomes: 1
+# 6 polymorphic positions on chromosome 1
+#4926, 4935, 5171, 6649, 6911, 9819
+
+                SampleName="Sample 1"
+                SampleSize=5
+                SampleData= {
+1_1     1       ACTGCC
+1_2     1       TAATCC
+1_3     1       TAATCT
+1_4     1       ACTGCT
+1_5     1       ACTGGC
+
+}
+----
+
+See the figure of +imr-070211-2.rif+ in the +note+ directory.
+
+A likelihood should be computed using a recombinant tree with mapped mutation
+events. I use Poisson probability to compute the likelihood. Rates of mutation
+events should be adjusted to accommodate ``widths'' of ``active'' recombinant
+edges.
+
+Sequential Markov coalescent algorithms for population models with demographic structure
+----------------------------------------------------------------------------------------
+
+Theoretical Population Biology
+Volume 76, Issue 2, September 2009, Pages 84-91
+doi:10.1016/j.tpb.2009.05.002 | How to Cite or Link Using DOI Cited By in Scopus
+(1)
+  Permissions & Reprints
+
+
+  Sequential Markov coalescent algorithms for population models with demographic
+  structure
+
+  Purchase
+  $ 31.50
+  A. Erikssona, b, B. Mahjania and B. Mehliga, , , 
+  aDepartment of Physics, University of Gothenburg, SE-41296 Gothenburg, Sweden
+  bDepartment of Marine Ecology, University of Gothenburg, SE-43005 Gothenburg,
+  Sweden
+  Received 19 January 2009.  Available online 9 May 2009. 
+  Abstract
+  We analyse sequential Markov coalescent algorithms for populations with
+  demographic structure: for a bottleneck model, a population-divergence model,
+  and for a two-island model with migration. The sequential Markov coalescent
+  method is an approximation to the coalescent suggested by McVean and Cardin,
+  and by Marjoram and Wall. Within this algorithm we compute, for two
+  individuals randomly sampled from the population, the correlation between
+  times to the most recent common ancestor and the linkage probability
+  corresponding to two different loci with recombination rate R between them.
+  These quantities characterise the linkage between the two loci in question. We
+  find that the sequential Markov coalescent method approximates the coalescent
+  well in general in models with demographic structure. An exception is the case
+  where individuals are sampled from populations separated by reduced gene flow.
+  In this situation, the correlations may be significantly underestimated. We
+  explain why this is the case.
+  Keywords: Coalescent; Sequential Markov coalescent; Recombination; Population
+  structure

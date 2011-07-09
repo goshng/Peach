@@ -4,7 +4,6 @@ SET (imr_SRCS
   "SimpleOpt.h"
   "tinystr.cpp"
   "tinystr.h"
-  "tinyxml"
   "tinyxml.cpp"
   "tinyxml.h"
   "tinyxmlerror.cpp"
@@ -17,6 +16,18 @@ SET (imr_SRCS
   "imrSequence.cpp"
   "imrSequence.h"
   "imrType.h"
+  "imrHelp.cpp"
+  "imrHelp.h"
+  "imrXmlFastsimcoal.cpp"
+  "imrXmlFastsimcoal.h"
+  "imrXmlImrInput.cpp"
+  "imrXmlImrInput.h"
+  "imrXmlImrOutput.cpp"
+  "imrXmlImrOutput.h"
+  "imrDefault.cpp"
+  "imrDefault.h"
+  "imrXml.cpp"
+  "imrXml.h"
 )
 
 SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wwrite-strings -g3 -ggdb -O0")
