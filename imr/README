@@ -5,6 +5,44 @@ Sang Chul Choi <goshng@yahoo.co.kr>
 History
 -------
 
+Wed Jul 27 13:33:25 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I think that SMC approximation may allow coalescent between lineages whose links
+can be intersected. In SMC, recombinant edges that connect two branches, which
+creates two trees that are different by one SPR move (I am not sure if this is
+right term, or the SPR move). Kuhner's method and SMC are similar in that
+recombination can happen in any eligible links. Kuhner's method may allow any
+lineage to coalesce whereas SMC method allows only lineages whose link
+intersection is not empty. 
+
+Let's create a partial recombinant tree by removing parts of a full recombinant
+tree. I choose a lineage that is created by a coalescent event. External
+lineages and internal lineages are considered. I do not consider the root.
+Multiple lineages from the coalescent event can be removed. Use the links at the
+chosen lineage to remove lineages. I first detach the chosen lineage and save
+it. See links at the bottom of the lineage. Remove all of the links that
+originate in the links at the top of the chosen lineage by following all of the
+lineages towards the root. After locating and indicating all of the links I
+could remove some edges. This needs more elaboration.
+
+Fri Jul 22 00:31:57 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Let's consider Kuhner's proposal and another SMC method. A recombinant tree from
+Kuhner's proposal cannot be converted to SMC of gene trees. Yet, SMC gene trees
+can be. It seems like that I should be able to propose a recombinant tree that
+is constrained by SMC. How can you propose a new SMC compatible recombinant
+tree? Kuhner's method could be modified to propose SMC compatible recombinant
+trees!  
+
+Wed Jul 20 22:05:01 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I need to do the programming for the no-data MCMC. How does sequential Markov
+chain method help? I thought that could be helpful. Sequential Markov chains can
+be used for simulation. But, could it be helpful in inference procedure? Why did
+I think that it would be helpful? Can I use it for inference? I thought that
+ClonalOrigin's model could be used in the inference with demographic model. Is
+that true? Trees change as I move along a genome or parts of it. 
+
 Tue Jul  5 16:05:49 EDT 2011
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .How to find departure and arrival points?

@@ -1,0 +1,28 @@
+# imr input file
+#./imr xml --print 3 -o imrinput.xml
+# Chain test
+#./imr chain --infile imrinput.xml
+
+# Read a tree, remove a recombinant edge, print it out.
+./imr build -w 1 --remove 3 --infile imrrectree.xml -o partialtree.xml
+
+#./imr build -w 2 --infile imrevent.xml 
+#./imr build -w 1 --remove 1 --infile imrrectree.xml 
+#./imr build -w 1 --remove 2 --infile imrrectree.xml 
+#./imr build -w 1 --remove 3 --infile imrrectree.xml 
+#./imr build -w 1 --remove 4 --infile imrrectree.xml 
+#./imr build -w 1 --remove 5 --infile imrrectree.xml 
+#./imr build -w 1 --remove 18 --infile imrrectree.xml 
+#./imr build -w 1 --remove 19 --infile imrrectree.xml 
+#./imr build -w 1 --remove 20 --infile imrrectree.xml 
+#./imr build -w 1 --remove 21 --infile imrrectree.xml 
+#./imr build -w 1 --remove 28 --infile imrrectree.xml 
+#./imr build -w 1 --remove 29 --infile imrrectree.xml 
+#./imr build -w 1 --remove 32 --infile imrrectree.xml 
+#./imr build -w 1 --remove 35 --infile imrrectree.xml 
+#./imr build -w 1 --remove 36 --infile imrrectree.xml 
+#./imr build -w 1 --remove 37 --infile imrrectree.xml 
+#./imr build -w 1 --remove 38 --infile imrrectree.xml 
+#./imr build -w 1 --remove 39 --infile imrrectree.xml 
+#./imr build -w 1 --remove 40 --infile imrrectree.xml 
+#./imr build -w 1 --remove 41 --infile imrrectree.xml 

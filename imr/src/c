@@ -4,24 +4,42 @@ NOWEBFILE=/Users/goshng/Documents/Projects/peach/imr/noweb/imr.nw
 
 
 CPPFILE=( imr.cpp \
+          imrRvTree.cpp \
+          imrPriorg.cpp \
+          imrMultichain.cpp \
+          imrChain.cpp \
           imrTree.cpp \
           imrEdge.cpp \
+          imrEvent.cpp \
           imrSequence.cpp \
           imrHelp.cpp \
           imrDefault.cpp \
           imrXmlFastsimcoal.cpp \
           imrXmlImrInput.cpp \
           imrXmlImrOutput.cpp \
+          imrXmlImrRectree.cpp \
+          imrXmlImrEvent.cpp \
+          imrCmdLikelihood.cpp \
           imrXml.cpp )
 HPPFILE=( imr.h \
+          imrCommon.h \
+          imrRvTree.h \
+          imrRandomVariable.h \
+          imrPriorg.h \
+          imrMultichain.h \
+          imrChain.h \
           imrTree.h \
           imrEdge.h \
+          imrEvent.h \
           imrSequence.h \
           imrHelp.h \
           imrDefault.h \
           imrXmlFastsimcoal.h \
           imrXmlImrInput.h \
           imrXmlImrOutput.h \
+          imrXmlImrRectree.h \
+          imrXmlImrEvent.h \
+          imrCmdLikelihood.h \
           imrXml.h \
           imrType.h )
 

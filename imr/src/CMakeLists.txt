@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8)
 PROJECT (imr)
 SET (imr_SRCS 
   "SimpleGlob.h"
@@ -9,8 +10,19 @@ SET (imr_SRCS
   "tinyxmlerror.cpp"
   "tinyxmlparser.cpp"
   "imr.cpp"
+  "imrMultichain.cpp"
+  "imrMultichain.h"
+  "imrChain.cpp"
+  "imrChain.h"
+  "imrPriorg.cpp"
+  "imrPriorg.h"
+  "imrRvTree.cpp"
+  "imrRvTree.h"
   "imrTree.cpp"
   "imrTree.h"
+  "imrRandomVariable.h"
+  "imrEvent.cpp"
+  "imrEvent.h"
   "imrEdge.cpp"
   "imrEdge.h"
   "imrSequence.cpp"
@@ -24,12 +36,18 @@ SET (imr_SRCS
   "imrXmlImrInput.h"
   "imrXmlImrOutput.cpp"
   "imrXmlImrOutput.h"
+  "imrXmlImrRectree.cpp"
+  "imrXmlImrRectree.h"
+  "imrXmlImrEvent.cpp"
+  "imrXmlImrEvent.h"
   "imrDefault.cpp"
   "imrDefault.h"
+  "imrCmdLikelihood.cpp"
+  "imrCmdLikelihood.h"
   "imrXml.cpp"
   "imrXml.h"
 )
-
+ADD_DEFINITIONS("-DTIXML_USE_STL")
 SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wwrite-strings -g3 -ggdb -O0")
 
 ADD_EXECUTABLE (imr ${imr_SRCS})
