@@ -62,6 +62,9 @@ http://stackoverflow.com/questions/696321/best-logging-framework-for-native-c
 Virtual functions and abstract class
 http://www.learncpp.com/cpp-tutorial/126-pure-virtual-functions-abstract-base-classes-and-interface-classes/
 
+CMake:
+http://www-flc.desy.de/ldcoptimization/documents/talks/CMake\_Tutorial.pdf
+
 \subsection{Build imr}
 <<CMakeLists.txt>>=
 cmake_minimum_required(VERSION 2.8)
@@ -86,6 +89,10 @@ SET (imr_SRCS
   "imrRvTree.h"
   "imrTree.cpp"
   "imrTree.h"
+  "imrSetup.cpp"
+  "imrSetup.h"
+  "imrProposal.cpp"
+  "imrProposal.h"
   "imrRandomVariable.h"
   "imrEvent.cpp"
   "imrEvent.h"
@@ -233,7 +240,7 @@ of the left and right edge.
 // along with IMR.  If not, see <http://www.gnu.org/licenses/>.
 
 @
-\subsection{Main program [[imr]]}
+\subsection{Main}
 
 <<imr.cpp>>=
 <<imr gnu copyright>>
@@ -251,12 +258,14 @@ of the left and right edge.
 #include "imrXml.h"
 #include "imrCmdLikelihood.h"
 #include "imrChain.h"
+#include "imrSetup.h"
+#include "imrProposal.h"
 using namespace std;
 using namespace imr;
 
 static string sInfile;
 static string sOutfile;
-static int sCommand;
+static int sCommand = 0;
 static int sXmlPrint = 1;
 static int sBuildWhat = 1;
 static int sBuildTreeRemove = 0; 
@@ -326,13 +335,13 @@ CSimpleOpt::SOption g_rgOptions[] = {
 
 #include "log.h"
 
-LOG_DECLARE;
+// LOG_DECLARE;
 
 int 
 main (int argc, char* argv[])
 {
-  LOG_INIT("main.log");
-  LOG_MSG("Application initialization");
+  // LOG_INIT("main.log");
+  // LOG_MSG("Application initialization");
   if (argc == 1)
     {
       Help::full ();
@@ -408,6 +417,9 @@ main (int argc, char* argv[])
           cerr << "Invalid argument: " << args.OptionText() << endl;
         }
     }
+  
+  Setup (sInfile.c_str());
+  Proposal (sInfile.c_str());
 
   // Execute one command with options.
   switch (sCommand)
@@ -477,13 +489,484 @@ main (int argc, char* argv[])
 
 #endif // _IMR_H_
 @
-\subsection{IMR common header}
+\subsection{Common header}
 <<imrCommon.h>>=
 <<imr gnu copyright>>
 #ifndef _IMRCOMMON_H_
 #define _IMRCOMMON_H_
-#define XDELETE (p) do { delete((p)); (p) = NULL; } while(0)
 #endif // _IMRCOMMON_H_
+@
+\subsection{Defined data types}
+A few data types are redefined.
+<<imrType.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRTYPE_H_
+#define _IMRTYPE_H_
+typedef unsigned long ULONG;
+typedef unsigned int UINT;
+typedef double UDBL;
+typedef double UFLT;
+#endif // _IMRTYPE_H_
+@
+\subsection{Online help}
+
+<<imrHelp.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRHELP_H_
+#define _IMRHELP_H_
+namespace imr {
+class Help {
+public:
+  static void full ();
+  static void version ();
+};
+}
+#endif // _IMRHELP_H_
+<<imrHelp.cpp>>=
+<<imr gnu copyright>>
+#include <iostream>
+#include "imrHelp.h"
+using namespace std;
+namespace imr {
+void 
+Help::full ()
+{
+  cout << ""
+"IMR(1)                          IMR Commands Manual                       IMR(1)\n"
+"\n"
+"NAME\n"
+"   imr -- Isolation, migration, and recombination\n"
+"\n"
+"SYNOPSIS\n"
+"   imr [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The program implements a statistical method of estimating population sizes,\n"
+"   migration rates, and recombination rates using infinite-sites data.\n"
+"   The method is described in papers (Choi 2011).\n"
+"\n"
+"   General options:\n"
+"      -h --help -?\n"
+"         Shows this help message.\n"
+"      --version\n"
+"         Shows the version.\n"
+"      -i --infile [INFILE]\n"
+"         Reads in an input file.\n"
+"      --type\n"
+"         Input and output files are in XML format.\n" 
+"\n"
+"   Commands:\n"
+"      mcmc\n"
+"         Samples recombinant trees.\n"
+"      summarize\n"
+"         Summarizes a posterior sample of recombinant trees.\n"
+"      likelihood\n"
+"         Computes the likelihod of a recombinant tree given data.\n"
+"      prior\n"
+"         Computes the prior of a recombinant tree given model parameters.\n"
+"      xml\n"
+"         Reads and writes XML files.\n"
+"      build\n"
+"         Reads an XML file to build a recombinant tree.\n"
+"      chain\n"
+"         Uses chains.\n"
+"\n"
+"   Command build options:\n"
+"      -w --what [NUMBER]\n"
+"         1 Build a recombiant tree by reading the XML file that is\n"
+"           created by xml --print 5 -o imrrectree.xml\n"
+"         2 Build a list of events by reading the XML file that is\n"
+"           created by xml --print 6 -o imrevent.xml\n"
+"      --remove [NUMBER]\n"
+"         Remove a recombinant edge.\n"
+"\n"
+"   Command xml options:\n"
+"      -p --print [NUMBER]\n"
+"         1 Default setting\n"
+"         2 fastsimcoal file\n"
+"         3 imr input file\n"
+"         4 imr output file\n"
+"         5 imr recombinant tree file\n"
+"         6 imr event file\n"
+"         7 imr chain state file\n"
+"\n"
+"   Files:\n"
+"      INFILE\n"
+"         Different commands can be combined with different formats of input\n"
+"         files. An input file with command xml is an XML file.\n" 
+"      OUTFILE\n"
+"\n"
+"   Usages:\n"
+"      imr xml --infile INFILE\n"
+"         Reads in an XML file, and prints it out to standard output.\n"
+"      imr xml --print 1 -o default.xml\n" 
+"         Prints the imr default setting.\n"
+"      imr likelihood -i imroutput.xml\n"
+"         Computes the likelihood of data given a recombinant tree.\n"
+"      imr xml --print 5 -o imrrectree.xml\n"
+"         Creates a recombinant tree in XML format\n"
+"      imr build -w 1 --infile imrrectree.xml\n"
+"         Build a recombinant tree using an XML file.\n"
+"      imr build -w 1 --remove 1 --infile imrrectree.xml\n"
+"         Build a recombinant tree using an XML file, and remove the edge.\n"
+"      imr build -w 1 --remove 1 --infile imrrectree.xml -o partialtree.xml\n"
+"         Build a recombinant tree using an XML file, and remove the edge.\n"
+"      imr xml --print 6 -o imrevent.xml\n"
+"         Creates a list of events in XML format\n"
+"      imr build -w 2 --infile imrevent.xml\n"
+"         Build a list of events using an XML file.\n"
+"      imr xml --print 7\n"
+"         Build a list of events using an XML file.\n"
+"      imr xml --print 3 -o imrinput.xml\n" 
+"         Prints the imr input file.\n"
+"      imr chain --infile imrinput.xml\n"
+"         Test a chain.\n"
+"\n"
+"AUTHOR\n"
+"   Written by Sang Chul Choi\n"
+"\n"
+"REPORTING BUGS\n"
+"   Report bugs to google group of Isolation with Migration\n"
+"   at http://groups.google.com/group/isolation-with-migration\n"
+"\n"
+"VERSION\n"
+"   imr 1.0 - Build IMRBUILDDATETIME\n"
+"\n"
+"COPYRIGHT\n"
+"   Copyright (C) 2011- Sang Chul Choi\n"
+"   See the source for copying conditions.\n"
+"   There is NO warranty; not even for MERCHANTABILITY\n"
+"\n"
+"GNU imr 1.0                     December 2011                             IMR(1)\n"
+"";
+}
+void 
+Help::version ()
+{
+  cout << ""
+"imr 1.0 - Build IMRBUILDDATETIME\n"
+"Written by Sang Chul Choi.\n"
+"\n"
+"Copyright (c) 2011- Sang Chul Choi\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"";
+}
+}
+@
+\subsection{Setup}
+[[imr]] default values are specified in this file.
+I need error handling classes.
+The base element [[setup]] has essential setup.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+    <setup>
+        <seed value="12423467" />
+        <generation year="25" />
+        <chain burn="50000" gens="100000" thin="100" />
+        <mc3 number="25" a="0.995" b="0.5" />
+    </setup>
+\end{Verbatim}
+<<imrSetup.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRSETUP_H_
+#define _IMRSETUP_H_
+#include <iostream>
+#include <vector>
+#include "imrCommon.h"
+#include "imrType.h"
+using namespace std;
+namespace imr {
+class Setup {
+private:
+  static ULONG mSeed;
+  static UDBL mGeneration;
+  static UINT mBurn;
+  static UINT mGens;
+  static UINT mThin;
+  static UINT mNumberChain;
+  static UDBL mMC3A;
+  static UDBL mMC3B;
+  Setup ();
+public:
+  Setup (const char*);
+};
+}
+#endif // _IMRSETUP_H_
+<<imrSetup.cpp>>=
+<<imr gnu copyright>>
+#include <cassert>
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrSetup.h"
+namespace imr {
+ULONG Setup::mSeed = 0;
+UDBL Setup::mGeneration = 1;
+UINT Setup::mBurn = 1000;
+UINT Setup::mGens = 1000;
+UINT Setup::mThin = 10;
+UINT Setup::mNumberChain = 1;
+UDBL Setup::mMC3A = 0.9;
+UDBL Setup::mMC3B = 0.9;
+Setup::Setup (const char* f)
+{
+  TiXmlDocument doc(f);
+  bool loadOkay = doc.LoadFile();
+  if (loadOkay == false)
+    {
+      return;
+    }
+
+  TiXmlHandle hDoc(&doc);
+  TiXmlElement* pElem;
+  TiXmlHandle hRoot(0);
+
+  {
+    pElem = hDoc.FirstChildElement().Element();
+    if (!pElem) return;
+    hRoot = TiXmlHandle(pElem);
+  }
+
+  {
+    pElem = hRoot.FirstChild("setup").FirstChild("seed").Element();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("value", &mSeed);
+      }
+    pElem = hRoot.FirstChild("setup").FirstChild("generation").Element();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("year", &mGeneration);
+      }
+    pElem = hRoot.FirstChild("setup").FirstChild("chain").Element();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("burn", &mBurn);
+        pElem->QueryValueAttribute("gens", &mGens);
+        pElem->QueryValueAttribute("thin", &mThin);
+      }
+    pElem = hRoot.FirstChild("setup").FirstChild("mc3").Element();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("number", &mNumberChain);
+        pElem->QueryValueAttribute("a", &mMC3A);
+        pElem->QueryValueAttribute("b", &mMC3B);
+      }
+  }
+/*
+  std::cout << "seed: " << mSeed << std::endl
+            << "generation: " << mGeneration << std::endl
+            << "burn: " << mBurn << std::endl
+            << "gens: " << mGens << std::endl
+            << "thin: " << mThin << std::endl
+            << "MC3 - number of chain: " << mNumberChain << std::endl
+            << "MC3 - a: " << mMC3A << std::endl
+            << "MC3 - b: " << mMC3B << std::endl;
+*/
+}
+}
+@
+\subsection{Proposal distributions}
+Mutation scalars across loci are updated using Hey2007. Recombinant edges are
+updated using Kuhner2000. Population splitting events are updated using
+Rannala2003. The values of update are used to compute relative proportions of
+update tries. Mutation scalers update of all of the loci, recombinant edge
+update for all of the loci, and splitting time update are equally tried. Note
+that a set of mutation scalers update is considered to be one iteration. 
+\begin{Verbatim}[frame=lines,framesep=5mm]
+    <proposal>
+        <hey2007 update="1" />
+        <kuhner2000 update="1" />
+        <rannala2003 update="1" />
+    </proposal>
+\end{Verbatim}
+<<imrProposal.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRPROPOSAL_H_
+#define _IMRPROPOSAL_H_
+#include <iostream>
+#include <vector>
+#include "imrCommon.h"
+#include "imrType.h"
+using namespace std;
+namespace imr {
+class Proposal {
+private:
+  static UINT mHey2007;
+  static UINT mKuhner2000;
+  static UINT mRannala2003;
+  Proposal ();
+public:
+  Proposal (const char*);
+};
+}
+#endif // _IMRPROPOSAL_H_
+<<imrProposal.cpp>>=
+<<imr gnu copyright>>
+#include <cassert>
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrProposal.h"
+namespace imr {
+UINT Proposal::mHey2007 = 1;
+UINT Proposal::mKuhner2000 = 1;
+UINT Proposal::mRannala2003 = 1;
+Proposal::Proposal (const char* f)
+{
+  TiXmlDocument doc(f);
+  bool loadOkay = doc.LoadFile();
+  if (loadOkay == false)
+    {
+      return;
+    }
+
+  TiXmlElement* pElem;
+  TiXmlHandle hDoc(&doc);
+  TiXmlHandle hRoot(NULL);
+
+  {
+    pElem = hDoc.FirstChildElement().ToElement();
+    if (!pElem) return;
+    hRoot = TiXmlHandle(pElem);
+  }
+
+  {
+    pElem = hRoot.FirstChild("proposal").FirstChild("hey2007").ToElement();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("update", &mHey2007);
+      }
+    pElem = hRoot.FirstChild("proposal").FirstChild("kuhner2000").ToElement();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("update", &mKuhner2000);
+      }
+    pElem = hRoot.FirstChild("proposal").FirstChild("rannala2003").ToElement();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("update", &mRannala2003);
+      }
+  }
+  std::cout << "hey2007: " << mHey2007 << std::endl
+            << "kuhner2000: " << mKuhner2000 << std::endl
+            << "rannala2003: " << mRannala2003 << std::endl;
+}
+}
+@
+\subsection{Prior distributions}
+Uniform priors on recombination rate $\rho$, population size $\theta$, and
+migration rate are imposed. Maximum values are given.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+    <prior>
+        <rho max="0.5" />
+        <theta max="1" />
+        <migration max="0.1" />
+        <populations>
+            <population name="East" id="1" />
+            <population name="West" id="2" />
+            <population name="Central" id="3" />
+        </populations>
+        <individuals>
+            <individual name="Alice" id="1" population="1" />
+            <individual name="Bob" id="2" population="1" />
+            <individual name="Carol" id="3" population="1" />
+            <individual name="David" id="4" population="1" />
+            <individual name="Elizabeth" id="5" population="1" />
+        </individuals>
+        <structure model="Tree" tree="((1,2)4,3)5">
+            <split>((1:1,2:1)4:2,3:2)5</split>
+            <theta>((1:5,2:5)4:5,3:5)5:2</theta>
+            <rho>((1:1,2:1)4:1,3:1)5:1</rho>
+            <migration>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</migration>
+        </structure>
+    </prior>
+\end{Verbatim}
+<<imrPrior.h>>=
+<<imr gnu copyright>>
+#ifndef _IMRPRIOR_H_
+#define _IMRPRIOR_H_
+#include <iostream>
+#include <vector>
+#include "imrCommon.h"
+#include "imrType.h"
+using namespace std;
+namespace imr {
+class Prior {
+private:
+  static UDBL mRho;
+  static UDBL mTheta;
+  static UDBL mMigration;
+
+  Prior ();
+public:
+  Prior (const char*);
+};
+// STOPPED
+}
+#endif // _IMRPRIOR_H_
+<<imrPrior.cpp>>=
+<<imr gnu copyright>>
+#include <cassert>
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "imrPrior.h"
+namespace imr {
+UINT Proposal::mHey2007 = 1;
+UINT Proposal::mKuhner2000 = 1;
+UINT Proposal::mRannala2003 = 1;
+Proposal::Proposal (const char* f)
+{
+  TiXmlDocument doc(f);
+  bool loadOkay = doc.LoadFile();
+  if (loadOkay == false)
+    {
+      return;
+    }
+
+  TiXmlElement* pElem;
+  TiXmlHandle hDoc(&doc);
+  TiXmlHandle hRoot(NULL);
+
+  {
+    pElem = hDoc.FirstChildElement().ToElement();
+    if (!pElem) return;
+    hRoot = TiXmlHandle(pElem);
+  }
+
+  {
+    pElem = hRoot.FirstChild("proposal").FirstChild("hey2007").ToElement();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("update", &mHey2007);
+      }
+    pElem = hRoot.FirstChild("proposal").FirstChild("kuhner2000").ToElement();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("update", &mKuhner2000);
+      }
+    pElem = hRoot.FirstChild("proposal").FirstChild("rannala2003").ToElement();
+    if (pElem != NULL)
+      {
+        pElem->QueryValueAttribute("update", &mRannala2003);
+      }
+  }
+  std::cout << "hey2007: " << mHey2007 << std::endl
+            << "kuhner2000: " << mKuhner2000 << std::endl
+            << "rannala2003: " << mRannala2003 << std::endl;
+}
+}
+
 @
 \subsection{Parallelize chains}
 I need to consider parallelization of codes. Obviously, each chain can run on a
@@ -1868,7 +2351,6 @@ Edge::print ()
 }
 
 }
-
 @
 \subsection{Sequence}
 A sequence data for each node.
@@ -1886,164 +2368,11 @@ namespace imr {
 
 }
 @
-\subsection{Data types}
-A few data types are redefined.
-<<imrType.h>>=
-<<imr gnu copyright>>
-#ifndef _IMRTYPE_H_
-#define _IMRTYPE_H_
-typedef unsigned int UINT;
-typedef double UDBL;
-typedef double UFLT;
-#endif // _IMRTYPE_H_
-@
-\subsection{Online help}
-
-<<imrHelp.h>>=
-<<imr gnu copyright>>
-#ifndef _IMRHELP_H_
-#define _IMRHELP_H_
-namespace imr {
-class Help {
-public:
-  static void full ();
-  static void version ();
-};
-}
-#endif // _IMRHELP_H_
-<<imrHelp.cpp>>=
-<<imr gnu copyright>>
-#include <iostream>
-#include "imrHelp.h"
-using namespace std;
-namespace imr {
-void 
-Help::full ()
-{
-  cout << ""
-"IMR(1)                          IMR Commands Manual                       IMR(1)\n"
-"\n"
-"NAME\n"
-"   imr -- Isolation, migration, and recombination\n"
-"\n"
-"SYNOPSIS\n"
-"   imr [OPTION]\n"
-"\n"
-"DESCRIPTION\n"
-"   The program implements a statistical method of estimating population sizes,\n"
-"   migration rates, and recombination rates using infinite-sites data.\n"
-"   The method is described in papers (Choi 2011).\n"
-"\n"
-"   General options:\n"
-"      -h --help -?\n"
-"         Shows this help message.\n"
-"      --version\n"
-"         Shows the version.\n"
-"      -i --infile [INFILE]\n"
-"         Reads in an input file.\n"
-"      --type\n"
-"         Input and output files are in XML format.\n" 
-"\n"
-"   Commands:\n"
-"      mcmc\n"
-"         Samples recombinant trees.\n"
-"      summarize\n"
-"         Summarizes a posterior sample of recombinant trees.\n"
-"      likelihood\n"
-"         Computes the likelihod of a recombinant tree given data.\n"
-"      prior\n"
-"         Computes the prior of a recombinant tree given model parameters.\n"
-"      xml\n"
-"         Reads and writes XML files.\n"
-"      build\n"
-"         Reads an XML file to build a recombinant tree.\n"
-"      chain\n"
-"         Uses chains.\n"
-"\n"
-"   Command build options:\n"
-"      -w --what [NUMBER]\n"
-"         1 Build a recombiant tree by reading the XML file that is\n"
-"           created by xml --print 5 -o imrrectree.xml\n"
-"         2 Build a list of events by reading the XML file that is\n"
-"           created by xml --print 6 -o imrevent.xml\n"
-"      --remove [NUMBER]\n"
-"         Remove a recombinant edge.\n"
-"\n"
-"   Command xml options:\n"
-"      -p --print [NUMBER]\n"
-"         1 Default setting\n"
-"         2 fastsimcoal file\n"
-"         3 imr input file\n"
-"         4 imr output file\n"
-"         5 imr recombinant tree file\n"
-"         6 imr event file\n"
-"         7 imr chain state file\n"
-"\n"
-"   Files:\n"
-"      INFILE\n"
-"         Different commands can be combined with different formats of input\n"
-"         files. An input file with command xml is an XML file.\n" 
-"      OUTFILE\n"
-"\n"
-"   Usages:\n"
-"      imr xml --infile INFILE\n"
-"         Reads in an XML file, and prints it out to standard output.\n"
-"      imr xml --print 1 -o default.xml\n" 
-"         Prints the imr default setting.\n"
-"      imr likelihood -i imroutput.xml\n"
-"         Computes the likelihood of data given a recombinant tree.\n"
-"      imr xml --print 5 -o imrrectree.xml\n"
-"         Creates a recombinant tree in XML format\n"
-"      imr build -w 1 --infile imrrectree.xml\n"
-"         Build a recombinant tree using an XML file.\n"
-"      imr build -w 1 --remove 1 --infile imrrectree.xml\n"
-"         Build a recombinant tree using an XML file, and remove the edge.\n"
-"      imr build -w 1 --remove 1 --infile imrrectree.xml -o partialtree.xml\n"
-"         Build a recombinant tree using an XML file, and remove the edge.\n"
-"      imr xml --print 6 -o imrevent.xml\n"
-"         Creates a list of events in XML format\n"
-"      imr build -w 2 --infile imrevent.xml\n"
-"         Build a list of events using an XML file.\n"
-"      imr xml --print 7\n"
-"         Build a list of events using an XML file.\n"
-"      imr xml --print 3 -o imrinput.xml\n" 
-"         Prints the imr input file.\n"
-"      imr chain --infile imrinput.xml\n"
-"         Test a chain.\n"
-"\n"
-"AUTHOR\n"
-"   Written by Sang Chul Choi\n"
-"\n"
-"REPORTING BUGS\n"
-"   Report bugs to google group of Isolation with Migration\n"
-"   at http://groups.google.com/group/isolation-with-migration\n"
-"\n"
-"VERSION\n"
-"   imr 1.0 - Build IMRBUILDDATETIME\n"
-"\n"
-"COPYRIGHT\n"
-"   Copyright (C) 2011- Sang Chul Choi\n"
-"   See the source for copying conditions.\n"
-"   There is NO warranty; not even for MERCHANTABILITY\n"
-"\n"
-"GNU imr 1.0                     December 2011                             IMR(1)\n"
-"";
-}
-void 
-Help::version ()
-{
-  cout << ""
-"imr 1.0 - Build IMRBUILDDATETIME\n"
-"Written by Sang Chul Choi.\n"
-"\n"
-"Copyright (c) 2011- Sang Chul Choi\n"
-"This is free software; see the source for copying conditions.  There is NO\n"
-"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"";
-}
-}
-@
 \subsection{XML files}
+[[imr]] reads in and writes to XML files. Main parts of the XML file are
+input, MCMC output, and ML output. The main XML element is imr. The main
+parts of elements are setup, parameter, prior, data, mcmc, and ml. 
+
 <<imrXml.h>>=
 <<imr gnu copyright>>
 #ifndef _IMRXML_H_

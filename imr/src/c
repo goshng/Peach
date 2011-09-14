@@ -4,6 +4,8 @@ NOWEBFILE=/Users/goshng/Documents/Projects/peach/imr/noweb/imr.nw
 
 
 CPPFILE=( imr.cpp \
+          imrSetup.cpp \
+          imrProposal.cpp \
           imrRvTree.cpp \
           imrPriorg.cpp \
           imrMultichain.cpp \
@@ -23,6 +25,8 @@ CPPFILE=( imr.cpp \
           imrXml.cpp )
 HPPFILE=( imr.h \
           imrCommon.h \
+          imrSetup.h \
+          imrProposal.h \
           imrRvTree.h \
           imrRandomVariable.h \
           imrPriorg.h \

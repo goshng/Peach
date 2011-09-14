@@ -1,0 +1,138 @@
+<?xml version="1.0" ?>
+<imr>
+    <setup>
+        <seed value="12423467" />
+        <generation year="25" />
+        <chain burn="50000" gens="100000" thin="100" />
+        <mc3 number="25" a="0.995" b="0.5" />
+    </setup>
+
+    <proposal>
+        <hey2007 update="1" />
+        <kuhner2000 update="1" />
+        <rannala2003 update="1" />
+    </proposal>
+
+    <prior>
+        <rho max="0.5" />
+        <theta max="1" />
+        <migration max="0.1" />
+        <populations>
+            <population name="East" id="1" />
+            <population name="West" id="2" />
+            <population name="Central" id="3" />
+        </populations>
+        <individuals>
+            <individual name="Alice" id="1" population="1" />
+            <individual name="Bob" id="2" population="1" />
+            <individual name="Carol" id="3" population="1" />
+            <individual name="David" id="4" population="1" />
+            <individual name="Elizabeth" id="5" population="1" />
+        </individuals>
+        <structure model="Tree" tree="((1,2)4,3)5">
+            <split>((1:1,2:1)4:2,3:2)5</split>
+            <theta>((1:5,2:5)4:5,3:5)5:2</theta>
+            <rho>((1:1,2:1)4:1,3:1)5:1</rho>
+            <migration>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</migration>
+        </structure>
+    </prior>
+
+    <data>
+        <locus name="locus1" length="10000" site="4926,4935,5171,6649,6911,9819">
+            <sequence individualid="1">ACTGCC</sequence>
+            <sequence individualid="2">TAATCC</sequence>
+            <sequence individualid="3">TAATCT</Sequence>
+            <sequence individualid="4">ACTGCT</Sequence>
+            <sequence individualid="5">ACTGGC</Sequence>
+        </locus>
+    </data>
+
+    <mcmc>
+        <iteration gen=1>
+            <mu>
+            </mu>
+            <rectree site="1,2,3,4,5,6,7,8,9,10,11,12,">
+                <events>
+                    <event time="1" type="recombination" up="4" downleft="5" downright="6" breakpoint="0" />
+                    <event time="2" type="recombination" up="5" downleft="7" downright="8" breakpoint="0" />
+                    <event time="3" type="recombination" up="1" downleft="9" downright="10" breakpoint="0" />
+                    <event time="4" type="recombination" up="3" downleft="11" downright="12" breakpoint="0" />
+                    <event time="5" type="recombination" up="2" downleft="13" downright="14" breakpoint="0" />
+                    <event time="6" type="recombination" up="14" downleft="15" downright="16" breakpoint="0" />
+                    <event time="7" type="coalescent" left="6" right="10" down="17" />
+                    <event time="8" type="coalescent" left="9" right="13" down="18" />
+                    <event time="9" type="coalescent" left="12" right="15" down="19" />
+                    <event time="10" type="coalescent" left="0" right="8" down="20" />
+                    <event time="11" type="recombination" up="18" downleft="21" downright="22" breakpoint="0" />
+                    <event time="12" type="recombination" up="7" downleft="23" downright="24" breakpoint="0" />
+                    <event time="13" type="recombination" up="19" downleft="25" downright="26" breakpoint="0" />
+                    <event time="14" type="coalescent" left="20" right="22" down="27" />
+                    <event time="15" type="coalescent" left="25" right="27" down="28" />
+                    <event time="16" type="recombination" up="28" downleft="29" downright="30" breakpoint="0" />
+                    <event time="17" type="coalescent" left="11" right="23" down="31" />
+                    <event time="18" type="recombination" up="26" downleft="32" downright="33" breakpoint="0" />
+                    <event time="19" type="coalescent" left="17" right="30" down="34" />
+                    <event time="20" type="coalescent" left="32" right="34" down="35" />
+                    <event time="21" type="coalescent" left="21" right="31" down="36" />
+                    <event time="22" type="coalescent" left="16" right="35" down="37" />
+                    <event time="23" type="coalescent" left="24" right="37" down="38" />
+                    <event time="24" type="coalescent" left="29" right="38" down="39" />
+                    <event time="25" type="coalescent" left="36" right="39" down="40" />
+                    <event time="26" type="coalescent" left="33" right="40" down="41" />
+                </events>
+                <edges>
+                    <edge id="0" time="-1" type="leaf" left="NULL" right="NULL" downLeft="20" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="1" time="-1" type="leaf" left="NULL" right="NULL" downLeft="9" downRight="10" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="2" time="-1" type="leaf" left="NULL" right="NULL" downLeft="13" downRight="14" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="3" time="-1" type="leaf" left="NULL" right="NULL" downLeft="11" downRight="12" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="4" time="-1" type="leaf" left="NULL" right="NULL" downLeft="5" downRight="6" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="5" time="1" type="recombination" left="4" right="NULL" downLeft="7" downRight="8" link="1,1,1,1,1,1,1,1,1,0,0,0," />
+                    <edge id="6" time="1" type="recombination" left="4" right="NULL" downLeft="17" downRight="NULL" link="0,0,0,0,0,0,0,0,0,1,1,1," />
+                    <edge id="7" time="2" type="recombination" left="5" right="NULL" downLeft="23" downRight="24" link="1,1,1,1,1,1,1,1,0,0,0,0," />
+                    <edge id="8" time="2" type="recombination" left="5" right="NULL" downLeft="20" downRight="NULL" link="0,0,0,0,0,0,0,0,1,0,0,0," />
+                    <edge id="9" time="3" type="recombination" left="1" right="NULL" downLeft="18" downRight="NULL" link="1,1,1,1,1,0,0,0,0,0,0,0," />
+                    <edge id="10" time="3" type="recombination" left="1" right="NULL" downLeft="17" downRight="NULL" link="0,0,0,0,0,1,1,1,1,1,1,1," />
+                    <edge id="11" time="4" type="recombination" left="3" right="NULL" downLeft="31" downRight="NULL" link="1,0,0,0,0,0,0,0,0,0,0,0," />
+                    <edge id="12" time="4" type="recombination" left="3" right="NULL" downLeft="19" downRight="NULL" link="0,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="13" time="5" type="recombination" left="2" right="NULL" downLeft="18" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,0,0," />
+                    <edge id="14" time="5" type="recombination" left="2" right="NULL" downLeft="15" downRight="16" link="0,0,0,0,0,0,0,0,0,0,1,1," />
+                    <edge id="15" time="6" type="recombination" left="14" right="NULL" downLeft="19" downRight="NULL" link="0,0,0,0,0,0,0,0,0,0,1,0," />
+                    <edge id="16" time="6" type="recombination" left="14" right="NULL" downLeft="37" downRight="NULL" link="0,0,0,0,0,0,0,0,0,0,0,1," />
+                    <edge id="17" time="7" type="coalescent" left="6" right="10" downLeft="34" downRight="NULL" link="0,0,0,0,0,1,1,1,1,1,1,1," />
+                    <edge id="18" time="8" type="coalescent" left="9" right="13" downLeft="21" downRight="22" link="1,1,1,1,1,1,1,1,1,1,0,0," />
+                    <edge id="19" time="9" type="coalescent" left="12" right="15" downLeft="25" downRight="26" link="0,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="20" time="10" type="coalescent" left="0" right="8" downLeft="27" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="21" time="11" type="recombination" left="18" right="NULL" downLeft="36" downRight="NULL" link="1,1,1,0,0,0,0,0,0,0,0,0," />
+                    <edge id="22" time="11" type="recombination" left="18" right="NULL" downLeft="27" downRight="NULL" link="0,0,0,1,1,1,1,1,1,1,0,0," />
+                    <edge id="23" time="12" type="recombination" left="7" right="NULL" downLeft="31" downRight="NULL" link="1,1,0,0,0,0,0,0,0,0,0,0," />
+                    <edge id="24" time="12" type="recombination" left="7" right="NULL" downLeft="38" downRight="NULL" link="0,0,1,1,1,1,1,1,0,0,0,0," />
+                    <edge id="25" time="13" type="recombination" left="19" right="NULL" downLeft="28" downRight="NULL" link="0,1,1,1,0,0,0,0,0,0,0,0," />
+                    <edge id="26" time="13" type="recombination" left="19" right="NULL" downLeft="32" downRight="33" link="0,0,0,0,1,1,1,1,1,1,1,1," />
+                    <edge id="27" time="14" type="coalescent" left="20" right="22" downLeft="28" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="28" time="15" type="coalescent" left="25" right="27" downLeft="29" downRight="30" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="29" time="16" type="recombination" left="28" right="NULL" downLeft="39" downRight="NULL" link="1,1,1,1,1,1,0,0,0,0,0,0," />
+                    <edge id="30" time="16" type="recombination" left="28" right="NULL" downLeft="34" downRight="NULL" link="0,0,0,0,0,0,1,1,1,1,1,1," />
+                    <edge id="31" time="17" type="coalescent" left="11" right="23" downLeft="36" downRight="NULL" link="1,1,0,0,0,0,0,0,0,0,0,0," />
+                    <edge id="32" time="18" type="recombination" left="26" right="NULL" downLeft="35" downRight="NULL" link="0,0,0,0,1,1,1,0,0,0,0,0," />
+                    <edge id="33" time="18" type="recombination" left="26" right="NULL" downLeft="41" downRight="NULL" link="0,0,0,0,0,0,0,1,1,1,1,1," />
+                    <edge id="34" time="19" type="coalescent" left="17" right="30" downLeft="35" downRight="NULL" link="0,0,0,0,0,1,1,1,1,1,1,1," />
+                    <edge id="35" time="20" type="coalescent" left="32" right="34" downLeft="37" downRight="NULL" link="0,0,0,0,1,1,1,1,1,1,1,1," />
+                    <edge id="36" time="21" type="coalescent" left="21" right="31" downLeft="40" downRight="NULL" link="1,1,1,0,0,0,0,0,0,0,0,0," />
+                    <edge id="37" time="22" type="coalescent" left="16" right="35" downLeft="38" downRight="NULL" link="0,0,0,0,1,1,1,1,1,1,1,1," />
+                    <edge id="38" time="23" type="coalescent" left="24" right="37" downLeft="39" downRight="NULL" link="0,0,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="39" time="24" type="coalescent" left="29" right="38" downLeft="40" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="40" time="25" type="coalescent" left="36" right="39" downLeft="41" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                    <edge id="41" time="26" type="coalescent" left="33" right="40" downLeft="NULL" downRight="NULL" link="1,1,1,1,1,1,1,1,1,1,1,1," />
+                </edges>
+            </rectree>
+        </iteration>
+    </mcmc>
+    <ml>
+        <mu>
+        </mu>
+        <theta>
+        </theta>
+        <rho>
+        </rho>
+    </ml>
+</imr>

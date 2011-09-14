@@ -4,7 +4,7 @@
 #./imr chain --infile imrinput.xml
 
 # Read a tree, remove a recombinant edge, print it out.
-./imr build -w 1 --remove 3 --infile imrrectree.xml -o partialtree.xml
+./imr bild -w 1 --remove 3 --infile imrrectree.xml -o partialtree.xml
 
 #./imr build -w 2 --infile imrevent.xml 
 #./imr build -w 1 --remove 1 --infile imrrectree.xml 
