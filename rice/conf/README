@@ -1,0 +1,32 @@
+# Main Configuration File
+# =======================
+#
+PROJECTNAME:rice
+#
+# Local Machine
+# -------------
+NUMBERCPU:4
+#
+# Cluster ID setup
+# ----------------
+CAC_USERNAME:sc2265
+CAC_LOGIN:linuxlogin.cac.cornell.edu
+CAC_ROOT:Documents/Projects/rice
+#
+# X11 linux ID setup
+# ------------------
+X11_USERNAME:choi
+X11_LOGIN:swiftgen
+X11_ROOT:Documents/Projects/rice
+#
+# Cluster access to job submission
+# --------------------------------
+BATCHEMAIL:schoi@cornell.edu
+BATCHACCESS:acs4_0001
+QUEUENAME:v4
+BATCHIMA2:bin/IMa2
+
+#
+# Global setup
+# ------------
+IMA2:src/ima2-4.11.11/b/src/IMa2

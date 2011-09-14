@@ -1,0 +1,38 @@
+Data
+====
+Sang Chul Choi
+
+The main data set
+-----------------
+The data set of 408 loci is in +summarize-sequence-data.txt+.
+Another data file +summarize-sequence-data-for-assignment.txt+ is a version for
+population assignment.
+A prior file for the three populations +prior-file1+ can be used with 
++summarize-sequence-data.txt+. Two more prior files +prior-file2+
++prior-file3+ are created by modifying the first one.
+
+File +summarize-sequence-data1+ is the same as 
++summarize-sequence-data.txt+. 
+Files +summarize-sequence-data2+ and 
++summarize-sequence-data3+ are data files for two alternative trees.
+
+----
+# Tree 1
+# summarize-sequence-data1
+# prior-file1
+((0,2):3,1):4
+----
+
+----
+# Tree 2: 1<->2 w.r.t. Tree 1
+# summarize-sequence-data2
+# prior-file2
+((0,1):3,2):4
+----
+
+----
+# Tree 3: 0<->1 w.r.t. Tree 1
+# summarize-sequence-data3
+# prior-file3
+((1,2):3,0):4
+----

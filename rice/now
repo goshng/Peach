@@ -1,0 +1,5 @@
+src/ima2-4.11.11/b/src/IMa2 -c3 -b300000 -d100 -l3000 \
+-hfg -hn30 -ha0.995 -hb0.95 \
+-g/Users/goshng/Documents/Projects/rice-analysis/output/osativa/1/data/prior-file.txt \
+-i/Users/goshng/Documents/Projects/rice-analysis/output/osativa/1/data/summarize-sequence-data.txt \
+-o/Users/goshng/Documents/Projects/rice-analysis/output/osativa/1/ima2/run-ima2-062811.out -r5 -z1000

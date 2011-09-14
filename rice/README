@@ -1,0 +1,89 @@
+Inferring species tree using rice genomes
+=========================================
+
+History
+-------
+
+Wed Jul 20 16:30:54 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are another paper by 
+He Z, Zhai W, Wen H, Tang T, Wang Y, et al. (2011) Two Evolutionary Histories in
+the Genome of Rice: the Roles of Domestication Genes. PLoS Genet 7(6): e1002100.
+doi:10.1371/journal.pgen.1002100
+The data set is in RNA-Seq short reads that can be downloaded from
+ftp://ftp.big.ac.cn
+
+Tue Jul  5 13:34:56 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Menu *ima2-prepare* is added to run the data +data/summarize-sequence-data.txt+
+with three different trees. Menu *ima2-receive* needs to be added to get the
+result from the cluster. The two splitting event times in the tree where
+rifipogon is the out-group appear to be nearer than what it was reported in
+Molina et al. (2011). Using BEAST they reported that the larger splitting event
+time was twice as much as the smaller one. Using 408 loci data set in the file
++data/summarize-sequence-data.txt+ the two splitting event times appear to be 
+similar. The following is the result of the +output/osativa/1+
+----
+HiPt    0.08150         0.08300
+HiSmth  0.07750         0.08300
+----
+that shows estimates of the two splitting event times.
+
+Mon Jun 13 09:58:28 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The population size of rufipogon appeared to be much larger than those of the
+other two of indica and japonica. I need to increase the the prior of
+rufipogon's population size. I increase the maximum of population size to three
+times as the other's.
+
+Fri Jun 10 14:27:43 EDT 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The genome sequence was downloaded.  
+The Rice data files are in DOS format. They should be changed to UNIX format.
+The decimal point is 1 digit(s) to the right of the |
+----
+0 | 00000000000000001111111111111111111111111111111111111111122222222222+162
+0 |
+55555555555555555555555555555555555555555555555555666666666666666666+107
+1 | 00000000000000000000111111111112222222222222222222233333333333344444
+1 | 55555555555566666666777777777888888888899999999
+2 | 000000000001111122222222333333344
+2 | 5556666666677888889999
+3 | 00111233344
+3 | 5566678
+4 | 122234
+4 | 58
+5 | 2
+5 | 
+6 | 4
+----
+
+Abstract
+--------
+Recently, rice genomes were sequenced in multiple individuals spanning three
+species. The phylogenetic relationship of these could have been resolved using
+the data set. The method developed in BEAST was not able to handle the data set
+presumably because the sequence data were not informative enough. Instead, the
+authors (Molina 2011) used site-frequency spectrum to sidestep the problem. They
+took advantage of other data sets not the data set they obtained. Here, we
+consider that 
+
+Methods and Materials
+---------------------
+We downloaded the rice DNA sequences at
+http://puruggananlab.bio.nyu.edu/Rice_data/RiceScan.zip.
+
+Introduction
+------------
+.Parts that I need to consider.
+. Three rice species: O. rufipogon, O. sativa ssp. indica, and O. sativa ssp.
+tropical japonica (rufipogon, indica, japonica).
+. Inferring species tree.
+.. *BEAST
+
+References
+----------
+. Molina, J.; Sikora, M.; Garud, N.; Flowers, J. M.; Rubinstein, S.; Reynolds, A.;
+Huang, P.; Jackson, S.; Schaal, B. A.; Bustamante, C. D.; Boyko, A. R. &
+Purugganan, M. D., 2011 Molecular evidence for a single evolutionary origin of
+domesticated rice. Proc Natl Acad Sci U S A 108: 8351-8356.
