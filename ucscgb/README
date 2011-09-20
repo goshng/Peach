@@ -6,3 +6,7 @@ Sang Chul Choi <goshng@yahoo.co.kr>
 files
 =====
 It contains files that I used or edited for installing UCSC genome browser.
+
+makeDb
+======
+A local track DB.
