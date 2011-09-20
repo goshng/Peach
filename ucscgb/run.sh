@@ -19,13 +19,13 @@ export SQL_PASSWORD=$USER
 #########################################################################
 # Let's add a new genome to streptoccocus genus.
 # Change the DBNAME.
-# strMut2 is the genome for RNA-Seq data.
-DBNAME=strMut2
-REFGENOMEFASTA=/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.fna
+# strPyg1 is the genome for RNA-Seq data.
+DBNAME=strPyg1
+REFGENOMEFASTA=/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_pyogenes_MGAS315_uid57911/NC_004070.fna
 cp $REFGENOMEFASTA .
 # Edit the genome FASTA-file so that the header is chr1.
-DBNAME=strMut2
-REFGENOMEFASTA=NC_004350.fna
+DBNAME=strPyg1
+REFGENOMEFASTA=NC_004070.fna
 hgFakeAgp -minContigGap=1 $REFGENOMEFASTA $DBNAME.agp
 faToTwoBit $REFGENOMEFASTA $DBNAME.2bit
 mkdir -p /gbdb/$DBNAME/html
@@ -45,7 +45,7 @@ hgLoadSqlTab $DBNAME chromInfo $KENT/src/hg/lib/chromInfo.sql \
 rm /tmp/chromInfo.tab
 hgGoldGapGl $DBNAME $DBNAME.agp
 #
-DBNAME=strMut2
+DBNAME=strPyg1
 mkdir bed/gc5Base
 hgGcPercent -wigOut -doGaps -file=stdout -win=5 -verbose=0 $DBNAME \
   $DBNAME.2bit | wigEncode stdin bed/gc5Base/gc5Base.{wig,wib}
@@ -58,14 +58,14 @@ hgsql hgcentral < files/dbDbInsert.sql
 # Grant permissions.
 mysql -u root -p${SQL_PASSWORD} -e "GRANT FILE ON *.* to browser@localhost \
 	IDENTIFIED BY 'genome';" mysql
-for DB in strMut2 # hgcentral hg19 hg18 strMut1 hgFixed # proteins040315
+for DB in strPyg1 # hgcentral hg19 hg18 strMut1 hgFixed # proteins040315
 do
     mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
 	CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on ${DB}.* \
 	TO browser@localhost \
 	IDENTIFIED BY 'genome';" mysql
 done
-for DB in strMut2 # hgcentral hg19 hg18 strMut1 hgFixed # cb1 proteins040315
+for DB in strPyg1 # hgcentral hg19 hg18 strMut1 hgFixed # cb1 proteins040315
 do
     mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, CREATE TEMPORARY TABLES \
 	on ${DB}.* TO \
