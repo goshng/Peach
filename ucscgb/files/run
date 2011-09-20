@@ -1,0 +1,191 @@
+#!/bin/bash
+
+KENT=/Users/goshng/Documents/Projects/ucsc/kent
+KENTPRODUCT=/Users/goshng/Documents/Projects/ucsc/kent/src/product
+SQL_PASSWORD=$USER
+
+function localtrack {
+hgTrackDb human hg19 trackDb_cornell ${KENT}/src/hg/lib/trackDb.sql local_tracks/trackDb 
+hgFindSpec human hg19 hgFindSpec_cornell ${KENT}/src/hg/lib/hgFindSpec.sql local_tracks/trackDb
+}
+
+
+###################################################
+# Download hgFixed
+# cp -r swiftgen:/gbdb/hgFixed /gbdb/
+# ./fetchFullGbdb.sh browserEnvironment.txt hgFixed
+# ./fetchFullGoldenPath.sh browserEnvironment.txt hgFixed
+# ./loadDb.sh browserEnvironment.txt hgFixed
+
+##################################################
+# SQL commands;
+# DELETE FROM search WHERE Category = 'Junk';
+##################################################
+# Build a new genome database
+# http://genomewiki.ucsc.edu/index.php/Building_a_new_genome_database
+# hgsql hgcentral < dbDbInsert.sql
+# show tables;
+# show databases;
+# use hgcentral
+# select * from dbDb;
+# select * from cladeGenome;
+# describe genomeClade;
+
+# trackDb.ra must be configured.
+
+#################################################
+# Connect to mysql.
+# MySQL data directory: /usr/local/mysql/data
+# mysql --user=root -pgoshng mysql
+
+#################################################
+# Grant permissions 
+for DB in hgcentral hg19 hg18 strMut1 hgFixed # proteins040315
+do
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+	CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on ${DB}.* \
+	TO browser@localhost \
+	IDENTIFIED BY 'genome';" mysql
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT FILE ON *.* to browser@localhost \
+	IDENTIFIED BY 'genome';" mysql
+done
+for DB in hgcentral hg19 hg18 strMut1 hgFixed # cb1 proteins040315
+do
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, CREATE TEMPORARY TABLES \
+	on ${DB}.* TO \
+	readonly@localhost IDENTIFIED BY 'access';" mysql
+done
+for DB in hgcentral hg19 hg18 strMut1 hgFixed
+do
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+	CREATE, DROP, ALTER on ${DB}.* TO readwrite@localhost \
+	IDENTIFIED BY 'update';" mysql
+done
+exit
+
+##################################################
+# Grant readwrite create database 
+mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+	CREATE, DROP, ALTER on *.* TO readwrite@localhost \
+	IDENTIFIED BY 'update';" mysql
+exit
+
+#################################################
+# 12. Where is the server log?
+# /var/log/apache2/
+# /usr/local/mysql/data
+# mysql -u root -p${SQL_PASSWORD} -e "create database hg18;"
+exit
+
+#################################################
+# 11.  Change the default
+hgsql -e 'update defaultDb set name="hg19" where genome="Human"' hgcentral
+exit
+
+#################################################
+# 10.  Load databases of interest.  See also: README.QuickStart
+# at scripts
+mysql -u root -p${SQL_PASSWORD} -e "create database hg19;"
+exit
+# Run these at scripts.
+./fetchMinimalGbdb.sh browserEnvironment.txt hg18
+./fetchMinimalGoldenPath.sh browserEnvironment.txt hg18
+./loadDb.sh browserEnvironment.txt hg18
+./fetchMinimalGbdb.sh browserEnvironment.txt hg19
+./fetchMinimalGoldenPath.sh browserEnvironment.txt hg19
+./loadDb.sh browserEnvironment.txt hg19
+exit
+
+
+#################################################
+# Use
+# Run scripts/ex.hgcentral.sql
+mysql -u browser -pgenome -e "create database hgcentral;"
+mysql -u browser -pgenome hgcentral < $KENTPRODUCT/ex.hgcentral.sql
+exit
+
+for DB in hgcentral hg19 # hg17 proteins040315
+do
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+	CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on ${DB}.* \
+	TO browser@localhost \
+	IDENTIFIED BY 'genome';" mysql
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT FILE ON *.* to browser@localhost \
+	IDENTIFIED BY 'genome';" mysql
+
+done
+for DB in hgcentral hg19 # cb1 hgFixed hg17 proteins040315
+do
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, CREATE TEMPORARY TABLES \
+	on ${DB}.* TO \
+	readonly@localhost IDENTIFIED BY 'access';" mysql
+done
+for DB in hgcentral hg18
+do
+    mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+	CREATE, DROP, ALTER on ${DB}.* TO readwrite@localhost \
+	IDENTIFIED BY 'update';" mysql
+done
+exit
+
+
+#################################################
+# Use 
+# kent/src/product/ex.MySQLUserPerms.sh
+# to create MySQL users.
+# Add a new user
+mysql -u root -p${SQL_PASSWORD} -e "CREATE USER 'browser'@'localhost' IDENTIFIED BY 'genome';" mysql
+mysql -u root -p${SQL_PASSWORD} -e "CREATE USER 'readonly'@'localhost' IDENTIFIED BY 'access';" mysql
+mysql -u root -p${SQL_PASSWORD} -e "CREATE USER 'readwrite'@'localhost' IDENTIFIED BY 'update';" mysql
+exit
+
+mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+	FILE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on ${DB}.* \
+	TO browser@localhost \
+	IDENTIFIED BY 'genome';" mysql
+exit
+
+###################################################
+# Build a new genome database
+DBNAME=strMut1
+REFGENOMEFASTA=/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.fna
+cp $REFGENOMEFASTA .
+REFGENOMEFASTA=NC_004350.fna
+hgFakeAgp -minContigGap=1 $REFGENOMEFASTA $DBNAME.agp
+faToTwoBit $REFGENOMEFASTA $DBNAME.2bit
+mkdir /gbdb/$DBNAME
+mkdir /gbdb/$DBNAME/html
+cp $DBNAME.2bit /gbdb/$DBNAME
+# ln -s `pwd`/abcDef1.2bit /gbdb/abcDef1/abcDef1.2bit
+sort -k1,1 -k2n,2n $DBNAME.agp > $DBNAME.agp.2
+checkAgpAndFa $DBNAME.agp.2 $DBNAME.2bit
+
+twoBitInfo $DBNAME.2bit stdout | sort -k2nr > chrom.sizes
+mkdir -p bed/chromInfo
+awk '{printf "%s\t%d\t/gbdb/strMut1/strMut1.2bit\n", $1, $2}' \
+  chrom.sizes > bed/chromInfo/chromInfo.tab
+hgsql -e "create database $DBNAME;" mysql
+hgsql $DBNAME < $KENT/src/hg/lib/grp.sql
+
+#hgLoadSqlTab $DBNAME chromInfo $KENT/src/hg/lib/chromInfo.sql \
+  #bed/chromInfo/chromInfo.tab
+cp bed/chromInfo/chromInfo.tab /tmp/
+hgLoadSqlTab $DBNAME chromInfo $KENT/src/hg/lib/chromInfo.sql \
+  /tmp/chromInfo.tab
+
+hgGoldGapGl $DBNAME $DBNAME.agp
+
+mkdir bed/gc5Base
+hgGcPercent -wigOut -doGaps -file=stdout -win=5 -verbose=0 $DBNAME \
+  $DBNAME.2bit | wigEncode stdin bed/gc5Base/gc5Base.{wig,wib}
+hgLoadWiggle -pathPrefix=/gbdb/$DBNAME/wib \
+  $DBNAME gc5Base bed/gc5Base/gc5Base.wig
+mkdir /gbdb/$DBNAME/wib
+cp bed/gc5Base/gc5Base.wib /gbdb/$DBNAME/wib
+#ln -s `pwd`/bed/gc5Base/gc5Base.wib /gbdb/abcDef1/wib
+hgsql hgcentral < dbDbInsert.sql
+
+# INSERT INTO defaultDb (genome, name) VALUES ("S. mutans", "strMut1")
+# INSERT INTO genomeClade (genome, clade, priority) VALUES ("S. mutans", "vertebrate", 123)
+
+
