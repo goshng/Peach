@@ -4,9 +4,42 @@ Sang Chul Choi <goshng@yahoo.co.kr>
 
 
 files
-=====
+-----
 It contains files that I used or edited for installing UCSC genome browser.
 
 makeDb
-======
+------
 A local track DB.
+
+Databases
+---------
+strMut2: RNA-Seq data analysis database.
+
+strPyg1: Streptococcus recombination paper.
+
+MySQL commands
+--------------
+.To delete a row
+----
+delete from dbdb where name='strMut2';
+----
+
+.To change some parts of a row
+----
+UPDATE genomeClade SET priority = 2 where genome = 'S. mutans';
+----
+
+Setup
+-----
+
+.
+----
+/etc/apache2/httpd.conf
+----
+
+Kent source code
+----------------
+.To download the executables of Kent's code 
+----
+http://hgwdev.cse.ucsc.edu/~kent/exe/macIntel/
+----
