@@ -32,7 +32,7 @@ UPDATE genomeClade SET priority = 2 where genome = 'S. mutans';
 Setup
 -----
 
-.
+.Apache web server setup file
 ----
 /etc/apache2/httpd.conf
 ----
@@ -43,3 +43,48 @@ Kent source code
 ----
 http://hgwdev.cse.ucsc.edu/~kent/exe/macIntel/
 ----
+
+.Helpful sites
+----
+http://hgwdev.cse.ucsc.edu/~kent/exe/usage.txt
+----
+
+Potentially useful commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getFeatDna - Get dna for a type of feature
+
+hgLoadBed - Load a generic bed file into database
+
+hgLoadPsl - Load up a mySQL database with psl alignment tables
+
+ldHgGene - load database with gene predictions from a gff file.
+
+Many hgLoadXXX commands.
+
+hgsql - Execute some sql code using passwords in .hg.conf
+
+lavToPsl - Convert blastz lav to psl format
+
+mafTest - Testing out maf stuff
+
+newProg - make a new C source skeleton
+
+nibFrag - Extract part of a nib file as .fa
+
+pslFilter - filter out psl file
+
+raToCds - Extract CDS positions from ra file
+
+gbToFaRa - Convert GenBank flat format file to an fa file containing
+the sequence data, an ra file containing other relevant info and
+a ta file containing summary statistics.
+
+splitFa - split a big FA file into smaller ones.
+
+splitFile - Split up a file
+
+stringify - Convert file to C strings
+
+tableSum - Summarize a table somehow
+
+
