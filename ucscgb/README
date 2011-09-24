@@ -19,6 +19,17 @@ strPyg1: Streptococcus recombination paper.
 
 MySQL commands
 --------------
+
+.Some commands
+----
+show databases;
+use hgcentral
+select * from dbdb;
+select * from defaultdb;
+select * from genomeclade;
+update genomeclade set genome='S. dys. equi. GGS124' where genome='S. dys. equi.  GGS124';
+----
+
 .To delete a row
 ----
 delete from dbdb where name='strMut2';
@@ -29,6 +40,18 @@ delete from dbdb where name='strMut2';
 UPDATE genomeClade SET priority = 2 where genome = 'S. mutans';
 ----
 
+.To show GRANTS for users
+----
+show grants for 'readonly'@'localhost';
+----
+
+.To add a user
+----
+CREATE USER 'ctdbuser2'@'localhost' IDENTIFIED BY 'ctdbpasswd';
+create database customTrash;
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER on customTrash TO 'ctdbuser'@'localhost' IDENTIFIED by 'ctdbpasswd';
+----
+
 Setup
 -----
 
@@ -36,6 +59,11 @@ Setup
 ----
 /etc/apache2/httpd.conf
 ----
+
+TrackDb
+~~~~~~~
+http://genomewiki.ucsc.edu/index.php/Adding_New_Tracks_to_a_browser_installation
+http://genome-source.cse.ucsc.edu/gitweb/?p=kent.git;a=blob;f=src/hg/makeDb/trackDb/README
 
 Kent source code
 ----------------

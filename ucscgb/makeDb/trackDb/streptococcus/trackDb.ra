@@ -1,0 +1,41 @@
+track gc5Base
+shortLabel GC % 5 base
+longLabel GC Percent in 5-Base Windows
+group map
+priority 10
+visibility hide
+autoScale Off
+maxHeightPixels 128:36:11
+graphTypeDefault Bar
+gridDefault OFF
+windowingFunction Mean
+color 0,100,0
+altColor 255,128,0
+viewLimits 30:70
+type wig 0 100
+
+track maf
+shortLabel Mauve alignments
+longLabel Mauve multiple sequence alignments
+group compGeno
+priority 5
+visibility full
+autoScale off
+maxHeightPixels 128:128:11
+windowingFunction mean
+color 0,100,0
+altColor 255,128,0
+viewLimits 30:70
+type wigMaf 0 100
+# Track maf missing required trackDb setting: speciesOrder, speciesGroups, or speciesUseFile
+
+track riprob
+shortLabel Mauve block
+longLabel Mauve alignment blocks
+type bedDetail
+visibility pack
+group compGeno
+priority 2
+configurable on
+url http://www.ensembl.org/Homo_sapiens/geneview?gene=$$
+
