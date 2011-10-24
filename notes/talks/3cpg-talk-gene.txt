@@ -1,0 +1,27 @@
+Three principles
+Selected genes and pathways
+Hormone signaling
+
+Gene expression levels are different among social status of bees: nursing,
+foraging, and aggression.
+
+Scouting
+Scouts have personality.   
+
+Social regulation
+African honey bees vs. European honey bees
+
+Metabolism enes also under selection during evolution of eusociality in bees.
+
+carbohydrate catabolism
+phosphorylation
+
+Meta-analysis tools reveal common transcrtiptional regulatory basis.
+
+Modular mosaic regulation.
+
+Future works
+1. Exprimental validation of systems biology predictions.
+2. Molecular pathways vs. neural cicuits
+3. Different evolutions, similar mechanisms: Genetic toolkits for social behaviors?
+
