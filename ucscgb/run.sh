@@ -115,7 +115,14 @@ hgsql hgcentral < files/dbDbInsert.sql
 echo "  granting permission on the created database ..."
 mysql -u root -p${SQL_PASSWORD} -e "GRANT FILE ON *.* to browser@localhost \
 	IDENTIFIED BY 'genome';" mysql
+# 1. SdeqATCC12394 
+# 2. SdeqGGS124 
+# 3. SddyATCC27957 
+# 4. SpyMGAS315    
+# 5. SpyMGAS10750  
+DBNAME=SpyMGAS10750
 SQL_PASSWORD=$USER
+mysql -u root -pgoshng --database=$DBNAME < dbdump/spy2knonwgenes.txt
 for DB in $DBNAME # hgcentral hg19 hg18 strMut1 hgFixed # proteins040315
 do
     mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
@@ -170,7 +177,7 @@ function loadRI {
 
 ###########################################################
 # Load virulence genes in BED format.
-
+# Check /Users/goshng/Documents/Projects/Mauve/test/virulence/run
 
 ###########################################################
 # Load recombination rate per block in BED format.

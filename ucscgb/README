@@ -20,6 +20,9 @@ strPyg1: Streptococcus recombination paper.
 MySQL commands
 --------------
 
+The user and password for the MySQL should be found at +~/.hg.conf+ at the host
+computer of the MySQL server.
+
 .Some commands
 ----
 show databases;
@@ -52,6 +55,41 @@ create database customTrash;
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER on customTrash TO 'ctdbuser'@'localhost' IDENTIFIED by 'ctdbpasswd';
 ----
 
+.To export and import tables
+----
+This will create a text file containing all the commands necessary to recreate
+all the tables and data found in guestdb. However, what if I want to export only
+one table? To do this the command is modified as follows assuming guestTbl is
+the table to be exported.:
+
+mysqldump guestdb guestTbl > guestdb.txt
+----
+
+.The six database names
+----
+1. SdeqATCC12394 
+2. SdeqGGS124 
+3. SddyATCC27957 
+4. SpyMGAS315    
+5. SpyMGAS10750  
+6. Seeq4047      
+----
+
+.Table dump for known genes
+----
+$ mysqldump -u username -ppassword SpyMGAS10750 knownGenes > dbdump/spy2knonwgenes.txt
+$ mysql -u root -pgoshng --database=SpyMGAS10750 < dbdump/spy2knonwgenes.txt
+$ mysql -u root -pgoshng -e "GRANT SELECT, INSERT, UPDATE, DELETE, \
+  CREATE, DROP, ALTER, CREATE TEMPORARY TABLES on ${DB}.* \
+  TO browser@localhost \
+  IDENTIFIED BY 'genome';" mysql
+$ mysql -u root -p${SQL_PASSWORD} -e "GRANT SELECT, CREATE TEMPORARY TABLES \
+  on ${DB}.* TO \
+  readonly@localhost IDENTIFIED BY 'access';" mysql
+----
+
+
+
 Setup
 -----
 
@@ -59,6 +97,8 @@ Setup
 ----
 /etc/apache2/httpd.conf
 ----
+
+
 
 TrackDb
 ~~~~~~~

@@ -1,0 +1,9 @@
+track recombrate
+shortLabel Recombination rate
+longLabel Recombination rate across the genome
+type bed 5
+visibility squish
+group compGeno
+priority 6
+configurable on
+useScore 1
