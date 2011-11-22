@@ -1,23 +1,24 @@
 Multiple facets of bacterial transcriptome can be tackled using a
 high-throughput sequencing technology called RNA-Seq.  Of the uses of RNA-Seq
 ascertaining differentially expressed genes among different biological
-conditions has been a focus. To put millions of short reads of mRNAs from
-RNA-Seq in the context of differential expression study one needs preprocess the
-huge data (Oshlack et al., 2010). We describe this procedure in a nutshell by
-focusing on bacterial transcriptome study.  A reference genome with annotated
-genes is required unless a de novo assembly is employed. Annotated genes include
-any genomic regions along the reference genome. They are not limited to protein
-coding genes, but a prior knowledge about any genomic regions can be used to
-list regions of biological interest.  Each of the predefined genomic regions are
-examined to count short reads that are mapped to the reference genome using a
-short read alinger such as BWA (Li and Durbin, 2009), a Burrows wheeler
-transform algorithm.  After these mapping of short reads to a reference genome
-and summarization of the mapped reads based on predefined genomic regions as a
-table of counts, a statistical hypothesis testing for finding differentially
-expressed genes can be performed on the table with a R-package such as DEseq
-(Anders and Huber, 2010) or edgeR (Robinson et al., 2010).  This prodecure would
-produce a list of differentially expressed genes.  Further analyses such as
-functionaly category enrichment test (Young et al., 2010) can be pursued.
+conditions has been a focus. To put millions of short reads from RNA-Seq in the
+context of differential expression study one needs preprocess the huge data
+(Oshlack et al., 2010). We describe this procedure in a nutshell by focusing on
+bacterial transcriptome study.  A reference genome with annotated genes is
+required unless a de novo assembly of the genome using the short reads is
+employed. Annotated genes include any genomic regions along the reference
+genome. They are not limited to protein coding genes, but a prior knowledge
+about any genomic regions can be used to list regions of biological interest.
+Each of the predefined genomic regions is examined to count short reads that are
+mapped to the reference genome using a short read alinger such as BWA (Li and
+Durbin, 2009), a Burrows wheeler transform algorithm.  After these mapping of
+short reads to a reference genome and summarization of the mapped reads based on
+predefined genomic regions as a table of counts, a statistical hypothesis
+testing for finding differentially expressed genes can be performed on the table
+with a R-package such as edgeR (Robinson et al., 2010) or DEseq (Anders and
+Huber, 2010).  This prodecure would produce a list of differentially expressed
+genes.  Further analyses such as functionaly category enrichment test (Young et
+al., 2010) can be pursued.
 
 References
 ----------
@@ -29,8 +30,17 @@ Li, H. & Durbin, R. Fast and accurate short read alignment with Burrows-Wheeler
 transform. Bioinformatics, Wellcome Trust Sanger Institute, Wellcome Trust
 Genome Campus, Cambridge, CB10 1SA, UK., 2009, 25, 1754-1760
 
+Marioni, J. C.; Mason, C. E.; Mane, S. M.; Stephens, M. & Gilad, Y. RNA-seq: an
+assessment of technical reproducibility and comparison with gene expression
+arrays. Genome Res, Department of Human Genetics, University of Chicago,
+Chicago, Illinois 60637, USA., 2008, 18, 1509-1517
+
 Oshlack A, Robinson MD, Young MD. From RNA-seq reads to differential expression
 results. Genome Biology. 2010;11:12.
+
+Oshlack, A. & Wakefield, M. J. Transcript length bias in RNA-seq data confounds
+systems biology. Biol Direct, Walter and Eliza Hall Institute of Medical
+Research, Parkville, Vic, Australia. oshlack@wehi.edu.au, 2009, 4, 14
 
 Robinson, M. D.; McCarthy, D. J. & Smyth, G. K. edgeR: a Bioconductor package
 for differential expression analysis of digital gene expression data.
@@ -38,47 +48,35 @@ Bioinformatics, Cancer Program, Garvan Institute of Medical Research, 384
 Victoria Street, Darlinghurst, NSW 2010, Australia. mrobinson@wehi.edu.au, 2010,
 26, 139-140
 
+Robinson, M. D. & Smyth, G. K. Moderated statistical tests for assessing
+differences in tag abundance. Bioinformatics, Department of Medical Biology,
+University of Melbourne, Parkville, Victoria, Australia., 2007, 23, 2881-2887
+
 Young, M. D.; Wakefield, M. J.; Smyth, G. K. & Oshlack, A. Gene ontology
 analysis for RNA-seq: accounting for selection bias. Genome Biol, Bioinformatics
 Division, The Walter and Eliza Hall Institute of Medical Research, 1G Royal
 Parade, Parkville 3052, Australia., 2010, 11, R14 
 
-Others
-------
+Other issues that could be discussed
+------------------------------------
 
-Using the summary of gene-wise
-expression of two biological conditions we ascertain differentially expressed
-genes.  A statistical hypothesis testing on the gene-wise counts is employed.
-
-The testing is based on statistical models including a Poisson model of read
+Statistical hypothesis testing on the gene-wise counts:
+the testing is based on statistical models including a Poisson model of read
 counts (Marioni et al. 2008), and a negative binomial model to account for
-variation in replicates (Robinson and Smith, 2007).
+variation in replicates (Robinson and Smith, 2007).  
 
+Technical and biological replicates:
 Because RNA-Seq is highly reproducible, technical replicates are often
 unnecessary. However, biological replicates would allow to account for
 biological variation.
 
+Normalization:
 We adjust for different total read counts from samples by normalizing RNA-Seq
 data (e.g., Robinson and Oshlack, 2010).
-Because genes with low read counts can lead to biases, 
-we remove genes with low counts, or below a threshold of counts.
-Transcript length (Oshlack and Wakefield, 2010; Young et al., 2010) should be
-considered to remove biases; simple division
-of read counts by gene lengths does not remove this potential bias.
 
-measure gene expression
-
-Hpothesis testing based on the gene-wise counts is performed to infer
-differentially expressed genes under two biological conditions.
-
-
-
-
-Hypothesis testing procedures include Fisher's exact test, t-test
-
-Marioni et al. (2008) - a Poisson model of read counts 
-Robinson and Smith (2007) - a negative binomial model (variation in replicates)
-Robinson et al. (2010) - edgeR
-Bullard et al. (2010) - comparison of methods, poor performance of t-test gene
-with low counts
-
+Biases due to low counts and lengths:
+Because genes with low read counts can lead to biases, we remove genes with low
+counts, or below a threshold of counts.  Transcript length (Oshlack and
+Wakefield, 2010; Young et al., 2010) should be considered to remove biases;
+simple division of read counts by gene lengths does not remove this potential
+bias.
