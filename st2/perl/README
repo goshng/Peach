@@ -1,0 +1,7 @@
+How To Use The Perl Script
+==========================
+
+Convert STRUCTURE's format to STRUCTURAMA's.
+--------------------------------------------
+[literal]
+perl s2m.pl --in ../diversitydata.stru --diploid 1 --asn 0 > ../diversitydata.structurama

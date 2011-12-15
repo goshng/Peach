@@ -1,0 +1,13 @@
+Test of STRUCTURAMA2
+====================
+
+Data Sources
+------------
+- Noah Rosenberg's lab
+[literal]
+http://rosenberglab.bioinformatics.med.umich.edu/diversity.html
+wget http://rosenberglab.bioinformatics.med.umich.edu/data/rosenbergEtAl2002/diversitydata.nex
+wget http://rosenberglab.bioinformatics.med.umich.edu/data/rosenbergEtAl2002/diversitydata.stru
+wget http://rosenberglab.bioinformatics.med.umich.edu/data/rosenbergEtAl2002/diversityreadme.txt
+
+
