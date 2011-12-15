@@ -1,0 +1,20 @@
+3 1  Example: single locus three populations
+5
+5   Africa
+0BAA      AAAGC
+0BAN      AAAGC
+0BAK      AAAGC
+0BAT      AAAGC
+0BAB      AAACC
+5   Americas
+1BAX      AAAGC
+1BAK      AAAGC
+1BBA      AAAGC
+1BAU      AAAGC
+1BAM      AAAGC
+5   Pacific
+2BAP      AAAGC
+2BAQ      AAAGC
+2BAS      AAAGC
+2BAV      AAAGC
+2BAL      AAAGC

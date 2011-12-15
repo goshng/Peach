@@ -1,0 +1,204 @@
+<lamarc version="2.1.3">
+<!-- Created by the Lamarc program -->
+  <chains>
+    <replicates>1</replicates>
+    <bayesian-analysis>No</bayesian-analysis>
+    <heating>
+      <adaptive>false</adaptive>
+      <temperatures> 1</temperatures>
+      <swap-interval>10</swap-interval>
+    </heating>
+    <strategy>
+      <resimulating>0.833333</resimulating>
+      <tree-size>0.166667</tree-size>
+      <haplotyping>0</haplotyping>
+      <trait-arranger>0</trait-arranger>
+    </strategy>
+    <initial>
+      <number>10</number>
+      <samples>500</samples>
+      <discard>1000</discard>
+      <interval>20</interval>
+    </initial>
+    <final>
+      <number>2</number>
+      <samples>10000</samples>
+      <discard>1000</discard>
+      <interval>20</interval>
+    </final>
+  </chains>
+  <format>
+    <convert-output-to-eliminate-zero> Yes </convert-output-to-eliminate-zero>
+    <verbosity>normal</verbosity>
+    <progress-reports>normal</progress-reports>
+    <results-file>outfile.txt</results-file>
+    <use-in-summary>false</use-in-summary>
+    <in-summary-file>insumfile.xml</in-summary-file>
+    <use-out-summary>false</use-out-summary>
+    <out-summary-file>outsumfile.xml</out-summary-file>
+    <use-curvefiles>false</use-curvefiles>
+    <curvefile-prefix>curvefile</curvefile-prefix>
+    <use-tracefile>true</use-tracefile>
+    <tracefile-prefix>tracefile</tracefile-prefix>
+    <use-newicktreefile>false</use-newicktreefile>
+    <newicktreefile-prefix>newick</newicktreefile-prefix>
+    <out-xml-file>menusettings_infile.xml</out-xml-file>
+  </format>
+  <im-format>
+    <burnduration>0</burnduration>
+    <burnsteps>134</burnsteps>
+    <calcoptions>
+      <calcoption>1</calcoption>
+      <calcoption>0</calcoption>
+      <calcoption>0</calcoption>
+      <calcoption>0</calcoption>
+      <calcoption>0</calcoption>
+    </calcoptions>
+    <savegenealogyint>55</savegenealogyint>
+    <mcfreadfilename>mcf.txt</mcfreadfilename>
+    <priorfilename>imapriors.txt</priorfilename>
+    <heatmode>2</heatmode>
+    <numchains>1</numchains>
+    <swaptries>25</swaptries>
+    <hval1>0.98</hval1>
+    <hval2>0.77</hval2>
+    <infilename>menusettings_infile.xml</infilename>
+    <modeloptions>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>1</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+    </modeloptions>
+    <cdurationmode>1</cdurationmode>
+    <genealogiestosave>-1</genealogiestosave>
+    <chainduration>43200</chainduration>
+    <mprior>0.1</mprior>
+    <outfilename>outfile</outfilename>
+    <outputoptions>
+      <outputoption>1</outputoption>
+      <outputoption>1</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+    </outputoptions>
+    <thetaprior>10</thetaprior>
+    <runoptions>
+      <runoption>1</runoption>
+      <runoption>1</runoption>
+      <runoption>1</runoption>
+      <runoption>0</runoption>
+      <runoption>0</runoption>
+      <runoption>1</runoption>
+      <runoption>0</runoption>
+    </runoptions>
+    <seed>0</seed>
+    <tprior>5</tprior>
+    <generationtime>1</generationtime>
+    <loadfilebase>loadfile</loadfilebase>
+    <printint>10000</printint>
+  </im-format>
+  <forces>
+    <coalescence>
+      <start-values> 0.01 0.01</start-values>
+      <method> PROGRAMDEFAULT PROGRAMDEFAULT</method>
+      <profiles> percentile percentile </profiles>
+      <constraints> unconstrained unconstrained </constraints>
+      <prior type="log">
+        <paramindex> all </paramindex>
+        <lower> 1e-05 </lower>
+        <upper> 10 </upper>
+      </prior>
+    </coalescence>
+    <migration>
+      <start-values> 0 100 100 0</start-values>
+      <method> PROGRAMDEFAULT FST FST PROGRAMDEFAULT</method>
+      <max-events>10000</max-events>
+      <profiles> none percentile percentile none </profiles>
+      <constraints> invalid unconstrained unconstrained invalid </constraints>
+      <prior type="log">
+        <paramindex> all </paramindex>
+        <lower> 0.01 </lower>
+        <upper> 1000 </upper>
+      </prior>
+    </migration>
+  </forces>
+  <data>
+    <region name="region0">
+      <model name="F84">
+        <normalize>false</normalize>
+        <categories>
+          <num-categories>1</num-categories>
+          <rates> 1</rates>
+          <probabilities> 1</probabilities>
+          <autocorrelation>1</autocorrelation>
+        </categories>
+        <relative-murate>1</relative-murate>
+        <base-freqs> calculated </base-freqs>
+        <ttratio>2</ttratio>
+      </model>
+      <effective-popsize>1</effective-popsize>
+      <spacing>
+        <block>
+          <map-position>1</map-position>
+          <length>3</length>
+          <offset>0</offset>
+        </block>
+      </spacing>
+    <population name="North">
+      <individual name="ind1">
+        <sample name="ind1-sample1">
+          <datablock type="DNA">
+            GTT
+          </datablock>
+        </sample>
+      </individual>
+      <individual name="ind2">
+        <sample name="ind2-sample1">
+          <datablock type="DNA">
+            CTT
+          </datablock>
+        </sample>
+      </individual>
+      <individual name="ind3">
+        <sample name="ind3-sample1">
+          <datablock type="DNA">
+            GTT
+          </datablock>
+        </sample>
+      </individual>
+    </population>
+    <population name="South">
+      <individual name="ind4">
+        <sample name="ind4-sample1">
+          <datablock type="DNA">
+            GGC
+          </datablock>
+        </sample>
+      </individual>
+      <individual name="ind5">
+        <sample name="ind5-sample1">
+          <datablock type="DNA">
+            GAT
+          </datablock>
+        </sample>
+      </individual>
+      <individual name="ind6">
+        <sample name="ind6-sample1">
+          <datablock type="DNA">
+            GGT
+          </datablock>
+        </sample>
+      </individual>
+    </population>
+    </region>
+  </data>
+</lamarc>

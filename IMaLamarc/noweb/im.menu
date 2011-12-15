@@ -1,0 +1,177 @@
+./ima3
+       IMa              Isolation-with-migration analytic         
+                        Version  2.1.3 (Debug)
+                        Release Date: 8 April 2010
+---------------------------------------------------------------------------
+Enter the location of the data file
+[Default: infile.xml]
+
+>>> 
+Data file was read successfully
+Calculating starting values; please be patient
+
+---------------------------------------------------------------------------
+Main Menu
+                                                                            
+  Y  Lamarc + IM (do im analysis using Lamarc)                                                           
+  D  Data options (tell us about your data)                                 
+  A  Analysis (tell us what you want to know)                               
+  S  Search Strategy menu (tell us how to do it)                            
+  I  Input and Output (tell us where to keep it)                            
+  O  Overview of current settings (what you told us)                        
+     ----------                                                             
+     . = Run | Q = Quit                                                     
+  >  Generate Lamarc input file for these settings                          
+
+>>> Y
+
+---------------------------------------------------------------------------
+Lamarc + IM (do im analysis using Lamarc)                                                           
+                                                                            
+  I  Priors (migration, splitting time, population sizes, etc.)
+  M  MCMC (burn-in, thin, generation, etc.)
+  Q  MC3 (heat mode, number of chains, swap tries, etc.)
+  F  IM Input and Output (output file, prior file names, etc.)
+  C  Calculation options (no data check, etc.)
+  J  Model options (migration on or off, etc.)
+  P  Output options (trace plots, marginal curves, etc.)
+  R  Run options (load tree mode, load saved MCMC, etc.)
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> I
+
+---------------------------------------------------------------------------
+Lamarc + IM : Priors
+                                                                            
+  T  Splitting times                                                 3.0
+  Q  Population sizes                                                5.0
+  M  Migration rates                                                 0.1
+  U  Generation time in years                                       25.0
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> T
+Enter the maximum of splitting time (between 0 and 1000).
+Enter the maximum of population sizes (between 1e-10 and 500).
+Enter the maximum of migration rates (between 0 and 50).
+Enter the generation time in years (between 1e-10 and 1000).
+
+>>>
+
+---------------------------------------------------------------------------
+Lamarc + IM : MCMC
+                                                                            
+  B  Burn-in mode                                                   STEP 
+  S  Burn-in                                                       10000
+  (H  Burn-in hours                                                   1.0)
+  T  Thin                                                            100
+  G  MCMC generation mode                                           TIME
+  L  L mode interval in hours                                       12.0
+  (N  Number of genealogies to save                                 10000)
+  I  Interval for output log                                       10000
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+
+Enter the burn-in mode (S for STEP or T for TIME).
+Enter the length of burn-in period in steps.
+Enter hours of burn-in period.
+Enter the thinning interval in steps.
+Enter the MCMC generation mode (S for STEP or T for TIME).
+Enter the length of sampling period in steps.
+Enter hours of L mode intervals.
+Enter the output log interval in steps.
+
+---------------------------------------------------------------------------
+Lamarc + IM : MC3
+                                                                            
+  N  Number of chains                                                 10
+  H  Heat mode                                                 GEOMETRIC
+  K  Swap tries                                                       25
+  A  Alpha value of the heat mode                                   0.98
+  B  Beta value of the heat mode                                    0.77
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+
+Enter the number of MC3 chains.
+Enter the heat mode (l for LINEAR, T for TWOSTEP, and G for GEOMETRIC).
+Enter the interval for swap tries.
+Enter alpha for the heat mode.
+Enter beta for the heat mode.
+
+---------------------------------------------------------------------------
+Lamarc + IM : IM Input and Output
+                                                                            
+  O  Output file name                                        outfile.txt 
+  R  Prior file name                                           prior.txt
+  M  File name for saving MCMC states                            mcf.txt
+  L  Base file name for loading genealogies                          sum
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+
+Enter your output file name.
+Enter your prior file name.
+Enter your MCMC saving file name.
+Enter your base file name for loading genealogies.
+
+
+---------------------------------------------------------------------------
+Lamarc + IM : Calculation options (no data check, etc.)
+                                                                            
+  X  No data                                                         OFF
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+
+We use toggle.
+
+---------------------------------------------------------------------------
+Lamarc + IM : Model options (migration on or off, etc.)
+                                                                            
+  M  Migration                                                       OFF
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+
+We use toggle.
+---------------------------------------------------------------------------
+Lamarc + IM : Output options (trace plots, marginal curves, etc.)
+                                                                            
+  T  Trace plots                                                      ON
+  M  Marginal curves for demographics                                 ON
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+We use toggle.
+
+---------------------------------------------------------------------------
+Lamarc + IM : Run options (load tree mode, load saved MCMC, etc.)
+                                                                            
+  L  L mode                                                          OFF
+  G  Save genealogies and phylogenies                                 ON
+  M  Save MCMC states                                                OFF
+  B  Print burn-in trace plots                                        ON
+     ----------                                                             
+     <Return> = Go Up | . = Run | Q = Quit                                  
+  >  Generate Lamarc input file for these settings                          
+
+>>> B
+We use toggle.
+

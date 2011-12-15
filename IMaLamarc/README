@@ -1,0 +1,21 @@
+
+The following files of LAMARC source code are changed. 
+1. xml/parsetreetosettings.[cpp|h]
+2. xml/parsetreetodata.[cpp|h]
+3. xml/lamarcschema.[cpp|h]
+4. xml/xml_strings.[cpp|h]
+5. ui_vars/ui_vars_userparams.h.[cpp|h] 
+6. ui_vars/ui_vars.[cpp|h]
+7. ui_interface/userparam_interface.[cpp|h] -> I did not change it.
+7.1 ui_interface/setgetmachine.[cpp|h]
+8. Many ui_interface files are not changed.
+9. tree/chainstate.[cpp|h]: a class called IMChainState is in there.
+10. tree/chain.[cpp|h]: a class called IMChain is in there.
+11. tree/arranger_types.[cpp|h]: IM Arranger types.
+12. tree/arranger.[cpp|h]: IM Arrangers are in a separate folder.
+13. report/outputfile.[cpp|h]: IM XML output functions.
+14. control/userparam.[cpp|h]: IM User Parameter
+15. control/registry.[cpp|h]: IM User Parameter 
+16. control/defaults.[cpp|h]: class im is under class default.
+17. control/chainmanager.[cpp|h]: a chain manager for IM analysis.
+

@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<lamarc version="2.1.5">
+    <format>
+        <convert-output-to-eliminate-zero>true</convert-output-to-eliminate-zero>
+    </format>
+    <data>
+        <region name="from test-three-pop.seq_1">
+            <spacing>
+                <block name="segment 1 of test-three-pop.seq" />
+            </spacing>
+            <population name="Africa">
+                <individual name="0BAA">
+                    <sample name="0BAA_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAN">
+                    <sample name="0BAN_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAK">
+                    <sample name="0BAK_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAT">
+                    <sample name="0BAT_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAB">
+                    <sample name="0BAB_0">
+                        <datablock type="DNA"> AAACC </datablock>
+                    </sample>
+                </individual>
+            </population>
+            <population name="Americas">
+                <individual name="1BAX">
+                    <sample name="1BAX_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BAK">
+                    <sample name="1BAK_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BBA">
+                    <sample name="1BBA_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BAU">
+                    <sample name="1BAU_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BAM">
+                    <sample name="1BAM_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+            </population>
+            <population name="Pacific">
+                <individual name="2BAP">
+                    <sample name="2BAP_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAQ">
+                    <sample name="2BAQ_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAS">
+                    <sample name="2BAS_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAV">
+                    <sample name="2BAV_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAL">
+                    <sample name="2BAL_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+            </population>
+        </region>
+    </data>
+</lamarc>

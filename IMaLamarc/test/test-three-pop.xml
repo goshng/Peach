@@ -1,0 +1,179 @@
+<?xml version="1.0" ?>
+<lamarc version="2.1.5">
+
+    <format>
+        <convert-output-to-eliminate-zero>true</convert-output-to-eliminate-zero>
+    </format>
+
+  <im-format>
+    <ptree>
+      ((0,1):3,4):5
+    </ptree>
+    <burnduration>0</burnduration>
+    <burnsteps>134</burnsteps>
+    <calcoptions>
+      <calcoption>1</calcoption>
+      <calcoption>0</calcoption>
+      <calcoption>0</calcoption>
+      <calcoption>0</calcoption>
+      <calcoption>0</calcoption>
+    </calcoptions>
+    <savegenealogyint>55</savegenealogyint>
+    <mcfreadfilename>mcf.txt</mcfreadfilename>
+    <priorfilename>imapriors.txt</priorfilename>
+    <heatmode>2</heatmode>
+    <numchains>1</numchains>
+    <swaptries>25</swaptries>
+    <hval1>0.98</hval1>
+    <hval2>0.77</hval2>
+    <infilename>menusettings_infile.xml</infilename>
+    <modeloptions>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>1</modeloption>
+      <modeloption>0</modeloption>
+      <modeloption>0</modeloption>
+    </modeloptions>
+    <cdurationmode>1</cdurationmode>
+    <genealogiestosave>-1</genealogiestosave>
+    <chainduration>43200</chainduration>
+    <mprior>0.1</mprior>
+    <outfilename>outfile</outfilename>
+    <outputoptions>
+      <outputoption>1</outputoption>
+      <outputoption>1</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+      <outputoption>0</outputoption>
+    </outputoptions>
+    <thetaprior>10</thetaprior>
+    <runoptions>
+      <runoption>1</runoption>
+      <runoption>1</runoption>
+      <runoption>1</runoption>
+      <runoption>0</runoption>
+      <runoption>0</runoption>
+      <runoption>1</runoption>
+      <runoption>0</runoption>
+    </runoptions>
+    <seed>0</seed>
+    <tprior>5</tprior>
+    <generationtime>1</generationtime>
+    <loadfilebase>loadfile</loadfilebase>
+    <printint>10000</printint>
+  </im-format>
+
+<forces>
+  <!-- <coalescence>
+    <start-values> 0.01 0.03 0.03 </start-values> 
+    <method> Watterson Watterson Watterson </method> 
+    <profiles> fixed fixed fixed </profiles> 
+  </coalescence> -->
+  <populationsplit>
+    <start-values> 0.01 0.02 0.03 </start-values>
+  </populationsplit>
+  <recombination>
+    <start-values> 0.04 </start-values>
+    <method> User </method>
+    <max-events> 1000 </max-events>
+    <profiles> none </profiles>
+  </recombination>
+</forces>
+
+    <data>
+        <region name="from test-three-pop.seq_1">
+            <spacing>
+                <block name="segment 1 of test-three-pop.seq" />
+            </spacing>
+            <population name="Africa">
+                <individual name="0BAA">
+                    <sample name="0BAA_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAN">
+                    <sample name="0BAN_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAK">
+                    <sample name="0BAK_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAT">
+                    <sample name="0BAT_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="0BAB">
+                    <sample name="0BAB_0">
+                        <datablock type="DNA"> AAACC </datablock>
+                    </sample>
+                </individual>
+            </population>
+            <population name="Americas">
+                <individual name="1BAX">
+                    <sample name="1BAX_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BAK">
+                    <sample name="1BAK_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BBA">
+                    <sample name="1BBA_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BAU">
+                    <sample name="1BAU_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="1BAM">
+                    <sample name="1BAM_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+            </population>
+            <population name="Pacific">
+                <individual name="2BAP">
+                    <sample name="2BAP_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAQ">
+                    <sample name="2BAQ_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAS">
+                    <sample name="2BAS_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAV">
+                    <sample name="2BAV_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+                <individual name="2BAL">
+                    <sample name="2BAL_0">
+                        <datablock type="DNA"> AAAGC </datablock>
+                    </sample>
+                </individual>
+            </population>
+        </region>
+    </data>
+</lamarc>

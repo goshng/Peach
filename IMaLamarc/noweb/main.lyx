@@ -1,0 +1,572 @@
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+We study the coalescent and recombination under the demographic structure
+ of a population tree.
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Standard
+We use most of the implementation of Lamarc to implement the isolation and
+ recombination with analytic integration.
+ We employ the technique developed in IMa2 such as analytic integration
+ of population sizes and recombination rates.
+ Population splitting time is inferred by being sampled with gene trees.
+\end_layout
+
+\begin_layout Standard
+m_xactives and m_xinactives are used for population sizes.
+ ActiveLinks and OpenLinks methods are used for recombination rates.
+ The variable m_pactive contains the number of active lineages in a population.
+ Populations are often called as partitions in Lamarc.
+ Splitting time must be included in m_inactivelist.
+ We need to figure out how likelihoods are computed in Lamarc.
+ Picktime is an important method that draws the next time of an event as
+ well as populations in which the event occurs.
+ We share the XML input and output format that Lamarc uses.
+\end_layout
+
+\begin_layout Standard
+I understand the simulation procedure of the data that I use for the inference.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+T(j)\sim{j \choose 2}e^{-{j \choose 2}t}\]
+
+\end_inset
+
+
+\begin_inset Formula \[
+u\sim Uniform[0,1]\]
+
+\end_inset
+
+
+\begin_inset Formula \[
+T(j)=\frac{-\ln u}{{j \choose 2}}\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We need to count the number of recombinations and length of the recombinant
+ tree.
+ 
+\end_layout
+
+\begin_layout Subsection
+A start of the implementation
+\end_layout
+
+\begin_layout Standard
+We start from the data-input part.
+ A population tree is a part of the Lamarc XML format.
+\end_layout
+
+\begin_layout Subsection
+Classes from IMa
+\end_layout
+
+\begin_layout Standard
+imrng.cc/hh uses Boost::Random class.
+ Functor uniform is accessible.
+ setseeds is still used to set the seed of the only prng.
+\end_layout
+
+\begin_layout Standard
+IMParameter.cc/hh uses imrng's uniform.
+\end_layout
+
+\begin_layout Standard
+EdgeIMParameter.cc/hh uses IMParameter class.
+ It uses VectorOperation.hh.
+\end_layout
+
+\begin_layout Standard
+Prob.cc/hh is a standalone class.
+\end_layout
+
+\begin_layout Standard
+imptools.cc/hh is a stand-alone module.
+\end_layout
+
+\begin_layout Standard
+ParserPoptreestring.cc/hh is a stand-alone module.
+\end_layout
+
+\begin_layout Standard
+Weight.cc/hh uses imptools.cc/hh module.
+\end_layout
+
+\begin_layout Standard
+Integrate.cc/hh uses imptools.cc/hh.
+\end_layout
+
+\begin_layout Standard
+immath.cc/hh is a stand-alone module.
+\end_layout
+
+\begin_layout Standard
+Pedge.cc/hh uses Weight, Integrate, IMParameter, and EdgeIMParameter.
+\end_layout
+
+\begin_layout Standard
+Ptree.cc/hh uses Pedge and ParserPoptreestring.Two header files, imset.hh and
+ imdef.hh, are needed.
+ Two modules, imconstants.cc/hh and imglobal.cc/hh, are also used by Ptree.
+ All of these are added to Lamarc source tree by creating a directory named
+ ima.
+ We prepared a single input XML file.
+\end_layout
+
+\begin_layout Subsection
+Input Processing
+\end_layout
+
+\begin_layout Standard
+There are three inputs for running IMa: command line options, XML input
+ file, and Lamarc menu.
+ We first read in XML input file for options.
+ Based on the XML input file and default values we could run IMa or show
+ Lamarc menu.
+ Command lines will override any options in the XML input file.
+ Command lines can dictate the mode of IMa2: interactive or non-interactive.
+ With an interactive mode IMa2 will show the Lamarc menu with which we can
+ change more options.
+ The precedence of options is the Lamarc menu, command line options, XML
+ input file, and default values in decreasing order.
+ We do this first although this is not the main part of IMa2 programming.
+ It should be done anyhow.
+ 
+\end_layout
+
+\begin_layout Standard
+Menu classes are a place where you learn class inheritance.
+\end_layout
+
+\begin_layout Standard
+UIInterface is a thing that needs attention.
+\end_layout
+
+\begin_layout Standard
+We list parts that are necessary for adding one menu item.
+ Let us add a control for maximum value of population splitting time.
+\end_layout
+
+\begin_layout Enumerate
+userparam.h : class IMUserParameters has a member, m_tprior, and its get/set
+ accessors.
+ GetTprior and SetTprior are the accessors.
+ The member is initialized by the IMUserParameters ctor.
+\end_layout
+
+\begin_layout Enumerate
+userparam.cpp : class IMUserParameters has a member function, ToXML, which
+ prints data member in XML format.
+ We use a few functions (MakeTag, MakeIndent, MakeCloseTag) to print m_tprior
+ out to an element of XML.
+\end_layout
+
+\begin_layout Enumerate
+xml/xml_strings.cpp/h : xmlstr::XML_TAG_IM_TPRIOR needs its definition.
+ It is the XML tag name for m_tprior.
+\end_layout
+
+\begin_layout Enumerate
+control/registry.h : class Registry has a data member of type IMUserParameters.
+ Get/Set member functions are GetIMUserParameters and SetIMUserParameters.
+ Member function, InstallIMUserParameters, set an object of IMUserParameters
+ by copying UIVarsIMUserParameters' members.
+\end_layout
+
+\begin_layout Enumerate
+ui_vars/ui_vars_userparams.h : class UIVarsIMUserParameters almost is the
+ same as class IMUserParameters.
+ We need similar members for m_tprior.
+\end_layout
+
+\begin_layout Enumerate
+ui_vars/ui_vars_userparams.cpp : class UIVarsIMUserParameters has two ctors.
+ m_tprior should be taken care of in the ctors.
+\end_layout
+
+\begin_layout Enumerate
+control/defaults.h/cpp : class defaults has all default values.
+ A nested class, im, contains all default values for IM: e.g., defaults::im::tprio
+r.
+\end_layout
+
+\begin_layout Enumerate
+lamarcmenus/lamarcmenu.cpp : LamarcMainMenu::LamarcMainMenu ctor lists the
+ main menu items.
+ A submenu for IM is prepended.
+ Note that the class IMMenuCreator.
+ 
+\end_layout
+
+\begin_layout Enumerate
+lamarcmenus/immenu.cpp : All, if possible, menus for IM are coded in immenu.cpp/h
+ module.
+ The main IM menu is handled by IMMenu and IMMenuCreator.
+ We only need member ui for type UIInterface.
+ IMPriorMenu and IMPriorMenuCreator are one of submenu of IMMenu.
+ Note both IMMenu and IMPriorMenu are of the same form.
+ IMPriorMenu has four more menu items, one of which is for population splitting
+ time prior: IMPriorSplitTimeMenuItemNoId.
+ It is a subclass of SetMenuItemNoId.
+ Three arguements are provided for SetMenuItemNoId's ctor: myKey, ui, and
+ myMenuKey.
+ myKey acts as a button.
+ Lamarc menu items are selected by typing in the myKey.
+ The keys mark at the first of menu items.
+ It can be string of any length.
+ Lamarc menu items typically have one-letter key.
+ Two-letter keys are also possible.
+ ui is just a reference of the only object of UIInterface.
+ myMenuKey is the key to set or get the corresponding value of it.
+ Class uistr or im::uistr has the key.
+ We will see this later.
+\end_layout
+
+\begin_layout Enumerate
+ui_vars/ui_vars.h : class UIVars hosts several members that are set by Lamarc
+ menus.
+ UIVarsIMUserParameters typed imuserparams is one of data members of class
+ UIVars.
+ We will need to see other members especially UIVarsDataPackPlus.
+\end_layout
+
+\begin_layout Enumerate
+ui_vars/ui_vars.cpp : class UIVars ctor needs attention when we add UIVarsIMUserP
+arameters typed imuserparams.
+\end_layout
+
+\begin_layout Enumerate
+tools/stringx.cpp : Lamarc provides tons of functions for handling strings.
+ We added a few: ToInteger, ToReal, Tokenize.
+\end_layout
+
+\begin_layout Enumerate
+xml/parsetreetodata.cpp : Member function ParseTreeToData::ProcessFileData
+ parses the input XML for data.
+ We added ptree XML element, which should be dealt with properly.
+\end_layout
+
+\begin_layout Enumerate
+xml/lamarcschema.cpp : XML schema is handled nicely.
+ We just need to add elements so that XML parser would not complain about.
+ FIXME: we need to take care of IM options XML parts.
+\end_layout
+
+\begin_layout Enumerate
+lamarcmenus/lamarc_strings.h/cpp : Lamarc menu strings are members of class
+ immenu.
+ Note that we use uistr for menu keys not these immenu members.
+\end_layout
+
+\begin_layout Enumerate
+ui_interface/userparam_interface.cpp : We need setget objects for transferring
+ user inputs to UIVars.
+ This is somewhat tedious.
+ It could have been done with class template.
+ uiPriorSplitTime is made for splitting time maximum value.
+ It is a subclass of SetGetDouble, which is a kind of setget classes.
+ Lamarc provides a variety of setget classes.
+\end_layout
+
+\begin_layout Enumerate
+ui_interface/ui_strings.cpp/h : Menu keys are essential to access appropriate
+ values.
+ im::uistr::SplitTime is used for splitting time.
+ All uistr must be distinct so that they can serve as keys.
+\end_layout
+
+\begin_layout Enumerate
+ui_interface/setgetmachine.cpp : SetGetMachine::Init installs uiPriorSplitTime.
+\end_layout
+
+\begin_layout Enumerate
+IMUserParameters::ToXML : To dump XML file for IM.
+\end_layout
+
+\begin_layout Enumerate
+ParseTreeToSettings::DoIMUserParams : To load XML setting for IM.
+\end_layout
+
+\begin_layout Enumerate
+ParseTreeToData::ProcessFileData : To load a population tree for IM.
+\end_layout
+
+\begin_layout Subsection
+Data
+\end_layout
+
+\begin_layout Standard
+Region is a 
+\begin_inset Quotes eld
+\end_inset
+
+locus
+\begin_inset Quotes erd
+\end_inset
+
+ in IMa.
+ Regions can have multiple loci.
+ Locus is the same as Block.
+\end_layout
+
+\begin_layout Subsection
+Chain
+\end_layout
+
+\begin_layout Standard
+We use the idea of various classes of Lamarc.
+\end_layout
+
+\begin_layout Enumerate
+tree/chainstate.h : ChainState - We have IMChainState class that is written
+ in the same header and source files.
+ I like the idea of separating chain and its state.
+ Tree and some demographic parameters are the state of a chain.
+\end_layout
+
+\begin_layout Enumerate
+tree/chain.h : Chain
+\end_layout
+
+\begin_layout Enumerate
+control/chainmanager.h : ChainManager
+\end_layout
+
+\begin_layout Enumerate
+TemperatureIdentity
+\end_layout
+
+\begin_layout Standard
+CollectionManager?
+\end_layout
+
+\begin_layout Standard
+Do ...
+ Regions
+\end_layout
+
+\begin_layout Standard
+Report or RunReport should be done by ChainManager not Chain.
+\end_layout
+
+\begin_layout Standard
+CollectionManager should be done by ChainManager not Chain?
+\end_layout
+
+\begin_layout Standard
+Tree -> TreeSummary, Interval (Intervals by events), -> Summry.
+ What is IntervalData? I think that Interval and IntervalData are very important
+ to understand.
+\end_layout
+
+\begin_layout Standard
+Each Arranager takes ChainState to update something through CollectionManager
+ and ParamCollector.
+\end_layout
+
+\begin_layout Standard
+ChainState includes all of the gene trees and the underlying species tree.
+\end_layout
+
+\begin_layout Standard
+force/forceparam.h : the only place for demographic parameters
+\end_layout
+
+\begin_layout Subsection
+Flow of IMa
+\end_layout
+
+\begin_layout Standard
+Once we load all the data we create Markov chains (A chain class is required).
+ Each region represents a locus in IMa2.
+ A region is associate with a recombinant genealogy.
+ There are three main updates: genealogy update, splitting time update,
+ and mutation scalar update.
+\end_layout
+
+\begin_layout Subsection
+Lamarc+Isolation
+\end_layout
+
+\begin_layout Standard
+We do not change much of Lamarc.
+ We assume that one and the only one region is given.
+ We do not need to change all the gene trees of the regions.
+ We jsut want to check if Rannala and Yang's update of splitting time can
+ work with Lamarc.
+ There are lots of things to do even after we are done with this.
+ We do not know how this turns out.
+ We cannot wait until then.
+\end_layout
+
+\begin_layout Section
+Lamarc Classes
+\end_layout
+
+\begin_layout Subsection
+TimeList
+\end_layout
+
+\begin_layout Standard
+TimeList::ClearBranchCount : branchmap is a map of branch type and its counts.
+ We reset all of the counts to 0.
+\end_layout
+
+\begin_layout Standard
+ClearBody : All of the tip branches are disconnected.
+ We count tip branches up in the data member, branchmap.
+\end_layout
+
+\begin_layout Subsection
+BranchBuffer
+\end_layout
+
+\begin_layout Standard
+m_activelist and m_inactivelist are of this type.
+ 
+\end_layout
+
+\begin_layout Standard
+m_branchxparts : 1-dim long.
+ # of coalescent events within a partition (or a population)
+\end_layout
+
+\begin_layout Standard
+m_branchparts : 2-dim long.
+ force-type x # of events within a partition.
+ (when and where is this created?)
+\end_layout
+
+\begin_layout Subsection
+DataPack
+\end_layout
+
+\begin_layout Standard
+m_partnames : force_type x StringVec1d
+\end_layout
+
+\begin_layout Section
+TODO
+\end_layout
+
+\begin_layout Standard
+m_branchxparts? : 1-dim long.
+ # of populations
+\end_layout
+
+\begin_layout Standard
+m_branchparts? : 2-dim long.
+ 1 x # of popualtions.
+\end_layout
+
+\begin_layout Standard
+m_eventvec should be changed after splitting time is been passed?
+\end_layout
+
+\begin_layout Standard
+GetBranchXParts? m_branchxparts should change in time period.
+\end_layout
+
+\begin_layout Standard
+GetBranchParts? m_branchparts should change in time period as well.
+\end_layout
+
+\begin_layout Standard
+SplitEvent?
+\end_layout
+
+\begin_layout Section
+Simulation
+\end_layout
+
+\begin_layout Standard
+We are back to the work of recombination with Isolation models.
+ We would have simulated data using Seq-Gen and MS (make sample).
+\end_layout
+
+\begin_layout Verse
+ms 6 1 -T -r 2.5 3 -I 2 3 3 -ma x 0 0 x -n 2 1 -ej 0.25 1 2 >sim6
+\end_layout
+
+\begin_layout Verse
+seq-gen -mHKY -t 0.8 -l 3 -p 499 -s 0.88 <sim6 >sg_sim6
+\end_layout
+
+\begin_layout Verse
+3 GTT 
+\end_layout
+
+\begin_layout Verse
+1 GTT 
+\end_layout
+
+\begin_layout Verse
+2 CTT 
+\end_layout
+
+\begin_layout Verse
+5 GAT 
+\end_layout
+
+\begin_layout Verse
+4 GGC 
+\end_layout
+
+\begin_layout Verse
+6 GGT 
+\end_layout
+
+\end_body
+\end_document
