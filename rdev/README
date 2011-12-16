@@ -1,3 +1,11 @@
 R Development
 =============
 
+.Things that I did for install R package into Mac OS X Snow Leopard 
+----
+mkdir downloads/R-2.14.0/i
+cd downloads/R-2.14.0/b
+http://R.research.att.com/gfortran-4.2.3.dmg
+gfortran-42-5664.dmg is installed and it worked.
+../configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=/Users/goshng/Documents/Projects/peach/rdev/downloads/R-2.14.0/i
+----

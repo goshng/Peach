@@ -1,0 +1,48 @@
+Fri Dec 16 15:09:31 EST 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We could ship a program with packages including BWA, and R packages.
+
+.One might be able to use R to develop a standalone program
+----
+http://users.stat.umn.edu/~charlie/stand/
+http://stackoverflow.com/questions/4736795/matrices-vectors-in-c-with-the-r-math-standalone-library
+http://www.stat.berkeley.edu/classes/s243/rmath.html
+http://cgjennings.ca/toybox/R/index.html
+http://stackoverflow.com/questions/5393257/including-r-standalone-library-in-a-c-source-tree
+----
+
+.One can use a R script as you would use other scripts
+----
+http://mazamascience.com/WorkingWithData/?p=888
+----
+
+.Many R extension
+----
+http://www.omegahat.org/
+----
+
+.Statistical Genetics in R
+----
+http://cran.fyxm.net/web/views/Genetics.html
+----
+
+.Installation of DESeq
+----
+> source("http://bioconductor.org/biocLite.R")
+> biocLite("DESeq")
+> system.file( "extra/TagSeqExample.tab", package="DESeq" )
+[1] "/Users/goshng/Documents/Projects/Peach/rdev/downloads/R-2.14.0/b/library/DESeq/extra/TagSeqExample.tab"
+----
+
+How can I ship this R with other programs, such as BWA, as a graphical user
+interface?
+
+.R for Mac OS X might have some answers to how to ship R with other programs
+----
+http://cran.r-project.org/bin/macosx/Mac-GUI-1.41.tar.gz
+----
+
+.A README of R Mac OS X GUI 
+----
+downloads/Mac-GUI-1.41/ReadMe.txt
+----
