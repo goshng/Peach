@@ -62,4 +62,9 @@
 	[ prefsController showWindow: self ];
 }
 
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+  NSLog(@"The application has started!");
+}
+
 @end

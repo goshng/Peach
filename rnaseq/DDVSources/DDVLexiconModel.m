@@ -28,11 +28,11 @@
 		lexiconArray = [ [ NSMutableArray alloc ] init ];
 		// Strings used to label user interface elements associated with particular table columns
 		firstLangLabel = [ [ NSString alloc ] initWithString:
-			NSLocalizedString( @"Some Language", nil ) ];
+			NSLocalizedString( @"Choose a project name", nil ) ];
 		secondLangLabel = [ [ NSString alloc ] initWithString:
-			NSLocalizedString( @"Andere Sprache", nil ) ];
+			NSLocalizedString( @"User name", nil ) ];
 		topicLabel = [ [ NSString alloc ] initWithString:
-			NSLocalizedString( @"Topic", nil ) ];
+			NSLocalizedString( @"Choose a reference genome", nil ) ];
 	}
 	return self;
 }

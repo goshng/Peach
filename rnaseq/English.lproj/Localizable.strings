@@ -2,13 +2,13 @@
 // "KEY" = "VALUE" format
 
 // DDVLexiconModel initialization strings
-"Native Language" = "Some Language";
-"Foreign Language" = "Andere Sprache";
+"Native Language" = "Korean";
+"Foreign Language" = "English";
 "Topic Header" = "Topic";
 // DDVLexItem initialization strings
-"Native Word" = "A Word";
-"Foreign Word" = "Ein Wort";
-"No Topic" = "None";
+"Native Word" = "A";
+"Foreign Word" = "B";
+"No Topic" = "C";
 // Error messages from fullscreen quiz
 "Capture Error" = "Unable to capture the main display";
 "Release Error" = "Unable to release the display(s)";

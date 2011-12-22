@@ -111,9 +111,9 @@
 
 - ( NSString * ) windowTitleForDocumentDisplayName: ( NSString * ) displayName
 {
-	[ inspector setTitle: [ NSLocalizedString( @"VocableTrainerX Selection: ", nil )
+	[ inspector setTitle: [ NSLocalizedString( @"dernaseq Selection: ", nil )
 		stringByAppendingString: displayName ] ];
-	return [ @"VocableTrainerX: " stringByAppendingString: displayName ];
+	return [ @"dernaseq: " stringByAppendingString: displayName ];
 }
 
 // This function is published in non-OO form in Apple's documentation for toolbars
@@ -427,6 +427,7 @@
 	[ settingsPanel orderOut: self ];
 }
 
+// Acts when users click the ok button settings.
 - ( IBAction ) dismissSettingsPanel: ( id ) sender
 {
 	[ self updateLabelStrings ];
@@ -436,20 +437,29 @@
 
 - ( void ) updateLabelStrings
 {
-	if ( ![ [ [ firstLColumn  headerCell ] stringValue ] isEqual: [ firstLSetting stringValue ] ] )
-		[ [ self document ] updateChangeCount: NSChangeDone ];
-	if ( ![ [ [ secondLColumn  headerCell ] stringValue ] isEqual: [ secondLSetting stringValue ] ] )
-		[ [ self document ] updateChangeCount: NSChangeDone ];
-	if ( ![ [ [ topicColumn  headerCell ] stringValue ] isEqual: [ topicSetting stringValue ] ] )
-		[ [ self document ] updateChangeCount: NSChangeDone ];
+//	if ( ![ [ [ firstLColumn  headerCell ] stringValue ] isEqual: [ firstLSetting stringValue ] ] )
+//		[ [ self document ] updateChangeCount: NSChangeDone ];
+//	if ( ![ [ [ secondLColumn  headerCell ] stringValue ] isEqual: [ secondLSetting stringValue ] ] )
+//		[ [ self document ] updateChangeCount: NSChangeDone ];
+//	if ( ![ [ [ topicColumn  headerCell ] stringValue ] isEqual: [ topicSetting stringValue ] ] )
+//		[ [ self document ] updateChangeCount: NSChangeDone ];
 
-	[ [ firstLColumn headerCell ] setStringValue: [ firstLSetting stringValue ] ];
-	[ [ secondLColumn headerCell ] setStringValue: [ secondLSetting stringValue ] ];
-	[ [ topicColumn headerCell ] setStringValue: [ topicSetting stringValue ] ];
+  // Sets the headers of the table view.NSLocalizedString( @"Insert Item", nil )
+//	[ [ firstLColumn headerCell ] setStringValue: [ firstLSetting stringValue ] ];
+//	[ [ secondLColumn headerCell ] setStringValue: [ secondLSetting stringValue ] ];
+//	[ [ topicColumn headerCell ] setStringValue: [ topicSetting stringValue ] ];
+
+//	[ firstLangLabel setStringValue: [ firstLSetting stringValue ] ];
+//	[ secondLangLabel setStringValue: [ secondLSetting stringValue ] ];
+//	[ topicLabel setStringValue: [ topicSetting stringValue ] ];
+  
+  [ [ firstLColumn headerCell ] setStringValue:NSLocalizedString(@"Sample ID",nil) ];
+	[ [ secondLColumn headerCell ] setStringValue:NSLocalizedString(@"Location",nil) ];
+	[ [ topicColumn headerCell ] setStringValue:NSLocalizedString(@"Factor",nil) ];
 	
-	[ firstLangLabel setStringValue: [ firstLSetting stringValue ] ];
-	[ secondLangLabel setStringValue: [ secondLSetting stringValue ] ];
-	[ topicLabel setStringValue: [ topicSetting stringValue ] ];
+	[ firstLangLabel setStringValue:NSLocalizedString(@"Sample ID",nil) ];
+	[ secondLangLabel setStringValue:NSLocalizedString(@"Location",nil) ];
+	[ topicLabel setStringValue:NSLocalizedString(@"Factor",nil) ];
 }
 
 // Implements mass topic string assignment - this app is now really full of sheet
@@ -484,6 +494,132 @@
 {
 	[ NSApp stopModal ];
 }
+
+#pragma mark еее DE RNA-seq еее
+
+// Takes RNA-seq samples from a dialog.
+- ( IBAction ) openSamplePathPanel: ( id ) sender
+{
+  NSOpenPanel* openDlg = [NSOpenPanel openPanel];
+  [openDlg setCanChooseFiles:YES];
+  [openDlg setCanChooseDirectories:YES];
+  [openDlg setPrompt:@"Select"];
+//  NSString *filename = @"/Users/goshng"; 
+  //  NSString *filename = [pathAsNSString lastPathComponent]; 
+  //  [filename stringByDeletingPathExtension];
+  if ([openDlg runModalForDirectory:nil file:nil] == NSOKButton )
+  {
+    NSArray* files = [openDlg filenames];
+    for(NSString* filePath in [openDlg filenames])
+    {
+      NSLog(@"%@",filePath);
+      //do something with the file at filePath
+      NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+      [alert setMessageText:filePath];
+      [alert runModal];
+    }
+  }
+}
+
+- ( IBAction ) indexGenome: ( id ) sender
+{
+  NSLog(@"Index a reference genome");
+  NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
+  NSString *bwaDir = 
+    [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
+  NSString *bwa = @"bin/bwa";
+  NSString *referenceGenome = @"NC_004350.fna";
+  NSString *commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ index -p %@/output/project/%@-bwa -a is %@/input/%@", 
+     baseDir, bwa, bwaDir, referenceGenome, baseDir, referenceGenome];
+  system([commandBwaIndex UTF8String]);
+}
+
+// Takes all of the RNA-seq samples and maps them on a reference genome.
+- ( IBAction ) mapSamples: ( id ) sender
+{
+  NSLog(@"Run BWA");
+  NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
+  NSString *bwaDir = 
+    [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
+  NSString *bwa = @"bin/bwa";
+  NSString *samtools = @"bin/samtools";
+  NSString *referenceGenome = @"NC_004350.fna";
+  
+  NSString *gzipfile = @"/Volumes/Elements/Documents/Projects/rnaseq/data/smutans/FASTQ01.subsample-100.gz";
+  
+  // bwa aln
+  NSString *commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ aln -I -t 2 %@/output/project/%@-bwa %@ > %@/output/project/FASTQ%d.sai", 
+     baseDir, bwa, bwaDir, referenceGenome, gzipfile, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+  
+  // bwa samse
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ samse -n 1 -f %@/output/project/FASTQ%d.sam %@/output/project/%@-bwa %@/output/project/FASTQ%d.sai %@", 
+     baseDir, bwa, bwaDir, 1, bwaDir, referenceGenome, bwaDir, 1, gzipfile];
+//  system([commandBwaIndex UTF8String]);
+
+  // samtools view -bS
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ view -bS -o %@/output/project/FASTQ%d.bam %@/output/project/FASTQ%d.sam", 
+     baseDir, samtools, bwaDir, 1, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+
+  // samtools sort
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ sort %@/output/project/FASTQ%d.bam %@/output/project/FASTQ%d.sorted", 
+     baseDir, samtools, bwaDir, 1, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+  
+  // samtools mpileup -q 15
+  int readDepth = 300000;
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ mpileup -q 15 -d %d -f %@/output/project/%@ %@/output/project/FASTQ%d.sorted.bam > %@/output/project/FASTQ%d.pileup", 
+     baseDir, samtools, readDepth, bwaDir, referenceGenome, bwaDir, 1, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+  
+  // perl pl/samtools-pileup.pl
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"perl -I %@ %@/pl/samtools-pileup.pl wiggle -refgenome %@/output/project/%@ -in %@/output/project/FASTQ%d.pileup -out %@/output/project/FASTQ%d.wig", 
+     baseDir, baseDir, bwaDir, referenceGenome, 
+     bwaDir, 1, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+
+  // samtools view and pl/bwa-summary.pl
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ view %@/output/project/FASTQ%d.sorted.bam | perl -I %@ %@/pl/bwa-summary.pl pos > %@/output/project/FASTQ%d-sum.pos", 
+     baseDir, samtools, bwaDir, 1, baseDir, baseDir, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+
+  // samtools view and pl/bwa-summary.pl
+  NSString *gfffile = @"/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.gff";
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/%@ view %@/output/project/FASTQ%d.sorted.bam | perl -I %@ %@/pl/bwa-summary.pl rrna -gff %@ > %@/output/project/FASTQ%d-sum.rrna", 
+     baseDir, samtools, bwaDir, 1, baseDir, baseDir, gfffile, bwaDir, 1];
+//  system([commandBwaIndex UTF8String]);
+
+  // perl pl/feature-genome.pl
+  NSString *pttfile = @"/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.ptt";
+  NSString *featurefile = @"feature-genome.out-geneonly";
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"perl -I %@ %@/pl/feature-genome.pl ptt2 -geneonly -in %@ -out %@/output/project/%@", 
+     baseDir, baseDir, pttfile, bwaDir, featurefile];
+//  system([commandBwaIndex UTF8String]);
+  
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"perl -I %@ %@/pl/de-count.pl join -first -singlegenome -shortread %@/output/project/FASTQ%d-sum.pos -genepos %@/output/project/%@ -o %@/output/project/FASTQ%d.de", 
+     baseDir, baseDir, bwaDir, 1, bwaDir, featurefile, bwaDir, 1];
+  system([commandBwaIndex UTF8String]);
+  
+  NSLog(commandBwaIndex);
+}
+
+- ( IBAction ) findDEGenes: ( id ) sender
+{
+  NSLog(@"Run edgeR or DESeq");
+}
+
 
 #pragma mark еее IMPORT / EXPORT еее
 

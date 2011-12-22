@@ -16,5 +16,6 @@
 - ( BOOL ) applicationShouldOpenUntitledFile: ( NSApplication * ) theApplication;
 - ( IBAction ) openNewDocument: ( id ) sender;
 - ( IBAction ) showPreferences: ( id ) sender;
+- (void)applicationDidFinishLaunching:(NSNotification *)notification;
 
 @end

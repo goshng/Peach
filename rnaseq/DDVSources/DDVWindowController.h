@@ -81,6 +81,13 @@
 - ( IBAction ) dismissCategorizeSheet: ( id ) sender;
 - ( IBAction ) cancelCategorizeAction: ( id ) sender;
 
+#pragma mark еее DE RNA-seq еее
+
+- ( IBAction ) openSamplePathPanel: ( id ) sender;
+- ( IBAction ) indexGenome: ( id ) sender;
+- ( IBAction ) mapSamples: ( id ) sender;
+- ( IBAction ) findDEGenes: ( id ) sender;
+
 #pragma mark еее IMPORT / EXPORT еее
 
 - ( IBAction ) exportCSV: ( id ) sender;

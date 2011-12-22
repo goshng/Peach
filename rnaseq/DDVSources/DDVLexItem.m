@@ -13,9 +13,9 @@
 - ( id ) init
 {
 	// Strings used for default table entry upon adding a new item
-	return [ self initWithFirstLanguage: NSLocalizedString( @"A Word", nil )
-		secondLanguage: NSLocalizedString( @"Ein Wort", nil )
-		topic: NSLocalizedString( @"None", nil ) ];
+	return [ self initWithFirstLanguage: NSLocalizedString( @"1", nil )
+		secondLanguage: NSLocalizedString( @"Full file path", nil )
+		topic: NSLocalizedString( @"Factor", nil ) ];
 }
 
 // Designated initializer
