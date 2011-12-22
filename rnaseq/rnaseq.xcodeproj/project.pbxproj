@@ -1,0 +1,633 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */; };
+		8D15AC2E0486D014006FF6A4 /* DDVDocument.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B4FDCFA73011CA2CEA /* DDVDocument.nib */; };
+		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
+		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
+		D0424E2614A2EDD2008A88F1 /* rnaseq_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */; };
+		F00D30B907BD2F4A00B0A3D8 /* DDVLexiconModel.h in Headers */ = {isa = PBXBuildFile; fileRef = F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */; };
+		F00D30BA07BD2F4A00B0A3D8 /* DDVLexiconModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */; };
+		F057915E07BE83A80074A85F /* XQuizItApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = F057915D07BE83A80074A85F /* XQuizItApp.icns */; };
+		F057917007BE83AF0074A85F /* XQuizItDoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = F057916F07BE83AF0074A85F /* XQuizItDoc.icns */; };
+		F0685BF207CA615A00E69CDC /* DDVTopicController.h in Headers */ = {isa = PBXBuildFile; fileRef = F0685BF007CA615A00E69CDC /* DDVTopicController.h */; };
+		F0685BF307CA615A00E69CDC /* DDVTopicController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0685BF107CA615A00E69CDC /* DDVTopicController.m */; };
+		F0685C0007CA62C700E69CDC /* DDVTopic.h in Headers */ = {isa = PBXBuildFile; fileRef = F0685BFE07CA62C700E69CDC /* DDVTopic.h */; };
+		F0685C0107CA62C700E69CDC /* DDVTopic.m in Sources */ = {isa = PBXBuildFile; fileRef = F0685BFF07CA62C700E69CDC /* DDVTopic.m */; };
+		F087116A07DF4D28002FA7DA /* DDVQuizWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = F087116807DF4D28002FA7DA /* DDVQuizWindow.h */; };
+		F087116B07DF4D28002FA7DA /* DDVQuizWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = F087116907DF4D28002FA7DA /* DDVQuizWindow.m */; };
+		F0934C4207F637DF0084AB38 /* info.gif in Resources */ = {isa = PBXBuildFile; fileRef = F0934C4107F637DF0084AB38 /* info.gif */; };
+		F093EEF607BAA80F001F2A4F /* DDVDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = F093EEF407BAA80F001F2A4F /* DDVDocument.h */; };
+		F093EEF707BAA80F001F2A4F /* DDVDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = F093EEF507BAA80F001F2A4F /* DDVDocument.m */; };
+		F0A0F04907CFC29F00709D41 /* Help in Resources */ = {isa = PBXBuildFile; fileRef = F0A0F02007CFC29F00709D41 /* Help */; };
+		F0A0F73D07D252CF00709D41 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = F0A0F73B07D252CF00709D41 /* Credits.html */; };
+		F0A0FA8F07D2891D00709D41 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F0A0FA8D07D2891D00709D41 /* Localizable.strings */; };
+		F0A7627F07C690C50089711B /* DDVSearchFieldFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A7627D07C690C50089711B /* DDVSearchFieldFormatter.h */; };
+		F0A7628007C690C50089711B /* DDVSearchFieldFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A7627E07C690C50089711B /* DDVSearchFieldFormatter.m */; };
+		F0A7635F07C69E5E0089711B /* MMAppController.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A7635D07C69E5E0089711B /* MMAppController.h */; };
+		F0A7636007C69E5E0089711B /* MMAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A7635E07C69E5E0089711B /* MMAppController.m */; };
+		F0A7663507C7E07F0089711B /* MMPrintView.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A7663307C7E07F0089711B /* MMPrintView.h */; };
+		F0A7663607C7E07F0089711B /* MMPrintView.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A7663407C7E07F0089711B /* MMPrintView.m */; };
+		F0A767FF07C8275C0089711B /* QuizWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = F0A767FD07C8275C0089711B /* QuizWindow.nib */; };
+		F0A7680C07C8299C0089711B /* DDVQuizController.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A7680A07C8299C0089711B /* DDVQuizController.h */; };
+		F0A7680D07C8299C0089711B /* DDVQuizController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A7680B07C8299C0089711B /* DDVQuizController.m */; };
+		F0A7681407C829A60089711B /* MMRandomEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A7681207C829A60089711B /* MMRandomEnumerator.h */; };
+		F0A7681507C829A60089711B /* MMRandomEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A7681307C829A60089711B /* MMRandomEnumerator.m */; };
+		F0B2431307C391DE00F1BE01 /* DDVLexiconController.h in Headers */ = {isa = PBXBuildFile; fileRef = F0B2431107C391DE00F1BE01 /* DDVLexiconController.h */; };
+		F0B2431407C391DE00F1BE01 /* DDVLexiconController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0B2431207C391DE00F1BE01 /* DDVLexiconController.m */; };
+		F0B247A507C60CEA00F1BE01 /* MMPasteboardCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = F0B247A307C60CEA00F1BE01 /* MMPasteboardCategory.h */; };
+		F0B247A607C60CEA00F1BE01 /* MMPasteboardCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = F0B247A407C60CEA00F1BE01 /* MMPasteboardCategory.m */; };
+		F0D05ABE07CC17050057C477 /* DDVTopicTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = F0D05ABC07CC17050057C477 /* DDVTopicTableView.h */; };
+		F0D05ABF07CC17050057C477 /* DDVTopicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = F0D05ABD07CC17050057C477 /* DDVTopicTableView.m */; };
+		F0EE700E07D8AB740018778D /* black.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE700907D8AB740018778D /* black.png */; };
+		F0EE700F07D8AB740018778D /* green.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE700A07D8AB740018778D /* green.png */; };
+		F0EE701007D8AB750018778D /* red.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE700B07D8AB740018778D /* red.png */; };
+		F0EE701107D8AB750018778D /* snow.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE700C07D8AB740018778D /* snow.png */; };
+		F0EE701207D8AB750018778D /* yellow.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE700D07D8AB740018778D /* yellow.png */; };
+		F0EE702007D8ABD10018778D /* violet.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE701F07D8ABD10018778D /* violet.png */; };
+		F0EE73B207D8BE270018778D /* echelon.png in Resources */ = {isa = PBXBuildFile; fileRef = F0EE73B107D8BE270018778D /* echelon.png */; };
+		F0EE75DC07D8E0F40018778D /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = F0EE75DA07D8E0F40018778D /* Preferences.nib */; };
+		F0EE776307D8EC9E0018778D /* DDVPrefsController.h in Headers */ = {isa = PBXBuildFile; fileRef = F0EE776107D8EC9E0018778D /* DDVPrefsController.h */; };
+		F0EE776407D8EC9E0018778D /* DDVPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0EE776207D8EC9E0018778D /* DDVPrefsController.m */; };
+		F0EE781C07D8F8C10018778D /* defaults.h in Headers */ = {isa = PBXBuildFile; fileRef = F0EE781B07D8F8C10018778D /* defaults.h */; };
+		F0F65A0907BAA920006FD6ED /* DDVWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = F0F65A0707BAA920006FD6ED /* DDVWindowController.h */; };
+		F0F65A0A07BAA920006FD6ED /* DDVWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0F65A0807BAA920006FD6ED /* DDVWindowController.m */; };
+		F0F65A2F07BAAA06006FD6ED /* DDVToolbarDelegateCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = F0F65A2D07BAAA06006FD6ED /* DDVToolbarDelegateCategory.h */; };
+		F0F65A3007BAAA06006FD6ED /* DDVToolbarDelegateCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = F0F65A2E07BAAA06006FD6ED /* DDVToolbarDelegateCategory.m */; };
+		F0F65A5F07BAAA40006FD6ED /* delete.png in Resources */ = {isa = PBXBuildFile; fileRef = F0F65A5A07BAAA40006FD6ED /* delete.png */; };
+		F0F65A6007BAAA40006FD6ED /* drawer.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F0F65A5B07BAAA40006FD6ED /* drawer.tiff */; };
+		F0F65A6107BAAA40006FD6ED /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = F0F65A5C07BAAA40006FD6ED /* folder.png */; };
+		F0F65A6207BAAA40006FD6ED /* insert.png in Resources */ = {isa = PBXBuildFile; fileRef = F0F65A5D07BAAA40006FD6ED /* insert.png */; };
+		F0F65A6307BAAA40006FD6ED /* questions.png in Resources */ = {isa = PBXBuildFile; fileRef = F0F65A5E07BAAA40006FD6ED /* questions.png */; };
+		F0FEBFA407BC041100D0794B /* DDVLexItem.h in Headers */ = {isa = PBXBuildFile; fileRef = F0FEBFA207BC041100D0794B /* DDVLexItem.h */; };
+		F0FEBFA507BC041100D0794B /* DDVLexItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F0FEBFA307BC041100D0794B /* DDVLexItem.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		2A37F4B5FDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/DDVDocument.nib; sourceTree = "<group>"; };
+		2A37F4B7FDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D15AC370486D014006FF6A4 /* rnaseq.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rnaseq.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rnaseq_Prefix.pch; sourceTree = "<group>"; };
+		F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVLexiconModel.h; path = DDVSources/DDVLexiconModel.h; sourceTree = "<group>"; };
+		F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVLexiconModel.m; path = DDVSources/DDVLexiconModel.m; sourceTree = "<group>"; };
+		F057915D07BE83A80074A85F /* XQuizItApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = XQuizItApp.icns; path = Graphics/XQuizItApp.icns; sourceTree = "<group>"; };
+		F057916F07BE83AF0074A85F /* XQuizItDoc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = XQuizItDoc.icns; path = Graphics/XQuizItDoc.icns; sourceTree = "<group>"; };
+		F0685BF007CA615A00E69CDC /* DDVTopicController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVTopicController.h; path = DDVSources/DDVTopicController.h; sourceTree = "<group>"; };
+		F0685BF107CA615A00E69CDC /* DDVTopicController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVTopicController.m; path = DDVSources/DDVTopicController.m; sourceTree = "<group>"; };
+		F0685BFE07CA62C700E69CDC /* DDVTopic.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVTopic.h; path = DDVSources/DDVTopic.h; sourceTree = "<group>"; };
+		F0685BFF07CA62C700E69CDC /* DDVTopic.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVTopic.m; path = DDVSources/DDVTopic.m; sourceTree = "<group>"; };
+		F087116807DF4D28002FA7DA /* DDVQuizWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVQuizWindow.h; path = DDVSources/DDVQuizWindow.h; sourceTree = "<group>"; };
+		F087116907DF4D28002FA7DA /* DDVQuizWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVQuizWindow.m; path = DDVSources/DDVQuizWindow.m; sourceTree = "<group>"; };
+		F0934C4107F637DF0084AB38 /* info.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = info.gif; path = Graphics/info.gif; sourceTree = "<group>"; };
+		F093EEF407BAA80F001F2A4F /* DDVDocument.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVDocument.h; path = DDVSources/DDVDocument.h; sourceTree = "<group>"; };
+		F093EEF507BAA80F001F2A4F /* DDVDocument.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVDocument.m; path = DDVSources/DDVDocument.m; sourceTree = "<group>"; };
+		F0A0F02107CFC29F00709D41 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = English.lproj/Help; sourceTree = "<group>"; };
+		F0A0F73C07D252CF00709D41 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; name = English; path = English.lproj/Credits.html; sourceTree = "<group>"; };
+		F0A0FA8E07D2891D00709D41 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F0A7627D07C690C50089711B /* DDVSearchFieldFormatter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVSearchFieldFormatter.h; path = DDVSources/DDVSearchFieldFormatter.h; sourceTree = "<group>"; };
+		F0A7627E07C690C50089711B /* DDVSearchFieldFormatter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVSearchFieldFormatter.m; path = DDVSources/DDVSearchFieldFormatter.m; sourceTree = "<group>"; };
+		F0A7635D07C69E5E0089711B /* MMAppController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MMAppController.h; path = DDVSources/MMAppController.h; sourceTree = "<group>"; };
+		F0A7635E07C69E5E0089711B /* MMAppController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MMAppController.m; path = DDVSources/MMAppController.m; sourceTree = "<group>"; };
+		F0A7663307C7E07F0089711B /* MMPrintView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MMPrintView.h; path = DDVSources/MMPrintView.h; sourceTree = "<group>"; };
+		F0A7663407C7E07F0089711B /* MMPrintView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MMPrintView.m; path = DDVSources/MMPrintView.m; sourceTree = "<group>"; };
+		F0A767FE07C8275C0089711B /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/QuizWindow.nib; sourceTree = "<group>"; };
+		F0A7680A07C8299C0089711B /* DDVQuizController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVQuizController.h; path = DDVSources/DDVQuizController.h; sourceTree = "<group>"; };
+		F0A7680B07C8299C0089711B /* DDVQuizController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVQuizController.m; path = DDVSources/DDVQuizController.m; sourceTree = "<group>"; };
+		F0A7681207C829A60089711B /* MMRandomEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MMRandomEnumerator.h; path = DDVSources/MMRandomEnumerator.h; sourceTree = "<group>"; };
+		F0A7681307C829A60089711B /* MMRandomEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MMRandomEnumerator.m; path = DDVSources/MMRandomEnumerator.m; sourceTree = "<group>"; };
+		F0B2431107C391DE00F1BE01 /* DDVLexiconController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVLexiconController.h; path = DDVSources/DDVLexiconController.h; sourceTree = "<group>"; };
+		F0B2431207C391DE00F1BE01 /* DDVLexiconController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVLexiconController.m; path = DDVSources/DDVLexiconController.m; sourceTree = "<group>"; };
+		F0B247A307C60CEA00F1BE01 /* MMPasteboardCategory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MMPasteboardCategory.h; path = DDVSources/MMPasteboardCategory.h; sourceTree = "<group>"; };
+		F0B247A407C60CEA00F1BE01 /* MMPasteboardCategory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MMPasteboardCategory.m; path = DDVSources/MMPasteboardCategory.m; sourceTree = "<group>"; };
+		F0D05ABC07CC17050057C477 /* DDVTopicTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVTopicTableView.h; path = DDVSources/DDVTopicTableView.h; sourceTree = "<group>"; };
+		F0D05ABD07CC17050057C477 /* DDVTopicTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVTopicTableView.m; path = DDVSources/DDVTopicTableView.m; sourceTree = "<group>"; };
+		F0EE700907D8AB740018778D /* black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = black.png; path = Graphics/black.png; sourceTree = "<group>"; };
+		F0EE700A07D8AB740018778D /* green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = green.png; path = Graphics/green.png; sourceTree = "<group>"; };
+		F0EE700B07D8AB740018778D /* red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = red.png; path = Graphics/red.png; sourceTree = "<group>"; };
+		F0EE700C07D8AB740018778D /* snow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = snow.png; path = Graphics/snow.png; sourceTree = "<group>"; };
+		F0EE700D07D8AB740018778D /* yellow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = yellow.png; path = Graphics/yellow.png; sourceTree = "<group>"; };
+		F0EE701F07D8ABD10018778D /* violet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = violet.png; path = Graphics/violet.png; sourceTree = "<group>"; };
+		F0EE73B107D8BE270018778D /* echelon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = echelon.png; path = Graphics/echelon.png; sourceTree = "<group>"; };
+		F0EE75DB07D8E0F40018778D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
+		F0EE776107D8EC9E0018778D /* DDVPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVPrefsController.h; path = DDVSources/DDVPrefsController.h; sourceTree = "<group>"; };
+		F0EE776207D8EC9E0018778D /* DDVPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVPrefsController.m; path = DDVSources/DDVPrefsController.m; sourceTree = "<group>"; };
+		F0EE781B07D8F8C10018778D /* defaults.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = defaults.h; sourceTree = "<group>"; };
+		F0F65A0707BAA920006FD6ED /* DDVWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVWindowController.h; path = DDVSources/DDVWindowController.h; sourceTree = "<group>"; };
+		F0F65A0807BAA920006FD6ED /* DDVWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVWindowController.m; path = DDVSources/DDVWindowController.m; sourceTree = "<group>"; };
+		F0F65A2D07BAAA06006FD6ED /* DDVToolbarDelegateCategory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVToolbarDelegateCategory.h; path = DDVSources/DDVToolbarDelegateCategory.h; sourceTree = "<group>"; };
+		F0F65A2E07BAAA06006FD6ED /* DDVToolbarDelegateCategory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVToolbarDelegateCategory.m; path = DDVSources/DDVToolbarDelegateCategory.m; sourceTree = "<group>"; };
+		F0F65A5A07BAAA40006FD6ED /* delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = delete.png; path = Graphics/delete.png; sourceTree = "<group>"; };
+		F0F65A5B07BAAA40006FD6ED /* drawer.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = drawer.tiff; path = Graphics/drawer.tiff; sourceTree = "<group>"; };
+		F0F65A5C07BAAA40006FD6ED /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = folder.png; path = Graphics/folder.png; sourceTree = "<group>"; };
+		F0F65A5D07BAAA40006FD6ED /* insert.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = insert.png; path = Graphics/insert.png; sourceTree = "<group>"; };
+		F0F65A5E07BAAA40006FD6ED /* questions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = questions.png; path = Graphics/questions.png; sourceTree = "<group>"; };
+		F0FEBFA207BC041100D0794B /* DDVLexItem.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVLexItem.h; path = DDVSources/DDVLexItem.h; sourceTree = "<group>"; };
+		F0FEBFA307BC041100D0794B /* DDVLexItem.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVLexItem.m; path = DDVSources/DDVLexItem.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D15AC330486D014006FF6A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A8FEA54F5311CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
+				2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FB0FE9D524F11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D15AC370486D014006FF6A4 /* rnaseq.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A37F4AAFDCFA73011CA2CEA /* DrawerDocApp */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4ABFDCFA73011CA2CEA /* Classes */,
+				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
+				F0F65A3F07BAAA0D006FD6ED /* Graphics */,
+				2A37F4B8FDCFA73011CA2CEA /* Resources */,
+				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
+				19C28FB0FE9D524F11CA2CBB /* Products */,
+			);
+			name = DrawerDocApp;
+			sourceTree = "<group>";
+		};
+		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				F093EEF407BAA80F001F2A4F /* DDVDocument.h */,
+				F093EEF507BAA80F001F2A4F /* DDVDocument.m */,
+				F0FEBFA207BC041100D0794B /* DDVLexItem.h */,
+				F0FEBFA307BC041100D0794B /* DDVLexItem.m */,
+				F0B2431107C391DE00F1BE01 /* DDVLexiconController.h */,
+				F0B2431207C391DE00F1BE01 /* DDVLexiconController.m */,
+				F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */,
+				F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */,
+				F0EE776107D8EC9E0018778D /* DDVPrefsController.h */,
+				F0EE776207D8EC9E0018778D /* DDVPrefsController.m */,
+				F0A7680A07C8299C0089711B /* DDVQuizController.h */,
+				F0A7680B07C8299C0089711B /* DDVQuizController.m */,
+				F087116807DF4D28002FA7DA /* DDVQuizWindow.h */,
+				F087116907DF4D28002FA7DA /* DDVQuizWindow.m */,
+				F0A7627D07C690C50089711B /* DDVSearchFieldFormatter.h */,
+				F0A7627E07C690C50089711B /* DDVSearchFieldFormatter.m */,
+				F0F65A2D07BAAA06006FD6ED /* DDVToolbarDelegateCategory.h */,
+				F0F65A2E07BAAA06006FD6ED /* DDVToolbarDelegateCategory.m */,
+				F0685BFE07CA62C700E69CDC /* DDVTopic.h */,
+				F0685BFF07CA62C700E69CDC /* DDVTopic.m */,
+				F0685BF007CA615A00E69CDC /* DDVTopicController.h */,
+				F0685BF107CA615A00E69CDC /* DDVTopicController.m */,
+				F0F65A0707BAA920006FD6ED /* DDVWindowController.h */,
+				F0F65A0807BAA920006FD6ED /* DDVWindowController.m */,
+				F0A7635D07C69E5E0089711B /* MMAppController.h */,
+				F0A7635E07C69E5E0089711B /* MMAppController.m */,
+				F0B247A307C60CEA00F1BE01 /* MMPasteboardCategory.h */,
+				F0B247A407C60CEA00F1BE01 /* MMPasteboardCategory.m */,
+				F0A7663307C7E07F0089711B /* MMPrintView.h */,
+				F0A7663407C7E07F0089711B /* MMPrintView.m */,
+				F0A7681207C829A60089711B /* MMRandomEnumerator.h */,
+				F0A7681307C829A60089711B /* MMRandomEnumerator.m */,
+				F0D05ABC07CC17050057C477 /* DDVTopicTableView.h */,
+				F0D05ABD07CC17050057C477 /* DDVTopicTableView.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */,
+				F0EE781B07D8F8C10018778D /* defaults.h */,
+				2A37F4B0FDCFA73011CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
+				F0EE75DA07D8E0F40018778D /* Preferences.nib */,
+				2A37F4B4FDCFA73011CA2CEA /* DDVDocument.nib */,
+				F0A767FD07C8275C0089711B /* QuizWindow.nib */,
+				F0A0F02007CFC29F00709D41 /* Help */,
+				F0A0F73B07D252CF00709D41 /* Credits.html */,
+				F057915D07BE83A80074A85F /* XQuizItApp.icns */,
+				F057916F07BE83AF0074A85F /* XQuizItDoc.icns */,
+				8D15AC360486D014006FF6A4 /* Info.plist */,
+				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				F0A0FA8D07D2891D00709D41 /* Localizable.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
+				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F0F65A3F07BAAA0D006FD6ED /* Graphics */ = {
+			isa = PBXGroup;
+			children = (
+				F0F65A5A07BAAA40006FD6ED /* delete.png */,
+				F0934C4107F637DF0084AB38 /* info.gif */,
+				F0F65A5B07BAAA40006FD6ED /* drawer.tiff */,
+				F0F65A5C07BAAA40006FD6ED /* folder.png */,
+				F0EE73B107D8BE270018778D /* echelon.png */,
+				F0F65A5D07BAAA40006FD6ED /* insert.png */,
+				F0F65A5E07BAAA40006FD6ED /* questions.png */,
+				F0EE700C07D8AB740018778D /* snow.png */,
+				F0EE700907D8AB740018778D /* black.png */,
+				F0EE700B07D8AB740018778D /* red.png */,
+				F0EE700D07D8AB740018778D /* yellow.png */,
+				F0EE700A07D8AB740018778D /* green.png */,
+				F0EE701F07D8ABD10018778D /* violet.png */,
+			);
+			name = Graphics;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8D15AC280486D014006FF6A4 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F093EEF607BAA80F001F2A4F /* DDVDocument.h in Headers */,
+				F0F65A0907BAA920006FD6ED /* DDVWindowController.h in Headers */,
+				F0F65A2F07BAAA06006FD6ED /* DDVToolbarDelegateCategory.h in Headers */,
+				F0FEBFA407BC041100D0794B /* DDVLexItem.h in Headers */,
+				F00D30B907BD2F4A00B0A3D8 /* DDVLexiconModel.h in Headers */,
+				F0B2431307C391DE00F1BE01 /* DDVLexiconController.h in Headers */,
+				F0B247A507C60CEA00F1BE01 /* MMPasteboardCategory.h in Headers */,
+				F0A7627F07C690C50089711B /* DDVSearchFieldFormatter.h in Headers */,
+				F0A7635F07C69E5E0089711B /* MMAppController.h in Headers */,
+				F0A7663507C7E07F0089711B /* MMPrintView.h in Headers */,
+				F0A7680C07C8299C0089711B /* DDVQuizController.h in Headers */,
+				F0A7681407C829A60089711B /* MMRandomEnumerator.h in Headers */,
+				F0685BF207CA615A00E69CDC /* DDVTopicController.h in Headers */,
+				F0685C0007CA62C700E69CDC /* DDVTopic.h in Headers */,
+				F0D05ABE07CC17050057C477 /* DDVTopicTableView.h in Headers */,
+				F0EE776307D8EC9E0018778D /* DDVPrefsController.h in Headers */,
+				F0EE781C07D8F8C10018778D /* defaults.h in Headers */,
+				F087116A07DF4D28002FA7DA /* DDVQuizWindow.h in Headers */,
+				D0424E2614A2EDD2008A88F1 /* rnaseq_Prefix.pch in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8D15AC270486D014006FF6A4 /* rnaseq */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D02E191614A2E02700177280 /* Build configuration list for PBXNativeTarget "rnaseq" */;
+			buildPhases = (
+				8D15AC280486D014006FF6A4 /* Headers */,
+				8D15AC2B0486D014006FF6A4 /* Resources */,
+				8D15AC300486D014006FF6A4 /* Sources */,
+				8D15AC330486D014006FF6A4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = rnaseq;
+			productInstallPath = "$(HOME)/Applications";
+			productName = DrawerDocApp;
+			productReference = 8D15AC370486D014006FF6A4 /* rnaseq.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "Cornell University";
+			};
+			buildConfigurationList = D02E191514A2E02700177280 /* Build configuration list for PBXProject "rnaseq" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* DrawerDocApp */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D15AC270486D014006FF6A4 /* rnaseq */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D15AC2B0486D014006FF6A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */,
+				8D15AC2E0486D014006FF6A4 /* DDVDocument.nib in Resources */,
+				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
+				F0F65A5F07BAAA40006FD6ED /* delete.png in Resources */,
+				F0F65A6007BAAA40006FD6ED /* drawer.tiff in Resources */,
+				F0F65A6107BAAA40006FD6ED /* folder.png in Resources */,
+				F0F65A6207BAAA40006FD6ED /* insert.png in Resources */,
+				F0F65A6307BAAA40006FD6ED /* questions.png in Resources */,
+				F057915E07BE83A80074A85F /* XQuizItApp.icns in Resources */,
+				F057917007BE83AF0074A85F /* XQuizItDoc.icns in Resources */,
+				F0A767FF07C8275C0089711B /* QuizWindow.nib in Resources */,
+				F0A0F04907CFC29F00709D41 /* Help in Resources */,
+				F0A0F73D07D252CF00709D41 /* Credits.html in Resources */,
+				F0A0FA8F07D2891D00709D41 /* Localizable.strings in Resources */,
+				F0EE700E07D8AB740018778D /* black.png in Resources */,
+				F0EE700F07D8AB740018778D /* green.png in Resources */,
+				F0EE701007D8AB750018778D /* red.png in Resources */,
+				F0EE701107D8AB750018778D /* snow.png in Resources */,
+				F0EE701207D8AB750018778D /* yellow.png in Resources */,
+				F0EE702007D8ABD10018778D /* violet.png in Resources */,
+				F0EE73B207D8BE270018778D /* echelon.png in Resources */,
+				F0EE75DC07D8E0F40018778D /* Preferences.nib in Resources */,
+				F0934C4207F637DF0084AB38 /* info.gif in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D15AC300486D014006FF6A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC320486D014006FF6A4 /* main.m in Sources */,
+				F093EEF707BAA80F001F2A4F /* DDVDocument.m in Sources */,
+				F0F65A0A07BAA920006FD6ED /* DDVWindowController.m in Sources */,
+				F0F65A3007BAAA06006FD6ED /* DDVToolbarDelegateCategory.m in Sources */,
+				F0FEBFA507BC041100D0794B /* DDVLexItem.m in Sources */,
+				F00D30BA07BD2F4A00B0A3D8 /* DDVLexiconModel.m in Sources */,
+				F0B2431407C391DE00F1BE01 /* DDVLexiconController.m in Sources */,
+				F0B247A607C60CEA00F1BE01 /* MMPasteboardCategory.m in Sources */,
+				F0A7628007C690C50089711B /* DDVSearchFieldFormatter.m in Sources */,
+				F0A7636007C69E5E0089711B /* MMAppController.m in Sources */,
+				F0A7663607C7E07F0089711B /* MMPrintView.m in Sources */,
+				F0A7680D07C8299C0089711B /* DDVQuizController.m in Sources */,
+				F0A7681507C829A60089711B /* MMRandomEnumerator.m in Sources */,
+				F0685BF307CA615A00E69CDC /* DDVTopicController.m in Sources */,
+				F0685C0107CA62C700E69CDC /* DDVTopic.m in Sources */,
+				F0D05ABF07CC17050057C477 /* DDVTopicTableView.m in Sources */,
+				F0EE776407D8EC9E0018778D /* DDVPrefsController.m in Sources */,
+				F087116B07DF4D28002FA7DA /* DDVQuizWindow.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C1660FE840EACC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		2A37F4B4FDCFA73011CA2CEA /* DDVDocument.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2A37F4B5FDCFA73011CA2CEA /* English */,
+			);
+			name = DDVDocument.nib;
+			sourceTree = "<group>";
+		};
+		2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2A37F4B7FDCFA73011CA2CEA /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		F0A0F02007CFC29F00709D41 /* Help */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F0A0F02107CFC29F00709D41 /* English */,
+			);
+			name = Help;
+			sourceTree = "<group>";
+		};
+		F0A0F73B07D252CF00709D41 /* Credits.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F0A0F73C07D252CF00709D41 /* English */,
+			);
+			name = Credits.html;
+			sourceTree = "<group>";
+		};
+		F0A0FA8D07D2891D00709D41 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F0A0FA8E07D2891D00709D41 /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		F0A767FD07C8275C0089711B /* QuizWindow.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F0A767FE07C8275C0089711B /* English */,
+			);
+			name = QuizWindow.nib;
+			sourceTree = "<group>";
+		};
+		F0EE75DA07D8E0F40018778D /* Preferences.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F0EE75DB07D8E0F40018778D /* English */,
+			);
+			name = Preferences.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D02E18EF14A2E02700177280 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Development;
+		};
+		D02E18F014A2E02700177280 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Deployment;
+		};
+		D02E18F114A2E02700177280 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Default;
+		};
+		D02E18F214A2E02700177280 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_TRIGRAPHS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = rnaseq_Prefix.pch;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = rnaseq;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		D02E18F314A2E02700177280 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_TRIGRAPHS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = rnaseq_Prefix.pch;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = rnaseq;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		D02E18F414A2E02700177280 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_TRIGRAPHS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = rnaseq_Prefix.pch;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = rnaseq;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D02E191514A2E02700177280 /* Build configuration list for PBXProject "rnaseq" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D02E18EF14A2E02700177280 /* Development */,
+				D02E18F014A2E02700177280 /* Deployment */,
+				D02E18F114A2E02700177280 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		D02E191614A2E02700177280 /* Build configuration list for PBXNativeTarget "rnaseq" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D02E18F214A2E02700177280 /* Development */,
+				D02E18F314A2E02700177280 /* Deployment */,
+				D02E18F414A2E02700177280 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+}

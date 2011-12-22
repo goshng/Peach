@@ -1,3 +1,26 @@
+
+Wed Dec 21 08:55:32 EST 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A web site for R-GUI.
+----
+http://www.R-project.org/GUI/
+----
+
+.To build R
+----
+at /Builds/R-builds/nightly
+./buildR R-2.14.0 x86_64 leopard-x86_64
+./pkg R-2.14.0
+/Builds/R-builds/nightly/packaging/leopard/mkdoc
+----
+
+Tue Dec 20 08:51:23 EST 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+R GUI for Mac OS X seems to be easily compiled.
+----
+svn co svn://svn.rforge.net/Mac-GUI/trunk Mac-GUI
+----
+
 Fri Dec 16 15:09:31 EST 2011
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We could ship a program with packages including BWA, and R packages.
@@ -45,4 +68,11 @@ http://cran.r-project.org/bin/macosx/Mac-GUI-1.41.tar.gz
 .A README of R Mac OS X GUI 
 ----
 downloads/Mac-GUI-1.41/ReadMe.txt
+open downloads/Mac-GUI-1.41/R.xcodeproj
 ----
+
+What is squared coefficient of variation (CV)?
+What is the mean-variance relationship in the data?
+What is dispersion?
+Why do I need dispersion? Equally, why do I need a negative binomial model?
+

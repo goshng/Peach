@@ -1,0 +1,22 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {skip = id; solve = id; terminate = id; }; 
+            CLASS = DDVQuizController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                feedback = NSTextField; 
+                firstLangLabel = NSTextField; 
+                promptField = NSTextField; 
+                quizView = NSView; 
+                secondLangLabel = NSTextField; 
+                skipButton = NSButton; 
+                solutionField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = "java.lang.Object"; LANGUAGE = Java; }
+    ); 
+    IBVersion = 1; 
+}

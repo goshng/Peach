@@ -1,0 +1,3524 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\froman\fcharset77 Times-Roman;\f1\froman\fcharset77 Times-Bold;\f2\fnil\fcharset77 LucidaGrande;
+\f3\fnil\fcharset77 LucidaGrande-Bold;\f4\fnil\fcharset77 AndaleMono;\f5\froman\fcharset77 Times-Italic;
+\f6\fswiss\fcharset77 ArialMS;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww14120\viewh12740\viewkind0
+\deftab720
+\pard\pardeftab720\sa120\ql\qnatural
+
+\f0\fs36 \cf0 How To Build VocableTrainerX\
+\pard\pardeftab720\li340\fi-340\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 A.	Change file and class names for the document class\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Open a new Cocoa document-based application project in Xcode: 
+\f1\b VocableTrainerX
+\f0\b0 \
+2.	In the project window, rename 
+\f2\fs24 MyDocument.h
+\f0\fs28  and 
+\f2\fs24 MyDocument.m
+\f0\fs28  to 
+\f2\fs24 VTXDocument.h
+\f0\fs28  and 
+\f2\fs24 VTXDocument.m
+\f0\fs28  (it\'d5s easier if you don\'d5t change the names in the Finder first)\
+3.	In the project window, rename 
+\f2\fs24 MyDocument.nib
+\f0\fs28  to 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 \
+4.	Open 
+\f2\fs24 VTXDocument.nib
+\f0\fs28  in Interface Builder and rename the document class from 
+\f3\b\fs24 MyDocument
+\f0\b0\fs28  to 
+\f3\b\fs24 VTXDocument
+\f0\b0\fs28  in the class browser\
+5.	In 
+\f2\fs24 VTXDocument.h
+\f0\fs28  and 
+\f2\fs24 VTXDocument.m
+\f0\fs28 , change the name of the class declarations to 
+\f3\b\fs24 VTXDocument
+\f0\b0\fs28 ; in 
+\f2\fs24 VTXDocument.m
+\f0\fs28 , import the renamed header file 
+\f2\fs24 VTXDocument.h
+\f0\fs28  instead of 
+\f2\fs24 MyDocument.h
+\f0\fs28 \
+6.	In the 
+\f4\fs24 windowNibName
+\f0\fs28  method of 
+\f2\fs24 VTXDocument.m
+\f0\fs28 , temporarily set the method to return a value of 
+\f4\fs24 @"VTXDocument"
+\f0\fs28 \
+7.	Select the target 
+\f2\fs24 VocableTrainerX
+\f0\fs28  and in its 
+\f2\fs24 Info
+\f0\fs28  window, change the 
+\f2\fs24 Document Class
+\f0\fs28  to 
+\f3\b\fs24 VTXDocument
+\f0\b0\fs28 ; build and run the project to test the new naming scheme\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 B.	Preliminary layout of the user interface using Interface Builder to add a table view to the main window and an inspector panel with text fields for data entry\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	In 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 , add the 
+\f3\b\fs24 NSWindow
+\f0\b0\fs28 -
+\f3\b\fs24 NSDrawer
+\f0\b0\fs28  combination object to the 
+\f2\fs24 Instances
+\f0\fs28  pane\
+2.	Select the new window and set an appropriate minimum size for it using the 
+\f2\fs24 Size
+\f0\fs28  panel of 
+\f2\fs24 NSWindow Info
+\f0\fs28 ; make the window\'d5s default size about 20% larger than the minimum\
+3.	Add a table view to the document window's content area; leave space at the top of the content area for a small text field; expand the table view to fill the window, set its auto-sizing behavior to resize with the window\
+4.	This example presents a table with four columns, but if your needs differ, it is trivial to give it a different size, with different labeling and model, etc.\
+5.	Assign default header cells for the table columns: 
+\f2\fs24 Some Language
+\f0\fs28 , 
+\f2\fs24 Another Language
+\f0\fs28 ,
+\f2  
+\fs24 Topic
+\f0\fs28 , 
+\f2\fs24 Score
+\f0\fs28 ; make the columns appropriately resizable; set table properties to include multiple selection and to auto-resize the columns to fit\
+6.	Add an 
+\f3\b\fs24 NSPanel
+\f0\b0\fs28  object to 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 ; this panel will not be resizable by default\
+7.	Add four editable text fields to the panel in a column orientation; make them wide enough to accommodate several words of text in each one\
+8.	Add a non-editable text field to the right of each editable text field to serve as a label; for now, just match the labels in the table column header cells
+\f1\b \
+\pard\pardeftab720\li720\fi-720\sl-280\sa120\ql\qnatural
+\cf0 C.	Create a subclass of 
+\f3\fs24 NSWindowController
+\f1\fs28 \
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	In 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 , locate 
+\f3\b\fs24 NSWindowController
+\f0\b0\fs28  in the class browser in the 
+\f2\fs24 Classes
+\f0\fs28  pane of IB; choose 
+\f2\fs24 Classes \'d1> Subclass NSWindowController
+\f0\fs28  and name the new class 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+2.	Select 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28  in the 
+\f2\fs24 Instances
+\f0\fs28  pane; select the 
+\f2\fs24 Custom Classes
+\f0\fs28  tab in the 
+\f2\fs24 Info
+\f0\fs28  window and designate 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  as the new class for 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28 \
+3.	Change the connection between 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28  and its 
+\f4\fs24 window
+\f0\fs28  outlet to point to the new window, then delete the original window from the 
+\f2\fs24 Instances
+\f0\fs28  pane\
+4.	For 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  in 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 , add an outlet that points to the drawer (
+\f4\fs24 topicsDrawer
+\f0\fs28 ); connect the outlet by control-dragging from 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28  to 
+\f3\b\fs24 NSDrawer
+\f0\b0\fs28  in the 
+\f2\fs24 Instances
+\f0\fs28  pane and clicking 
+\f2\fs24 Connect
+\f0\fs28 \
+5.	Create an action to operate the drawer (
+\f4\fs24 toggleDrawer:
+\f0\fs28 ); install the new action in the 
+\f2\fs24 Attributes
+\f0\fs28  pane of the 
+\f2\fs24 VTXMainWindowController Info
+\f0\fs28  window in 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 ; for now just log the action in its implementation in 
+\f2\fs24 VTXMainWindowController.m
+\f0\fs28 \
+6.	Add an item to the 
+\f2\fs24 Window
+\f0\fs28  menu in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 , labeled 
+\f2\fs24 Toggle Drawer
+\f0\fs28  with shortcut 
+\f2\fs24 CMD-K
+\f0\fs28 ; add the action to the list of actions known to 
+\f3\b\fs24 First Responder
+\f0\b0\fs28  in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 ; to target the action on 
+\f2\fs24 First Responder
+\f0\fs28  in 
+\f2\fs24 MainMenu.nib
+\f0\fs28  control-drag and click 
+\f2\fs24 Connect
+\f0\fs28 \
+7.	Connect the delegate outlet of the main window to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  in the 
+\f2\fs24 Instances
+\f0\fs28  pane in 
+\f2\fs24 VTXDocument.nib
+\f0\fs28  by control-dragging to 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28  and clicking the 
+\f2\fs24 Connect
+\f0\fs28  button\
+8.	Create the files for 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  from IB and add them to the project in Xcode\
+9.	In the nib file, set the drawer to open along the right edge of the window as the preferred edge (use the 
+\f2\fs24 Info
+\f0\fs28  window for the 
+\f3\b\fs24 NSDrawer
+\f0\b0\fs28 , 
+\f2\fs24 Attributes
+\f0\fs28  pane)\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 D.	Modify the Finder-related information in project settings, strings, and property list files\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Open the 
+\f2\fs24 Properties
+\f0\fs28  pane in the 
+\f2\fs24 Target Info
+\f0\fs28  window; change the
+\f2\fs24  Document Types Name
+\f0\fs28  field to 
+\f2\fs24 Vocable Trainer X Document
+\f0\fs28 ; this modifies the string for the 
+\f2\fs24 CFBundleTypeName
+\f0\fs28  key in 
+\f2\fs24 Info.plist
+\f0\fs28 ; make sure the string value associated with the 
+\f2\fs24 NSDocumentClass
+\f0\fs28  key is 
+\f2\fs24 VTXDocument
+\f0\fs28 \
+2.	Also in 
+\f2\fs24 Info.plist
+\f0\fs28 , change the 
+\f2\fs24 CFBundleVersion
+\f0\fs28  string to 1 (use version number 0.8.0d1 for the 
+\f2\fs24 CFBundleShortVersionString
+\f0\fs28  in the 
+\f2\fs24 InfoPlist.strings
+\f0\fs28  file)\
+3.	Appropriately modify the copyright information in 
+\f2\fs24 InfoPlist.strings
+\f0\fs28  and make similar changes in 
+\f2\fs24 Credits.rtf
+\f0\fs28 , or replace it with a 
+\f2\fs24 Credits.html
+\f0\fs28  file\
+4.	In the 
+\f2\fs24 Target Info
+\f0\fs28  window 
+\f2\fs24 Properties
+\f0\fs28  pane, change the 
+\f2\fs24 Identifier
+\f0\fs28  to an appropriate value (in this application it is 
+\f4\fs24 net.sourceforge.vocx
+\f0\fs28 ); this will set the name for the app\'d5s 
+\f2\fs24 Preferences
+\f0\fs28  file in 
+\f2\fs24 ~/Library/Preferences
+\f0\fs28 \
+5.	Revise the menus: Change occurrences of 
+\f2\fs24 New Application
+\f0\fs28  to 
+\f2\fs24 VocableTrainerX
+\f0\fs28  in all the menu bar items that require it\
+\pard\pardeftab720\li720\fi-720\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 E.	Replace and/or modify initialization methods in the document class\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Remove the 
+\f4\fs24 windowNibName
+\f0\fs28  method from 
+\f2\fs24 VTXDocument.m
+\f0\fs28 ; override the method 
+\f4\fs24 makeWindowControllers
+\f0\fs28  instead, with:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) makeWindowControllers\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXMainWindowController *controller = \
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ VTXMainWindowController alloc ] init ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self addWindowController: controller ];\
+[ controller release ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Remove the delegate method 
+\f4\fs24 windowControllerDidLoadNib:
+\f0\fs28  in 
+\f2\fs24 VTXDocument
+\f0\fs28 .m; instead, use standard initialization and cleanup methods in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 :\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( id ) init\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if (self = [ super initWithWindowNibName: @\'d3VTXDocument\'d3 ])\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 // close document if main window closes\
+[ self setShouldCloseDocument: YES ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return self;\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) dealloc\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ NSNotificationCenter defaultCenter ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 removeObserver: self ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ super dealloc ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 F.	Set up basic connections for the table, drawer, and inspector panel\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Add a 
+\f4\fs24 setupDrawer
+\f0\fs28  method to post notifications when the drawer opens and closes; invoke 
+\f4\fs24 setupDrawer
+\f0\fs28  in 
+\f4\fs24 awakeFromNib
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+2.	Declare an outlet to the table view (
+\f4\fs24 lexiconTable
+\f0\fs28 ) in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  and in 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 ; connect the outlet in IB; implement an accessor that returns the 
+\f4\fs24 id
+\f0\fs28  of the table view in 
+\f3\b\fs24 VTXMainWindowController\
+
+\f0\b0\fs28 3.	Declare an outlet to the inspector panel in the window controller and nib file; make an accessor to return the 
+\f4\fs24 id
+\f0\fs28  of the inspector panel; create an action to display the inspector panel and connect it to a menu item (
+\f2\fs24 Inspector
+\f0\fs28 ) in the 
+\f2\fs24 Window
+\f0\fs28  menu (shortcut 
+\f2\fs24 CMD-I
+\f0\fs28 ); you can use the panel\'d5s 
+\f4\fs24 makeKeyAndOrderFront:
+\f0\fs28  method to display it; if you set the panel\'d5s 
+\f2\fs24 Utility window (Panel only)
+\f0\fs28  property, it will close when the main window does\
+4.	Now that everything is in place, implement the 
+\f4\fs24 toggleDrawerAction:
+\f0\fs28  method: in 
+\f2\fs24 VTXMainWindowController.m
+\f0\fs28  and test the skeleton of the application\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) toggleDrawerAction: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicsDrawer toggle: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 G.	Implement the document window toolbar category and toolbar stub action methods
+\f0\b0 \
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 1.	Add the files 
+\f2\fs24 VTXToolbarDelegateCategory.h
+\f0\fs28  and 
+\f2\fs24 VTXToolbarDelegateCategory.m
+\f0\fs28 ; add the associated button image files to a new project group called 
+\f2\fs24 Images
+\f0\fs28  (see project files)\
+2.	Implement stub action methods for the toolbar actions; declare the toolbar actions and an outlet for a toolbar search field instance variable; place a search field inside an auxiliary view added to 
+\f2\fs24 VTXDocument.nib
+\f0\fs28  in order to connect an outlet to it\
+3.	Implement the 
+\f4\fs24 setupToolbar
+\f0\fs28  method and a stub 
+\f4\fs24 controlTextDidChange
+\f0\fs28  method in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  (invoke the toolbar setup in 
+\f4\fs24 awakeFromNib
+\f0\fs28 )\
+4.	Connect the search field\'d5s 
+\f4\fs24 delegate
+\f0\fs28  outlet to the window controller; set the search field delegate to 
+\f4\fs24 nil
+\f0\fs28  in 
+\f4\fs24 dealloc
+\f0\fs28 \
+5.	Implement 
+\f4\fs24 windowTitleForDocumentDisplayName:
+\f0  
+\fs28 to add the name of the application to the title bar of the document window and inspector panel\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 H.	Use the Cocoa Controller Layer to bind the table view to data in a model class\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Create a KVC-enabled model class named 
+\f2\fs24 VTXVocable
+\f0\fs28  that conforms to 
+\f2\fs24 <NSCoding>
+\f0\fs28 , with strings (and accessors for) 
+\f4\fs24 firstL
+\f0\fs28 , 
+\f4\fs24 secondL
+\f0\fs28 , 
+\f4\fs24 topic
+\f0\fs28 , and 
+\f4\fs24 score
+\f0\fs28  (the latter will be supported by 
+\f4\fs24 int
+\f0\fs28  variables 
+\f4\fs24 numGuesses
+\f0\fs28  and 
+\f4\fs24 numCorrect
+\f0\fs28 , which are described below); the getter accessors for the strings should not be able to return 
+\f4\fs24 nil
+\f0\fs28 ; return 
+\f4\fs24 @\'d3\'d3
+\f0\fs28  instead\
+2.	In Interface Builder, select an instance of 
+\f3\b\fs24 NSArrayController
+\f0\b0\fs28  from the 
+\f2\fs24 Cocoa-Controllers
+\f0\fs28  palette; drag it into the 
+\f2\fs24 Instances
+\f0\fs28  pane of 
+\f2\fs24 VTXDocument.nib
+\f0\fs28  and label it 
+\f2\fs24 Lexicon Control
+\f0\fs28 ; create a subclass of 
+\f3\b\fs24 NSArrayController
+\f0\b0\fs28  named 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28 ; create the source files and add them to the project; import the new class into the nib file; change the array controller instance\'d5s class to 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28  in IB\
+3.	Bind the controller to the data model by opening the 
+\f2\fs24 Attributes
+\f0\fs28  pane of the
+\f2\fs24  Info
+\f0\fs28  window for 
+\f2\fs24 V
+\f3\b TXLexArrayController
+\f2\b0  
+\f0\fs28 and changing the 
+\f2\fs24 Object Class Name
+\f0\fs28  to 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28 \
+4.	In the same 
+\f2\fs24 Attributes
+\f0\fs28  pane insert the keys that correspond to the relevant instance variables of the 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  class: 
+\f4\fs24 firstL
+\f0\fs28 , 
+\f4\fs24 secondL
+\f0\fs28 , 
+\f4\fs24 topic
+\f0\fs28 , and 
+\f4\fs24 score
+\f0\fs28 \
+5.	Bind the array controller to the columns in the table view: select column labeled 
+\f2\fs24 Some Language
+\f0\fs28  and open the 
+\f4\fs24 value
+\f0\fs28  component in its 
+\f2\fs24 Bindings
+\f0\fs28  inspector in the 
+\f2\fs24 Info
+\f0\fs28  window; set the 
+\f2\fs24 Bind to:
+\f0\fs28  field 
+\f2\fs24 Lexicon Control
+\f0\fs28 ; set the 
+\f2\fs24 Controller Key:
+\f0\fs28  field to 
+\f4\fs24 arrangedObjects
+\f0\fs28 , the method of 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28  that will return its array of 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  objects. Then, select 
+\f4\fs24 firstL
+\f0\fs28  from the popup associated with the 
+\f2\fs24 Model Key Path:
+\f0\fs28  field; perform a similar series of steps to bind the other table columns to their model key path variables\
+6.	To bind the 
+\f2\fs24 Insert
+\f0\fs28  and 
+\f2\fs24 Delete
+\f0\fs28  toolbar buttons to appropriate array controller methods, create the outlet 
+\f4\fs24 lexiconController
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; declare it in the window controller in IB and connect it; for appropriate items in the 
+\f2\fs24 Toolbar Delegate
+\f0\fs28  category, set the target to 
+\f4\fs24 lexiconController
+\f0\fs28  and 
+\f4\fs24 insert:
+\f0\fs28  or 
+\f4\fs24 remove:
+\f0\fs28  action as appropriate\
+7.	Test the application to confirm that the data model is bound to the table view\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 I.	Implement Undo support for record insertion and deletion and for table cell editing\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Declare the following methods in the 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  header\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - (void) insertObject: ( id ) v inVocablesAtIndex: ( int ) index;\
+- (void) removeObjectFromVocablesAtIndex: ( int ) index;\
+- (void) startObservingVocable: (VTXVocable * ) v;\
+- (void) stopObservingVocable: ( VTXVocable * ) v;\
+- (void) changeKeyPath: ( NSString * ) keyPath\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 ofObject: ( id ) obj toValue: ( id ) newValue\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 - (void) observeValueForKeyPath:(NSString*) kp ofObject:(id) obj\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 change: ( NSDictionary * ) change context: ( void * ) con\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Declare an 
+\f3\b\fs24 NSMutableArray
+\f0\b0\fs28  
+\f4\fs24 vocables
+\f0\fs28  ivar in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; declare and implement getter/setter accessors for it; create it in 
+\f4\fs24 init
+\f0\fs28  and destroy it in 
+\f4\fs24 dealloc
+\f0\fs28 \
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) setVocables: ( NSMutableArray * ) array\
+\{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSEnumerator *e;\
+VTXVocable *v;\
+if ( array == vocables )	return;\
+e = [ vocables objectEnumerator ];\
+while ( v = [ e nextObject ] )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 [ self stopObservingVocable: v ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ vocables release ];\
+vocables = [ array retain ];\
+e = [ vocables objectEnumerator ];\
+while ( v = [ e nextObject ] )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self startObservingVocable: v ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Implement KVO in 
+\f2\fs24 VTXMainWindowController.m
+\f0\fs28  with these methods; 
+\f1\b add coverage for all object ivars
+\f0\b0 , not just 
+\f4\fs24 firstL
+\f0\fs28  as shown in the example below\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) startObservingVocable: ( VTXVocable * ) v\
+\{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v addObserver: self forKeyPath: @"firstL"\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 options: NSKeyValueObservingOptionOld context: NULL ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) stopObservingVocable: ( VTXVocable * ) v\
+\{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v removeObserver: self forKeyPath: @"firstL" ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) insertObject: (id) v inVocablesAtIndex: ( int ) index\
+\{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Add the inverse of this operation to the undo stack\
+NSUndoManager *undo = [ doc undoManager ];\
+[ [ undo prepareWithInvocationTarget: self ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 removeObjectFromVocablesAtIndex: index ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( ![ undo isUndoing ] )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ undo setActionName: @"Insert Vocable" ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Add the vocable to the array\
+[ self startObservingVocable: v ];\
+[ vocables insertObject: v atIndex: index ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) removeObjectFromVocablesAtIndex: ( int ) index\
+\{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXVocable *v = [ vocables objectAtIndex: index ];\
+NSUndoManager *undo = [ doc undoManager ];\
+// Add the inverse of this operation to the undo stack\
+[ [ undo prepareWithInvocationTarget: self ] insertObject: v\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 inVocablesAtIndex: index ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( ![ undo isUndoing ] )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ undo setActionName: @"Delete Vocable" ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Remove the vocable from the array\
+[ self stopObservingVocable: v ];\
+[ vocables removeObjectAtIndex: index ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) changeKeyPath: ( NSString * ) keyPath\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 ofObject: ( id ) obj toValue: ( id ) newValue\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 // This method is its own inverse op for undo stack with edits\
+// setValue: forKeyPath: invokes KVO, and takes care of undoing\
+[ obj setValue: newValue forKeyPath: keyPath ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) observeValueForKeyPath: ( NSString * ) kp\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 ofObject: ( id ) obj\
+change: ( NSDictionary * ) change context: ( void * ) con\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSUndoManager *undo = [ doc undoManager ];\
+id oldValue = [ change objectForKey: NSKeyValueChangeOldKey ];\
+[ [ undo prepareWithInvocationTarget: self ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 changeKeyPath: kp ofObject: obj toValue: oldValue ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ undo setActionName: @"Edit" ];\
+\pard\pardeftab720\li360\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Manually bind the 
+\f4\fs24 vocables
+\f0\fs28  array to the array controller in the 
+\f4\fs24 awakeFromNib
+\f0\fs28  method:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 [ lexiconController bind: @"contentArray"\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 toObject: self withKeyPath: @"lexiconArray" options: nil ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Send a matching unbind message and set the array controller\'d5s content to 
+\f4\fs24 nil
+\f0\fs28  on closing; do 
+\f1\b NOT
+\f0\b0  bind the array to the controller via the
+\f3\b\fs24  File\'d5s Owner
+\f0\b0\fs28  object in IB\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 J.	Create the 
+\f3\fs24 VTXLexiconModel
+\f1\fs28  class to support archiving of a document\'d5s Model data\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Create the class files and implement the designated initializer; include an accessor to return the document that creates this model object; this class should also conform to 
+\f2\fs24 <NSCoding>
+\f0\fs28 \
+2.	Declare an 
+\f3\b\fs24 NSArray
+\f0\b0\fs28  
+\f4\fs24 lexiconArray
+\f0\fs28  in 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28 ; create accessors for it; create the instance in the 
+\f4\fs24 init
+\f0\fs28  method of 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  and destroy it in 
+\f4\fs24 dealloc
+\f0\fs28 ; ; this ivar will store a copy of the records managed by the array controller when a document is saved; declare additional ivars to store supporting data for the document (e.g,, the labels for the table column header cells)\
+3.	Include an instance variable in 
+\f2\fs24 VTXLexiconModel
+\f0\fs28  to save the document window\'d5s frame, (an 
+\f2\fs24 NSRect
+\f0\fs28  containing its origin and size); encode these data when archiving a document and decode them when loading a document\
+4.	Declare a 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  ivar in 
+\f2\fs24 VTXDocument.h
+\f0\fs28 ; declare and implement an accessor for this instance variable\
+\page 5.	Instantiate a 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  object in the initialization of the document object and release it in the 
+\f4\fs24 dealloc
+\f0\fs28  method\
+6.	Declare an ivar for a 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  object in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; create a reference to it via the window controller's 
+\f4\fs24 document
+\f0\fs28  accessor in the 
+\f4\fs24 init
+\f0\fs28  method and release it in the 
+\f4\fs24 dealloc
+\f0\fs28  method\
+7.	Bind the model object data to the data entry text fields in the inspector panel: In the 
+\f2\fs24 value
+\f0\fs28  section set each 
+\f2\fs24 Model Key Path
+\f0\fs28  to the appropriate model ivars; set the 
+\f2\fs24 Controller Key
+\f0\fs28  field to 
+\f3\b\fs24 selection
+\f0\b0\fs28 , a method that returns the currently-selected object in the array; test that the text fields for data entry respond for both inspection and editing\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 K.	Implement data archiving for the model objects\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	To make 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  conform to the 
+\f4\fs24 NSCoding
+\f0\fs28  protocol, implement the methods 
+\f4\fs24 encodeWithCoder:
+\f0\fs28  and 
+\f4\fs24 initWithCoder:
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) encodeWithCoder: ( NSCoder * ) encoder\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ encoder encodeObject: lexiconArray ];\
+[ encoder encodeObject: firstLangLabel ];\
+[ encoder encodeObject: secondLangLabel ];\
+[ encoder encodeObject: topicLabel ];\
+[ encoder encodeObject: frame ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( id ) initWithCoder: ( NSCoder * ) decoder\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( self = [ super init ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setLexiconArray: [ decoder decodeObject ] ];\
+[ self setFirstLangLabel: [ decoder decodeObject ] ];\
+[ self setSecondLangLabel: [ decoder decodeObject ] ];\
+[ self setTopicLabel: [ decoder decodeObject ] ];\
+[ self setFrame: [ decoder decodeObject ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return self;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Implement the document methods to save and load the document and allow for multiple root objects in archive\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( NSData * ) dataRepresentationOfType: ( NSString * ) type\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Get the arranged objects from the NSArrayController\
+VTXMainWindowController *winCtl =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ self windowControllers ] objectAtIndex: 0 ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconModel setLexiconArray: [ winCtl lexiconArray ] ];\
+[ lexiconModel setFrame: [ [ winCtl window ] frame ] ];\
+if ([type isEqualToString: @"Vocable Trainer X Document"])\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ NSArchiver archivedDataWithRootObject:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self lexiconModel ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return nil;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( BOOL ) loadDataRepresentation: ( NSData * ) data\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 ofType: ( NSString * ) type\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXLexiconModel *model = nil;\
+if ([type isEqualToString: @"Vocable Trainer X Document"])\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 model = [ NSUnarchiver unarchiveObjectWithData: data ];\
+if ( model != nil )\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconModel setFirstLangLabel:\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ model firstLangLabel ] ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconModel setSecondLangLabel:\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ model secondLangLabel ] ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconModel setTopicLabel: [ model topicLabel ] ];\
+[ lexiconModel setLexiconArray: [model lexiconArray] ];\
+[ lexiconModel setFrame: [ model frame ] ];\
+return YES;\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Disable 
+\f2\fs24 Undo
+\f0\fs28  registration when loading data from a file: modify the section for updating the table view in the window controller's 
+\f4\fs24 awakeFromNib
+\f0\fs28 ; add a line to update the view when loading data from file\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 // Bypass Undo registration when loading data from a file\
+[ [ doc undoManager ] disableUndoRegistration ];\
+[ [ self lexiconController ] addObjects:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ doc lexiconModel ] lexiconArray ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ doc undoManager ] enableUndoRegistration ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ lexiconTable deselectAll: self ];\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	In order to position the window properly when restoring it from frame data loaded from a file, you need to turn off window cascading in the window controller, just before you set the frame of the window using the data from the file in 
+\f4\fs24 awakeFromNib
+\f0\fs28 , as follows:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 [ self setShouldCascadeWindows: NO ];\
+[ [ self window ] setFrame:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ [ doc lexiconModel ] frame ] display: YES ];\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	At this point you should be able to save and load data to files; required accessors include getter and setter for the 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  class in the document class, a document class getter in 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28 , a getter and setter for 
+\f4\fs24 lexiconArray
+\f0\fs28  in 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28 , and getters for 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28 , 
+\f4\fs24 lexiconTable
+\f0\fs28 , and 
+\f4\fs24 lexiconController
+\f0\fs28  in the window controller class (include the headers for these different classes as required in each class)\
+6.	Now that you are saving and restoring documents, add the icons for the application and document (supplied); these do not go in the localizable folders; in the 
+\f2\fs24 Target Inspector
+\f0\fs28 , set the 
+\f2\fs24 Document Extension
+\f0\fs28  and 
+\f2\fs24 OS Types
+\f0\fs28  to 
+\f2\fs24 vtxd
+\f1\b\fs28 \
+\pard\pardeftab720\li720\fi-720\sl-280\sa120\ql\qnatural
+\cf0 L.	Implement saving and loading of CSV data prepared for or in other programs\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Implement the 
+\f4\fs24 saveAsCSV:
+\f0\fs28  action in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) saveAsCSV: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSSavePanel *panel = [ NSSavePanel savePanel ];\
+[ panel setRequiredFileType: @"csv" ];\
+if ( [ panel runModal ] == NSOKButton )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ self getCSVData ] writeToFile: [ panel filename ]\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 atomically: YES ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( NSString * ) getCSVData\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSMutableString *csvString = [ NSMutableString string ];\
+NSEnumerator *vocablesEnumerator =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [[lexiconController arrangedObjects] objectEnumerator];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXVocable *v;\
+while ( v = [ vocablesEnumerator nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ csvString appendString:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [NSString stringWithFormat: @"\\"%@\\",\\"%@\\",\\"%@\\"\\n",\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v firstL ],[ v secondL ], [ v topic ] ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return [ NSString stringWithString: csvString ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Put a menu item in the File menu 
+\f2\fs24 Export to CSV...
+\f0\fs28  and connect it to this action; disable this menu item in a 
+\f4\fs24 validateMenuItem:
+\f0\fs28  method if the table contains no entries\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( [ theItem action ] == @selector( saveCSV: ) )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 return [ [ lexiconController arrangedObjects ] count ] > 0;\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 In an identical manner, also disable the toolbar item that triggers this action when the table is empty.\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 3.	Put a menu item in the 
+\f2\fs24 File
+\f0\fs28  menu 
+\f2\fs24 Import from CSV...
+\f0\fs28  and connect it to the following action implemented in 
+\f2\fs24 VTXMainWindowController
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) importFromCSV: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSMutableString *line;\
+NSString *lineBuffer;\
+NSString *rawString;\
+NSArray *lines;\
+NSArray *arr;\
+NSEnumerator *lineEnumerator;\
+VTXVocable *v;\
+NSOpenPanel *panel = [ NSOpenPanel openPanel ];\
+if ( [ panel runModalForTypes: nil ] == NSOKButton )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 rawString = [ NSString stringWithContentsOfFile:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ panel filenames ] objectAtIndex: 0 ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 lines = [ rawString componentsSeparatedByString: @"\\n" ];\
+lineEnumerator = [ lines objectEnumerator ];\
+\
+while ( lineBuffer = [ lineEnumerator nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 line = [ NSMutableString stringWithString: lineBuffer ];\
+[ line replaceOccurrencesOfString:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 @"\\"" withString: @"" options: NSLiteralSearch\
+range: NSMakeRange( 0, [ line length ] ) ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 arr = [ line componentsSeparatedByString: @"," ];\
+if ( [ arr count ] < 3 )\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 continue;\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 v = [ [ VTXVocable alloc ]\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithFirstLanguage: [ arr objectAtIndex: 0 ]\
+secondLanguage: [ arr objectAtIndex: 1 ]\
+topic: [ arr objectAtIndex: 2 ] ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController addObject: [ v autorelease ] ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+[ doc updateChangeCount: NSChangeDone ];\
+[ lexiconTable deselectAll: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 M.	Subclass 
+\f3\fs24 NSArrayController
+\f1\fs28  and name the class 
+\f3\fs24 VTXLexArrayController
+\f1\fs28 \
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Give the class an outlet to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  and connect it in IB; declare an 
+\f3\b\fs24 NSString
+\f0\b0\fs28  instance variable named 
+\f4\fs24 searchString
+\f0\fs28  (characters to be retrieved from the search field); declare accessors for the search string; disconnect the search field 
+\f2\fs24 delegate
+\f0\fs28  outlet from the window controller and reconnect it to the array controller\
+2.	Initialize the search string to an empty string in 
+\f4\fs24 awakeFromNib
+\f0\fs28  and release it in 
+\f4\fs24 dealloc
+\f0\fs28 .\
+3.	Implement a method 
+\f4\fs24 controlTextDidChange:
+\f0\fs28  to intercept keystrokes in the search field and from cells in the table view\
+\pard\pardeftab720\li360\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) controlTextDidChange: ( NSNotification * ) note\
+\{\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ [note object] isKindOfClass: [NSSearchField class] ] )\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setSearchString:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ [ note object ] stringValue ] lowercaseString ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self rearrangeObjects ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ [ note object ] isKindOfClass: [ NSTableView class ] ] )\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSLog( @\'d3Edited table view cell\'d3 );\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	In 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 , delete the body of 
+\f4\fs24 controlTextDidChange:
+\f0\fs28  and also override the 
+\f4\fs24 preservesSelection:
+\f0\fs28  method of 
+\f3\b\fs24 NSArrayController
+\f0\b0\fs28  to return 
+\f4\fs24 NO
+\f0\fs28  or else set this property in the 
+\f2\fs24 Attributes
+\f0\fs28  pane for the array controller in IB\
+5.	Import the source files into the project and add references to 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28  at appropriate locations (custom class in IB, and return types, arguments or declarations in the sources); you will now have to import its header in any file that uses this class\
+6.	Override the 
+\f4\fs24 arrangeObjects:
+\f0\fs28  method in 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28  to use the search string to filter the controller's array (and the table view will automatically update)\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( NSArray * ) arrangeObjects: ( NSArray * ) lexicon\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXVocable *vocable;\
+NSEnumerator *ve = [ lexicon objectEnumerator ];\
+NSMutableArray *matchedObjects =\
+[ NSMutableArray arrayWithCapacity: [ lexicon count ] ];\
+NSString *lowerSearch = [ searchString lowercaseString ];\
+if ( [ lowerSearch length ] == 0 )	// case insensitive search\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ super arrangeObjects: lexicon ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+else\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 while ( vocable = [ oEnum nextObject ] )\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSString *lowerFirstL =\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ vocable firstL ] lowercaseString ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSString *lowerSecondL= [ [ vocable secondL ]\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 LowercaseString ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ lowerFirstL rangeOfString:\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 lowerSearch ].location != NSNotFound\
+|| [ lowerSecondL rangeOfString:\
+lowerSearch ].location != NSNotFound )\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ matchedObjects addObject: item ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return [ super arrangeObjects: matchedObjects ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 7.	Override the 
+\f4\fs24 insert:
+\f0\fs28  and 
+\f4\fs24 remove:
+\f0\fs28  methods to call the super's corresponding method\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) insert: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ super insert: sender ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) remove: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ super remove: sender ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 N.	Implement validation methods for toolbar and menu items to disable table insertion and deletion, and simple saving of files when the search field is active\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Validate toolbar items for adding and deleting records in 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) validateToolbarItem: ( NSToolbarItem * ) theItem\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Disable Add & Delete buttons during active filtering\
+// Modification of arrangedObjects would corrupt the array\
+if ( [ theItem action ] == @selector( insert: ) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return ( [ searchString length ] == 0 );\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Also disable the Delete button if no items are selected\
+if ( [ theItem action ] == @selector( remove: ) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return ( [ [ self selectedObjects ] count ] > 0\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 && [ searchString length ] == 0 );\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return true;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Use 
+\f4\fs24 validateMenuItem:
+\f0\fs28  in 
+\f3\b\fs24 VTXDocument
+\f0\b0\fs28  to disable the document's 
+\f2\fs24 Save
+\f0\fs28  and 
+\f2\fs24 Revert
+\f0\fs28  actions when the search field is active, since the filtered array would overwrite the file's data without asking the user to confirm the replacement\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) validateMenuItem: ( NSMenuItem * ) theItem\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSSearchField *searchf = [ [ [ self windowControllers ] objectAtIndex: 0 ] toolbarSearchField ];\
+if ( [ theItem action ] == @selector( saveDocument: ) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ [ searchf stringValue ] length ] == 0;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ([theItem action] == @selector(revertDocumentToSaved:))\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ [ searchf stringValue ] length ] == 0;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return true;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Implement the same method in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  to disable importing data from a text file if the search field is active by using the following test:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( [ theItem action ] == @selector( import: ) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa120\ql\qnatural
+\cf0 return ( [ [ searchf stringValue ] length ] == 0 );\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 O.	Implement a selection status text field in the space between the table and the toolbar\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Make an outlet to the text field in the window controller. Set 
+\f3\b\fs24 VTXMainWindowController
+\f2\b0  as 
+\f0\fs28 the delegate of 
+\f4\fs24 lexiconTable
+\f0\fs28 ; implement the following method and update the string in 
+\f4\fs24 awakeFromNib
+\f0\fs28  and also in delegate method 
+\f4\fs24 tableViewSelectionDidChange:
+\f0\fs28  which you should implement in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) updateSelectionStatus\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 int s, a;\
+s = [ lexiconTable numberOfSelectedRows ];\
+a = [ lexiconTable numberOfRows ];\
+[ selectionStatus setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [NSString stringWithFormat: @"%d of %d selected", s,a] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 You will also need to invoke this method whenever a row is added to or deleted from the table.\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 2.	Make sure the text field autosizes correctly. To display a correct selection status message when the table view is filtered, update it in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  at the end of the 
+\f4\fs24 controlTextDidChange:
+\f0\fs28  method in 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28 .\
+3.	Add a 
+\f3\b\fs24 VTXAppController
+\f0\b0\fs28  class to customize the application's startup behavior, with the following method:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 // Application should not open an empty document on launch\
+- ( BOOL ) applicationShouldOpenUntitledFile:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 ( NSApplication * ) theApplication\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Instantiate 
+\f3\b\fs24 VTXAppController
+\f0\b0\fs28  in 
+\f2\fs24 MainMenu.nib
+\f0\fs28  and make it the delegate of 
+\f3\b\fs24 File\'d5s Owner
+\f0\b0\fs28 .\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 P.	Implement the 
+\f3\fs24 VTXPasteboardCategory
+\f1\fs28  on 
+\f3\fs24 VTXMainWindowController
+\f1\fs28  to permit cutting and pasting of table rows within and between tables\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Implement the 
+\f4\fs24 copy:
+\f0\fs28  action\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) copy: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSPasteboard *pb = [ NSPasteboard generalPasteboard ];\
+[ self writeStringToPboard: pb ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) writeStringToPboard: ( NSPasteboard * ) pb\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ lexiconTable numberOfSelectedRows ] < 1 )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSBeep( );\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Declare types\
+[ pb declareTypes: [ NSArray arrayWithObjects:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSStringPboardType, NSTabularTextPboardType,\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 @"VTXPboardType", nil ] owner: self ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Copy data to the pasteboard\
+[ pb setString: [ self prepareNSStringForPboard:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController selectedObjects ] ]\
+forType: NSStringPboardType ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ pb setString: [ self prepareNSStringForPboard:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController selectedObjects ] ]\
+forType: NSTabularTextPboardType ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ pb setString: [ self prepareVTXPboardType:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController selectedObjects ] ]\
+forType: @"VTXPboardType" ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 // This type is used for pasting text to other programs\
+- (NSString *) prepareNSStringForPboard: (NSArray *) vocables\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSEnumerator *e = [ vocables objectEnumerator ];\
+NSMutableString *result = [ NSMutableString string ];\
+VTXVocable *vocable;\
+while ( vocable = [ e nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ result appendString: [ NSString stringWithFormat:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 @"%@\\t%@\\t%@", [ vocable firstL ],\
+[ vocable secondL ], [ vocable topic ] ] ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ result appendString: [ NSString stringWithFormat:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 @"%c", NSCarriageReturnCharacter ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return result;\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Custom pasteboard format for copying inside VTX\
+// Preserves the vocable scores data\
+- ( NSString * ) prepareVTXPboardType: ( NSArray * ) vocables\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSEnumerator *e = [ vocables objectEnumerator ];\
+NSMutableString *result = [ NSMutableString string ];\
+VTXVocable *vocable;\
+while ( vocable = [ e nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ result appendString: [ NSString stringWithFormat:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 @"%@\\t%@\\t%@\\t%d\\t%d", [ vocable firstL ],\
+[ vocable secondL ], [ vocable topic ],\
+[ vocable numCorrect ], [ vocable numGuesses ] ] ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ result appendString: [ NSString stringWithFormat:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 @"%c", NSCarriageReturnCharacter ] ];   \
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return result;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Implement the 
+\f4\fs24 cut:
+\f0\fs28  action\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) cut: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSArray *selection = [ lexiconController selectedObjects ];\
+NSEnumerator *se = [ selection objectEnumerator ];\
+DDVLexItem *item;\
+[ self copy: sender ];\
+while ( item = [ se nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ doc undoManager ] disableUndoRegistration ];\
+[ lexiconController removeObject: item ];\
+[ [ doc  undoManager ] enableUndoRegistration ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+[ lexiconTable reloadData ];\
+[ lexiconTable deselectAll: self ];\
+[ [ self document ] updateChangeCount: NSChangeDone ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Implement 
+\f4\fs24 paste:
+\f0\fs28  action; pasteboard contents are implemented as strings that are parsed back to 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  objects\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) paste: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSPasteboard *pb = [ NSPasteboard generalPasteboard ];\
+if ( ![ self readStringFromPasteboard: pb ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSBeep( );\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( BOOL ) readStringFromPasteboard: ( NSPasteboard * ) pb\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSArray *types = [ pb types ];\
+NSMutableArray *result;\
+NSEnumerator *e;\
+VTXVocable *vocable;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 int selectedRowIndex = [ lexiconTable selectedRow ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ types containsObject: @"VTXPboardType" ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 result = [ self readVocableStringFromPboard: pb ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else if ( [ types containsObject: NSStringPboardType ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 result = [ self readNSStringFromPboard: pb ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\{ \
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO; \
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( selectedRowIndex == -1 )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ doc undoManager ] disableUndoRegistration ];\
+[ lexiconController addObjects: result ];\
+[ [ doc undoManager ] enableUndoRegistration ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Insert the vocables at the selected row\
+e = [ result reverseObjectEnumerator ];\
+while ( vocable = [ e nextObject ] )\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ doc undoManager ] disableUndoRegistration ];\
+[ lexiconController insertObject: vocable\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 atArrangedObjectIndex: selectedRowIndex ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ doc undoManager ] enableUndoRegistration ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return YES;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - (NSMutableArray *) readNSStringFromPboard:(NSPasteboard *) pb\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSString *value;	NSArray *lines;\
+NSEnumerator *linesEnumerator;\
+NSString *line;	NSArray *words;	VTXVocable *newVocable;\
+NSMutableArray *result = [ NSMutableArray array ];\
+value = [ pb stringForType: NSStringPboardType ];\
+lines = [ value componentsSeparatedByString:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSString stringWithFormat:\
+@"%c", NSCarriageReturnCharacter ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 linesEnumerator = [ lines objectEnumerator ];\
+while ( line = [ linesEnumerator nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 words = [ line componentsSeparatedByString: @"\\t" ];\
+if ( [ words count ] >= 2 )\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 newVocable = [ [ VTXVocable alloc ]\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithFirstLanguage: [ words objectAtIndex: 0 ]\
+secondLanguage: [ words objectAtIndex: 1 ]\
+\pard\pardeftab720\li2160\sl-200\sb20\sa80\ql\qnatural
+\cf0 topic: @"None" ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ([words count]>2 && [words objectAtIndex: 2]!=@"")\
+\pard\pardeftab720\li2160\sl-200\sb20\sa80\ql\qnatural
+\cf0 [ newVocable setTopic: [ words objectAtIndex: 2 ] ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ result addObject: [ newVocable autorelease ] ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return result;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - (NSMutableArray *) readVocableStringFromPboard:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 (NSPasteboard *) pb\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSString *value;	NSArray *lines;\
+NSEnumerator *linesEnumerator;\
+NSString *line;	NSArray *words;	VTXVocable *newVocable;\
+NSMutableArray *result = [ NSMutableArray array ];\
+value = [ pb stringForType: @"VTXPboardType" ];\
+lines = [ value componentsSeparatedByString:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSString stringWithFormat: @"%c",\
+NSCarriageReturnCharacter ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 linesEnumerator = [ lines objectEnumerator ];\
+while ( line = [ linesEnumerator nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 words = [ line componentsSeparatedByString: @"\\t" ];\
+if ( [ words count ] == 5 )\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 newVocable = [ [ VTXVocable alloc ] init ];\
+[ newVocable setFirstL: [ words objectAtIndex: 0 ] ];\
+[ newVocable setSecondL: [ words objectAtIndex: 1 ] ];\
+[ newVocable setTopic: [ words objectAtIndex: 2 ] ];\
+[ newVocable setNumCorrect:\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ words objectAtIndex: 3 ] intValue ] ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ newVocable setNumGuesses:\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ words objectAtIndex: 4 ] intValue ] ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ result addObject: [ newVocable autorelease ] ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+return result;\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Implement a 
+\f3\b\fs24 VTXSearchFieldFormatter
+\f0\b0\fs28  subclass of 
+\f3\b\fs24 NSFormatter
+\f0\b0\fs28  to format the pasteboard contents in case the user inadvertently tries to paste table row strings into the search field. Override the following two methods:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) getObjectValue: ( id * ) obj forString:\
+( NSString * ) string errorDescription: ( NSString ** ) e\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 *obj = string;\
+if ( string != NULL )\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 return YES;\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( e != NULL )\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 *e = @"Error in search field formatter";\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO;\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( NSString * ) stringForObjectValue: ( id ) obj\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ obj isKindOfClass: [ NSString class ] ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSMutableString *s =\
+[ NSMutableString stringWithString: obj ];\
+[ s replaceOccurrencesOfString: @"\\r" withString: @" "\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 options: NSCaseInsensitiveSearch\
+range: NSMakeRange( 0, [ s length ] ) ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ [ s copy ] autorelease ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ obj description ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	In the window controller\'d5s 
+\f4\fs24 awakeFromNib
+\f0\fs28  method, send these messages as well:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 [ [ toolbarSearchField cell ] setWraps: NO ];\
+[ [ toolbarSearchField cell ] setScrollable: YES ];\
+VTXSearchFieldFormatter *f =\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ VTXSearchFieldFormatter alloc ] init ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ toolbarSearchField setFormatter: f ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ f release ];	// Formatter is retained by the search field\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 Q.	Create a Document Settings sheet so that the user can customize table header cells and other document options\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Add the 
+\f2\fs24 Document Settings
+\f0\fs28  panel to 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 ; make a 
+\f4\fs24 settingsPanel
+\f0\fs28  outlet in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; add three labeled text fields to the panel and a button to dismiss the panel; declare the outlet in 
+\f2\fs24 VTXMainWindowController.h
+\f0\fs28 \
+2.	Add a 
+\f2\fs24 Document Settings
+\f0\fs28  menu item to the 
+\f2\fs24 Window
+\f0\fs28  menu in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 ; add a new action to the 
+\f3\b\fs24 First Responder
+\f0\b0\fs28  object in IB (implement 
+\f4\fs24 openDocumentSettings:
+\f0\fs28  and 
+\f4\fs24 dismissDocumentSettings:
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+3.	When the user creates a new document, immediately open the language settings panel; add the following action to the nib file and implement it in 
+\f2\fs24 VTXAppController.m
+\f0\fs28 : connect the 
+\f2\fs24 File \'d1> New
+\f0\fs28  menu item to the following 
+\f4\fs24 openNewDocument:
+\f0\fs28  action\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) openNewDocument: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSDocumentController *dc =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSDocumentController sharedDocumentController ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ dc newDocument: self ];\
+[ [ [ [ dc currentDocument ] windowControllers ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 objectAtIndex: 0 ] openSettingsPanel: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Add outlets for the editable text field outlets in the document settings sheet and getter accessors for them; add outlets to the customizable table columns in the window controller and connect them in IB (first language, second language, and topic). Add outlets to the static text labels associated with the editable text fields in the inspector panel and connect them\
+3.	Implement the 
+\f4\fs24 updateLabelStrings
+\f0\fs28  method in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; you may wish to include additional code that sets the document changed status if the strings differ between the table view header cells and the document settings sheet\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) updateLabelStrings\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ firstLColumn headerCell ] setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ firstLSetting stringValue ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ secondLColumn headerCell ] setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ secondLSetting stringValue ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ topicColumn headerCell ] setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 [ topicSetting stringValue ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ firstLangLabel setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ firstLSetting stringValue ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ secondLangLabel setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ secondLSetting stringValue ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicLabel setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicSetting stringValue ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Invoke 
+\f4\fs24 updateLabelStrings
+\f0\fs28  in 
+\f4\fs24 dismissSettingsPanel
+\f0\fs28  and in 
+\f4\fs24 awakeFromNib
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; flag the document changed status if strings in settings sheet differ from current values; when restoring a document from disk, fill them with data from 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  in 
+\f4\fs24 awakeFromNib
+\f0\fs28  to refresh the views properly\
+5.	Create instance variables and accessors for these three strings in the 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  class; update the strings in the interface when loading data from an archive, in the 
+\f4\fs24 awakeFromNib
+\f0\fs28  method\
+\pard\tx780\pardeftab720\li800\fi-420\sl-280\sa120\ql\qnatural
+\cf0 6.	When archiving data in the document, update the 
+\f3\b\fs24 VTXLexiconModel
+\f0\b0\fs28  class to write the current strings before archiving it, in 
+\f4\fs24 dataRepresentationOfType:
+\f0\fs28 , as follows:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 [ lexiconModel setFirstLangLabel:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ myWindowController firstLSetting ] stringValue ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconModel setSecondLangLabel:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ myWindowController secondLSetting ] stringValue ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconModel setTopicLabel:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ [ myWindowController topicSetting ] stringValue ] ];\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 R.	Implement a simple capability for printing lexicon lists\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Override 
+\f4\fs24 printDocument:
+\f0\fs28  in 
+\f2\fs24 VTXDocument.m
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) printDocument: ( id ) sender\
+\{\
+\pard\pardeftab720\li1420\fi-320\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ [ self windowControllers ] objectAtIndex: 0 ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 printShowingPrintPanel: TRUE ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	In 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 , implement 
+\f4\fs24 printShowingPanel:
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) printShowingPrintPanel: ( BOOL ) showPanels\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSPrintOperation *op;\
+// Obtain a custom view that will be printed\
+NSMutableString *title =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSMutableString stringWithString: [doc displayName] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSView *printView = [ [ VTXPrintView alloc]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithVocables: [ lexiconController arrangedObjects ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 andTitle: title printInfo: [ doc printInfo ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Construct the print operation and setup Print panel\
+op = [ NSPrintOperation printOperationWithView:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 printView printInfo: [ doc printInfo ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 [ op setShowPanels: showPanels ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Run operation, showing Print panel if showPanels was YES\
+//[ myDocument runModalPrintOperation: op delegate: nil\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 // didRunSelector: NULL contextInfo: NULL ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ op runOperation ];\
+[ printView release ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Implement 
+\f3\b\fs24 VTXPrintView
+\f0\b0\fs28 , a subview of 
+\f3\b\fs24 NSView
+\f0\b0\fs28 , and add the files to the project; the work is done in 
+\f4\fs24 drawRect:
+\f0\fs28 , as usual\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 S.	Implement the Quiz Window interface\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Create 
+\f2\fs24 QuizWindow.nib
+\f0\fs28  with an 
+\f3\b\fs24 NSPanel
+\f0\b0\fs28  (closeable but not resizeable or minimizing), two labeled editable text fields and a button labeled 
+\f2\fs24 Skip this one
+\f0\fs28 ; set the custom class for 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28  of this nib to 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28 ; set the 
+\f2\fs24 window
+\f0\fs28  outlet for 
+\f3\b\fs24 File's Owner
+\f0\b0\fs28  to the 
+\f3\b\fs24 NSPanel
+\f0\b0\fs28 \
+2.	Add 
+\f3\b\fs24 MMRandomEnumerator
+\f0\b0\fs28  class source files to project; add 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  class source files to project; create and connect outlets for the quiz window text fields and labels and a static text field to the quiz window for the quiz answer feedback\
+3.	Add ivars to 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  to hold an 
+\f3\b\fs24 NSNumber
+\f0\b0\fs28 , an 
+\f3\b\fs24 NSArray
+\f0\b0\fs28  (
+\f4\fs24 quizVocables
+\f0\fs28 ), an individual 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  object, an 
+\f3\b\fs24 MMRandomEnumerator
+\f0\b0\fs28  object, two 
+\f3\b\fs24 NSColor
+\f0\b0\fs28  objects (
+\f4\fs24 rightColor
+\f0\fs28 , 
+\f4\fs24 wrongColor
+\f0\fs28 ), and a 
+\f4\fs24 BOOL
+\f0\fs28  (
+\f4\fs24 isCorrect
+\f0\fs28 )\
+4.	Implement the designated initializer for 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  and cleanup when the quiz controller object is destroyed; implement a setter accessor for 
+\f4\fs24 quizVocables
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( id ) initWithWindowNibName: ( NSString * ) windowNibName\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 quizVocables: ( NSArray * ) theVocables\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 self = [ super initWithWindowNibName: windowNibName ];\
+if ( self )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 quizVocables = [ [ NSArray alloc ] init ];\
+[ self setQuizVocables: theVocables ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 rightColor = [ [ NSColor colorWithCalibratedRed: 0.0\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 green: 0.6 blue: 0.0 alpha: 1.0 ] retain ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 wrongColor = [ [ NSColor colorWithCalibratedRed: 0.6\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 green: 0.0 blue: 0.0 alpha: 1.0 ] retain ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 return self;\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) dealloc\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ rightColor release ];\
+[ wrongColor release ];\
+[ quizVocables release ];\
+[ super dealloc ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 6.	Set up the quiz after the quiz window has loaded (draw labels for the labeled text fields from the document that the quiz belongs to); randomize the array of vocables that will be passed from the document; display the first item in the quiz sequence\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) windowDidLoad\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 int index;\
+NSNumber *num;\
+NSMutableArray *seq = [ NSMutableArray array ];\
+srandom( time( NULL ) ); // Seed the random number generator\
+// Set text field labels to match the document\'d5s labels\
+[ firstLangLabel setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ [ self document ] lexiconModel ] firstLangLabel ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ secondLangLabel setStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ [ self document ] lexiconModel ] secondLangLabel ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ promptField setFont: [ NSFont userFontOfSize: 24 ] ];\
+[ solutionField setFont: [ NSFont userFontOfSize: 24 ] ];\
+// Create a sequence from zero to the number of vocables\
+for ( index = 0; index < [ quizVocables count ]; index++ )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 num = [ NSNumber numberWithInt: index ];\
+[ seq addObject: num ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+// Create an enumerator for the random sequence\
+// Release the enumerator in windowShouldClose:\
+// For picking items at random from the array of vocables\
+quizEnum = [[MMRandomEnumerator initWithArray: seq] retain];\
+[ self showNextVocable ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 7.	Implement the method for color-coding the quiz answer feedback string\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - (NSMutableAttributedString *) feedbackString: (NSString *) s\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSMutableAttributedString *fb;\
+fb = [[NSMutableAttributedString alloc] initWithString: s];\
+[ fb addAttribute: NSFontAttributeName\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 value: [ NSFont userFontOfSize: 24 ]\
+range: NSMakeRange( 0, [ s length ] ) ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( isCorrect )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ fb addAttribute:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSForegroundColorAttributeName value: rightColor\
+range: NSMakeRange( 0, [ s length ] ) ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ fb addAttribute:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSForegroundColorAttributeName value: wrongColor\
+range: NSMakeRange( 0, [ s length ] ) ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [ fb autorelease ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 8.	Declare an outlet to the 
+\f2\fs24 Skip this one
+\f0\fs28  button in the source files and IB; disable the 
+\f2\fs24 Skip this one
+\f0\fs28  button at the same time as the solution field is disabled for input if the last quiz item is answered\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 T.	Run the quiz when the user presses the appropriate toolbar button\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Implement a 
+\f4\fs24 validateToolbarItem:
+\f0\fs28  method in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  to disable 
+\f2\fs24 Start Quiz
+\f0\fs28  button if table is empty\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) validateToolbarItem: ( NSToolbarItem * ) theItem\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ theItem action ] == @selector( startQuiz: ) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [[lexiconController arrangedObjects] count] > 0;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return true;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Add an ivar to 
+\f2\fs24 VTXMainWindowController.h
+\f0\fs28  that points to a 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  object (a forward 
+\f4\fs24 @class
+\f0\fs28  declaration is necessary); name the ivar 
+\f4\fs24 quizCtl
+\f0\fs28 \
+3.	Implement the 
+\f4\fs24 startQuiz:
+\f0\fs28  action in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  which will create a new 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  and display the 
+\f2\fs24 Quiz Window
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) startQuiz: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSArray *arr = [ lexiconController arrangedObjects ];\
+NSArray *sel = [ lexiconController selectedObjects ];\
+if ( [ sel count ] == 0 )\
+quizCtl = [ [ VTXQuizController alloc ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithWindowNibName: @"QuizWindow" quizVocables: arr ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+quizCtl = [ [ VTXQuizController alloc ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithWindowNibName: @"QuizWindow" quizVocables: sel ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ doc addWindowController: quizCtl ];\
+[ quizCtl showWindow: self ];	[ quizCtl autorelease ];\
+[ [ self window ] orderOut: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Implement the 
+\f4\fs24 showNextVocable:
+\f0\fs28  action in 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  to display a random sequence of quiz items (
+\f4\fs24 ranseq
+\f0\fs28  is declared as an 
+\f3\b\fs24 NSNumber
+\f0\b0\fs28  in the header); vocables are omitted from the test for certain values of the success rate and number of trials:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) showNextVocable\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( ranseq = [ quizEnum nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 v=[[quizVocables objectAtIndex:[ranseq intValue]]retain];\
+if ([[v score] floatValue] > 0.8 || [v numGuesses] < 25)\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ promptField setStringValue: [ v firstL ] ];\
+[ solutionField setStringValue: @"" ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v release ];	[ self showNextVocable ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ solutionField setEnabled: FALSE ];\
+[ skipButton setEnabled: FALSE ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	Implement the 
+\f4\fs24 solve:
+\f0\fs28  method (class declares a 
+\f4\fs24 BOOL
+\f0\fs28  variable that is set 
+\f4\fs24 TRUE
+\f0\fs28  here, and was initialized as 
+\f4\fs24 FALSE
+\f0\fs28  in the init method)\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) solve: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 attemptedAnswer = YES;\
+// A somewhat-forgiving caseInsensitveCompare:\
+if ( [ [ v secondL ] caseInsensitiveCompare:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ solutionField stringValue ] ] == NSOrderedSame )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v setNumGuesses: [ v numGuesses ] + 1 ];\
+[ v setNumCorrect: [ v numCorrect ] + 1 ];\
+isCorrect = YES;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+else\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v setNumGuesses: [ v numGuesses ] + 1 ];\
+isCorrect = NO;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ feedback setAttributedStringValue:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self feedbackString: [ v secondL ] ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSTimer scheduledTimerWithTimeInterval: 2 target: self\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 selector: @selector( showNextVocable ) userInfo: nil repeats: NO ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v release ];	// This was retained in showNextItem\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 6.	Implement the 
+\f4\fs24 skip:
+\f0\fs28  action for when the user presses the 
+\f2\fs24 Skip this one
+\f0\fs28  button\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) skip: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self showNextVocable ];\
+[ feedback setStringValue: @"" ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 7.	Implement the 
+\f4\fs24 windowShouldClose:
+\f0\fs28  delegate method in 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28  to run when the user dismisses the quiz window\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) windowShouldClose: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ [ [ self document ] windowControllers ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 objectAtIndex: 0 ] endQuizWithFlag: attemptedAnswer ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Put the main document window back in front\
+[ [ [ [ [ self document ] windowControllers ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 objectAtIndex: 0 ] window ] orderFront: self ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ quizEnum release ];	// Don\'d5t forget to release this\
+return TRUE;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 8.	Implement the 
+\f4\fs24 endQuizWithFlag:
+\f0\fs28  method in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) endQuizWithFlag: ( BOOL ) answersAttempted;\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( answersAttempted )\
+[ doc updateChangeCount: NSChangeDone ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 9.	For a few debugging notes regarding the presentation of the quiz, see Appendix 4.\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 U.	Enable addition and deletion of vocable items via menu or via keyboard shortcuts, and resetting of score values or switching data between languages for selected vocables\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Implement the following actions in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  and add these actions to the list of actions in 
+\f3\b\fs24 First Responder
+\f0\b0\fs28  in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) insertVocableViaMenu: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController insert: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( IBAction ) deleteVocableViaMenu: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController remove: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	In the 
+\f2\fs24 File
+\f0\fs28  menu of the program menus in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 , add items 
+\f2\fs24 Insert Vocable
+\f0\fs28  and 
+\f2\fs24 Delete Vocable
+\f0\fs28 ; connect these items to appropriate 
+\f3\b\fs24 First Responder
+\f0\b0\fs28  actions\
+3.	Disable the 
+\f2\fs24 Delete Vocable
+\f0\fs28  item if nothing is selected in the table and both of the new menu items if the search field is active, using the 
+\f4\fs24 validateMenuItem:
+\f0\fs28  method\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) validateMenuItem: ( NSMenuItem * ) theItem\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [theItem action] == @selector(insertVocableViaMenu:) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return [toolbarSearchField stringValue] length == 0;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [theItem action] == @selector(deleteVocableViaMenu:) )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return ( [[lexiconController selectedObjects] count] > 0\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 && [toolbarSearchField stringValue] length == 0 );\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 return true;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	Enable resetting of scores values for listed vocables by adding the following action to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) resetScores: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSMutableArray *vocables =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController arrangedObjects ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSEnumerator *vocablesEnumerator;\
+VTXVocable *vocable;\
+vocablesEnumerator = [ vocables objectEnumerator ];\
+while ( vocable = [ vocablesEnumerator nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ vocable setNumGuesses: 0 ];\
+[ vocable setNumCorrect: 0 ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+[ lexiconTable reloadData ];\
+[ doc updateChangeCount: NSChangeDone ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	Add a 
+\f2\fs24 Lexicon
+\f0\fs28  menu to the main menu in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 ; add a 
+\f2\fs24 Reset Scores
+\f0\fs28  item to it and connect the new item to the 
+\f4\fs24 resetScores:
+\f0\fs28  action by adding it to the list of actions in 
+\f3\b\fs24 First Responder
+\f0\b0\fs28 ; disable the 
+\f2\fs24 Reset Scores
+\f0\fs28  menu item if the table is empty by adding the following test to 
+\f4\fs24 validateMenuItem:
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( [ theItem action ] == @selector( resetScores: ) )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 return [ [ lexiconController arrangedObjects ] count ] > 0;
+\fs28 \
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0 \cf0 6.	Implement the following action in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; add an appropriate item to the 
+\f2\fs24 Lexicon
+\f0\fs28  menu and add the action through 
+\f3\b\fs24 First Responder
+\f0\b0\fs28  in 
+\f2\fs24 MainMenu.nib
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) swapLanguages: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXVocable *vocable;\
+NSMutableArray *vocables =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController selectedObjects ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSEnumerator *vocablesEnumerator =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ vocables objectEnumerator ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 while ( vocable = [ vocablesEnumerator nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ vocable swapLanguages ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+[ doc updateChangeCount: NSChangeDone ];    \
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Declare and implement the 
+\f4\fs24 swapLanguages
+\f0\fs28  method in class 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) swapLanguages\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSString *temp = [ NSString stringWithString: firstL ];\
+[ self setFirstL: secondL ];\
+[ self setSecondL: temp ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Disable the 
+\f2\fs24 Swap Languages
+\f0\fs28  menu item if no rows are selected in the table by adding the following test to 
+\f4\fs24 validateManuItem:
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( [ theItem action ] == @selector( swapLanguages: ) )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 return [ [ lexiconController selectedObjects ] count ] > 0;\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 7.	Create a 
+\f2\fs24 Categorize
+\f0\fs28  panel in 
+\f2\fs24 VTXDocument.nib
+\f0\fs28  with a text field labeled 
+\f2\fs24 Change Category of Selected Vocables To:
+\f0\fs28 , and a button to close the panel; include a 
+\f2\fs24 Cancel
+\f0\fs28  button that will dismiss the panel without making any changes\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 Implement a 
+\f4\fs24 categorizeVocables:
+\f0\fs28  action to open the panel as a modal sheet; data from text field in sheet will set topic data for selected vocables; implement a button to dismiss the sheet; add a 
+\f2\fs24 Categorize
+\f0\fs28  item to the 
+\f2\fs24 Lexicon
+\f0\fs28  menu; connect it to the action\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) categorizeVocables: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self openCategorizeVocablesSheet ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( void ) openCategorizeVocablesSheet\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSApp beginSheet: categorizePanel\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 modalForWindow: [ self window ] modalDelegate: nil\
+didEndSelector: nil contextInfo: nil ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSApp runModalForWindow: categorizePanel ];\
+[ NSApp endSheet: categorizePanel ];\
+[ categorizePanel orderOut: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( IBAction ) dismissCategorizePanel: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSArray *vocableSelection =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ lexiconController selectedObjects ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSEnumerator *e = [ vocableSelection objectEnumerator ];\
+VTXVocable *v;\
+while ( v = [ e nextObject ] )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ v setTopic: [ categoryField stringValue ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ self document ] updateChangeCount: NSChangeDone ];\
+[ NSApp stopModal ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( IBAction ) cancelCategorizeAction: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSApp stopModal ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Disable the 
+\f2\fs24 Categorize
+\f0\fs28  menu item in 
+\f4\fs24 validateMenuItem
+\f0\fs28  if no rows are selected\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 V.	Implement graphical display cells for the 
+\f3\fs24 Score
+\f1\fs28  table column\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Add the 
+\f3\b\fs24 BezierPathCell
+\f0\b0\fs28  class files to the project\
+2.	Modify the 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  class score accessor to return the value of the score ivar as a string representation of the percentage score, and to return -1 if no scores have been recorded\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( NSString * ) score\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 float pct;\
+if ( numGuesses != 0 )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 pct = ( float ) numCorrect / ( float ) numGuesses;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 pct = -1.0;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Return the score as pct, guesses, and number correct\
+return [ NSString stringWithFormat:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 @"%4.2f %d/%d", pct, numCorrect, numGuesses ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 // Return the score only as percentage correct\
+// return [ NSString stringWithFormat: @"%4.2f", pct ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	The table view can set the data cell object for the appropriate column with this line in the 
+\f4\fs24 awakeFromNib
+\f0\fs28  method of 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 :\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 [ [ lexiconTable tableColumnWithIdentifier: @"score" ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 setDataCell: [ [ [ BezierPathCell alloc ] init ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 autorelease ] ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 You must explicitly create an identifier for the 
+\f2\fs24 Score
+\f0\fs28  table column in 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 , or do it programmatically\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 4.	Implement 
+\f2\fs24 Insert Item
+\f0\fs28  and 
+\f2\fs24 Delete Item
+\f0\fs28  in the 
+\f2\fs24 Lexicon
+\f0\fs28  menu; the connected actions in the window controller will simply invoke the 
+\f4\fs24 insert:
+\f0\fs28  and 
+\f4\fs24 remove:
+\f0\fs28  methods of the array controller; then connect these actions to the editable text fields in the inspector panel so they send the appropriate actions (have the action sent not on 
+\f2\fs24 End Editing
+\f0\fs28 , but on 
+\f2\fs24 Return
+\f0\fs28  only); this lets the user efficiently add items to the table by tabbing from field to field\
+5.	Another way to implement graphical scores display is to add a new column to the table and a new instance variable, 
+\f4\fs24 image
+\f0\fs28 , of type 
+\f3\b\fs24 NSImage
+\f0\b0\fs28  to the 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  class, along with its appropriate accessors. Add a new binding to 
+\f3\b\fs24 VTXLexiconController
+\f0\b0\fs28  for this key and bind the new table column to it. Replace the existing code that sets the data cell for this column in the window controller\'d5s 
+\f4\fs24 awakeFromNib
+\f0\fs28  method with the following:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 [ [ lexiconTable tableColumnWithIdentifier: @"image" ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 setDataCell: [ [ [ NSImageCell alloc ] init ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 autorelease ] ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Import a set of images to the project and use them in 
+\f3\b\fs24 VTXVocable
+\f0\b0\fs28  in the 
+\f4\fs24 score
+\f0\fs28  method in the following way:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( pct > 0.8 )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setImage: [ NSImage imageNamed: @"violet.png" ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 else if ( pct > 0.6 )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setImage: [ NSImage imageNamed: @"green.png" ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 else if ( pct > 0.4 )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setImage: [ NSImage imageNamed: @"yellow.png" ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 else if ( pct > 0.2 )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setImage: [ NSImage imageNamed: @"red.png" ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 else if ( pct >= 0.0 )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ self setImage: [ NSImage imageNamed: @"black.png" ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 else if ( pct == -1.0 )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ self setImage: [ NSImage imageNamed: @"white.png" ] ];\
+\pard\pardeftab720\li720\fi-720\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 W.	In the main window\'d5s drawer, implement a topic listing table for the table\
+\pard\pardeftab720\li700\fi-340\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	In 
+\f2\fs24 VTXDocument.nib
+\f0\fs28 , add a table view containing one (noneditable) column to the drawer content view and add a new 
+\f3\b\fs24 NSArrayController
+\f0\b0\fs28  instance to the instances pane; declare an outlet to the table view (
+\f4\fs24 topicTable
+\f0\fs28 ) and to the array controller (
+\f4\fs24 topicController
+\f0\fs28 ) in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  and connect them to the instances in the nib file\
+\pard\pardeftab720\li680\fi-300\sl-280\sa120\ql\qnatural
+\cf0 2.	Subclass the new 
+\f3\b\fs24 NSArrayControlle
+\f0\b0\fs28 r as 
+\f3\b\fs24 VTXTopicController
+\f0\b0\fs28 ; create files for the new class and implement the following method:\
+\pard\pardeftab720\li740\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) selectsInsertedObjects\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO;\
+\pard\pardeftab720\li740\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li740\fi-380\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Create 
+\f3\b\fs24 VTXTopic
+\f0\b0\fs28 , a subclass of 
+\f3\b\fs24 NSObject
+\f0\b0\fs28 , with a single 
+\f3\b\fs24 NSString
+\f0\b0\fs28  ivar 
+\f4\fs24 topicString
+\f0\fs28 , and with initializers, and at least a getter accessor, and add it to the project\
+4.	Set up the bindings for the array controller: Bind the attributes of the array controller to 
+\f3\b\fs24 VTXTopic
+\f0\b0\fs28  and bind the new table column to the
+\f2\fs24  topicString
+\f0\fs28  key in 
+\f3\b\fs24 VTXTopic
+\f0\b0\fs28 \
+5.	Implement a method to update the content array of the new array controller with a list of unique topic strings from the list of topics in the main table view; send this message to the window controller in its 
+\f4\fs24 awakeFromNib
+\f0\fs28  method; make sure that if any topic strings are empty, an entry is created to represent them so user can search for them specifically\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) updateTopicsList\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXVocable *vocable;\
+NSString *aTopic;\
+NSEnumerator *e;\
+NSMutableArray *uniqueTopics = [ NSMutableArray array ];\
+[ topicController removeObjects:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicController arrangedObjects ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 e = [ lexiconArray objectEnumerator];\
+// find unique topics and add them to a temporary array\
+while ( vocable = [ e nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( ![ uniqueTopics containsObject: [ vocable topic ] ]\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 && !( [ [ vocable topic ] isEqualToString: @"" ] ) )\
+[ uniqueTopics addObject: [ vocable topic ] ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( ![ uniqueTopics containsObject: @\'d3<Empty\'d3 ]\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 && ( [ [ vocable topic ] isEqualToString: @"" ] ) )\
+[ uniqueTopics addObject: @\'d3<Empty\'d3 ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 e = [ uniqueTopics objectEnumerator ];\
+while ( aTopic = [ e nextObject ] )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicController addObject: [ [ [ VTXTopic alloc ]\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithString: aTopic ] autorelease ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicTable deselectAll: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 6.	Implement 
+\f4\fs24 controlTextDidEndEditing
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  to send the 
+\f4\fs24 updateTopicsList
+\f0\fs28  message to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; connect delegate outlet of topic text field for the inspector window to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  so that the topics list is updated after all table cell edits and after editing in the topic inspector\
+7.	Send the 
+\f4\fs24 updateTopicsList
+\f0\fs28  message to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28  in the following methods:\
+\pard\pardeftab720\li720\sl-280\sa40\ql\qnatural
+\cf0 \'a5	at the end of 
+\f4\fs24 awakeFromNib
+\f0\fs28  and 
+\f4\fs24 importFromCSV
+\f0\fs28  in the window controller\
+\'a5	in the 
+\f4\fs24 dismissCategorizePanel
+\f0\fs28  method\
+\'a5	in 
+\f4\fs24 controlTextDidEndEditing:
+\f0\fs28 \
+\'a5	in the 
+\f4\fs24 insert:
+\f0\fs28  and 
+\f4\fs24 remove:
+\f0\fs28  methods of 
+\f3\b\fs24 VTXLexArrayController
+\f0\b0\fs28 \
+\'a5	
+\f4\fs24 insertObject: inVocablesAtIndex:
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\'a5	
+\f4\fs24 removeObjectFromVocablesAtIndex:
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\'a5	
+\f4\fs24 changeKeyPath: ofObject: toValue:
+\f0\fs28  in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 \
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 8.	Deselect all items in 
+\f4\fs24 topicTable
+\f0\fs28  at appropriate places in code, such as when the drawer closes, and by adding the following method to 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 ; don\'d5t forget to connect the 
+\f4\fs24 topicsTable
+\f0\fs28  delegate outlet to the window controller\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) tableView: ( NSTableView * ) aTableView\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 mouseDownInHeaderOfTableColumn: ( NSTableColumn * ) column\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( aTableView == topicTable )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ topicTable deselectAll: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 X.	Implement filtering-by-topic of the main table from the list in the drawer\'d5s topic table\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Implement filtering-by-topic of the main table with the following method in the window controller: 
+\f4\fs24 vocablesSelectedByTopic
+\f0\fs28 \
+\pard\pardeftab720\li720\sl-280\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( NSArray * ) vocablesSelectedByTopic\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 VTXVocable *v;\
+VTXTopic t;\
+NSEnumerator *te;\
+NSEnumerator *le;\
+NSMutableArray *s;\
+NSArray *vocables;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 NSArray *topics;\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 topics = [ topicController selectedObjects ];\
+vocables = [ lexiconController arrangedObjects ];\
+s = [ NSMutableArray arrayWithCapacity: [vocables count] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa80\ql\qnatural
+\cf0 le = [ vocables objectEnumerator ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 while ( v = [ le nextObject ] )\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 te = [ topics objectEnumerator ];\
+while ( t = [ te nextObject ] )\
+\{\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ [ v topic ] isEqualToString: [t topic string] )\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ s addObject: v ];\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ [ v topic ] isEqualToString: @\'d3\'d3 ] &&\
+\pard\pardeftab720\li2160\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ t topicString isEqualToString: @\'d3<Empty>\'d3 ] \}\
+[ s addObject: v ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li1080\sl-280\sa20\ql\qnatural
+\cf0 \}\
+return [ [ s copy ] autorelease ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-340\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 2.	Subclass 
+\f3\b\fs24 NSTableView
+\f0\b0\fs28  as 
+\f3\b\fs24 VTXTopicTableView
+\f0\b0\fs28 ; add the class to the document nib and create files for the new class; override only the following method:\
+\pard\pardeftab720\li760\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) acceptsFirstResponder\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 return NO;\
+\pard\pardeftab720\li760\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li700\fi-320\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Change the class of the topics table to 
+\f3\b\fs24 VTXTopicTableView
+\f0\b0\fs28 ; this table will be able to change its selection, but it will not be able to receive keyboard events. Therefore the main table will continue to function as key view even when the user is selecting items in the topic table (this is mainly to preserve proper table highlighting for rows selected when the user selects from the topics table).\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 Y.	Implement an HTML-based Help system\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Create a folder containing your HTML reference documents and add it to the project from the 
+\f2\fs24 Resources
+\f0\fs28  folder, since the help files can very well be localized. Be sure to select the option to create 
+\f5\i folders
+\f0\i0  recursively for any added folders when the sheet for adding the files appears. The root folder of this hierarchy should be labeled 
+\f2\fs24 Help
+\f0\fs28 .\
+2.	Make sure there is an 
+\f2\fs24 index.html
+\f0\fs28  file in the root folder of the help system, with a header block that contains something closely resembling the following code:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 <title>Vocable Trainer X Help</title>\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 <meta name="AppleTitle" content="VocableTrainerX Help">\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 3.	Add the following keys and associated values to the top level of the 
+\f2\fs24 Info.plist
+\f0\fs28  file:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 <key>CFBundleHelpBookFolder</key>\
+<string>Help</string>\
+<key>CFBundleHelpBookName</key>\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 <string>VocableTrainerX Help</string>\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	The three steps above should install the Help system; it will probably be necessary to remove the current 
+\f2\fs24 com.apple.helpui
+\f0\fs28  folder from the 
+\f2\fs24 ~/Library/Caches
+\f0\fs28  folder of the current user in order to display the new pages rather than a blank Help system screen in order to test it.\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 Z.	Implement a system of user preferences for VocableTrainerX\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	In Interface Builder, create a new nib file and add it to the project. Name it 
+\f2\fs24 Preferences.nib
+\f0\fs28  and create a 
+\f6\fs24 Preferences
+\f0\fs28  panel that includes checkbox controls labeled 
+\f2\fs24 Open New Empty Doc at Launch Time
+\f0\fs28  and 
+\f2\fs24 Present Quiz in Full-screen Mode
+\f0\fs28 .\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 Create a new 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28  class that is a subclass of 
+\f3\b\fs24 NSWindowController
+\f0\b0\fs28 .\
+Create outlets for two checkboxes in 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28 ; name them 
+\f4\fs24 newDocCheckbox
+\f0\fs28  and 
+\f4\fs24 quizModeCheckbox
+\f0\fs28 .\
+Create the files for 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28  and add them to the VocableTrainerX project.\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 2.	Next, declare 
+\f4\fs24 prefsController
+\f0\fs28  as an instance variable in 
+\f2\fs24 VTXAppController.h
+\f0\fs28  rather than instantiating it in 
+\f2\fs24 Preferences.nib
+\f0\fs28 ; the instance will be created programmatically if needed:\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 VTXPrefsController *prefsController;\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Create a forward declaration for the new class in 
+\f2\fs24 VTXAppController.h
+\f0\fs28 : import the header into the implementation of 
+\f3\b\fs24 VTXAppController
+\f0\b0\fs28 .\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 3.	Connect the 
+\f6\fs24 Preferences\'c9
+\f0\fs28  item in the application menu to an action to display the preferences window; name it 
+\f4\fs24 showPreferences
+\f0\fs28 : and implement it in 
+\f3\b\fs24 VTXAppController
+\f0\b0\fs28 , using usual procedures for connecting a menu item in 
+\f2\fs24 MainMenu.nib
+\f0\fs28  to the desired action:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) showPreferences: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( !prefsController )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 prefsController = [ [ VTXPrefsController alloc ] init ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ prefsController showWindow: self ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	In order to display the 
+\f6\fs24 Preferences
+\f0\fs28  window, 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28  must have its 
+\f4\fs24 window
+\f0\fs28  outlet connected, also inherited from 
+\f3\b\fs24 NSWindowController
+\f0\b0\fs28 . Use the 
+\f3\b\fs24 File\'d5s Owner
+\f0\b0\fs28  proxy as usual to set the class for 
+\f3\b\fs24 File\'d5s Owner
+\f0\b0\fs28  to 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28  and connect its 
+\f4\fs24 window
+\f0\fs28  outlet.\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 Implement an 
+\f4\fs24 init
+\f0\fs28  method for 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28  to test the functioning of the new menu item with the following method in 
+\f2\fs24 VTXPrefsController.m
+\f0\fs28 :\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( id ) init\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( self = [super initWithWindowNibName: @"Preferences"] )\
+\{\
+\}\
+return self;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	Connect the outlets in 
+\f3\b\fs24 VTXPrefsController
+\f0\b0\fs28  to the check boxes in the
+\f6\fs24  Preferences
+\f0\fs28  window. To test the connections, override the 
+\f4\fs24 windowDidLoad:
+\f0\fs28  method:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) windowDidLoad\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ newDocCheckBox setState: TRUE ];\
+NSLog( @\'d3New Doc state = %d\'d3, [ newDocCheckBox state ] );\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 6.	Set up the keys that will be used to label the settings from the 
+\f6\fs24 Preferences
+\f0\fs28  panel when they are stored in the defaults database. 
+\f3\b\fs24 NSString
+\f0\b0\fs28  objects must be used as defaults database keys. Collect these in a separate header file for accessibility where they are needed, since the same keys will be used throughout the application. Create a new file named 
+\f2\fs24 defaults.h
+\f0\fs28  in the 
+\f6\fs24 Other Sources
+\f0\fs28  group of the VocableTrainerX project. Add these declarations to the new file:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 #define VTXNewDocCheckBoxStateKey	@\'d3New Doc CheckBox State\'d3\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 #define VTXQuizModeCheckBoxStateKey @\'d3Quiz Mode CheckBox State\'d3\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 7.	The defaults must be registered in the database before they are used. This involves creating a dictionary object and then associating the keys in 
+\f2\fs24 defaults.h
+\f0\fs28  with a set of initial values. This should be done as soon as possible after the application launches. To accomplish this, add the following class method (inherited from 
+\f3\b\fs24 NSObject
+\f0\b0\fs28 ) to 
+\f2\fs24 VTXAppController.m
+\f0\fs28 :\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 + ( void ) initialize	// Note that this is a class method\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSMutableDictionary *defaultDict =\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 [ NSMutableDictionary dictionary ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ NSUserDefaults standardUserDefaults ]\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 registerDefaults: defaultDict ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Naturally, you must now import 
+\f2\fs24 defaults.h
+\f0\fs28  into 
+\f2\fs24 VTXAppController.m
+\f0\fs28 .\
+The recommended way to register defaults is via the 
+\f4\fs24 initialize
+\f0\fs28  method. A class receives this message when it is being used in an application for the first time. In contrast to the 
+\f4\fs24 init
+\f0\fs28  method, an explicit 
+\f4\fs24 [ super initialize ]
+\f0\fs28  message is not necessary. Recall that dictionary objects used in the defaults database can only contain objects from certain supported classes.\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 8.	Set up 
+\f6\fs24 PrefsController
+\f0\fs28  so that operating the controls in the 
+\f6\fs24 Preferences
+\f0\fs28  window allows the user to change the application-wide default values. First, import definitions of database keys from 
+\f2\fs24 defaults.h
+\f0\fs28  into 
+\f2\fs24 PrefsController.m
+\f0\fs28 :\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 #import \'d2defaults.h\'d3\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 In 
+\f2\fs24 PrefsController.m
+\f0\fs28 , re-implement the 
+\f4\fs24 windowDidLoad:
+\f0\fs28  method with the following code:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( void ) windowDidLoad\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSUserDefaults *defaults;\
+\pard\pardeftab720\li1440\sl-200\sb20\sa80\ql\qnatural
+\cf0 defaults = [ NSUserDefaults standardUserDefaults ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ newDocCheckBox setState:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ defaults boolForKey: VTXNewDocCheckBoxStateKey ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ quizModeCheckBox setState:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ defaults boolForKey: VTXQuizModeCheckBoxStateKey ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Next, declare the following actions in 
+\f2\fs24 PrefsController.h
+\f0\fs28 , add them to the nib file, and connect the controls in the 
+\f6\fs24 Preferences
+\f0\fs28  window to their targets in the nib\'d5s 
+\f3\b\fs24 File\'d5s Owner
+\f0\b0\fs28 :\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) changeNewDocCBFlag: ( id ) sender;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 - ( IBAction ) changeQuizModeCBFlag: ( id ) sender;\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Implement these methods as follows:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( IBAction ) changeNewDocCBFlag: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ NSUserDefaults standardUserDefaults ] setObject:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSNumber numberWithBool: [ sender state ] ]\
+forKey: VTXNewDocCheckBoxStateKey ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 - ( IBAction ) changeQuizModeCBFlag: ( id ) sender\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ NSUserDefaults standardUserDefaults ] setObject:\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ NSNumber numberWithBool: [ sender state ] ]\
+forKey: VTXQuizModeCheckBoxStateKey ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 9.	The file named 
+\f2\fs24 foo.mydomain.VocableTrainerX
+\f0\fs28  should exist in 
+\f2\fs24 ~/Library/Preferences
+\f0\fs28  (the toolbar settings bring it into existence). Use the new information saved in the database to update the user interface and set the user\'d5s desired behavior for the application. Open a new document (or not) based on the value returned by the checkbox in the 
+\f6\fs24 Preferences
+\f0\fs28  window, with 
+\f4\fs24 applicationShouldOpenUntitledFile:
+\f0  
+\fs28 in 
+\f3\b\fs24 VTXAppController.m
+\f0\b0\fs28 : with the following code\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 - ( BOOL ) applicationShouldOpenUntitledFile:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 ( NSApplication * ) theApplication\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSUserDefaults *defaults =\
+[ NSUserDefaults standardUserDefaults ];\
+if ( [ defaults boolForKey: VTXNewDocCheckBoxStateKey ] )\
+return YES;\
+else\
+return NO;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Implement code for using the quiz mode setting in 
+\f4\fs24 startQuiz:
+\f0\fs28  using a similar pattern.\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 Appendix 1. Notes for implementing the full-screen quiz window\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Create a 
+\f3\b\fs24 VTXQuizWindow
+\f0\b0\fs28  window subclass that returns 
+\f4\fs24 YES
+\f0\fs28  in 
+\f4\fs24 canBecomeKeyWindow
+\f0\fs28 \
+2.	Modify 
+\f2\fs24 QuizWindow.nib
+\f0\fs28  so that the controls are in a custom view; depending on how you do this, you may have to reconnect all the outlets and actions. Include an outlet to the custom view in the nib file. Make the default quiz window blank and assign its content view to the custom view before the quiz starts (in the quiz controller\'d5s 
+\f4\fs24 windowDidLoad
+\f0\fs28  method)\
+3.	Add a 
+\f2\fs24 Terminate Quiz
+\f0\fs28  button to the quiz window interface view; create an action for it in the quiz controller implementation. For now, just have it invoke 
+\f4\fs24 windowShouldClose:
+\f0\fs28 , but it will eventually handle terminating the full-screen quiz, which will have no 
+\f2\fs24 Close
+\f0\fs28  button.\
+4.	Implement the 
+\f4\fs24 showFullScreenQuizWindow
+\f0\fs28  method in the quiz controller; its job is to capture the full screen display, allocate and initialize an instance of the custom quiz window, and set up the frame and content view so that it shows the quiz controls. In addition, you will have to manually load the nib containing the custom view so that its outlet is set by the time the quiz window comes into existence; at the end of this method, simply re-use the code that sets up the initial state of the quiz by invoking 
+\f4\fs24 windowDidLoad
+\f0\fs28 . The screen capture code looks like this:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if (CGDisplayCapture(kCGDirectMainDisplay) != kCGErrorSuccess)\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSLog( @"Unable to capture the main display" );\
+return;\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	All the quiz controls should work normally, with one proviso: In 
+\f4\fs24 windowDidLoad
+\f0\fs28  there is a line that sets the window\'d5s content view if the non-full-screen version is loaded; this will not work for the full-screen version, so you must make this instruction conditional on there being no instance of the full screen window; this is not tricky \'d0 the full screen instance will 
+\f5\i not
+\f0\i0  be created unless the user has set the preferences to run the quiz in that mode (see below). This step is necessary because the full-screen version sets its content in the method that creates it.\
+6.	All that is left is to clean up after the user terminates a full-screen quiz. In the 
+\f4\fs24 terminate:
+\f0\fs28  method, after the line that invokes 
+\f4\fs24 windowShouldClose:
+\f0\fs28 , test for a full-screen window instance and if it exists, release the instance and unwind the capture of the main display:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if (CGDisplayRelease(kCGDirectMainDisplay) != kCGErrorSuccess)\
+\{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 NSLog( @"Unable to release the display(s)" );\
+// Any GUI alert should appear at shield window level\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 If a full-screen quiz window does 
+\f5\i not
+\f0\i0  exist (i.e., the user has not requested full-screen mode), then just send the quiz controller\'d5s window a 
+\f4\fs24 close
+\f0\fs28  message. This will cause the delegate method, 
+\f4\fs24 windowShouldClose:
+\f0\fs28 , to be invoked automatically.\
+In either case, the random enumerator instance should be released, and the delegate method should take care of bringing the main window back in front and invoking the main window controller\'d5s 
+\f4\fs24 endQuizWithFlag:
+\f0\fs28  method.\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 7.	The initialization of the full-screen, borderless quiz window looks like this:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 vtxQuizWindow = [ [ VTXQuizWindow alloc ]\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 initWithContentRect: [ [ NSScreen mainScreen ] frame ]\
+styleMask: NSBorderlessWindowMask\
+backing: NSBackingStoreBuffered\
+defer: NO screen: [ NSScreen mainScreen ] ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ vtxQuizWindow setFrame:\
+[ [ NSScreen mainScreen ] frame ] display: YES ];\
+[ vtxQuizWindow setContentView: quizView ];\
+[ vtxQuizWindow setLevel:  CGShieldingWindowLevel( ) ];\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ vtxQuizWindow makeKeyAndOrderFront: self ];\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 Appendix 2. Further notes on quiz filtering based on success rates\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	In Section T, a method was included that eliminated items from a typical quiz under specified conditions; however, such items should not be invariably omitted, since occasional practice is beneficial. Testing methodology can grow rather technical, but the following will illustrate a straightforward approach based simply on pseudo-random number generation. Insert another 
+\f4\fs24 if
+\f0\fs28  block in the code for 
+\f4\fs24 showNextItem
+\f0\fs28 , as follows:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 else if ( [ [ item score ] floatValue ] >= 0.8 &&\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 random( ) % 1000 > 666 )\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+\cf0 \{\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ promptField setStringValue: [ item firstL ] ];\
+[ solutionField setStringValue: @"" ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+\cf0 \}\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 Appendix 3. Localizable strings within the VocableTrainerX source code\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	Create a 
+\f2\fs24 Localizable.strings
+\f0\fs28  file for the VocableTrainerX project. This file will contain key-value pairs for specifying string values for any localizable strings in the application. This file name is used by convention if only one file is used to list these strings. Additional files will also use the 
+\f2\fs24 .strings
+\f0\fs28  extension, and all such files should be added to each localized resource (
+\f2\fs24 .lproj
+\f0\fs28 ) folder in the project.\
+2.	In 
+\f3\b\fs24 DDVLexiconModel
+\f0\b0\fs28  (
+\f4\fs24 initWithDocument:
+\f0\fs28  method) initialize the field labels with:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"Some Language", nil )\
+NSLocalizedString( @"Andere Sprache", nil )\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 NSLocalizedString( @"Topic", nil )\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 The second argument could be used to supply a descriptive comment for use by localization contractors, to explain the intended purpose of each string.\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 3.	In 
+\f3\b\fs24 DDVLexItem
+\f0\b0\fs28  (
+\f4\fs24 init
+\f0\fs28  method) initialize the default values with:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"A Word", nil )\
+NSLocalizedString( @"Ein Wort", nil )\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 NSLocalizedString( @"None", nil )\
+\pard\pardeftab720\li700\fi-320\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 4.	In 
+\f3\b\fs24 DDVToolbarDelegateCategory
+\f0\b0\fs28 , localize the labels for the toolbar items:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"Insert Item", nil )\
+NSLocalizedString( @"Delete Item", nil )\
+NSLocalizedString( @"Export Data", nil )\
+NSLocalizedString( @"Start Quiz", nil )\
+NSLocalizedString( @"Search Data", nil )\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 NSLocalizedString( @"Topic Drawer", nil )\
+\pard\tx810\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 5.	In 
+\f3\b\fs24 DDVTopic
+\f0\b0\fs28 , localize the default value in the 
+\f4\fs24 init
+\f0\fs28  method (this string also appears in the 
+\f4\fs24 readNSStringFromPBoard
+\f0\fs28  method in 
+\f2\fs24 MMPasteboardCategory
+\f0\fs28 ):\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"None", nil )
+\f0\fs28 \
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 6.	In 
+\f3\b\fs24 DDVWindowController
+\f0\b0\fs28  localize the selection status message (
+\f4\fs24 awakeFromNib
+\f0\fs28 ); also in the 
+\f4\fs24 updateSelectionStatus
+\f0\fs28  method:\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"%d of %d selected", nil )\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Localize the title string for the Inspector window (
+\f4\fs24 windowTitleForDocument\'c9
+\f0\fs28 )\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"XQuizIt Selection: ", nil )\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Localize the placeholder string for empty topic table entries in 
+\f4\fs24 updateTopicsList
+\f0\fs28  and 
+\f4\fs24 lexiconSelectedByTopic
+\f0\fs28  methods:\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"<Empty>", nil )\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 Localize the menu item strings for undo manager operations (indexed accessor methods)\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"Insert Item", nil )\
+NSLocalizedString( @"Edit", nil )\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+\cf0 NSLocalizedString( @"Delete Item", nil )\
+\pard\tx720\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 7.	In 
+\f3\b\fs24 MMPrintView
+\f0\b0\fs28 , localize the string for enumerating printed pages:\
+\pard\pardeftab720\li720\sl-200\sb20\sa120\ql\qnatural
+
+\f4\fs24 \cf0 NSLocalizedString( @"Page", nil )\
+\pard\pardeftab720\li720\fi-720\sl-280\sa120\ql\qnatural
+
+\f1\b\fs28 \cf0 Appendix 4. Debugging notes related to quiz-presentation code\
+\pard\pardeftab720\li1080\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	When the quiz is NOT presented in full-screen mode, several adjustments must be made in managing the main document window, the inspector window, and the quiz window. In the 
+\f4\fs24 startQuiz:
+\f0\fs28  method in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 , make the following code changes:\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( [ defaults boolForKey: VTXQuizModeCheckBoxStateKey ] )\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ quizController showFullScreenQuizWindow ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 else\
+\{\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 if ( [ inspector isVisible ] )\
+\pard\pardeftab720\li1800\sl-200\sb20\sa80\ql\qnatural
+\cf0 [ inspector orderOut: self ];\
+\pard\pardeftab720\li1440\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ [ self window ] orderOut: self ];\
+quizSession = [ NSApp beginModalSessionForWindow:\
+\pard\pardeftab720\li1800\sl-200\sb20\sa20\ql\qnatural
+\cf0 [ quizController window ] ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa20\ql\qnatural
+\cf0 \}\
+[ [ self window ] orderOut: self ];\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ NSApp runModalSession: quizSession ];\
+\pard\pardeftab720\li1080\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 This hides the inspector window during the quiz, which is run in a modal session so that ordinary VocableTrainerX commands will be disabled. The 
+\f3\b\fs24 NSModalSession
+\f0\b0\fs28  instance variable 
+\f4\fs24 quizSession
+\f0\fs28  is declared in 
+\f3\b\fs24 VTXMainWindowController
+\f0\b0\fs28 .\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+\cf0 2.	Of course, the modal quiz session must be terminated properly when the user closes the quiz window. In 
+\f4\fs24 endQuizWithFlag:
+\f0\fs28 , add the following block of code:\
+\pard\pardeftab720\li720\sl-200\sb20\sa20\ql\qnatural
+
+\f4\fs24 \cf0 if ( [ NSApp modalWindow ] )\
+\pard\pardeftab720\li1080\sl-200\sb20\sa120\ql\qnatural
+\cf0 [ NSApp endModalSession: quizSession ];\
+\pard\pardeftab720\li720\sl-280\sa120\ql\qnatural
+
+\f0\fs28 \cf0 This ends the modal session (well, duh!); the 
+\f4\fs24 windowShouldClose:
+\f0\fs28  method of the quiz window controller already takes care of bringing the main window back in front.\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+
+\f1\b \cf0 Appendix 5. Notes for addition of language-swapping feature in quiz window\
+\pard\pardeftab720\li720\fi-360\sl-280\sa120\ql\qnatural
+
+\f0\b0 \cf0 1.	In 
+\f3\b\fs24 VTXQuizController
+\f0\b0\fs28 , add some logic for simple random swapping of languages during the quiz. In detail, convert the code in 
+\f4\fs24 showNextItem
+\f0\fs28  to produce a random number (this will need to be stored in an instance variable of the class); use this value to swap the prompted-for language depending on whether the random value is even or odd. That is, if the value is odd, prompt with the second-language value and test the response for the first-language value, and do the opposite if the value is even. The 
+\f4\fs24 solve:
+\f0\fs28  method will also need to be changed to test for the correct half of the lexical item and to show the correct solution in the feedback field.\
+2.	Set up a new checkbox in the preferences window so the user can switch between systematic and random language prompts, and add a key for the new preference to 
+\f2\fs24 defaults.h
+\f0\fs28 . Obtain the default value for this preference in the quiz controller\'d5s 
+\f4\fs24 windowDidLoad
+\f0\fs28  method so that it is only loaded once for each quiz. Update the checkboxes for the Preferences window in that window\'d5s 
+\f4\fs24 windowDidLoad
+\f0\fs28  method using the current set of values in the defaults database.\
+\pard\pardeftab720\li360\fi-360\sl-280\sa120\ql\qnatural
+\cf0 \
+}

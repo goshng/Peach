@@ -1,0 +1,35 @@
+// English language strings for XQuizIt
+// "KEY" = "VALUE" format
+
+// DDVLexiconModel initialization strings
+"Native Language" = "Some Language";
+"Foreign Language" = "Andere Sprache";
+"Topic Header" = "Topic";
+// DDVLexItem initialization strings
+"Native Word" = "A Word";
+"Foreign Word" = "Ein Wort";
+"No Topic" = "None";
+// Error messages from fullscreen quiz
+"Capture Error" = "Unable to capture the main display";
+"Release Error" = "Unable to release the display(s)";
+// Error in DDVSearchFieldFormatter
+"Formatter Error" = "Error in DDVSearchFieldFormatter";
+// Toolbar Item Labels
+"Insert Item" = "Insert Item";
+"Delete Item" = "Delete Item";
+"Export Data" = "Export Data";
+"Start Quiz" = "Start Quiz";
+"Search Data" = "Search Data";
+"Topic Drawer" = "Topic Drawer";
+// Selection status message for status bar (main window controller, awakeFromNib)
+"Selection Status" = "%d of %d selected";
+// Window title for inspector window
+"Inspector Title" = "XQuizIt Selection: ";
+// Placeholder string for "blank" topic table entries
+"Empty" = "<Empty>";
+// Menu strings for Undo manager actions in indexed accessors (main window controller)
+"Insert Item" = "Insert Item";
+"Delete Item" = "Delete Item";
+"Edit" = "Edit";
+// For enumerating pages in MMPrintView
+"Page" = "Page";

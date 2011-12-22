@@ -1,0 +1,48 @@
+VocableTrainerX
+---------------
+$Name:  $
+$Revision: 1.10 $
+$Date: 2005/05/10 15:00:53 $
+
+Author: Michael Meer (michael.meer@gmx.ch)
+
+Why was this program made?
+--------------------------
+VocableTrainerX is intended to be an easy program to learn vocables of an foreign language. I'm learning Indonesian in my university and have to learn a lot of new words. Because I also want to learn Objective-C and the Cocoa Framework it's an ideal combination to write this little software. I hope it might be useful for somebody else too!
+
+Requirements
+------------
+It runs under Mac OS X 10.3. Probably it won't run under any previous version of OS X.
+
+What does it do?
+----------------
+When you start a new document, you'll have to enter the two languages to which the vocables belong. Then you get to the main screen and can enter new vocables.
+You do this by pressing the "Add New Vocable" Button. It adds a random word to table of vocables, just go and edit it right in the table. Doubleclick the first field and enter a word, when you're done just press TAB to get to the next field.
+There are fields for both the first and second language of a word and the lesson in which this word appears. The last two fields R and T are not editable. They stand for how many times you had to guess the word in Quiz yet (T) and how many times you got that word right (R).
+You can delete vocables or switch their language.
+So far you just entered vocables but didn't learn them... We do this by pressing the "Start Quiz" Button. You have to select the lessons which have to be included in the quiz or if you want to be asked about all vocables you entered that far. In the Options Tab you can specify in which language you want to be tested.
+Then it starts: you'll see a screen with one word in either the first or second language and you have to imagine what it means in the other language (you don't have to enter that, just think of it). Press RETURN or the "Solve" Button to see the solution. If you had it right press r or the "Right Guess" Button, otherwise press w or the "Wrong Guess" Button.
+If you answered all the questions once, you'll be able to choose if you want to repeat the vocables you didn't knew or if you want to quit quiz.
+That's all you need to know :-)
+
+Keyboard shortcuts
+------------------
+Main Window:	- Backspace / Delete to delete vocables
+                - Q to start a quiz
+
+Quiz Window:	- Tabulator to switch between buttons
+                - Space to press a button
+                - R for Right guess button
+                - W for Wrong guess button
+                
+Still to do
+-----------
+- Import from CSV-File
+                
+Feedback
+--------
+VocableTrainerX is my small pet-project and so far it does everything i need. I hope you like it too! If not, please tell me what's missing or to-be-fixed!
+
+
+With best regards,
+Mike

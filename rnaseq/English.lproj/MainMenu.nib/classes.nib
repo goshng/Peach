@@ -1,0 +1,30 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                categorize = id; 
+                deleteLexItem = id; 
+                exportCSV = id; 
+                importCSV = id; 
+                insertLexItem = id; 
+                openSettingsPanel = id; 
+                resetScores = id; 
+                selectNone = id; 
+                showInspector = id; 
+                showPreferences = id; 
+                swapLanguages = id; 
+                toggleTopicsDrawer = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {openNewDocument = id; }; 
+            CLASS = MMAppController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
