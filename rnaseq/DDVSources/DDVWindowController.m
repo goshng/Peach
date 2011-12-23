@@ -78,6 +78,8 @@
 	[ toolbarSearchField setDelegate: nil ];
 	[ self setLexiconArray: nil ];
 	[ super dealloc ];
+  
+  end_R();
 }
 
 - ( void ) awakeFromNib
@@ -314,6 +316,15 @@
 	
 	NSArray *arr = [ lexiconController arrangedObjects ];
 	NSArray *sel = [ lexiconController selectedObjects ];
+  
+  int arrayCount = [arr count];
+  NSAutoreleasePool *pool =  [[NSAutoreleasePool alloc] init];
+  for (int i = 0; i < arrayCount; i++) {
+    NSLog([[arr objectAtIndex:i] firstL]);
+    NSLog([[arr objectAtIndex:i] secondL]);
+  }
+  [pool release];
+  return;
 	
 	// Quiz includes only selected items or else all items in document if no prior selection exists
 	if ( [ sel count ] == 0 )
@@ -585,91 +596,105 @@
 
   PROTECT(e = lang1(install("foo")));
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
-//  fprintf(stderr, "Trying again (yes it will fail also!)\n");fflush(stderr);
-//  R_tryEval(e, R_GlobalEnv, &errorOccurred);
   UNPROTECT(1);
-
-//  end_R();
+  
+  // Prepares an R script to perform DE.
+  // Parses the resulting output file.  
 }
 
 // Takes all of the RNA-seq samples and maps them on a reference genome.
 - ( IBAction ) mapSamples: ( id ) sender
 {
   NSLog(@"Run BWA");
-  NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
-  NSString *bwaDir = 
+  
+  NSArray *arr = [ lexiconController arrangedObjects ];
+//	NSArray *sel = [ lexiconController selectedObjects ];
+  
+  int arrayCount = [arr count];
+  NSAutoreleasePool *pool =  [[NSAutoreleasePool alloc] init];
+  for (int i = 0; i < arrayCount; i++) {
+    int fastqNumber = [[[arr objectAtIndex:i] firstL] integerValue];
+    NSString* gzipfile = [[arr objectAtIndex:i] secondL];
+    NSLog([NSString stringWithFormat:@"%03d %@", fastqNumber, gzipfile]);
+    
+    // Some global preferences.
+    NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
+    NSString *bwaDir = 
     [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
-  NSString *bwa = @"bin/bwa";
-  NSString *samtools = @"bin/samtools";
-  NSString *referenceGenome = @"NC_004350.fna";
-  
-  NSString *gzipfile = @"/Volumes/Elements/Documents/Projects/rnaseq/data/smutans/FASTQ01.subsample-100.gz";
-  
-  // bwa aln
-  NSString *commandBwaIndex = 
+    NSString *bwa = @"bin/bwa";
+    NSString *samtools = @"bin/samtools";
+    NSString *referenceGenome = @"NC_004350.fna";
+    
+//    NSString *gzipfile = @"/Volumes/Elements/Documents/Projects/rnaseq/data/smutans/FASTQ01.subsample-100.gz";
+    
+    // bwa aln
+    NSString *commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ aln -I -t 2 %@/output/project/%@-bwa %@ > %@/output/project/FASTQ%d.sai", 
-     baseDir, bwa, bwaDir, referenceGenome, gzipfile, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-  
-  // bwa samse
-  commandBwaIndex = 
+     baseDir, bwa, bwaDir, referenceGenome, gzipfile, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // bwa samse
+    commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ samse -n 1 -f %@/output/project/FASTQ%d.sam %@/output/project/%@-bwa %@/output/project/FASTQ%d.sai %@", 
-     baseDir, bwa, bwaDir, 1, bwaDir, referenceGenome, bwaDir, 1, gzipfile];
-//  system([commandBwaIndex UTF8String]);
-
-  // samtools view -bS
-  commandBwaIndex = 
+     baseDir, bwa, bwaDir, fastqNumber, bwaDir, referenceGenome, bwaDir, fastqNumber, gzipfile];
+    system([commandBwaIndex UTF8String]);
+    
+    // samtools view -bS
+    commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ view -bS -o %@/output/project/FASTQ%d.bam %@/output/project/FASTQ%d.sam", 
-     baseDir, samtools, bwaDir, 1, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-
-  // samtools sort
-  commandBwaIndex = 
+     baseDir, samtools, bwaDir, fastqNumber, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // samtools sort
+    commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ sort %@/output/project/FASTQ%d.bam %@/output/project/FASTQ%d.sorted", 
-     baseDir, samtools, bwaDir, 1, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-  
-  // samtools mpileup -q 15
-  int readDepth = 300000;
-  commandBwaIndex = 
+     baseDir, samtools, bwaDir, fastqNumber, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // samtools mpileup -q 15
+    int readDepth = 300000;
+    commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ mpileup -q 15 -d %d -f %@/output/project/%@ %@/output/project/FASTQ%d.sorted.bam > %@/output/project/FASTQ%d.pileup", 
-     baseDir, samtools, readDepth, bwaDir, referenceGenome, bwaDir, 1, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-  
-  // perl pl/samtools-pileup.pl
-  commandBwaIndex = 
+     baseDir, samtools, readDepth, bwaDir, referenceGenome, bwaDir, fastqNumber, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // perl pl/samtools-pileup.pl
+    commandBwaIndex = 
     [NSString stringWithFormat:@"perl -I %@ %@/pl/samtools-pileup.pl wiggle -refgenome %@/output/project/%@ -in %@/output/project/FASTQ%d.pileup -out %@/output/project/FASTQ%d.wig", 
      baseDir, baseDir, bwaDir, referenceGenome, 
-     bwaDir, 1, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-
-  // samtools view and pl/bwa-summary.pl
-  commandBwaIndex = 
+     bwaDir, fastqNumber, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // samtools view and pl/bwa-summary.pl
+    commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ view %@/output/project/FASTQ%d.sorted.bam | perl -I %@ %@/pl/bwa-summary.pl pos > %@/output/project/FASTQ%d-sum.pos", 
-     baseDir, samtools, bwaDir, 1, baseDir, baseDir, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-
-  // samtools view and pl/bwa-summary.pl
-  NSString *gfffile = @"/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.gff";
-  commandBwaIndex = 
+     baseDir, samtools, bwaDir, fastqNumber, baseDir, baseDir, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // samtools view and pl/bwa-summary.pl
+    NSString *gfffile = @"/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.gff";
+    commandBwaIndex = 
     [NSString stringWithFormat:@"%@/%@ view %@/output/project/FASTQ%d.sorted.bam | perl -I %@ %@/pl/bwa-summary.pl rrna -gff %@ > %@/output/project/FASTQ%d-sum.rrna", 
-     baseDir, samtools, bwaDir, 1, baseDir, baseDir, gfffile, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-
-  // perl pl/feature-genome.pl
-  NSString *pttfile = @"/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.ptt";
-  NSString *featurefile = @"feature-genome.out-geneonly";
-  commandBwaIndex = 
+     baseDir, samtools, bwaDir, fastqNumber, baseDir, baseDir, gfffile, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    // perl pl/feature-genome.pl
+    NSString *pttfile = @"/Volumes/Elements/Documents/Projects/mauve/bacteria/Streptococcus_mutans_UA159_uid57947/NC_004350.ptt";
+    NSString *featurefile = @"feature-genome.out-geneonly";
+    commandBwaIndex = 
     [NSString stringWithFormat:@"perl -I %@ %@/pl/feature-genome.pl ptt2 -geneonly -in %@ -out %@/output/project/%@", 
      baseDir, baseDir, pttfile, bwaDir, featurefile];
-//  system([commandBwaIndex UTF8String]);
-  
-  commandBwaIndex = 
+    system([commandBwaIndex UTF8String]);
+    
+    commandBwaIndex = 
     [NSString stringWithFormat:@"perl -I %@ %@/pl/de-count.pl join -first -singlegenome -shortread %@/output/project/FASTQ%d-sum.pos -genepos %@/output/project/%@ -o %@/output/project/FASTQ%d.de", 
-     baseDir, baseDir, bwaDir, 1, bwaDir, featurefile, bwaDir, 1];
-//  system([commandBwaIndex UTF8String]);
-  
-  NSLog(commandBwaIndex);
+     baseDir, baseDir, bwaDir, fastqNumber, bwaDir, featurefile, bwaDir, fastqNumber];
+    system([commandBwaIndex UTF8String]);
+    
+    NSLog(commandBwaIndex);
+  }
+  [pool release];
+  return;
 }
 
 - ( IBAction ) findDEGenes: ( id ) sender
