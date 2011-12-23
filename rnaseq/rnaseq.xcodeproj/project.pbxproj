@@ -13,6 +13,20 @@
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		D0424E2614A2EDD2008A88F1 /* rnaseq_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */; };
+		D060038714A402D700A64659 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D060038614A402D700A64659 /* R.framework */; };
+		D060038B14A4033200A64659 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D060038A14A4033200A64659 /* Quartz.framework */; };
+		D06003E214A4036400A64659 /* ExceptionHandling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D06003E114A4036400A64659 /* ExceptionHandling.framework */; };
+		D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D06003E314A403C600A64659 /* libicucore.dylib */; };
+		D060936714A4007100A95B87 /* RegexKitLite.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936514A4007100A95B87 /* RegexKitLite.h */; };
+		D060936814A4007100A95B87 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936614A4007100A95B87 /* RegexKitLite.m */; };
+		D060937214A400B200A95B87 /* Rcallbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936A14A400B200A95B87 /* Rcallbacks.h */; };
+		D060937314A400B200A95B87 /* Rcallbacks.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936B14A400B200A95B87 /* Rcallbacks.m */; };
+		D060937414A400B200A95B87 /* REngine.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936C14A400B200A95B87 /* REngine.h */; };
+		D060937514A400B200A95B87 /* REngine.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936D14A400B200A95B87 /* REngine.m */; };
+		D060937614A400B200A95B87 /* Rinit.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936E14A400B200A95B87 /* Rinit.h */; };
+		D060937714A400B200A95B87 /* Rinit.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936F14A400B200A95B87 /* Rinit.m */; };
+		D060937814A400B200A95B87 /* RSEXP.h in Headers */ = {isa = PBXBuildFile; fileRef = D060937014A400B200A95B87 /* RSEXP.h */; };
+		D060937914A400B200A95B87 /* RSEXP.m in Sources */ = {isa = PBXBuildFile; fileRef = D060937114A400B200A95B87 /* RSEXP.m */; };
 		F00D30B907BD2F4A00B0A3D8 /* DDVLexiconModel.h in Headers */ = {isa = PBXBuildFile; fileRef = F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */; };
 		F00D30BA07BD2F4A00B0A3D8 /* DDVLexiconModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */; };
 		F057915E07BE83A80074A85F /* XQuizItApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = F057915D07BE83A80074A85F /* XQuizItApp.icns */; };
@@ -81,6 +95,20 @@
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* rnaseq.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rnaseq.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rnaseq_Prefix.pch; sourceTree = "<group>"; };
+		D060038614A402D700A64659 /* R.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = R.framework; path = /Library/Frameworks/R.framework; sourceTree = "<absolute>"; };
+		D060038A14A4033200A64659 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = /System/Library/Frameworks/Quartz.framework; sourceTree = "<absolute>"; };
+		D06003E114A4036400A64659 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = /System/Library/Frameworks/ExceptionHandling.framework; sourceTree = "<absolute>"; };
+		D06003E314A403C600A64659 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = /usr/lib/libicucore.dylib; sourceTree = "<absolute>"; };
+		D060936514A4007100A95B87 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
+		D060936614A4007100A95B87 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
+		D060936A14A400B200A95B87 /* Rcallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rcallbacks.h; sourceTree = "<group>"; };
+		D060936B14A400B200A95B87 /* Rcallbacks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rcallbacks.m; sourceTree = "<group>"; };
+		D060936C14A400B200A95B87 /* REngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REngine.h; sourceTree = "<group>"; };
+		D060936D14A400B200A95B87 /* REngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REngine.m; sourceTree = "<group>"; };
+		D060936E14A400B200A95B87 /* Rinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rinit.h; sourceTree = "<group>"; };
+		D060936F14A400B200A95B87 /* Rinit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rinit.m; sourceTree = "<group>"; };
+		D060937014A400B200A95B87 /* RSEXP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSEXP.h; sourceTree = "<group>"; };
+		D060937114A400B200A95B87 /* RSEXP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSEXP.m; sourceTree = "<group>"; };
 		F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVLexiconModel.h; path = DDVSources/DDVLexiconModel.h; sourceTree = "<group>"; };
 		F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVLexiconModel.m; path = DDVSources/DDVLexiconModel.m; sourceTree = "<group>"; };
 		F057915D07BE83A80074A85F /* XQuizItApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = XQuizItApp.icns; path = Graphics/XQuizItApp.icns; sourceTree = "<group>"; };
@@ -144,6 +172,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
+				D060038714A402D700A64659 /* R.framework in Frameworks */,
+				D060038B14A4033200A64659 /* Quartz.framework in Frameworks */,
+				D06003E214A4036400A64659 /* ExceptionHandling.framework in Frameworks */,
+				D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +185,9 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D06003E114A4036400A64659 /* ExceptionHandling.framework */,
+				D06003E314A403C600A64659 /* libicucore.dylib */,
+				D060038614A402D700A64659 /* R.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -161,6 +196,7 @@
 		1058C7A8FEA54F5311CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D060038A14A4033200A64659 /* Quartz.framework */,
 				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
 				2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */,
 			);
@@ -178,6 +214,8 @@
 		2A37F4AAFDCFA73011CA2CEA /* DrawerDocApp */ = {
 			isa = PBXGroup;
 			children = (
+				D060936914A400B200A95B87 /* REngine */,
+				D060936414A4007100A95B87 /* Regex Engine */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				F0F65A3F07BAAA0D006FD6ED /* Graphics */,
@@ -266,6 +304,30 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D060936414A4007100A95B87 /* Regex Engine */ = {
+			isa = PBXGroup;
+			children = (
+				D060936514A4007100A95B87 /* RegexKitLite.h */,
+				D060936614A4007100A95B87 /* RegexKitLite.m */,
+			);
+			name = "Regex Engine";
+			sourceTree = "<group>";
+		};
+		D060936914A400B200A95B87 /* REngine */ = {
+			isa = PBXGroup;
+			children = (
+				D060936A14A400B200A95B87 /* Rcallbacks.h */,
+				D060936B14A400B200A95B87 /* Rcallbacks.m */,
+				D060936C14A400B200A95B87 /* REngine.h */,
+				D060936D14A400B200A95B87 /* REngine.m */,
+				D060936E14A400B200A95B87 /* Rinit.h */,
+				D060936F14A400B200A95B87 /* Rinit.m */,
+				D060937014A400B200A95B87 /* RSEXP.h */,
+				D060937114A400B200A95B87 /* RSEXP.m */,
+			);
+			path = REngine;
+			sourceTree = "<group>";
+		};
 		F0F65A3F07BAAA0D006FD6ED /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
@@ -312,6 +374,11 @@
 				F0EE781C07D8F8C10018778D /* defaults.h in Headers */,
 				F087116A07DF4D28002FA7DA /* DDVQuizWindow.h in Headers */,
 				D0424E2614A2EDD2008A88F1 /* rnaseq_Prefix.pch in Headers */,
+				D060936714A4007100A95B87 /* RegexKitLite.h in Headers */,
+				D060937214A400B200A95B87 /* Rcallbacks.h in Headers */,
+				D060937414A400B200A95B87 /* REngine.h in Headers */,
+				D060937614A400B200A95B87 /* Rinit.h in Headers */,
+				D060937814A400B200A95B87 /* RSEXP.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +487,11 @@
 				F0D05ABF07CC17050057C477 /* DDVTopicTableView.m in Sources */,
 				F0EE776407D8EC9E0018778D /* DDVPrefsController.m in Sources */,
 				F087116B07DF4D28002FA7DA /* DDVQuizWindow.m in Sources */,
+				D060936814A4007100A95B87 /* RegexKitLite.m in Sources */,
+				D060937314A400B200A95B87 /* Rcallbacks.m in Sources */,
+				D060937514A400B200A95B87 /* REngine.m in Sources */,
+				D060937714A400B200A95B87 /* Rinit.m in Sources */,
+				D060937914A400B200A95B87 /* RSEXP.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

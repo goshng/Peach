@@ -610,7 +610,7 @@
   commandBwaIndex = 
     [NSString stringWithFormat:@"perl -I %@ %@/pl/de-count.pl join -first -singlegenome -shortread %@/output/project/FASTQ%d-sum.pos -genepos %@/output/project/%@ -o %@/output/project/FASTQ%d.de", 
      baseDir, baseDir, bwaDir, 1, bwaDir, featurefile, bwaDir, 1];
-  system([commandBwaIndex UTF8String]);
+//  system([commandBwaIndex UTF8String]);
   
   NSLog(commandBwaIndex);
 }
