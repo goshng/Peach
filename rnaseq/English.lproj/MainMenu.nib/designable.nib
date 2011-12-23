@@ -656,8 +656,7 @@
 								<object class="NSMenuItem" id="508968679">
 									<reference key="NSMenu" ref="217757986"/>
 									<string key="NSTitle">Find DE genes</string>
-									<string key="NSKeyEquiv">d</string>
-									<int key="NSKeyEquivModMask">1048576</int>
+									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="119500197"/>
 									<reference key="NSMixedImage" ref="1002575943"/>
@@ -681,6 +680,22 @@
 								<object class="NSMenuItem" id="347758189">
 									<reference key="NSMenu" ref="443330534"/>
 									<string key="NSTitle">R init</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="119500197"/>
+									<reference key="NSMixedImage" ref="1002575943"/>
+								</object>
+								<object class="NSMenuItem" id="99979795">
+									<reference key="NSMenu" ref="443330534"/>
+									<string key="NSTitle">BWA index genome</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="119500197"/>
+									<reference key="NSMixedImage" ref="1002575943"/>
+								</object>
+								<object class="NSMenuItem" id="989317627">
+									<reference key="NSMenu" ref="443330534"/>
+									<string key="NSTitle">Find DE genes</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="119500197"/>
@@ -1192,6 +1207,22 @@
 					</object>
 					<int key="connectionID">272</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">indexGenome:</string>
+						<reference key="source" ref="230600643"/>
+						<reference key="destination" ref="99979795"/>
+					</object>
+					<int key="connectionID">274</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">findDEGenes:</string>
+						<reference key="source" ref="230600643"/>
+						<reference key="destination" ref="989317627"/>
+					</object>
+					<int key="connectionID">276</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1656,8 +1687,8 @@
 							<reference ref="431907086"/>
 							<reference ref="267589373"/>
 							<reference ref="281965334"/>
-							<reference ref="508968679"/>
 							<reference ref="829965409"/>
+							<reference ref="508968679"/>
 						</object>
 						<reference key="parent" ref="601518741"/>
 					</object>
@@ -1716,6 +1747,8 @@
 							<reference ref="36248857"/>
 							<reference ref="272487757"/>
 							<reference ref="347758189"/>
+							<reference ref="99979795"/>
+							<reference ref="989317627"/>
 						</object>
 						<reference key="parent" ref="1013165703"/>
 					</object>
@@ -1772,6 +1805,16 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">271</int>
 						<reference key="object" ref="347758189"/>
+						<reference key="parent" ref="443330534"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">273</int>
+						<reference key="object" ref="99979795"/>
+						<reference key="parent" ref="443330534"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">275</int>
+						<reference key="object" ref="989317627"/>
 						<reference key="parent" ref="443330534"/>
 					</object>
 				</object>
@@ -1910,6 +1953,8 @@
 					<string>267.IBPluginDependency</string>
 					<string>269.IBPluginDependency</string>
 					<string>271.IBPluginDependency</string>
+					<string>273.IBPluginDependency</string>
+					<string>275.IBPluginDependency</string>
 					<string>29.IBEditorWindowLastContentRect</string>
 					<string>29.IBPluginDependency</string>
 					<string>29.ImportedFromIB2</string>
@@ -2059,7 +2104,7 @@
 					<string>{{626, 459}, {204, 183}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{701, 489}, {194, 153}}</string>
+					<string>{{701, 449}, {210, 193}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2076,6 +2121,8 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2135,7 +2182,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">272</int>
+			<int key="maxID">276</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

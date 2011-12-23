@@ -580,26 +580,22 @@
 
 - ( IBAction ) indexGenome: ( id ) sender
 {
-  NSLog(@"Run edgeR or DESeq");
-  SEXP e;
-  int errorOccurred;
+  NSLog(@"Index a reference genome");
+  NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
+  NSString *bwaDir = 
+  [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
+  NSString *bwa = @"bin/bwa";
+  NSString *referenceGenome = @"NC_004350.fna";
 
-  /*
-    Evaluates the two expressions:
-    source("error.R")
-    and then calls foo()  twice
-    where foo is defined in the file error.R
-  */
-  PROTECT(e = lang2(install("source"), mkString("/Users/goshng/error.R")));
-  R_tryEval(e, R_GlobalEnv, &errorOccurred);
-  UNPROTECT(1);
-
-  PROTECT(e = lang1(install("foo")));
-  R_tryEval(e, R_GlobalEnv, &errorOccurred);
-  UNPROTECT(1);
+  NSString *commandBwaIndex = 
+  [NSString stringWithFormat:@"cp %@/input/%@ %@/output/project", 
+   baseDir, referenceGenome, bwaDir];
+  system([commandBwaIndex UTF8String]);
   
-  // Prepares an R script to perform DE.
-  // Parses the resulting output file.  
+  commandBwaIndex = 
+  [NSString stringWithFormat:@"%@/%@ index -p %@/output/project/%@-bwa -a is %@/input/%@", 
+   baseDir, bwa, bwaDir, referenceGenome, baseDir, referenceGenome];
+  system([commandBwaIndex UTF8String]);
 }
 
 // Takes all of the RNA-seq samples and maps them on a reference genome.
@@ -697,18 +693,83 @@
   return;
 }
 
+
+
 - ( IBAction ) findDEGenes: ( id ) sender
 {
-  NSLog(@"Index a reference genome");
+  NSLog(@"Run edgeR or DESeq");
+  SEXP e;
+  int errorOccurred;
+  
+
+  // Some global preferences.
   NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
   NSString *bwaDir = 
   [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
   NSString *bwa = @"bin/bwa";
+  NSString *samtools = @"bin/samtools";
   NSString *referenceGenome = @"NC_004350.fna";
+  
+  //    NSString *gzipfile = @"/Volumes/Elements/Documents/Projects/rnaseq/data/smutans/FASTQ01.subsample-100.gz";
+  
+  // bwa aln
   NSString *commandBwaIndex = 
-  [NSString stringWithFormat:@"%@/%@ index -p %@/output/project/%@-bwa -a is %@/input/%@", 
-   baseDir, bwa, bwaDir, referenceGenome, baseDir, referenceGenome];
+    [NSString stringWithFormat:@"cut -f4 %@/output/project/feature-genome.out-geneonly > %@/output/project/1.de", 
+     bwaDir, bwaDir];
   system([commandBwaIndex UTF8String]);
+
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"paste %@/output/project/*.de > %@/output/project/count.txt", 
+     bwaDir, bwaDir];
+  system([commandBwaIndex UTF8String]);
+
+  commandBwaIndex = 
+    [NSString stringWithFormat:@"%@/output/project/count.txt.index", 
+     bwaDir];
+  [[NSFileManager defaultManager] createFileAtPath:commandBwaIndex contents:nil attributes:nil];  
+  
+  NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:commandBwaIndex];
+  NSString* space = @" ";
+  
+  NSArray *arr = [ lexiconController arrangedObjects ];
+  //	NSArray *sel = [ lexiconController selectedObjects ];
+  int arrayCount = [arr count];
+  NSAutoreleasePool *pool =  [[NSAutoreleasePool alloc] init];
+  for (int i = 0; i < arrayCount; i++) {
+//    int fastqNumber = [[[arr objectAtIndex:i] firstL] integerValue];
+    NSString* factor = [[arr objectAtIndex:i] topic];
+//    NSLog([NSString stringWithFormat:@"%03d %@", fastqNumber, factor]);
+    [fileHandle writeData:[factor dataUsingEncoding:NSUTF8StringEncoding]];
+    [fileHandle writeData:[space dataUsingEncoding:NSUTF8StringEncoding]];
+  }
+  space = @"\n";
+  [fileHandle writeData:[space dataUsingEncoding:NSUTF8StringEncoding]];
+  [fileHandle closeFile];
+  [pool release];  
+  
+  
+  
+  /*
+   Evaluates the two expressions:
+   source("error.R")
+   and then calls foo()  twice
+   where foo is defined in the file error.R
+   */
+  commandBwaIndex = 
+  [NSString stringWithFormat:@"%@/deseq-cornell.R", 
+   bwaDir];
+  
+  
+  PROTECT(e = lang2(install("source"), mkString([commandBwaIndex UTF8String])));
+  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+  UNPROTECT(1);
+  
+//  PROTECT(e = lang1(install("foo")));
+//  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+//  UNPROTECT(1);
+  
+  // Prepares an R script to perform DE.
+  // Parses the resulting output file.  
 }
 
 
