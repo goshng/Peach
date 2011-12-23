@@ -87,6 +87,7 @@
 - ( IBAction ) indexGenome: ( id ) sender;
 - ( IBAction ) mapSamples: ( id ) sender;
 - ( IBAction ) findDEGenes: ( id ) sender;
+- ( IBAction ) initializeR: ( id ) sender;
 
 #pragma mark еее IMPORT / EXPORT еее
 

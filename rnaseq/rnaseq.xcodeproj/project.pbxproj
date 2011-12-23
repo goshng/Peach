@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 42;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -19,14 +19,8 @@
 		D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D06003E314A403C600A64659 /* libicucore.dylib */; };
 		D060936714A4007100A95B87 /* RegexKitLite.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936514A4007100A95B87 /* RegexKitLite.h */; };
 		D060936814A4007100A95B87 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936614A4007100A95B87 /* RegexKitLite.m */; };
-		D060937214A400B200A95B87 /* Rcallbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936A14A400B200A95B87 /* Rcallbacks.h */; };
-		D060937314A400B200A95B87 /* Rcallbacks.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936B14A400B200A95B87 /* Rcallbacks.m */; };
-		D060937414A400B200A95B87 /* REngine.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936C14A400B200A95B87 /* REngine.h */; };
-		D060937514A400B200A95B87 /* REngine.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936D14A400B200A95B87 /* REngine.m */; };
-		D060937614A400B200A95B87 /* Rinit.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936E14A400B200A95B87 /* Rinit.h */; };
-		D060937714A400B200A95B87 /* Rinit.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936F14A400B200A95B87 /* Rinit.m */; };
-		D060937814A400B200A95B87 /* RSEXP.h in Headers */ = {isa = PBXBuildFile; fileRef = D060937014A400B200A95B87 /* RSEXP.h */; };
-		D060937914A400B200A95B87 /* RSEXP.m in Sources */ = {isa = PBXBuildFile; fileRef = D060937114A400B200A95B87 /* RSEXP.m */; };
+		D0FEC33014A41BAE00365FE7 /* embeddedRCall.c in Sources */ = {isa = PBXBuildFile; fileRef = D0FEC32E14A41BAE00365FE7 /* embeddedRCall.c */; };
+		D0FEC33114A41BAE00365FE7 /* embeddedRCall.h in Headers */ = {isa = PBXBuildFile; fileRef = D0FEC32F14A41BAE00365FE7 /* embeddedRCall.h */; };
 		F00D30B907BD2F4A00B0A3D8 /* DDVLexiconModel.h in Headers */ = {isa = PBXBuildFile; fileRef = F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */; };
 		F00D30BA07BD2F4A00B0A3D8 /* DDVLexiconModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */; };
 		F057915E07BE83A80074A85F /* XQuizItApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = F057915D07BE83A80074A85F /* XQuizItApp.icns */; };
@@ -101,14 +95,8 @@
 		D06003E314A403C600A64659 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = /usr/lib/libicucore.dylib; sourceTree = "<absolute>"; };
 		D060936514A4007100A95B87 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
 		D060936614A4007100A95B87 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
-		D060936A14A400B200A95B87 /* Rcallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rcallbacks.h; sourceTree = "<group>"; };
-		D060936B14A400B200A95B87 /* Rcallbacks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rcallbacks.m; sourceTree = "<group>"; };
-		D060936C14A400B200A95B87 /* REngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REngine.h; sourceTree = "<group>"; };
-		D060936D14A400B200A95B87 /* REngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REngine.m; sourceTree = "<group>"; };
-		D060936E14A400B200A95B87 /* Rinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rinit.h; sourceTree = "<group>"; };
-		D060936F14A400B200A95B87 /* Rinit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rinit.m; sourceTree = "<group>"; };
-		D060937014A400B200A95B87 /* RSEXP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSEXP.h; sourceTree = "<group>"; };
-		D060937114A400B200A95B87 /* RSEXP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSEXP.m; sourceTree = "<group>"; };
+		D0FEC32E14A41BAE00365FE7 /* embeddedRCall.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = embeddedRCall.c; sourceTree = "<group>"; };
+		D0FEC32F14A41BAE00365FE7 /* embeddedRCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = embeddedRCall.h; sourceTree = "<group>"; };
 		F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVLexiconModel.h; path = DDVSources/DDVLexiconModel.h; sourceTree = "<group>"; };
 		F00D30B807BD2F4A00B0A3D8 /* DDVLexiconModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DDVLexiconModel.m; path = DDVSources/DDVLexiconModel.m; sourceTree = "<group>"; };
 		F057915D07BE83A80074A85F /* XQuizItApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = XQuizItApp.icns; path = Graphics/XQuizItApp.icns; sourceTree = "<group>"; };
@@ -214,7 +202,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* DrawerDocApp */ = {
 			isa = PBXGroup;
 			children = (
-				D060936914A400B200A95B87 /* REngine */,
+				D0FEC32D14A41BAE00365FE7 /* Embedding */,
 				D060936414A4007100A95B87 /* Regex Engine */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
@@ -313,19 +301,13 @@
 			name = "Regex Engine";
 			sourceTree = "<group>";
 		};
-		D060936914A400B200A95B87 /* REngine */ = {
+		D0FEC32D14A41BAE00365FE7 /* Embedding */ = {
 			isa = PBXGroup;
 			children = (
-				D060936A14A400B200A95B87 /* Rcallbacks.h */,
-				D060936B14A400B200A95B87 /* Rcallbacks.m */,
-				D060936C14A400B200A95B87 /* REngine.h */,
-				D060936D14A400B200A95B87 /* REngine.m */,
-				D060936E14A400B200A95B87 /* Rinit.h */,
-				D060936F14A400B200A95B87 /* Rinit.m */,
-				D060937014A400B200A95B87 /* RSEXP.h */,
-				D060937114A400B200A95B87 /* RSEXP.m */,
+				D0FEC32E14A41BAE00365FE7 /* embeddedRCall.c */,
+				D0FEC32F14A41BAE00365FE7 /* embeddedRCall.h */,
 			);
-			path = REngine;
+			path = Embedding;
 			sourceTree = "<group>";
 		};
 		F0F65A3F07BAAA0D006FD6ED /* Graphics */ = {
@@ -375,10 +357,7 @@
 				F087116A07DF4D28002FA7DA /* DDVQuizWindow.h in Headers */,
 				D0424E2614A2EDD2008A88F1 /* rnaseq_Prefix.pch in Headers */,
 				D060936714A4007100A95B87 /* RegexKitLite.h in Headers */,
-				D060937214A400B200A95B87 /* Rcallbacks.h in Headers */,
-				D060937414A400B200A95B87 /* REngine.h in Headers */,
-				D060937614A400B200A95B87 /* Rinit.h in Headers */,
-				D060937814A400B200A95B87 /* RSEXP.h in Headers */,
+				D0FEC33114A41BAE00365FE7 /* embeddedRCall.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,7 +392,7 @@
 				ORGANIZATIONNAME = "Cornell University";
 			};
 			buildConfigurationList = D02E191514A2E02700177280 /* Build configuration list for PBXProject "rnaseq" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -488,10 +467,7 @@
 				F0EE776407D8EC9E0018778D /* DDVPrefsController.m in Sources */,
 				F087116B07DF4D28002FA7DA /* DDVQuizWindow.m in Sources */,
 				D060936814A4007100A95B87 /* RegexKitLite.m in Sources */,
-				D060937314A400B200A95B87 /* Rcallbacks.m in Sources */,
-				D060937514A400B200A95B87 /* REngine.m in Sources */,
-				D060937714A400B200A95B87 /* Rinit.m in Sources */,
-				D060937914A400B200A95B87 /* RSEXP.m in Sources */,
+				D0FEC33014A41BAE00365FE7 /* embeddedRCall.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,18 +544,47 @@
 		D02E18EF14A2E02700177280 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = USE_POOLS;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/R.framework/PrivateHeaders,
+					/Library/Frameworks/R.framework/Headers,
+				);
+				LD_RUNPATH_SEARCH_PATHS = "/Library/Frameworks @executable_path/../Frameworks";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				STRIP_INSTALLED_PRODUCT = NO;
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/R.framework/Headers /Library/Frameworks/R.framework/PrivateHeaders";
 			};
 			name = Development;
 		};
 		D02E18F014A2E02700177280 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/R.framework/PrivateHeaders,
+					/Library/Frameworks/R.framework/Headers,
+				);
+				LD_RUNPATH_SEARCH_PATHS = "/Library/Frameworks @executable_path/../Frameworks";
+				STRIP_INSTALLED_PRODUCT = NO;
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/R.framework/Headers /Library/Frameworks/R.framework/PrivateHeaders";
 			};
 			name = Deployment;
 		};
 		D02E18F114A2E02700177280 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/R.framework/PrivateHeaders,
+					/Library/Frameworks/R.framework/Headers,
+				);
+				LD_RUNPATH_SEARCH_PATHS = "/Library/Frameworks @executable_path/../Frameworks";
+				STRIP_INSTALLED_PRODUCT = NO;
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/R.framework/Headers /Library/Frameworks/R.framework/PrivateHeaders";
 			};
 			name = Default;
 		};

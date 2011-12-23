@@ -3,6 +3,9 @@
 
 //  Created by Daniel Stein on Wed Feb 09 2005.
 //  Copyright (c) 2005 DelDotVee. All rights reserved.
+#include <stdlib.h>
+#include "../Embedding/embeddedRCall.h"
+#include <R_ext/Parse.h>
 
 #import "DDVWindowController.h"
 #import "DDVLexiconController.h"
@@ -28,6 +31,44 @@
 		lexiconArray = [ [ NSMutableArray alloc ] init ];
 		[ self setShouldCloseDocument: YES ];   // Close entire document if main window closes
 	}
+  
+  // BEGIN: R Initialization
+  setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
+  setenv("R_VERSION", "2.14.0", 1);
+  setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
+  setenv("R_PDFVIEWER", "/usr/bin/open", 1);
+  setenv("BIBINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bib:", 1);
+  setenv("BSTINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bst:", 1);
+  setenv("SED", "/usr/bin/sed", 1);
+  setenv("R_INCLUDE_DIR", "/Library/Frameworks/R.framework/Resources/include", 1);
+  setenv("R_PRINTCMD", "lpr", 1);
+  setenv("R_RD4DVI", "ae", 1);
+  setenv("R_SYSTEM_ABI", "osx,gcc,gxx,gfortran,?", 1);
+  setenv("R_RD4PDF", "times,inconsolata,hyper", 1);
+  setenv("R_PAPERSIZE", "letter", 1);
+  setenv("R_ZIPCMD", "/usr/bin/zip", 1);
+  setenv("PAGER", "/usr/bin/less", 1);
+  setenv("R_GZIPCMD", "/opt/local/bin/gzip", 1);
+  setenv("R_SHARE_DIR", "/Library/Frameworks/R.framework/Resources/share", 1);
+  setenv("R_OSTYPE", "unix", 1);
+  setenv("R_BROWSER", "/usr/bin/open", 1);
+  setenv("PERL5LIB", "/opt/local/lib/perl5/site_perl/5.12.3", 1);
+  setenv("R_CMD", "/Library/Frameworks/R.framework/Resources/bin/Rcmd", 1);
+  setenv("TEXINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex:", 1);
+  setenv("R_ARCH", "", 1);
+  setenv("MAKE", "make", 1);
+  setenv("R_PAPERSIZE_USER", "", 1);
+  setenv("DYLD_LIBRARY_PATH", "/Library/Frameworks/R.framework/Resources/lib", 1);
+  setenv("R_UNZIPCMD", "/usr/bin/unzip", 1);
+  setenv("R_BZIPCMD", "/opt/local/bin/bzip2", 1);
+  setenv("R_HOME", "/Library/Frameworks/R.framework/Resources", 1);
+  setenv("R_PLATFORM", "i386-apple-darwin10.8.0", 1);
+  setenv("R_LIBS_USER", "~/Library/R/2.14/library", 1);
+  setenv("R_DOC_DIR", "/Library/Frameworks/R.framework/Resources/doc", 1);  
+  char *localArgs[] = {"R", "--silent"};
+  init_R(sizeof(localArgs)/sizeof(localArgs[0]), localArgs); 
+  // END: R Initialization
+  
 	return self;
 }
 
@@ -521,18 +562,34 @@
   }
 }
 
+- ( IBAction ) initializeR: ( id ) sender
+{
+ 
+}
+
 - ( IBAction ) indexGenome: ( id ) sender
 {
-  NSLog(@"Index a reference genome");
-  NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
-  NSString *bwaDir = 
-    [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
-  NSString *bwa = @"bin/bwa";
-  NSString *referenceGenome = @"NC_004350.fna";
-  NSString *commandBwaIndex = 
-    [NSString stringWithFormat:@"%@/%@ index -p %@/output/project/%@-bwa -a is %@/input/%@", 
-     baseDir, bwa, bwaDir, referenceGenome, baseDir, referenceGenome];
-  system([commandBwaIndex UTF8String]);
+  NSLog(@"Run edgeR or DESeq");
+  SEXP e;
+  int errorOccurred;
+
+  /*
+    Evaluates the two expressions:
+    source("error.R")
+    and then calls foo()  twice
+    where foo is defined in the file error.R
+  */
+  PROTECT(e = lang2(install("source"), mkString("/Users/goshng/error.R")));
+  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+  UNPROTECT(1);
+
+  PROTECT(e = lang1(install("foo")));
+  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+//  fprintf(stderr, "Trying again (yes it will fail also!)\n");fflush(stderr);
+//  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+  UNPROTECT(1);
+
+//  end_R();
 }
 
 // Takes all of the RNA-seq samples and maps them on a reference genome.
@@ -617,7 +674,16 @@
 
 - ( IBAction ) findDEGenes: ( id ) sender
 {
-  NSLog(@"Run edgeR or DESeq");
+  NSLog(@"Index a reference genome");
+  NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
+  NSString *bwaDir = 
+  [NSString stringWithFormat:@"%@/output/dernaseq", baseDir];
+  NSString *bwa = @"bin/bwa";
+  NSString *referenceGenome = @"NC_004350.fna";
+  NSString *commandBwaIndex = 
+  [NSString stringWithFormat:@"%@/%@ index -p %@/output/project/%@-bwa -a is %@/input/%@", 
+   baseDir, bwa, bwaDir, referenceGenome, baseDir, referenceGenome];
+  system([commandBwaIndex UTF8String]);
 }
 
 
