@@ -1,1 +1,8 @@
-wget http://software.rc.fas.harvard.edu/mirrors/R/src/base/R-2/R-2.14.0.tar.gz
+#!/bin/sh
+mkdir downloads
+cd downloads
+
+# wget http://software.rc.fas.harvard.edu/mirrors/R/src/base/R-2/R-2.14.1.tar.gz
+mkdir build
+cd build
+tar zxf ../R-
