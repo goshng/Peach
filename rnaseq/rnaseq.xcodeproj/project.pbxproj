@@ -19,6 +19,8 @@
 		D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D06003E314A403C600A64659 /* libicucore.dylib */; };
 		D060936714A4007100A95B87 /* RegexKitLite.h in Headers */ = {isa = PBXBuildFile; fileRef = D060936514A4007100A95B87 /* RegexKitLite.h */; };
 		D060936814A4007100A95B87 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = D060936614A4007100A95B87 /* RegexKitLite.m */; };
+		D0E8F44214A66C7F00FF6ECF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E8F44114A66C7F00FF6ECF /* WebKit.framework */; };
+		D0E8F44414A66C9800FF6ECF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E8F44314A66C9800FF6ECF /* Security.framework */; };
 		D0FEC33014A41BAE00365FE7 /* embeddedRCall.c in Sources */ = {isa = PBXBuildFile; fileRef = D0FEC32E14A41BAE00365FE7 /* embeddedRCall.c */; };
 		D0FEC33114A41BAE00365FE7 /* embeddedRCall.h in Headers */ = {isa = PBXBuildFile; fileRef = D0FEC32F14A41BAE00365FE7 /* embeddedRCall.h */; };
 		F00D30B907BD2F4A00B0A3D8 /* DDVLexiconModel.h in Headers */ = {isa = PBXBuildFile; fileRef = F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */; };
@@ -95,6 +97,8 @@
 		D06003E314A403C600A64659 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = /usr/lib/libicucore.dylib; sourceTree = "<absolute>"; };
 		D060936514A4007100A95B87 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
 		D060936614A4007100A95B87 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
+		D0E8F44114A66C7F00FF6ECF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		D0E8F44314A66C9800FF6ECF /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		D0FEC32E14A41BAE00365FE7 /* embeddedRCall.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = embeddedRCall.c; sourceTree = "<group>"; };
 		D0FEC32F14A41BAE00365FE7 /* embeddedRCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = embeddedRCall.h; sourceTree = "<group>"; };
 		F00D30B707BD2F4A00B0A3D8 /* DDVLexiconModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DDVLexiconModel.h; path = DDVSources/DDVLexiconModel.h; sourceTree = "<group>"; };
@@ -164,6 +168,8 @@
 				D060038B14A4033200A64659 /* Quartz.framework in Frameworks */,
 				D06003E214A4036400A64659 /* ExceptionHandling.framework in Frameworks */,
 				D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */,
+				D0E8F44214A66C7F00FF6ECF /* WebKit.framework in Frameworks */,
+				D0E8F44414A66C9800FF6ECF /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,6 +183,8 @@
 				D06003E314A403C600A64659 /* libicucore.dylib */,
 				D060038614A402D700A64659 /* R.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
+				D0E8F44114A66C7F00FF6ECF /* WebKit.framework */,
+				D0E8F44314A66C9800FF6ECF /* Security.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";

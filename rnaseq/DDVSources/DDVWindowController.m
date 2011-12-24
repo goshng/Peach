@@ -4,8 +4,11 @@
 //  Created by Daniel Stein on Wed Feb 09 2005.
 //  Copyright (c) 2005 DelDotVee. All rights reserved.
 #include <stdlib.h>
+#include <Rembedded.h>
 #include "../Embedding/embeddedRCall.h"
 #include <R_ext/Parse.h>
+#include <R.h>
+#include <Rinternals.h>
 
 #import "DDVWindowController.h"
 #import "DDVLexiconController.h"
@@ -33,41 +36,40 @@
 	}
   
 //  // BEGIN: R Initialization
-//  setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
-////  setenv("R_VERSION", "2.14.0", 1);
-//  setenv("R_VERSION", "2.13.0", 1);
-//  setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
-//  setenv("R_PDFVIEWER", "/usr/bin/open", 1);
-//  setenv("BIBINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bib:", 1);
-//  setenv("BSTINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bst:", 1);
-//  setenv("SED", "/usr/bin/sed", 1);
-//  setenv("R_INCLUDE_DIR", "/Library/Frameworks/R.framework/Resources/include", 1);
-//  setenv("R_PRINTCMD", "lpr", 1);
-//  setenv("R_RD4DVI", "ae", 1);
-//  setenv("R_SYSTEM_ABI", "osx,gcc,gxx,gfortran,?", 1);
-//  setenv("R_RD4PDF", "times,inconsolata,hyper", 1);
-//  setenv("R_PAPERSIZE", "letter", 1);
-//  setenv("R_ZIPCMD", "/usr/bin/zip", 1);
-//  setenv("PAGER", "/usr/bin/less", 1);
-//  setenv("R_GZIPCMD", "/opt/local/bin/gzip", 1);
-//  setenv("R_SHARE_DIR", "/Library/Frameworks/R.framework/Resources/share", 1);
-//  setenv("R_OSTYPE", "unix", 1);
-//  setenv("R_BROWSER", "/usr/bin/open", 1);
-//  setenv("PERL5LIB", "/opt/local/lib/perl5/site_perl/5.12.3", 1);
-//  setenv("R_CMD", "/Library/Frameworks/R.framework/Resources/bin/Rcmd", 1);
-//  setenv("TEXINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex:", 1);
-//  setenv("R_ARCH", "", 1);
-//  setenv("MAKE", "make", 1);
-//  setenv("R_PAPERSIZE_USER", "", 1);
-//  setenv("DYLD_LIBRARY_PATH", "/Library/Frameworks/R.framework/Resources/lib", 1);
-//  setenv("R_UNZIPCMD", "/usr/bin/unzip", 1);
-//  setenv("R_BZIPCMD", "/opt/local/bin/bzip2", 1);
-//  setenv("R_HOME", "/Library/Frameworks/R.framework/Resources", 1);
+  setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
+  setenv("R_VERSION", "2.14.0", 1);
+  setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
+  setenv("R_PDFVIEWER", "/usr/bin/open", 1);
+  setenv("BIBINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bib:", 1);
+  setenv("BSTINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bst:", 1);
+  setenv("SED", "/usr/bin/sed", 1);
+  setenv("R_INCLUDE_DIR", "/Library/Frameworks/R.framework/Resources/include", 1);
+  setenv("R_PRINTCMD", "lpr", 1);
+  setenv("R_RD4DVI", "ae", 1);
+  setenv("R_SYSTEM_ABI", "osx,gcc,gxx,gfortran,?", 1);
+  setenv("R_RD4PDF", "times,inconsolata,hyper", 1);
+  setenv("R_PAPERSIZE", "letter", 1);
+  setenv("R_ZIPCMD", "/usr/bin/zip", 1);
+  setenv("PAGER", "/usr/bin/less", 1);
+  setenv("R_GZIPCMD", "/opt/local/bin/gzip", 1);
+  setenv("R_SHARE_DIR", "/Library/Frameworks/R.framework/Resources/share", 1);
+  setenv("R_OSTYPE", "unix", 1);
+  setenv("R_BROWSER", "/usr/bin/open", 1);
+  setenv("PERL5LIB", "/opt/local/lib/perl5/site_perl/5.12.3", 1);
+  setenv("R_CMD", "/Library/Frameworks/R.framework/Resources/bin/Rcmd", 1);
+  setenv("TEXINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex:", 1);
+  setenv("R_ARCH", "", 1);
+  setenv("MAKE", "make", 1);
+  setenv("R_PAPERSIZE_USER", "", 1);
+  setenv("LD_LIBRARY_PATH", "/usr/lib:/usr/local/lib:/opt/local/lib:/Library/Frameworks/R.framework/Resources/lib", 1);
+  setenv("DYLD_LIBRARY_PATH", "/usr/lib:/usr/local/lib:/opt/local/lib:/Library/Frameworks/R.framework/Resources/lib", 1);
+  setenv("R_UNZIPCMD", "/usr/bin/unzip", 1);
+  setenv("R_BZIPCMD", "/opt/local/bin/bzip2", 1);
+  setenv("R_HOME", "/Library/Frameworks/R.framework/Resources", 1);
 //  setenv("R_PLATFORM", "x86_64-apple-darwin10.8.0", 1);
-////  setenv("R_PLATFORM", "i386-apple-darwin10.8.0", 1);
-//  setenv("R_LIBS_USER", "~/Library/R/2.14/library", 1);
-////  setenv("R_LIBS_USER", "~/Library/R/2.11/library", 1);
-//  setenv("R_DOC_DIR", "/Library/Frameworks/R.framework/Resources/doc", 1);
+  setenv("R_PLATFORM", "i386-apple-darwin10.8.0", 1);
+  setenv("R_LIBS_USER", "~/Library/R/2.14/library", 1);
+  setenv("R_DOC_DIR", "/Library/Frameworks/R.framework/Resources/doc", 1);
   
   if (!getenv("R_HOME")) {
     NSString* lastInitRError = @"R_HOME is not set. Please set all required environment variables before running this program. You have to exit the program because this program will not work with R packages.";
@@ -76,15 +78,40 @@
     [alert runModal];
     return self;
   }
+  else
+  {
+    NSString* lastinitRError = [NSString stringWithUTF8String:getenv("R_HOME")];
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:lastinitRError];
+    [alert runModal];
+  }
   
-//  int stat=Rf_initialize_R(argc, argv);
+  // This made it worked! This seems to be essential: "--no-save", 
+//  char *localArgs[]={ "R", "--silent", "--no-save", "--no-restore-data", "--gui=none"};  // WORKED VERSION!
+  char *localArgs[]={"R", "--no-save"};
+  
+//  char *localArgs[] = {"R", "--gui=none", "--silent"};
+//  int stat=Rf_initialize_R(sizeof(localArgs)/sizeof(localArgs[0]), localArgs);
 //  if (stat<0) {
-//    lastInitRError = "Failed to initialize R!";;
-//    return -2;
+//    NSString* commandBwaIndex = 
+//    [NSString stringWithFormat:@"Error # from Rf_initialize_R: %d",stat];
+//    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+//    [alert setMessageText:commandBwaIndex];
+//    [alert runModal];
+//    return self;
 //  }
+////  Rf_mainloop();
   
-  char *localArgs[] = {"R", "--silent"};
+//  char *localArgs[] = {"R", "--silent"};
   init_R(sizeof(localArgs)/sizeof(localArgs[0]), localArgs);
+  
+  {
+    NSString* lastinitRError = [NSString stringWithUTF8String:getenv("LD_LIBRARY_PATH")];
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:lastinitRError];
+    [alert runModal];
+  }
+  
   // END: R Initialization
   
 	return self;
@@ -718,7 +745,15 @@
   NSLog(@"Run edgeR or DESeq");
   SEXP e;
   int errorOccurred;
+  NSString* testRFile = 
+  [NSString stringWithFormat:@"/Users/goshng/error.R"];
   
+  
+  PROTECT(e = lang2(install("source"), mkString([testRFile UTF8String])));
+  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+  UNPROTECT(1);
+  
+  return;
 
   // Some global preferences.
   NSString *baseDir = @"/Users/goshng/Documents/Projects/RNASeq-Analysis";
