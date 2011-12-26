@@ -1,8 +1,38 @@
 #!/bin/sh
+BASE=`pwd`
+PKGDIR=$BASE/package
+mkdir package
 mkdir downloads
 cd downloads
 
 # wget http://software.rc.fas.harvard.edu/mirrors/R/src/base/R-2/R-2.14.1.tar.gz
 mkdir build
 cd build
-tar zxf ../R-
+BUILDDIR=`pwd`
+
+# bwa-0.6.1.tar.bz2
+# samtools-0.1.18.tar.bz2
+# cutadapt-1.0.tar.gz
+BWADIST=bwa-0.6.1
+tar jxf ../$BWADIST.tar.bz2 
+cd $BWADIST
+make > /dev/null
+cp bwa $PKGDIR
+echo Created bwa in $PKGDIR
+
+cd $BUILDDIR
+STDIST=samtools-0.1.18
+tar jxf ../$STDIST.tar.bz2 
+cd $STDIST
+make > /dev/null
+cp samtools $PKGDIR
+echo Created samtools in $PKGDIR
+
+cd $BUILDDIR
+CUTDIST=cutadapt-1.0
+tar zxf ../$CUTDIST.tar.gz
+cd $CUTDIST
+python setup.py build > /dev/null
+sudo python setup.py install > /dev/null
+echo Created /usr/local/bin/cutadapt
+

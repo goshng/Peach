@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd /usr/bin
+rm -rf rnaseqbwa rnaseqsamtools
+ln -s /Applications/rnaseq.app/Others/bwa rnaseqbwa
+ln -s /Applications/rnaseq.app/Others/samtools rnaseqsamtools
+cd /Applications/rnaseq.app/Others
+tar zxf cutadapt-1.0.tar.gz
+cd cutadapt-1.0
+python setup.py build
+python setup.py install
+

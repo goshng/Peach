@@ -40,10 +40,10 @@
   setenv("R_VERSION", "2.14.0", 1);
   setenv("R_TEXI2DVICMD", "/opt/local/bin/texi2dvi", 1);
   setenv("R_PDFVIEWER", "/usr/bin/open", 1);
-  setenv("BIBINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bib:", 1);
-  setenv("BSTINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/bibtex/bst:", 1);
+  setenv("BIBINPUTS", ".:/Library/Frameworks/RNAseq.framework/Resources/share/texmf/bibtex/bib:", 1);
+  setenv("BSTINPUTS", ".:/Library/Frameworks/RNAseq.framework/Resources/share/texmf/bibtex/bst:", 1);
   setenv("SED", "/usr/bin/sed", 1);
-  setenv("R_INCLUDE_DIR", "/Library/Frameworks/R.framework/Resources/include", 1);
+  setenv("R_INCLUDE_DIR", "/Library/Frameworks/RNAseq.framework/Resources/include", 1);
   setenv("R_PRINTCMD", "lpr", 1);
   setenv("R_RD4DVI", "ae", 1);
   setenv("R_SYSTEM_ABI", "osx,gcc,gxx,gfortran,?", 1);
@@ -52,24 +52,24 @@
   setenv("R_ZIPCMD", "/usr/bin/zip", 1);
   setenv("PAGER", "/usr/bin/less", 1);
   setenv("R_GZIPCMD", "/opt/local/bin/gzip", 1);
-  setenv("R_SHARE_DIR", "/Library/Frameworks/R.framework/Resources/share", 1);
+  setenv("R_SHARE_DIR", "/Library/Frameworks/RNAseq.framework/Resources/share", 1);
   setenv("R_OSTYPE", "unix", 1);
   setenv("R_BROWSER", "/usr/bin/open", 1);
   setenv("PERL5LIB", "/opt/local/lib/perl5/site_perl/5.12.3", 1);
-  setenv("R_CMD", "/Library/Frameworks/R.framework/Resources/bin/Rcmd", 1);
-  setenv("TEXINPUTS", ".:/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex:", 1);
+  setenv("R_CMD", "/Library/Frameworks/RNAseq.framework/Resources/bin/Rcmd", 1);
+  setenv("TEXINPUTS", ".:/Library/Frameworks/RNAseq.framework/Resources/share/texmf/tex/latex:", 1);
   setenv("R_ARCH", "", 1);
   setenv("MAKE", "make", 1);
   setenv("R_PAPERSIZE_USER", "", 1);
-  setenv("LD_LIBRARY_PATH", "/usr/lib:/usr/local/lib:/opt/local/lib:/Library/Frameworks/R.framework/Resources/lib", 1);
-  setenv("DYLD_LIBRARY_PATH", "/usr/lib:/usr/local/lib:/opt/local/lib:/Library/Frameworks/R.framework/Resources/lib", 1);
+  setenv("LD_LIBRARY_PATH", "/usr/lib:/usr/local/lib:/opt/local/lib:/Library/Frameworks/RNAseq.framework/Resources/lib", 1);
+  setenv("DYLD_LIBRARY_PATH", "/usr/lib:/usr/local/lib:/opt/local/lib:/Library/Frameworks/RNAseq.framework/Resources/lib", 1);
   setenv("R_UNZIPCMD", "/usr/bin/unzip", 1);
   setenv("R_BZIPCMD", "/opt/local/bin/bzip2", 1);
-  setenv("R_HOME", "/Library/Frameworks/R.framework/Resources", 1);
+  setenv("R_HOME", "/Library/Frameworks/RNAseq.framework/Resources", 1);
 //  setenv("R_PLATFORM", "x86_64-apple-darwin10.8.0", 1);
   setenv("R_PLATFORM", "i386-apple-darwin10.8.0", 1);
   setenv("R_LIBS_USER", "~/Library/R/2.14/library", 1);
-  setenv("R_DOC_DIR", "/Library/Frameworks/R.framework/Resources/doc", 1);
+  setenv("R_DOC_DIR", "/Library/Frameworks/RNAseq.framework/Resources/doc", 1);
   
   if (!getenv("R_HOME")) {
     NSString* lastInitRError = @"R_HOME is not set. Please set all required environment variables before running this program. You have to exit the program because this program will not work with R packages.";

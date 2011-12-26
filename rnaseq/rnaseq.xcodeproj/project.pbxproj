@@ -13,7 +13,7 @@
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		D0424E2614A2EDD2008A88F1 /* rnaseq_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */; };
-		D060038714A402D700A64659 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D060038614A402D700A64659 /* R.framework */; };
+		D049A0BF14A85C4C00D71333 /* RNAseq.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D049A0BE14A85C4C00D71333 /* RNAseq.framework */; };
 		D060038B14A4033200A64659 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D060038A14A4033200A64659 /* Quartz.framework */; };
 		D06003E214A4036400A64659 /* ExceptionHandling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D06003E114A4036400A64659 /* ExceptionHandling.framework */; };
 		D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D06003E314A403C600A64659 /* libicucore.dylib */; };
@@ -91,7 +91,7 @@
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* rnaseq.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rnaseq.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0424E2514A2EDD2008A88F1 /* rnaseq_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rnaseq_Prefix.pch; sourceTree = "<group>"; };
-		D060038614A402D700A64659 /* R.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = R.framework; path = /Library/Frameworks/R.framework; sourceTree = "<absolute>"; };
+		D049A0BE14A85C4C00D71333 /* RNAseq.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RNAseq.framework; path = /Library/Frameworks/RNAseq.framework; sourceTree = "<absolute>"; };
 		D060038A14A4033200A64659 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = /System/Library/Frameworks/Quartz.framework; sourceTree = "<absolute>"; };
 		D06003E114A4036400A64659 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = /System/Library/Frameworks/ExceptionHandling.framework; sourceTree = "<absolute>"; };
 		D06003E314A403C600A64659 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = /usr/lib/libicucore.dylib; sourceTree = "<absolute>"; };
@@ -164,12 +164,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
-				D060038714A402D700A64659 /* R.framework in Frameworks */,
 				D060038B14A4033200A64659 /* Quartz.framework in Frameworks */,
 				D06003E214A4036400A64659 /* ExceptionHandling.framework in Frameworks */,
 				D06003E414A403C600A64659 /* libicucore.dylib in Frameworks */,
 				D0E8F44214A66C7F00FF6ECF /* WebKit.framework in Frameworks */,
 				D0E8F44414A66C9800FF6ECF /* Security.framework in Frameworks */,
+				D049A0BF14A85C4C00D71333 /* RNAseq.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,10 +181,10 @@
 			children = (
 				D06003E114A4036400A64659 /* ExceptionHandling.framework */,
 				D06003E314A403C600A64659 /* libicucore.dylib */,
-				D060038614A402D700A64659 /* R.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 				D0E8F44114A66C7F00FF6ECF /* WebKit.framework */,
 				D0E8F44314A66C9800FF6ECF /* Security.framework */,
+				D049A0BE14A85C4C00D71333 /* RNAseq.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -552,19 +552,23 @@
 		D02E18EF14A2E02700177280 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = USE_POOLS;
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/R.framework/PrivateHeaders,
-					/Library/Frameworks/R.framework/Headers,
+					/Library/Frameworks/RNAseq.framework/PrivateHeaders,
+					/Library/Frameworks/RNAseq.framework/Headers,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "/Library/Frameworks @executable_path/../Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					R,
+				);
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_INSTALLED_PRODUCT = NO;
-				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/R.framework/Headers /Library/Frameworks/R.framework/PrivateHeaders";
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/RNAseq.framework/Headers /Library/Frameworks/RNAseq.framework/PrivateHeaders";
 			};
 			name = Development;
 		};
@@ -573,12 +577,16 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/R.framework/PrivateHeaders,
-					/Library/Frameworks/R.framework/Headers,
+					/Library/Frameworks/RNAseq.framework/PrivateHeaders,
+					/Library/Frameworks/RNAseq.framework/Headers,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "/Library/Frameworks @executable_path/../Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					RNAseq,
+				);
 				STRIP_INSTALLED_PRODUCT = NO;
-				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/R.framework/Headers /Library/Frameworks/R.framework/PrivateHeaders";
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/RNAseq.framework/Headers /Library/Frameworks/RNAseq.framework/PrivateHeaders";
 			};
 			name = Deployment;
 		};
@@ -587,12 +595,16 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/R.framework/PrivateHeaders,
-					/Library/Frameworks/R.framework/Headers,
+					/Library/Frameworks/RNAseq.framework/PrivateHeaders,
+					/Library/Frameworks/RNAseq.framework/Headers,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "/Library/Frameworks @executable_path/../Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					RNAseq,
+				);
 				STRIP_INSTALLED_PRODUCT = NO;
-				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/R.framework/Headers /Library/Frameworks/R.framework/PrivateHeaders";
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/RNAseq.framework/Headers /Library/Frameworks/RNAseq.framework/PrivateHeaders";
 			};
 			name = Default;
 		};
@@ -623,7 +635,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					R,
+					RNAseq,
 				);
 				PRODUCT_NAME = rnaseq;
 				SECTORDER_FLAGS = "";
@@ -662,7 +674,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					R,
+					RNAseq,
 				);
 				PRODUCT_NAME = rnaseq;
 				SECTORDER_FLAGS = "";
@@ -699,7 +711,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					R,
+					RNAseq,
 				);
 				PRODUCT_NAME = rnaseq;
 				SECTORDER_FLAGS = "";
