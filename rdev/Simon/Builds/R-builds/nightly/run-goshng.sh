@@ -1,3 +1,49 @@
+RD=R-2.14.0
+# wget http://software.rc.fas.harvard.edu/mirrors/R/src/base/R-2/$RD.tar.gz
+# tar zxf $RD.tar.gz
+# rm $RD.tar.gz
+
+# make
+#sudo rm -rf snowleopard-ppc snowleopard-i386 snowleopard-x86_64 snowleopard-universal
+#cp R/Makeconf.in $RD
+#./buildR R-2.14.0 ppc snowleopard-ppc
+#./buildR R-2.14.0 i386 snowleopard-i386
+#./buildR R-2.14.0 x86_64 snowleopard-x86_64
+
+#for TARGET in snowleopard-ppc snowleopard-i386 snowleopard-x86_64; do
+#  ./install-packages.sh $RD $TARGET
+#  ./install-packages.sh $RD $TARGET
+#done
+
+# sudo TRI=1 ./universal
+# cd /Library/Frameworks/RNAseq.framework
+# sudo ln -s Versions/Current/R RNAseq
+# cd /Builds/R-builds/nightly
+
+# cd packaging/leopard
+# make tools
+# cd ../..
+
+# ./old2new
+
+# sudo rm -rf /Applications/rnaseq.app
+# sudo rm -rf /Applications/rnaseq64.app
+# sudo rm -rf /Library/Frameworks/RNAseq.framework-original
+# sudo cp -r /Users/goshng/Documents/Projects/peach/rnaseq/build/Development/rnaseq.app /Applications
+# sudo cp -r /Users/goshng/Documents/Projects/peach/rnaseq/build/Development/rnaseq.app /Applications/rnaseq64.app
+# sudo cp -r /Library/Frameworks/RNAseq.framework /Library/Frameworks/RNAseq.framework-original
+# sudo PKGONLY=1 ./pkg $RD
+
+sudo mv /Applications/rnaseq.app /Applications/rnaseq.app.original 
+sudo mv /Applications/rnaseq64.app /Applications/rnaseq64.app.original 
+sudo mv /Library/Frameworks/RNAseq.framework /Library/Frameworks/RNAseq.framework.original
+open /Builds/R-builds/nightly/deploy/leopard/$RD/universal/$RD-leopard.pkg
+exit
+
+# libRblas.vecLib.dylib
+# libgcc_s.1.dylib
+# libgfortran.2.dylib
+
 sudo rm -rf /Applications/rnaseq.app
 sudo rm -rf /Applications/rnaseq64.app
 sudo rm -rf /Library/Frameworks/RNAseq.framework

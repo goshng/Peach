@@ -23,7 +23,8 @@ if otool -L $R/lib/libR.dylib | grep /gcc4.0/ > /dev/null; then
     GCCLIBS="libgcc_s.1.0.dylib libgfortran.0.dylib libstdc++.6.dylib"
 else
     echo " - local GCC mode"
-    GCCLIB=/usr/local/lib
+    # GCCLIB=/usr/local/lib
+    GCCLIB=/usr/lib
     GCCLIBS="libgcc_s.1.dylib libgfortran.2.dylib"
 fi
 

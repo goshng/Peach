@@ -69,8 +69,8 @@ for RD in $RDIRS; do
     if [ $miss = no ]; then
 	failed=no
 	echo "Remove previous framework ..."
-	rm -rf /Library/Frameworks/R.framework 
-	RFWH=/Library/Frameworks/R.framework/Resources
+	rm -rf /Library/Frameworks/RNAseq.framework 
+	RFWH=/Library/Frameworks/RNAseq.framework/Resources
 	for tarch in $tarchs; do
 	    ATNAME="$oscode-$tarch"
 
@@ -117,24 +117,25 @@ for RD in $RDIRS; do
 	    fi
 
 	    # determine full path to lib (via id entry in libR)
-	    LIBDIR=`otool -L /Library/Frameworks/R.framework/R | sed -n '/\/libR/s/.*\(\/Library.*\)\/libR.dylib.*/\1/p'`
+	    LIBDIR=`otool -L /Library/Frameworks/RNAseq.framework/R | sed -n '/\/libR/s/.*\(\/Library.*\)\/libR.dylib.*/\1/p'`
 	    # fix libRblas entry in bin/exec/<arch>/R  (I still don't know why it's screwed...)
 	    for a in $tarchs; do
-		install_name_tool -change libRblas.dylib "${LIBDIR}/libRblas.dylib" /Library/Frameworks/R.framework/Resources/bin/exec/$a/R
+		install_name_tool -change libRblas.dylib "${LIBDIR}/libRblas.dylib" /Library/Frameworks/RNAseq.framework/Resources/bin/exec/$a/R
 	    done
 
 	    # remove superfluous Makeconf
-	    rm -f /Library/Frameworks/R.framework/Resources/bin/etc/Makeconf
+	    rm -f /Library/Frameworks/RNAseq.framework/Resources/bin/etc/Makeconf
 
 	    # make CRAN changes to the shell script - setting R_ARCH default according to `arch` 
-	    #patch /Library/Frameworks/R.framework/Resources/bin/R < $BASE/R.sh.diff
+	    #patch /Library/Frameworks/RNAseq.framework/Resources/bin/R < $BASE/R.sh.diff
 
             # move readline into R and fixup the ld path
-	    rllib=`ls /usr/local/lib/libreadline.?.?.dylib|tail -n 1`
+	    # rllib=`ls /usr/local/lib/libreadline.?.?.dylib|tail -n 1`
+	    rllib=`ls /opt/local/lib/libreadline.?.?.dylib|tail -n 1`
 	    rllib=`basename ${rllib}`
-	    cp /usr/local/lib/${rllib} "$LIBDIR/"
+	    cp /opt/local/lib/${rllib} "$LIBDIR/"
 	    chmod +w "$LIBDIR/"* 2> /dev/null
-	    install_name_tool -change /usr/local/lib/${rllib} "$LIBDIR/${rllib}" "$LIBDIR/libR.dylib"
+	    install_name_tool -change /opt/local/lib/${rllib} "$LIBDIR/${rllib}" "$LIBDIR/libR.dylib"
 	    ln -s ${rllib} "$LIBDIR/libreadline.dylib"
     
 	    # replace singe-arch dylibs with softlinks to corresponding fat library
@@ -152,12 +153,12 @@ for RD in $RDIRS; do
 
 	    # copy qpdf (if present) and set R_QPDF accordingly
 	    if [ -e "$BASE/qpdf" ]; then
-		cp "$BASE/qpdf" /Library/Frameworks/R.framework/Resources/bin/qpdf
+		cp "$BASE/qpdf" /Library/Frameworks/RNAseq.framework/Resources/bin/qpdf
 		for a in $tarchs; do
-		    renv="/Library/Frameworks/R.framework/Resources/etc/$a/Renviron"
+		    renv="/Library/Frameworks/RNAseq.framework/Resources/etc/$a/Renviron"
 		    if [ -e "$renv" ]; then
 			echo '## CRAN R ships with qpdf inside so use it unless directed otherwise' >> "$renv"
-			echo 'R_QPDF=${R_QPDF-'"'/Library/Frameworks/R.framework/Resources/bin/qpdf'"'}' >> "$renv"
+			echo 'R_QPDF=${R_QPDF-'"'/Library/Frameworks/RNAseq.framework/Resources/bin/qpdf'"'}' >> "$renv"
 		    fi
 		done
 	    fi
@@ -189,8 +190,12 @@ for RD in $RDIRS; do
 	    ln -s libRblas.0.dylib "${LIBDIR}/libRblas.dylib"
 
 	    # unpack fontconfig config files and include fc-cache
-	    if [ -e $BASE/fontconfig-Rfw.tar.gz ]; then tar fxz $BASE/fontconfig-Rfw.tar.gz -C /; fi
-	    if [ -e /usr/local/bin/fc-cache ]; then cp /usr/local/bin/fc-cache $RFWH/bin/fc-cache; fi
+	    if [ -e $BASE/fontconfig-Rfw.tar.gz ]; then 
+        mkdir t 
+        tar fxz $BASE/fontconfig-Rfw.tar.gz -C t
+        cp -r t/$RFWH/fontconfig $RFWH
+      fi
+	    if [ -e /opt/local/bin/fc-cache ]; then cp /opt/local/bin/fc-cache $RFWH/bin/fc-cache; fi
 	    # remove any existing cache
 	    rm -rf $RFWH/fontconfig/cache/*
 
@@ -208,7 +213,7 @@ for RD in $RDIRS; do
 	    install_name_tool -id "${LIBDIR}/libRblas.dylib" "${LIBDIR}/libRblas.dylib"
 	    $BASE/fixup
 	    cd /
-	    tar fcz $BASE/$RD-$TNAME.tar.gz /Library/Frameworks/R.framework
+	    tar fcz $BASE/$RD-$TNAME.tar.gz /Library/Frameworks/RNAseq.framework
 	    cd $BASE
 
 	    echo "SUCCESS"

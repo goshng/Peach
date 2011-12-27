@@ -1,0 +1,15 @@
+#!/bin/sh
+nightly=/Users/goshng/Documents/Projects/peach/rdev/Simon/Builds/R-builds/nightly
+
+for f in conf.snowleopard-i386 conf.snowleopard-ppc conf.snowleopard-x86_64 \
+  builds fixpathR pkg \
+  packaging/leopard/mkdoc \
+  copy-to-git run-goshng.sh src/fixup.c install-packages.sh R universal; do
+  if [ -d $f ]; then
+    cp -r $f $nightly
+  else
+    DIRNAME=`dirname $f`
+    BASENAME=`basename $f`
+    cp $f $nightly/$DIRNAME/$BASENAME
+  fi
+done

@@ -2,11 +2,11 @@
 #
 # optional: set PKGONLY=1 if you want to package from the
 #           currently installed files (otherwise tar balls are used)
-
+# PKGONLY=1
 # -- configurable paths needed for operation --
-ROOT=/Builds/nightly
-XCODE=/Developer
 
+ROOT=/Builds/R-builds/nightly
+XCODE=/Developer
 
 # make sure the PATH contains sbin for chmod etc.
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin:/usr/local/bin
@@ -24,13 +24,14 @@ fi
 WD=`pwd`
 RNAME="$1"
 DEP="${ROOT}/deploy/leopard/$1/universal"
-PKGDIR="${ROOT}/packaging/leopard/"
+# DEP="${ROOT}/deploy/leopard/$1/x86_64"
+PKGDIR="${ROOT}/packaging/leopard"
 oscode=leopard
 
-rm -rf "$PKGDIR/R.pkg"
+rm -rf "$DEP/$RNAME-$oscode.pkg"
 
 if [ -z "$PKGONLY" ]; then
-
+echo $DEP/SUCCESS
 if [ ! -e "$DEP/SUCCESS" ]; then
     echo "ERROR: the nightly build was not sucessful"
     exit 1
@@ -43,14 +44,14 @@ fi
 
 echo "-- restoring framework and GUIs from tar balls"
 
-GUI32=`ls $DEP/R-GUI-*-Leopard.tar.gz|sort|tail -n 1`
-GUI64=`ls $DEP/R-GUI-*-Leopard64.tar.gz|sort|tail -n 1`
+GUI32=`ls $DEP/rnaseq-*-Leopard.tar.gz|sort|tail -n 1`
+GUI64=`ls $DEP/rnaseq-*-Leopard64.tar.gz|sort|tail -n 1`
 if [ -z "$GUI32" ]; then
-    echo "ERROR: cannot find 32-bit R.app tar ball"
+    echo "ERROR: cannot find 32-bit rnaseq.app tar ball"
     exit 1
 fi
 if [ -z "$GUI64" ]; then
-    echo "ERROR: cannot find 64-bit R.app tar ball"
+    echo "ERROR: cannot find 64-bit rnaseq.app tar ball"
     exit 1
 fi
 
@@ -59,27 +60,28 @@ if [ `id -u` != 0 ]; then
     exit 1
 fi
 
-rm -rf /Library/Frameworks/R.framework
+rm -rf /Library/Frameworks/RNAseq.framework
 tar fxz "$DEP/$RNAME-$oscode-universal.tar.gz" -C /
 
-rm -rf /Applications/R.app /Applications/R64.app
+rm -rf /Applications/rnaseq.app /Applications/rnaseq64.app
 
 tar fxz "$GUI64" -C /Applications/
-mv /Applications/R.app /Applications/R64.app
+mv /Applications/rnaseq.app /Applications/rnaseq64.app
 tar fxz "$GUI32" -C /Applications/
 
 else # PKGONLY=1
     echo "-- running in packaging mode only"
 fi 
 
-chown -Rh root:admin /Applications/R.app /Applications/R64.app
-chmod -R g+w /Applications/R.app /Applications/R64.app
+chown -Rh root:admin /Applications/rnaseq.app /Applications/rnaseq64.app /Library/Frameworks/RNAseq.framework
+chmod -R g+w /Applications/rnaseq.app /Applications/rnaseq64.app /Library/Frameworks/RNAseq.framework
 
 cd "$PKGDIR"
 ./mkdoc
 rm -f "$DEP/$RNAME-$oscode.pkg"
-${XCODE}/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -d R.pmdoc -o "$DEP/$RNAME-$oscode.pkg"
-chown urbanek:admin "$DEP/$RNAME-$oscode.pkg"
+${XCODE}/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -d RNAseq.pmdoc -o "$DEP/$RNAME-$oscode.pkg"
+# chown urbanek:admin "$DEP/$RNAME-$oscode.pkg"
+chown goshng:staff "$DEP/$RNAME-$oscode.pkg"
 
 echo ''
 echo " Package created: $DEP/$RNAME-$oscode.pkg"

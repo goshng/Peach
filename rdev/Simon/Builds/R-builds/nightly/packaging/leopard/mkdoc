@@ -8,7 +8,7 @@
 echo " - Detecting build settings"
 
 if [ -z "${FWPATH}" ]; then
-    FWPATH=/Library/Frameworks/R.framework
+    FWPATH=/Library/Frameworks/RNAseq.framework
 fi
 
 RBIN="${FWPATH}/Resources/bin/R"
@@ -17,7 +17,7 @@ if [ -z "${VERFULL}" ]; then
     ## since 2011/07/04 R-devel doesn't show the version, so we need to tease it out from the headers and re-construct the same string it used to give ..
     echo '#include <Rversion.h>~#include <stdio.h>~int main() { printf("%s.%s %s (%s-%s-%s r%s)\n", R_MAJOR, R_MINOR, R_STATUS, R_YEAR, R_MONTH, R_DAY, R_SVN_REVISION); return 0; }' | tr '~' '\n' > /tmp/get_r_ver.c
     rm -f /tmp/get_r_ver
-    gcc -o /tmp/get_r_ver /tmp/get_r_ver.c -I /Library/Frameworks/R.framework/Headers
+    gcc -o /tmp/get_r_ver /tmp/get_r_ver.c -I /Library/Frameworks/RNAseq.framework/Headers
     VERFULL=`/tmp/get_r_ver`
     rm -f /tmp/get_r_ver /tmp/get_r_ver.c
     if [ -z "${VERFULL}" ]; then
@@ -46,13 +46,15 @@ if [ -z "${GUIPATH}" ]; then
         GUIPATH=/Applications
 fi
 
-if [ ! -e "${GUIPATH}/R.app/Contents/Resources/English.lproj/InfoPlist.strings" ]; then
+if [ ! -e "${GUIPATH}/rnaseq.app/Contents/Resources/English.lproj/InfoPlist.strings" ]; then
         echo "** ERROR: ${GUIPATH}/R.app is not a valid GUI (set GUIPATH when necessary)"
         exit 1
 fi
 
-GUIVER=`sed -n -e '/CFBundleGetInfoString/ s/.*GUI \([0-9.]\{3,\}\).*/\1/p' "${GUIPATH}/R.app/Contents/Resources/English.lproj/InfoPlist.strings"`
-GUISVN=`sed -n -e '/CFBundleGetInfoString/ s/.*(\([0-9]\{1,\}\)).*/\1/p' "${GUIPATH}/R.app/Contents/Resources/English.lproj/InfoPlist.strings"`
+# GUIVER=`sed -n -e '/CFBundleGetInfoString/ s/.*GUI \([0-9.]\{3,\}\).*/\1/p' "${GUIPATH}/R.app/Contents/Resources/English.lproj/InfoPlist.strings"`
+# GUISVN=`sed -n -e '/CFBundleGetInfoString/ s/.*(\([0-9]\{1,\}\)).*/\1/p' "${GUIPATH}/R.app/Contents/Resources/English.lproj/InfoPlist.strings"`
+GUIVER=1.41
+GUISVN=5874
 
 FWPVER=`echo $VERSH|sed -e 's:\.:0:' -e 's:$:'$SVN':'`
 
@@ -65,7 +67,7 @@ echo " pkg: RRPATH=$RRPATH"
 echo ""
 
 
-chmod -R g+w "${GUIPATH}/R.app" "${GUIPATH}/R64.app"
+chmod -R g+w "${GUIPATH}/rnaseq.app" "${GUIPATH}/rnaseq64.app"
 
 if [ -z "${GUISVN}" -o -z "${GUIVER}" ]; then
     echo "** ERROR: unable to find out GUI version/revision (possibly a pre-release?)"
@@ -84,27 +86,27 @@ export TP
 export FWPATH
 export FWPVER
 
-if [ "$1" = '-u' -a -e R.pmdoc ]; then
-    echo " - Updating R.pmdoc"
+if [ "$1" = '-u' -a -e RNAseq.pmdoc ]; then
+    echo " - Updating RNAseq.pmdoc"
 
     do_update=1
 else
-    echo " - Creating R.pmdoc"
+    echo " - Creating RNAseq.pmdoc"
 
-    rm -rf R.pmdoc
-    mkdir R.pmdoc
+    rm -rf RNAseq.pmdoc
+    mkdir RNAseq.pmdoc
 fi
 
-for i in `find R-template.pmdoc -type f`; do
+for i in `find RNAseq-template.pmdoc -type f`; do
     j=`echo $i|sed 's:-template::'`
     ./envs $i $j
 done
 
 if [ -z "${do_update}" ]; then
     echo " - create contents files"
-    ./mkcont /Library/Frameworks/R.framework > R.pmdoc/01r-contents.xml
-    ./mkcont /Applications/R.app > R.pmdoc/02r-contents.xml
-    ./mkcont /Applications/R64.app > R.pmdoc/03r-contents.xml
+    ./mkcont /Library/Frameworks/RNAseq.framework > RNAseq.pmdoc/01r-contents.xml
+    ./mkcont /Applications/rnaseq.app > RNAseq.pmdoc/02r-contents.xml
+    ./mkcont /Applications/rnaseq64.app > RNAseq.pmdoc/03r-contents.xml
 fi
 
 echo " - Done"

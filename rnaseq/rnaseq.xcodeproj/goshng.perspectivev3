@@ -329,7 +329,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D049A1C514A8F49700D71333</string>
+										<string>D05B58AB14A970FF005A0570</string>
 										<key>history</key>
 										<array>
 											<string>D0FEC37714A4210200365FE7</string>
@@ -376,7 +376,7 @@
 											<string>D049A1A514A879DC00D71333</string>
 											<string>D049A1A614A879DC00D71333</string>
 											<string>D049A1A714A879DC00D71333</string>
-											<string>D049A1A814A879DC00D71333</string>
+											<string>D049A1C514A8F49700D71333</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -390,18 +390,18 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {1099, 294}}</string>
+								<string>{{0, 0}, {1099, 282}}</string>
 								<key>RubberWindowFrame</key>
 								<string>0 59 1280 719 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>294pt</string>
+							<string>282pt</string>
 						</dict>
 						<dict>
 							<key>Proportion</key>
-							<string>379pt</string>
+							<string>391pt</string>
 							<key>Tabs</key>
 							<array>
 								<dict>
@@ -415,7 +415,9 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {1099, 352}}</string>
+										<string>{{10, 27}, {1099, 364}}</string>
+										<key>RubberWindowFrame</key>
+										<string>0 59 1280 719 0 0 1280 778 </string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -470,8 +472,6 @@
 									<dict>
 										<key>Frame</key>
 										<string>{{10, 27}, {1099, 352}}</string>
-										<key>RubberWindowFrame</key>
-										<string>0 59 1280 719 0 0 1280 778 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXBuildResultsModule</string>
@@ -499,11 +499,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>D049A1AA14A879DC00D71333</string>
+				<string>D05B58A414A970E4005A0570</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>D049A1AB14A879DC00D71333</string>
+				<string>D05B58A514A970E4005A0570</string>
 				<string>D02E191D14A2E10500177280</string>
-				<string>D049A1AC14A879DC00D71333</string>
+				<string>D05B58A614A970E4005A0570</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
