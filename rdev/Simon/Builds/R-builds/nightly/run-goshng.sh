@@ -34,10 +34,10 @@ RD=R-2.14.0
 # sudo cp -r /Library/Frameworks/RNAseq.framework /Library/Frameworks/RNAseq.framework-original
 # sudo PKGONLY=1 ./pkg $RD
 
-sudo mv /Applications/rnaseq.app /Applications/rnaseq.app.original 
-sudo mv /Applications/rnaseq64.app /Applications/rnaseq64.app.original 
-sudo mv /Library/Frameworks/RNAseq.framework /Library/Frameworks/RNAseq.framework.original
-open /Builds/R-builds/nightly/deploy/leopard/$RD/universal/$RD-leopard.pkg
+# sudo mv /Applications/rnaseq.app /Applications/rnaseq.app.original 
+# sudo mv /Applications/rnaseq64.app /Applications/rnaseq64.app.original 
+# sudo mv /Library/Frameworks/RNAseq.framework /Library/Frameworks/RNAseq.framework.original
+# open /Builds/R-builds/nightly/deploy/leopard/$RD/universal/$RD-leopard.pkg
 exit
 
 # libRblas.vecLib.dylib

@@ -280,11 +280,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
+									<integer>28</integer>
+									<integer>5</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {159, 660}}</string>
+							<string>{{0, 150}, {159, 660}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -317,7 +319,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>D02E191D14A2E10500177280</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>DDVQuizController.m</string>
+								<string>DDVWindowController.h</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -325,16 +327,15 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>D02E191E14A2E10500177280</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>DDVQuizController.m</string>
+										<string>DDVWindowController.h</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D05B58AB14A970FF005A0570</string>
+										<string>D0BAB1AD14ABD087006807E1</string>
 										<key>history</key>
 										<array>
 											<string>D0FEC37714A4210200365FE7</string>
 											<string>D0FEC37914A4210200365FE7</string>
-											<string>D0FEC42714A44F2200365FE7</string>
 											<string>D043E6D914A45DE500CF8300</string>
 											<string>D043E6DA14A45DE500CF8300</string>
 											<string>D043E6DB14A45DE500CF8300</string>
@@ -374,9 +375,10 @@
 											<string>D049A1A214A879DC00D71333</string>
 											<string>D049A1A414A879DC00D71333</string>
 											<string>D049A1A514A879DC00D71333</string>
-											<string>D049A1A614A879DC00D71333</string>
 											<string>D049A1A714A879DC00D71333</string>
-											<string>D049A1C514A8F49700D71333</string>
+											<string>D0BAB0BC14AAE45E006807E1</string>
+											<string>D0BAB1AB14ABD087006807E1</string>
+											<string>D0BAB1AC14ABD087006807E1</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -390,18 +392,18 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {1099, 282}}</string>
+								<string>{{0, 0}, {1099, 673}}</string>
 								<key>RubberWindowFrame</key>
 								<string>0 59 1280 719 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>282pt</string>
+							<string>673pt</string>
 						</dict>
 						<dict>
 							<key>Proportion</key>
-							<string>391pt</string>
+							<string>0pt</string>
 							<key>Tabs</key>
 							<array>
 								<dict>
@@ -415,7 +417,7 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {1099, 364}}</string>
+										<string>{{10, 27}, {1099, -27}}</string>
 										<key>RubberWindowFrame</key>
 										<string>0 59 1280 719 0 0 1280 778 </string>
 									</dict>
@@ -471,7 +473,7 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {1099, 352}}</string>
+										<string>{{10, 27}, {1099, 364}}</string>
 									</dict>
 									<key>Module</key>
 									<string>PBXBuildResultsModule</string>
@@ -499,11 +501,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>D05B58A414A970E4005A0570</string>
+				<string>D0BAB1AE14ABD087006807E1</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>D05B58A514A970E4005A0570</string>
+				<string>D0BAB1AF14ABD087006807E1</string>
 				<string>D02E191D14A2E10500177280</string>
-				<string>D05B58A614A970E4005A0570</string>
+				<string>D0BAB1B014ABD087006807E1</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
