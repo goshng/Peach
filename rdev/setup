@@ -1,0 +1,4 @@
+#!/bin/sh
+sudo mkdir /Builds 2> /dev/null
+sudo chown -R goshng:staff /Builds
+cp -r Simon/Builds/R-builds /Builds

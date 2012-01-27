@@ -1,0 +1,4 @@
+the full repertoire of transcripts of an organism on a genome-wide scale
+genome-wide RNA profiles of numerous prokaryotes
+rRNA depletion methods
+Most transcriptome analyses focus on obtaining a snap- shot of the transcriptional profile at a specific time point or evaluating differential expression to various stimuli.

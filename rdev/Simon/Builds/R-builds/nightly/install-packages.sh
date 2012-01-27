@@ -28,5 +28,10 @@ $TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/down
 $TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/xtable_1.6-0.tar.gz
 $TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/DESeq_1.6.1.tar.gz
 $TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/edgeR_2.4.1.tar.gz
+$TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/foreign_0.8-48.tgz
+$TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/KernSmooth_2.23-7.tgz
+$TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/Matrix_1.0-2.tgz
+$TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/mgcv_1.7-12.tgz
+$TARGET/$RD/bin/R CMD INSTALL /Users/goshng/Documents/Projects/peach/rnaseq/downloads/pasilla_0.2.10.tar.gz
 $TARGET/$RD/bin/Rscript R/x2.R $TARGET
 echo "Check $TARGET/not-yet-installd.txt"

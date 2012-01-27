@@ -1,30 +1,38 @@
 RD=R-2.14.0
-# wget http://software.rc.fas.harvard.edu/mirrors/R/src/base/R-2/$RD.tar.gz
-# tar zxf $RD.tar.gz
-# rm $RD.tar.gz
+#wget http://software.rc.fas.harvard.edu/mirrors/R/src/base/R-2/$RD.tar.gz
+#tar zxf $RD.tar.gz
+#rm $RD.tar.gz
 
-# make
+#make
 #sudo rm -rf snowleopard-ppc snowleopard-i386 snowleopard-x86_64 snowleopard-universal
 #cp R/Makeconf.in $RD
-#./buildR R-2.14.0 ppc snowleopard-ppc
+##./buildR R-2.14.0 ppc snowleopard-ppc
 #./buildR R-2.14.0 i386 snowleopard-i386
 #./buildR R-2.14.0 x86_64 snowleopard-x86_64
 
-#for TARGET in snowleopard-ppc snowleopard-i386 snowleopard-x86_64; do
+#for TARGET in snowleopard-x86_64; do
 #  ./install-packages.sh $RD $TARGET
 #  ./install-packages.sh $RD $TARGET
 #done
 
-# sudo TRI=1 ./universal
+# rm -rf t; mkdir t; cd t; tar zxf ../fontconfig-Rfw.tar.gz; cd ..
+# mv t/Library/Frameworks/R.framework t/Library/Frameworks/RNAseq.framework
+# RFRAMEWORK=/Library/Frameworks/R.framework/Versions/2.13/Resources
+# cp $RFRAMEWORK/lib/libRblas.vecLib.dylib .
+# cp $RFRAMEWORK/lib/libgfortran.2.dylib .
+# cp $RFRAMEWORK/lib/libgcc_s.1.dylib .
+
+# Following shell scripts are called. fixpathR.
+# sudo bashdb ./fixpathR /Library/Frameworks/RNAseq.framework/Versions/2.14/Resources
+# sudo ./universal
 # cd /Library/Frameworks/RNAseq.framework
 # sudo ln -s Versions/Current/R RNAseq
 # cd /Builds/R-builds/nightly
 
-# cd packaging/leopard
-# make tools
-# cd ../..
-
-# ./old2new
+#cd packaging/leopard
+#make tools
+#cd ../..
+#./old2new
 
 # sudo rm -rf /Applications/rnaseq.app
 # sudo rm -rf /Applications/rnaseq64.app

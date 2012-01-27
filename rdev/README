@@ -12,4 +12,13 @@ gfortran-42-5664.dmg is installed and it worked.
 ../configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=/Users/goshng/Documents/Projects/peach/rdev/downloads/R-2.14.0/i --enable-R-shlib 
 ----
 
-
+downloads
+---------
+DESeq_1.6.1.tar.gz
+Mac-GUI-1.41.tar.gz
+R-2.14.0.tar.gz
+R-2.14.1.tar.gz
+bwa-0.6.1.tar.bz2
+cutadapt-1.0.tar.gz
+edgeR_2.4.1.tar.gz
+samtools-0.1.18.tar.bz2

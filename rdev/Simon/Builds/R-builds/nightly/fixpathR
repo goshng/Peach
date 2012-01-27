@@ -23,8 +23,8 @@ if otool -L $R/lib/libR.dylib | grep /gcc4.0/ > /dev/null; then
     GCCLIBS="libgcc_s.1.0.dylib libgfortran.0.dylib libstdc++.6.dylib"
 else
     echo " - local GCC mode"
-    # GCCLIB=/usr/local/lib
-    GCCLIB=/usr/lib
+    GCCLIB=/usr/local/lib
+    # GCCLIB=/usr/lib
     GCCLIBS="libgcc_s.1.dylib libgfortran.2.dylib"
 fi
 
@@ -58,16 +58,16 @@ cd $R/lib
 otool -L libR.dylib|grep readline
 if [ $? == 0 ]; then
     echo "Copying and fixing readline ..."
-    rllib=`ls /usr/local/lib/libreadline.?.?.dylib|sort|tail -n 1`
+    rllib=`ls /opt/local/lib/libreadline.?.?.dylib|sort|tail -n 1`
     rllib=`basename ${rllib}`
-    cp /usr/local/lib/${rllib} .
+    cp /opt/local/lib/${rllib} .
     chmod a+x lib*
     chgrp admin lib*
     chmod g+w lib*
     install_name_tool -id $R/lib/${rllib} ${rllib}
     cd $R
     find . -name \*.dylib -o -name \*.so| xargs -n 1 install_name_tool -change ${rllib} $R/lib/${rllib}
-    find . -name \*.dylib -o -name \*.so| xargs -n 1 install_name_tool -change /usr/local/lib/${rllib} $R/lib/${rllib}
+    find . -name \*.dylib -o -name \*.so| xargs -n 1 install_name_tool -change /opt/local/lib/${rllib} $R/lib/${rllib}
 fi
 
 # last pass -- actually it coulde replace the above two

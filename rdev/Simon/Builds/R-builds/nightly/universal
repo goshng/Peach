@@ -35,6 +35,11 @@ if [ -z "${QUAD}" ]; then
 else
     defarchs="ppc64 x86_64 ppc i386"
 fi
+
+if [ -z "${SINGLE}" ]; then
+  defarchs="x86_64"
+fi
+
 : ${tarchs="${defarchs}"}
 
 TS=`date +%s:%Y%m%d:%H%M%S`
@@ -52,6 +57,7 @@ for RD in $RDIRS; do
     miss=no
     missppc64=no
     for tarch in $tarchs; do	
+        echo $tarch 
 	if [ -e "$BASE/$oscode-$tarch/$RD-$oscode-$tarch-bld.tar.gz" -a -e "$BASE/$oscode-$tarch/$RD.SUCCESS" ]; then
 	    echo "$TS:$RD:common:collect:0:$oscode-$tarch" >> $BASE/$TNAME/build.log
 	else
@@ -193,7 +199,8 @@ for RD in $RDIRS; do
 	    if [ -e $BASE/fontconfig-Rfw.tar.gz ]; then 
         mkdir t 
         tar fxz $BASE/fontconfig-Rfw.tar.gz -C t
-        cp -r t/$RFWH/fontconfig $RFWH
+        mv t/Library/Frameworks/R.framework t/Library/Frameworks/RNAseq.framework
+        cp -r t$RFWH/fontconfig $RFWH
       fi
 	    if [ -e /opt/local/bin/fc-cache ]; then cp /opt/local/bin/fc-cache $RFWH/bin/fc-cache; fi
 	    # remove any existing cache
