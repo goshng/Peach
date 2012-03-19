@@ -1,0 +1,10 @@
+We assume a random mating population of effective size Ne.
+we assume a value for Nem of 0.001.
+estimates of Nes are noisy and upwardly biased
+It is composed of 35 genes
+all genes which were significant at 5%
+on average one SNP per 100 bp 
+as many as several million leaves
+increasing running time advantage as the number of taxa increases
+The total of 341
+With the increasing availability of
