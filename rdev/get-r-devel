@@ -1,0 +1,5 @@
+#!/bin/bash
+export REPOS=https://svn.r-project.org/R
+export RTOP=downloads
+cd $RTOP
+svn co $REPOS/trunk r-devel/R

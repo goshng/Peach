@@ -1,4 +1,141 @@
 the full repertoire of transcripts of an organism on a genome-wide scale
 genome-wide RNA profiles of numerous prokaryotes
 rRNA depletion methods
-Most transcriptome analyses focus on obtaining a snap- shot of the transcriptional profile at a specific time point or evaluating differential expression to various stimuli.
+Most transcriptome analyses focus on obtaining a snap-shot of the transcriptional profile at a specific time point or evaluating differential expression to various stimuli.
+capturing the transcriptional landscape at single time points, or evaluating responses to a specific set of conditions
+Genome-wide studies of bacterial gene expression
+annotation-independent detection of transcription
+improved sensitivity and increased dynamic range
+functional genomics experiments
+quantitative gene expression studies
+saturation of sequence data by abundant transcripts
+DNase treatment
+random hexamer-primed reverse transcription
+second DNA strand synthesis
+
+
+\section*{Words}
+
+\subsection*{Nouns}
+
+protein encoding mRNAs 
+
+small non-coding regulatory, structural or catalytic RNAs
+
+advantages as well as drawbacks
+
+protocols for the preparation of high quality RNA
+
+the con- struction of the cDNA library
+
+identification and characterization of the transcripts
+
+\subsection*{Verbs}
+
+calls for
+
+reach these goals
+
+unravel genetic expression at the scale of entire genomes.
+
+draw some perspectives regarding technological advances and possible appli-
+cations.
+
+the rRNA/tRNA fraction accounts for more than 95% of total cellular RNA
+
+critical for downstream results
+
+forego the design of tiling arrays probes.
+
+streamlines analysis of the results.
+
+discard sequence reads with multiple matching positions
+
+Detecting and quantifying changes in transcript abun- dance between different
+conditions
+
+\subsection*{Phrases}
+
+
+
+whether the observed differences are signifi- cantly greater than expected by
+chance alone.
+
+The overall process of new transcript annotation usually requires substantial
+pipeline tuning and/or manual post processing [43,44].
+
+This is particularly true when one wants to build a consensus annotation based
+on several experimental data sets of different nature or querying different
+physiological conditions. An attractive, even though oversimplified, approach
+consists of taking one condition as a reference and to further subdivide the
+transcribed regions according to other data sets (which can be of different
+types) [40].
+
+As only changes in signal enable transcription start site detection, detection
+of internal alternative start sites is not possible unless their activity
+produces a significant increase of the expression signal with respect to the
+upstream region.
+
+ boundaries of transcripts can be identified as sudden changes in the level of
+ expression, 
+
+Importantly, in RNA- seq experiments, investigation of reads repartition showed
+that the local nucleotide composition can explain up to 50% of the variability
+observed along a given transcribed region [35,36]. When the library preparation
+relies on random priming, local sequence context can be partly accounted for by
+weighing reads counts according to the hexamer found at the 50-end of each read
+[35].
+
+an additional challenge stems from reads
+
+The huge amount of sequences produced (0.5–50 Gb per run, depending on the NGS
+technology) prompted the development of high-perform- ance algorithms such as
+BWA
+
+Defining and quantifying transcribed regions
+
+As standard library construction methods do not generate strand-specific data,
+approaches that rely on the ligation of linkers to the ends of the RNAs
+fragments to retain their directionality have been devel- oped [21,22,13] and
+implemented [14,15,7,8] with success. The library is analyzed through NGS and
+the reads produced are mapped onto the reference genome to reveal the
+transcribed regions.
+
+ by reverse tran- scription using random primers or oligo(dT) primers (after
+ poly(A) tailing), the RNA (usually after rRNA depletion) is converted into
+ cDNA.
+
+The     employed        enzyme, terminator      50 -phosphate-depend- ent
+exonuclease, is also used by a new transcriptomics approach developed by Vogel’s
+group [13] termed differ- ential RNA-seq (dRNA-seq) which permits
+differentiation of primary transcripts with 50-triphosphate ends from pro-
+cessed transcripts.
+However, while specifically suitable for the identification of small RNAs and of
+transcription start sites [13,14,15, dRNA-seq provides only ‘semi-quanti-
+tative’ data [13].
+
+The rRNA capture approach using the MICROBExpress Kit (Ambion) has been widely
+applied in RNA-seq stu- dies. As it is based on 16S and 23S rRNA specific
+capture probes, depletion efficiency of these kits varies between bacterial
+species. 
+
+a major challenge in RNA-seq applications is the enrich- ment for all transcript
+species other than rRNA and tRNA
+
+sequencing of total RNA samples greatly reduces useful transcript coverage
+
+provide comprehensive identification and quantification of transcripts with an
+unprecedented resolution.
+
+lead to breakthroughs in systems biology.
+
+review each step of the analysis from library preparation to the interpretation
+of the data, with particular attention paid to the possible sources of
+artifacts.
+
+boost metatranscriptomics and evolutionary transcriptomics applications.
+
+determining the transcriptional structure of genes.
+
+quantifying the changing expression level of each transcript under different
+conditions over the full dynamic range of cellular RNA expression.

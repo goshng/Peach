@@ -1,0 +1,117 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass scrlttr2
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing onehalf
+\use_hyperref false
+\papersize letterpaper
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\align center
+
+\size large
+Statement of research interests and experience
+\end_layout
+
+\begin_layout Standard
+
+\lyxline
+I am intrigued by the way how statistical genetics is applied to recent
+ genetic and genomic data to recover past history of life.
+ Unfortunately, advance in models and methods has been slow and it seemingly
+ will be.
+ This is why I want to develop new models and methods in the area of molecular
+ evolution and population genetics for the incoming era of genomic data.
+ 
+\end_layout
+
+\begin_layout Standard
+As a part of my research career, I have been working on a population genetic
+ problem of assigning individuals based on their genotypes.
+ Traditional methods use Hardy-Weinberg equilibrium and linkage disequilibrium
+ (e.g., STRUCTURE).
+ Instead, I use demographic and mutation models to achieve the goal.
+ Additionally, I can study demographic history at the same time.
+ Two more problems have also attracted my attention: inference of recombination
+ rates under species trees and species tree inference using multiple loci.
+ In addition to the current research projects above, protein coding DNA
+ sequence evolution is also of my interest since my graduate study at NC
+ State University.
+ Protein structure prediction methods were used to model the sequence evolution.
+ Together with my current research of species tree inference I am interested
+ in studying multiple protein sequence evolution under species tree.
+\end_layout
+
+\begin_layout Standard
+The development of the above statistical procedures are underway using C
+ or C++ under Unix-like Operating System.
+ R and Perl scripts are often used for post- or pre-processing data or analyzing
+ results from them.
+ A high-level functional programming with Mathematica is sometimes used.
+ I also have had chances of using unix or linux clusters for running batch
+ jobs.
+ Recently, I have been interested in using GPU (Graphics processing unit)
+ for massive parallelization to speed up a serialized program.
+\end_layout
+
+\begin_layout Standard
+With this my research interest I wish I could have an opportunity of experiencin
+g exciting environment for population geneticists in Cornell University
+ at Ithaca.
+ If you need further information regarding my application or could give
+ me a chance of interview with you to discuss potential research projects,
+ feel free to contact me at email address of goshng at gmail dot com or
+ phone number of 732-445-2681.
+\end_layout
+
+\begin_layout Standard
+\align right
+\begin_inset VSpace 0.3in
+\end_inset
+
+Sang Chul Choi
+\end_layout
+
+\begin_layout Standard
+\align right
+BSCB, Cornell, NY
+\end_layout
+
+\end_body
+\end_document

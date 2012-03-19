@@ -1,0 +1,614 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\frenchspacing
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\ø}{\raisebox{.3ex}{\tiny$\; \bullet \;$}}
+\renewcommand{\arraystretch}{1.25}
+\usepackage{fancyheadings}
+\pagestyle{fancy}
+\chead{\textit{Sang Chul Choi · Curriculum Vitae · goshng@gmail.com · +1-732-445-2681}}
+\usepackage{mathpazo}
+\end_preamble
+\use_default_options false
+\language american
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize 11
+\spacing single
+\use_hyperref false
+\papersize letterpaper
+\use_geometry true
+\use_amsmath 1
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\leftmargin 0.75in
+\topmargin 1in
+\rightmargin 0.75in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\align center
+
+\size large
+\noun on
+sang chul choi
+\noun default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Department of Biological Statistics and Computational Biology
+\begin_inset Newline newline
+\end_inset
+
+Cornell University
+\begin_inset Newline newline
+\end_inset
+
+Ithaca, NY 14853
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 13pt
+\end_inset
+
+
+\series bold
+Education
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\noun on
+2003--07 North Carolina State University
+\noun default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Ph.D.
+ in Bioinformatics
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\noun on
+1993--98 Pohang University of Science and Technology
+\noun default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Bachelor of Science in Life Science, Bachelor of Engineering in Electronic
+ & Electrical Engineering with a minor in Computer Science & Engineering.
+ February 1998
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Academic Positions
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+2010-- Postdoctoral Associate, Department of Biological Statistics and Computati
+onal Biology, Cornell University
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+2008--10 Research Assistant, Department of Genetics, Rutgers, The State
+ University of New Jersey
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+2008 Postdoctoral Associate, Department of Genetics, Rutgers, The State
+ University of New Jersey
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+2005--07 Graduate Research Assistant, Bioinformatics Research Center, North
+ Carolina State University
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+1996--97 Undergraduate Research Assistant, Life Science, Pohang University
+ of Science and Technology
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Work Experience
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\noun on
+2002--03 korea national genome research institute
+\noun default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Associate Researcher
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\noun on
+1998--01 hanstep co., ltd.
+\noun default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Software Engineer
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Teaching Experience
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\noun on
+1997 pohang night school
+\noun default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Secondary School English Teacher
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Research Interests
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Models of protein evolution, population genetics, protein structure prediction.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ High-throughput sequencing data analysis and methods development.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Research Projects: Current and Planned
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ RNA-seq analysis of 
+\emph on
+Streptococcus mutans
+\emph default
+.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Replacing and additive horizontal gene transfer in Streptococcus.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Inference of recombination under a species tree.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Inference of species tree with migration.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Research Publications
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2011 Choi SC, Hey J.
+ 2011.
+ 
+\emph on
+Joint inference of population assignment and demographic history.
+ Genetics 189: 561-577.
+
+\emph default
+ Genetics.
+ 189, 561-577.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2009 Choi SC, Stone EA, Kishino H, Thorne JL.
+ 2009.
+ 
+\emph on
+Estimates of natural selection due to protein tertiary structure inform
+ the ancestry of biallelic loci.
+
+\emph default
+ Gene.
+ 441, 45-52.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2008 Choi SC, Redelings BD, Thorne JL.
+ 2008.
+ 
+\emph on
+Basing population genetic inferences and models of molecular evolution upon
+ desired stationary distributions of DNA or protein sequences
+\emph default
+.
+ Philos.
+ Trans.
+ R.
+ Soc.
+ Lond., Ser.
+ B Biol.
+ Sci.
+ 363 3931-3939.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2007 Choi SC.
+ 2007.
+ 
+\emph on
+Statistical inference and biological interpretation via comparatively realistic
+ models of molecular evolution
+\emph default
+.
+ Doctoral Dissertation.
+ North Carolina State University.
+ December of 2007.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2007 Choi SC, Hobolth A, Robinson DM, Kishino H, Thorne JL.
+ 2007.
+ 
+\emph on
+Quantifying the impact of protein tertiary structure on molecular evolution.
+
+\emph default
+ Mol Biol Evol.
+ 24, 1769-1782.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2007 Thorne JL, Choi SC, Yu J, Higgs PG, Kishino H.
+ 2007.
+ 
+\emph on
+Population genetics without intraspecific data
+\emph default
+.
+ Mol Biol Evol.
+ 24, 1667-1677.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+1998 Choi SC.
+ 1998.
+ 
+\emph on
+Tissue culturing and transformation with chrysanthemums
+\emph default
+.
+ Archive of Undergraduate Thesis.
+ Pohang University of Science and Technology.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Contributed Talks and Posters
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2009 Choi SC, Hey J.
+ 
+\emph on
+Inference of Population Assignment using Demographic and Mutation Models
+\emph default
+.
+ Contributed Talk at SMBE 2009 Annual Meeting.
+ June 6th of 2009.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2007 Choi SC, Thorne JL, Stone EA, Kishino H.
+ 
+\emph on
+Combining population genetic and interspecific perspectives on evolutionary
+ constraints due to protein tertiary structure
+\emph default
+.
+ Poster at SMBE 2007 Annual Meeting.
+ June of 2007.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2006 Choi SC, Hobolth A, Robinson DM, Kishino H, Thorne JL.
+ 
+\emph on
+The impact of tertiary structure on protein evolution and a population genetics
+ interpretation
+\emph default
+.
+ Contributed Talk at SMBE 2006 Annual Meeting.
+ May 28th of 2006.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Honors and Awards
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+2003 Ph.D.
+ Study Abroad Award.
+ Korea Science and Engineering Foundation.
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+1993--97 Young-il scholarships (4 semesters), Hyo-gok scholarship (1 semester),
+ Ji-gok scholarships (2 semesters), and Part-time work scholarships (2 semesters
+).
+ Pohang University of Science and Technology.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Services
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Reviewer of Molecular Biology and Evolution
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Reviewer of BMC Evolutionary Biology
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Affiliations
+\series default
+
+\lyxline
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace -8pt
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring MMMMM
+\begin_inset space ~
+\end_inset
+
+ Society of Molecular Biology and Evolution
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,19 @@
+Problem Set 1.2
+---------------
+3. (Recommended) Describe the intersection of the three planes u + v + w +
+z = 6 and u+w+z = 4 and u+w = 2 (all in four-dimensional space). Is it a line or
+a point or an empty set? What is the intersection if the fourth plane u = −1 is
+included? Find a fourth equation that leaves us with no solution.
+
+u + w = 2, v = 2, z = 2. It is a line. If u = -1, w = 3. 
+One of them is u + w = 4.
+
+4. Sketch these three lines and decide if the equations are solvable:
+3 by 2 system
+x + 2y = 2
+x − y = 2
+y = 1
+What happens if all right-hand sides are zero? Is there any nonzero choice of
+right-hand sides that allows the three lines to intersect at the same point?
+
+

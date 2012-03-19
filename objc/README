@@ -1,0 +1,21 @@
+Objective-C using gcc 4.6
+=========================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+Objective-C: Links, Resources, Stuff
+http://www.foldr.org/~michaelw/objective-c/
+
+A general purpose Objective-C Class library
+http://code.google.com/p/ofc/
+
+IOLib is a portable universal data IO library. Implementations exist in C, C++
+and Objective C and for many different platforms (including Linux, Win32, MacOS
+X and .NET).
+IOLib provides a unified interface for accessing different types of data
+streams. It currently supports file IO, BSD sockets, memory buffers and SOCKS4/5
+connections and can be extended with 'drivers' easily.
+It has support for different binary formats (Intel, Motorola, PDP) and it
+supports filters. You can write your own filters (e.g. for encryption or
+compression) and use them with IOLib.
+http://www.iolib.org/index.html
+

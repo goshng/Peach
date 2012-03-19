@@ -10,6 +10,19 @@ http://R.research.att.com/gfortran-42-5664.pkg
 gfortran-42-5664.dmg is installed and it worked.
 ../configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=/Users/goshng/Documents/Projects/peach/rdev/downloads/R-2.14.0/i
 ../configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=/Users/goshng/Documents/Projects/peach/rdev/downloads/R-2.14.0/i --enable-R-shlib 
+../configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=/Users/goshng/Documents/Projects/peach/rdev/downloads/build/R-latest/i
+----
+
+.Download the latest source code
+----
+$ cd downloads
+$ wget http://cran.r-project.org/src/base-prerelease/R-latest.tar.gz
+$ cd R-patched
+$ tools/rsync-recommended
+$ cd ../build
+$ mkdir R-latest
+$ cd R-latest
+$ ../../../configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=/Users/goshng/Documents/Projects/peach/rdev/downloads/build/R-latest/i
 ----
 
 downloads
