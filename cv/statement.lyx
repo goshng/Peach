@@ -2,7 +2,7 @@
 \lyxformat 345
 \begin_document
 \begin_header
-\textclass scrlttr2
+\textclass letter
 \use_default_options true
 \language english
 \inputencoding auto
@@ -16,7 +16,7 @@
 \font_tt_scale 100
 
 \graphics default
-\paperfontsize default
+\paperfontsize 12
 \spacing onehalf
 \use_hyperref false
 \papersize letterpaper
@@ -26,7 +26,9 @@
 \cite_engine basic
 \use_bibtopic false
 \paperorientation portrait
+\leftmargin 1in
 \topmargin 0.5in
+\rightmargin 1in
 \bottommargin 0.5in
 \secnumdepth 3
 \tocdepth 3
@@ -123,8 +125,7 @@ The development of the above statistical procedures are underway using mostly
 
 \begin_layout Standard
 With this my research interest I wish I could have an opportunity of experiencin
-g exciting environment for molecular evolution in EMBL-European Bioinformatics
- Institute at Cambridge.
+g exciting environment for molecular evolution.
  If you need further information regarding my application or could give
  me a chance of interview with you to discuss potential research projects,
  feel free to contact me at email address of goshng at gmail dot com.
