@@ -20,12 +20,14 @@
 \spacing onehalf
 \use_hyperref false
 \papersize letterpaper
-\use_geometry false
+\use_geometry true
 \use_amsmath 1
 \use_esint 1
 \cite_engine basic
 \use_bibtopic false
 \paperorientation portrait
+\topmargin 0.5in
+\bottommargin 0.5in
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -52,52 +54,80 @@ Statement of research interests and experience
 \begin_layout Standard
 
 \lyxline
-I am intrigued by the way how statistical genetics is applied to recent
- genetic and genomic data to recover past history of life.
- Unfortunately, advance in models and methods has been slow and it seemingly
- will be.
- This is why I want to develop new models and methods in the area of molecular
- evolution and population genetics for the incoming era of genomic data.
+My research has been focused on applications of statistical genetics methods
+ to recent genetic and genomic data to recover past history of life.
+ Because advance in models and methods has been slow and seemingly will
+ be, I want to develop new models and methods in the area of molecular evolution
+ and population genetics for the incoming era of genomic data.
  
 \end_layout
 
 \begin_layout Standard
-As a part of my research career, I have been working on a population genetic
- problem of assigning individuals based on their genotypes.
- Traditional methods use Hardy-Weinberg equilibrium and linkage disequilibrium
- (e.g., STRUCTURE).
- Instead, I use demographic and mutation models to achieve the goal.
- Additionally, I can study demographic history at the same time.
- Two more problems have also attracted my attention: inference of recombination
- rates under species trees and species tree inference using multiple loci.
- In addition to the current research projects above, protein coding DNA
- sequence evolution is also of my interest since my graduate study at NC
- State University.
- Protein structure prediction methods were used to model the sequence evolution.
- Together with my current research of species tree inference I am interested
- in studying multiple protein sequence evolution under species tree.
+To achieve my research goals, I have applied models of molecular evolution
+ throughout my research.
+ Currently, with Adam Siepel at Cornell University, I have been working
+ on bacterial genome analysis by focusing on horizontal gene transfer in
+ 
+\emph on
+Streptococcus pyogenes
+\emph default
+ and 
+\emph on
+S.
+\begin_inset space \space{}
+\end_inset
+
+dysgalactiae ssp.
+\begin_inset space \space{}
+\end_inset
+
+equisimilis
+\emph default
+.
+ Before joining the current lab, I had worked on dependent-site codon models
+ with Jeffrey Thorne at North Carolina State University, and later worked
+ on a demography model with Jody Hey at Rutgers University.
+ In addition to applying models of molecular evolution, I have been analyzing
+ RNA-seq data sampled from 
+\emph on
+S.
+\begin_inset space \space{}
+\end_inset
+
+mutans
+\emph default
+ by collaborating with experimental biologists at University of Florida.
+ My roles in the RNA-seq project include detecting differential expression
+ among samples.
+ I am also interested in methods development during my research in the RNA-seq
+ project while I have had opportunity of working on next-generation sequencing
+ data analyses.
+ My future research interest is mainly in method developments in models
+ of molecular evolution potentially utilizing data from next-generation
+ sequencing technology.
+ I am curious of how new genomic era will change the future research in
+ phylogenetics with large data from new sequencing platform.
+ With more solid background of models of molecular evolution, I am interested
+ in population genetics studies because two areas started to merge lately.
+ 
 \end_layout
 
 \begin_layout Standard
-The development of the above statistical procedures are underway using C
- or C++ under Unix-like Operating System.
+The development of the above statistical procedures are underway using mostly
+ C (sometimes C++) under Unix-like Operating System using large linux cluster.
  R and Perl scripts are often used for post- or pre-processing data or analyzing
  results from them.
  A high-level functional programming with Mathematica is sometimes used.
- I also have had chances of using unix or linux clusters for running batch
- jobs.
- Recently, I have been interested in using GPU (Graphics processing unit)
- for massive parallelization to speed up a serialized program.
+ 
 \end_layout
 
 \begin_layout Standard
 With this my research interest I wish I could have an opportunity of experiencin
-g exciting environment for population geneticists in Cornell University
- at Ithaca.
+g exciting environment for molecular evolution in EMBL-European Bioinformatics
+ Institute at Cambridge.
  If you need further information regarding my application or could give
  me a chance of interview with you to discuss potential research projects,
- feel free to contact me at email address of goshng at gmail dot com or
- phone number of 732-445-2681.
+ feel free to contact me at email address of goshng at gmail dot com.
 \end_layout
 
 \begin_layout Standard
