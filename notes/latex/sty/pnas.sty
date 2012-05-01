@@ -1,0 +1,35 @@
+%    version = 2.03 of pnas.sty 2007 Feb 5
+% 2007 Feb 05, 2.03: clean up
+% 2007 Feb 05, 2.02: calls natbib
+% 2006 May 02, 1.00: origin
+% 
+%   Dr. Thomas D. Schneider
+%   National Institutes of Health
+%   National Cancer Institute
+%   Center for Cancer Research Nanobiology Program
+%   Molecular Information Theory Group
+%   Frederick, Maryland  21702-1201
+%   toms@ncifcrf.gov
+%   permanent email: toms@alum.mit.edu (use only if first address fails)
+%   http://www.ccrnp.ncifcrf.gov/~toms/
+
+% From: Ricardo Azevedo 
+% rbazevSPAMBLOCKsbcglobal.net
+%
+% change the reference list from
+%  [1] Abcd, E.F. ...
+%  [2] Someone, S.B. ...
+%
+% to
+%
+%  Whereas the PNAS instructions for authors implies that they should be:
+%  1. Abcd, E.F. ...
+%  2. Someone, S.B. ...
+
+% Note: for styles one does not need the makeatletter/other:
+%\makeatletter
+\renewcommand\@biblabel[1]{#1.}
+%\makeatother
+
+% from dalonsoSPAMBLOCKumich.edu
+\usepackage[numbers,sort&compress,round]{natbib}
