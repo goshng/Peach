@@ -15,3 +15,4 @@ The increasing availability of
 questions relating to how much and what type of data are required
 questions that puzzled Darwin remain unanswered
 the fusion of Darwin's theory of adaptation by natural selection with Mendel's theory of inheritance
+Researchers faced with nonnormal data often try

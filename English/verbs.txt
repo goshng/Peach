@@ -84,3 +84,10 @@ presents substantial computational difficulties
 improves on prior supertree methods
 have the charm of being amenable to statistical analysis
 abound in
+defy classical statistical procedures
+fall outside the scope of the methods taught in introductory statistics
+shoehorning their data into classical statisti- cal frameworks
+remain agnostic
+resolve some controversies about
+benefit our analyses
+overturn earlier studies
