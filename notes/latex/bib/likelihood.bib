@@ -1,0 +1,155 @@
+% This file was created with JabRef 2.3.1.
+% Encoding: ISO8859_1
+
+@ARTICLE{Keane:2007,
+  author = {Thomas M Keane and Thomas J Naughton and James O McInerney},
+  title = {MultiPhyl: a high-throughput phylogenomics webserver using distributed
+	computing.},
+  journal = {Nucleic Acids Res},
+  year = {2007},
+  volume = {35},
+  pages = {W33--W37},
+  number = {Web Server issue},
+  month = {Jul},
+  abstract = {With the number of fully sequenced genomes increasing steadily, there
+	is greater interest in performing large-scale phylogenomic analyses
+	from large numbers of individual gene families. Maximum likelihood
+	(ML) has been shown repeatedly to be one of the most accurate methods
+	for phylogenetic construction. Recently, there have been a number
+	of algorithmic improvements in maximum-likelihood-based tree search
+	methods. However, it can still take a long time to analyse the evolutionary
+	history of many gene families using a single computer. Distributed
+	computing refers to a method of combining the computing power of
+	multiple computers in order to perform some larger overall calculation.
+	In this article, we present the first high-throughput implementation
+	of a distributed phylogenetics platform, MultiPhyl, capable of using
+	the idle computational resources of many heterogeneous non-dedicated
+	machines to form a phylogenetics supercomputer. MultiPhyl allows
+	a user to upload hundreds or thousands of amino acid or nucleotide
+	alignments simultaneously and perform computationally intensive tasks
+	such as model selection, tree searching and bootstrapping of each
+	of the alignments using many desktop machines. The program implements
+	a set of 88 amino acid models and 56 nucleotide maximum likelihood
+	models and a variety of statistical methods for choosing between
+	alternative models. A MultiPhyl webserver is available for public
+	use at: http://www.cs.nuim.ie/distributed/multiphyl.php.},
+  doi = {10.1093/nar/gkm359},
+  keywords = {Algorithms; Animals; Computational Biology; Computer Simulation; Computers;
+	Computing Methodologies; Databases, Genetic; Genomics; Humans; Internet;
+	Likelihood Functions; Phy; Sequence Alignment; Software; User-Computer
+	Interface; logeny},
+  owner = {goshng},
+  pii = {gkm359},
+  pmid = {17553837},
+  timestamp = {2007.08.08},
+  url = {http://dx.doi.org/10.1093/nar/gkm359}
+}
+
+@ARTICLE{Pond:2004,
+  author = {Sergei L Kosakovsky Pond and Spencer V Muse},
+  title = {Column sorting: rapid calculation of the phylogenetic likelihood
+	function.},
+  journal = {Syst Biol},
+  year = {2004},
+  volume = {53},
+  pages = {685--692},
+  number = {5},
+  month = {Oct},
+  abstract = {Likelihood applications have become a central approach for molecular
+	evolutionary analyses since the first computationally tractable treatment
+	two decades ago. Although Felsenstein's original pruning algorithm
+	makes likelihood calculations feasible, it is usually possible to
+	take advantage of repetitive structure present in the data to arrive
+	at even greater computational reductions. In particular, alignment
+	columns with certain similarities have components of the likelihood
+	calculation that are identical and need not be recomputed if columns
+	are evaluated in an optimal order. We develop an algorithm for exploiting
+	this speed improvement via an application of graph theory. The reductions
+	provided by the method depend on both the tree and the data, but
+	typical savings range between 15\%and 50\%. Real-data examples with
+	time reductions of 80\%have been identified. The overhead costs associated
+	with implementing the algorithm are minimal, and they are recovered
+	in all but the smallest data sets. The modifications will provide
+	faster likelihood algorithms, which will allow likelihood methods
+	to be applied to larger sets of taxa and to include more thorough
+	searches of the tree topology space.},
+  doi = {10.1080/10635150490522269},
+  keywords = {Algorithms; Base Sequence; Classification; Evolution, Molecular; Likelihood
+	Functions; Models, Genetic; Phylogeny},
+  owner = {goshng},
+  pii = {N5QBABBH87BRYJFV},
+  pmid = {15545249},
+  timestamp = {2007.08.08},
+  url = {http://dx.doi.org/10.1080/10635150490522269}
+}
+
+@ARTICLE{Rogers:1998,
+  author = {J. S. Rogers and D. L. Swofford},
+  title = {A fast method for approximating maximum likelihoods of phylogenetic
+	trees from nucleotide sequences.},
+  journal = {Syst Biol},
+  year = {1998},
+  volume = {47},
+  pages = {77--89},
+  number = {1},
+  month = {Mar},
+  abstract = {We have developed a rapid parsimony method for reconstructing ancestral
+	nucleotide states that allows calculation of initial branch lengths
+	that are good approximations to optimal maximum-likelihood estimates
+	under several commonly used substitution models. Use of these approximate
+	branch lengths (rather than fixed arbitrary values) as starting points
+	significantly reduces the time required for iteration to a solution
+	that maximizes the likelihood of a tree. These branch lengths are
+	close enough to the optimal values that they can be used without
+	further iteration to calculate approximate maximum-likelihood scores
+	that are very close to the "exact" scores found by iteration. Several
+	strategies are described for using these approximate scores to substantially
+	reduce times needed for maximum-likelihood tree searches.},
+  keywords = {Animals; Base Sequence; Chordata, Nonvertebrate; DNA; DNA, Ribosomal;
+	Decision Trees; Likelihood Functions; Phylogeny; RNA, Ribosomal;
+	Regression Analysis; Reproducibility of Results},
+  owner = {goshng},
+  pmid = {12064242},
+  timestamp = {2007.08.08}
+}
+
+@ARTICLE{Schadt:1998,
+  author = {E. E. Schadt and J. S. Sinsheimer and K. Lange},
+  title = {Computational advances in maximum likelihood methods for molecular
+	phylogeny.},
+  journal = {Genome Res},
+  year = {1998},
+  volume = {8},
+  pages = {222--233},
+  number = {3},
+  month = {Mar},
+  abstract = {We have developed a generalization of Kimura's Markov chain model
+	for base substitution at a single nucleotide site. This generalized
+	model incorporates more flexible transition rates and consequently
+	allows irreversible as well as reversible chains. Because the model
+	embodies just the right amount of symmetry, it permits explicit calculation
+	of finite-time transition probabilities and equilibrium distributions.
+	The model also meshes well with maximum likelihood methods for phylogenetic
+	analysis. Quick calculation of likelihoods and their derivatives
+	can be carried out by adapting Baum's forward and backward algorithms
+	from the theory of hidden Markov chains. Analysis of HIV sequence
+	data illustrates the speed of the algorithms on trees with many contemporary
+	taxa. Analysis of some of Lake's data on the origin of the eukaryotic
+	nucleus contrasts the reversible and irreversible versions of the
+	model.},
+  keywords = {Algorithms; Animals; Computational Biology; Compute; Evolution, Molecular;
+	Humans; Likelihood Functions; Markov Chains; Models, Statistical;
+	Phylogeny; Software; r Simulation},
+  owner = {goshng},
+  pmid = {9521926},
+  timestamp = {2007.08.08}
+}
+
+@comment{jabref-meta: selector_publisher:}
+
+@comment{jabref-meta: selector_author:}
+
+@comment{jabref-meta: selector_journal:}
+
+@comment{jabref-meta: selector_keywords:}
+

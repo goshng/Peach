@@ -1,0 +1,2481 @@
+% This file was created with JabRef 2.6.
+% Encoding: ISO8859_1
+
+@ARTICLE{Akerborg:2009,
+  author = {Orjan Akerborg and Bengt Sennblad and Lars Arvestad and Jens Lagergren},
+  title = {Simultaneous Bayesian gene tree reconstruction and reconciliation
+	analysis.},
+  journal = {Proc Natl Acad Sci U S A},
+  year = {2009},
+  volume = {106},
+  pages = {5714--5719},
+  number = {14},
+  month = {Apr},
+  abstract = {We present GSR, a probabilistic model integrating gene duplication,
+	sequence evolution, and a relaxed molecular clock for substitution
+	rates, that enables genomewide analysis of gene families. The gene
+	duplication and loss process is a major cause for incongruence between
+	gene and species tree, and deterministic methods have been developed
+	to explain such differences through tree reconciliations. Although
+	probabilistic methods for phylogenetic inference have been around
+	for decades, probabilistic reconciliation methods are far less established.
+	Based on our model, we have implemented a Bayesian analysis tool,
+	PrIME-GSR, for gene tree inference that takes a known species tree
+	into account. Our implementation is sound and we demonstrate its
+	utility for genomewide gene-family analysis by applying it to recently
+	presented yeast data. We validate PrIME-GSR by comparing with previous
+	analyses of these data that take advantage of gene order information.
+	In a case study we apply our method to the ADH gene family and are
+	able to draw biologically relevant conclusions concerning gene duplications
+	creating key yeast phenotypes. On a higher level this shows the biological
+	relevance of our method. The obtained results demonstrate the value
+	of a relaxed molecular clock. Our good performance will extend to
+	species where gene order conservation is insufficient.},
+  doi = {10.1073/pnas.0806251106},
+  institution = {School for Computer Science and Communication, Royal Institute of
+	Technology, SE-10044 Stockholm, Sweden.},
+  keywords = {Bayes Theorem; Gene Duplication; Genome, Fungal; Kinetics; Models,
+	Genetic; Mutation; Phylogeny; Yeasts, genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {0806251106},
+  pmid = {19299507},
+  review = {A computation of p(G) in a different perspective. Gene duplication
+	and gene loss.},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1073/pnas.0806251106}
+}
+
+@ARTICLE{Altekar:2004,
+  author = {Gautam Altekar and Sandhya Dwarkadas and John P Huelsenbeck and Fredrik
+	Ronquist},
+  title = {Parallel Metropolis coupled Markov chain Monte Carlo for Bayesian
+	phylogenetic inference.},
+  journal = {Bioinformatics},
+  year = {2004},
+  volume = {20},
+  pages = {407--415},
+  number = {3},
+  month = {Feb},
+  abstract = {MOTIVATION: Bayesian estimation of phylogeny is based on the posterior
+	probability distribution of trees. Currently, the only numerical
+	method that can effectively approximate posterior probabilities of
+	trees is Markov chain Monte Carlo (MCMC). Standard implementations
+	of MCMC can be prone to entrapment in local optima. Metropolis coupled
+	MCMC [(MC)(3)], a variant of MCMC, allows multiple peaks in the landscape
+	of trees to be more readily explored, but at the cost of increased
+	execution time. RESULTS: This paper presents a parallel algorithm
+	for (MC)(3). The proposed parallel algorithm retains the ability
+	to explore multiple peaks in the posterior distribution of trees
+	while maintaining a fast execution time. The algorithm has been implemented
+	using two popular parallel programming models: message passing and
+	shared memory. Performance results indicate nearly linear speed improvement
+	in both programming models for small and large data sets.},
+  doi = {10.1093/bioinformatics/btg427},
+  institution = {Department of Computer Science, University of Rochester, USA. galtekar@cs.rochester.edu},
+  keywords = {Algorithms; Bayes Theorem; Computer Communication Networks; Computing
+	Methodologies; Gene Expression Profiling, methods; Markov Chains;
+	Monte Carlo Method; Numerical Analysis, Computer-Assisted; Phylogeny;
+	Sequence Alignment, methods; Sequence Analysis, DNA, methods; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btg427},
+  pmid = {14960467},
+  review = {A little detailed explanation of MC3},
+  timestamp = {2009.11.13},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btg427}
+}
+
+@ARTICLE{Ane:2007,
+  author = {Cécile Ané and Bret Larget and David A Baum and Stacey D Smith and
+	Antonis Rokas},
+  title = {Bayesian estimation of concordance among gene trees.},
+  journal = {Mol Biol Evol},
+  year = {2007},
+  volume = {24},
+  pages = {412--426},
+  number = {2},
+  month = {Feb},
+  abstract = {Multigene sequence data have great potential for elucidating important
+	and interesting evolutionary processes, but statistical methods for
+	extracting information from such data remain limited. Although various
+	biological processes may cause different genes to have different
+	genealogical histories (and hence different tree topologies), we
+	also may expect that the number of distinct topologies among a set
+	of genes is relatively small compared with the number of possible
+	topologies. Therefore evidence about the tree topology for one gene
+	should influence our inferences of the tree topology on a different
+	gene, but to what extent? In this paper, we present a new approach
+	for modeling and estimating concordance among a set of gene trees
+	given aligned molecular sequence data. Our approach introduces a
+	one-parameter probability distribution to describe the prior distribution
+	of concordance among gene trees. We describe a novel 2-stage Markov
+	chain Monte Carlo (MCMC) method that first obtains independent Bayesian
+	posterior probability distributions for individual genes using standard
+	methods. These posterior distributions are then used as input for
+	a second MCMC procedure that estimates a posterior distribution of
+	gene-to-tree maps (GTMs). The posterior distribution of GTMs can
+	then be summarized to provide revised posterior probability distributions
+	for each gene (taking account of concordance) and to allow estimation
+	of the proportion of the sampled genes for which any given clade
+	is true (the sample-wide concordance factor). Further, under the
+	assumption that the sampled genes are drawn randomly from a genome
+	of known size, we show how one can obtain an estimate, with credibility
+	intervals, on the proportion of the entire genome for which a clade
+	is true (the genome-wide concordance factor). We demonstrate the
+	method on a set of 106 genes from 8 yeast species.},
+  doi = {10.1093/molbev/msl170},
+  institution = {Department of Statistics, University of Wisconsin, USA. ane@wisc.edu},
+  keywords = {Algorithms; Base Sequence; Bayes Theorem; Evolution, Molecular; Genes;
+	Markov Chains; Models, Genetic; Monte Carlo Method; Phylogeny; Saccharomyces,
+	genetics; Sequence Alignment},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {msl170},
+  pmid = {17095535},
+  review = {A two-stage approach using sampling gene trees},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1093/molbev/msl170}
+}
+
+@ARTICLE{Beiko:2006,
+  author = {Robert G Beiko and Nicholas Hamilton},
+  title = {Phylogenetic identification of lateral genetic transfer events.},
+  journal = {BMC Evol Biol},
+  year = {2006},
+  volume = {6},
+  pages = {15},
+  abstract = {BACKGROUND: Lateral genetic transfer can lead to disagreements among
+	phylogenetic trees comprising sequences from the same set of taxa.
+	Where topological discordance is thought to have arisen through genetic
+	transfer events, tree comparisons can be used to identify the lineages
+	that may have shared genetic information. An 'edit path' of one or
+	more transfer events can be represented with a series of subtree
+	prune and regraft (SPR) operations, but finding the optimal such
+	set of operations is NP-hard for comparisons between rooted trees,
+	and may be so for unrooted trees as well. RESULTS: Efficient Evaluation
+	of Edit Paths (EEEP) is a new tree comparison algorithm that uses
+	evolutionarily reasonable constraints to identify and eliminate many
+	unproductive search avenues, reducing the time required to solve
+	many edit path problems. The performance of EEEP compares favourably
+	to that of other algorithms when applied to strictly bifurcating
+	trees with specified numbers of SPR operations. We also used EEEP
+	to recover edit paths from over 19,000 unrooted, incompletely resolved
+	protein trees containing up to 144 taxa as part of a large phylogenomic
+	study. While inferred protein trees were far more similar to a reference
+	supertree than random trees were to each other, the phylogenetic
+	distance spanned by random versus inferred transfer events was similar,
+	suggesting that real transfer events occur most frequently between
+	closely related organisms, but can span large phylogenetic distances
+	as well. While most of the protein trees examined here were very
+	similar to the reference supertree, requiring zero or one edit operations
+	for reconciliation, some trees implied up to 40 transfer events within
+	a single orthologous set of proteins. CONCLUSION: Since sequence
+	trees typically have no implied root and may contain unresolved or
+	multifurcating nodes, the strategy implemented in EEEP is the most
+	appropriate for phylogenomic analyses. The high degree of consistency
+	among inferred protein trees shows that vertical inheritance is the
+	dominant pattern of evolution, at least for the set of organisms
+	considered here. However, the edit paths inferred using EEEP suggest
+	an important role for genetic transfer in the evolution of microbial
+	genomes as well.},
+  doi = {10.1186/1471-2148-6-15},
+  institution = {Institute for Molecular Bioscience, The University of Queensland,
+	Brisbane, Australia. beiko@imb.uq.edu.au},
+  keywords = {Algorithms; Computational Biology, methods; Evolution, Molecular;
+	Gene Transfer, Horizontal; Genome, Archaeal; Genome, Bacterial; Genomics,
+	methods; Phylogeny},
+  language = {eng},
+  medline-pst = {epublish},
+  owner = {goshng},
+  pii = {1471-2148-6-15},
+  pmid = {16472400},
+  timestamp = {2009.09.22},
+  url = {http://dx.doi.org/10.1186/1471-2148-6-15}
+}
+
+@ARTICLE{Berry:2006,
+  author = {Vincent Berry and François Nicolas},
+  title = {Improved parameterized complexity of the maximum agreement subtree
+	and maximum compatible tree problems.},
+  journal = {IEEE/ACM Trans Comput Biol Bioinform},
+  year = {2006},
+  volume = {3},
+  pages = {289--302},
+  number = {3},
+  abstract = {Given a set of evolutionary trees on a same set of taxa, the maximum
+	agreement subtree problem (MAST), respectively, maximum compatible
+	tree problem (MCT), consists of finding a largest subset of taxa
+	such that all input trees restricted to these taxa are isomorphic,
+	respectively compatible. These problems have several applications
+	in phylogenetics such as the computation of a consensus of phylogenies
+	obtained from different data sets, the identification of species
+	subjected to horizontal gene transfers and, more recently, the inference
+	of supertrees, e.g., Trees Of Life. We provide two linear time algorithms
+	to check the isomorphism, respectively, compatibility, of a set of
+	trees or otherwise identify a conflict between the trees with respect
+	to the relative location of a small subset of taxa. Then, we use
+	these algorithms as subroutines to solve MAST and MCT on rooted or
+	unrooted trees of unbounded degree. More precisely, we give exact
+	fixed-parameter tractable algorithms, whose running time is uniformly
+	polynomial when the number of taxa on which the trees disagree is
+	bounded. The improves on a known result for MAST and proves fixed-parameter
+	tractability for MCT.},
+  doi = {10.1109/TCBB.2006.39},
+  institution = {Equipe Méthodes et Algorithmes pour la Bioinformatique-L.I.R.M.M.,
+	Montpellier, France. vberry@lirmm.fr},
+  keywords = {Algorithms; Evolution; Genetics, Population; Likelihood Functions;
+	Models, Genetic; Pedigree; Phylogeny; Sequence Analysis, DNA, methods;
+	ecular},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {17048466},
+  timestamp = {2009.09.22},
+  url = {http://dx.doi.org/10.1109/TCBB.2006.39}
+}
+
+@ARTICLE{Brito:2009,
+  author = {Patrícia H Brito and Scott V Edwards},
+  title = {Multilocus phylogeography and phylogenetics using sequence-based
+	markers.},
+  journal = {Genetica},
+  year = {2009},
+  volume = {135},
+  pages = {439--455},
+  number = {3},
+  month = {Apr},
+  abstract = {We review recent trends in phylogeography and phylogenetics and argue
+	that these two fields stand to be reunited by the common yardstick
+	provided by sequence and SNP data and by new multilocus methods for
+	phylogenetic analysis. Whereas the modern incarnation of both fields
+	was spawned by PCR approaches applied to mitochondrial DNA in the
+	late 1980s, the two fields diverged during the 1990s largely due
+	to the adoption by phylogeographers of microsatellites, in contrast
+	to the adoption of nuclear sequence data by phylogeneticists. Sequence-based
+	markers possess a number of advantages over microsatellites, even
+	on the recent time scales that are the purview of phylogeography.
+	Using examples primarily from vertebrates, we trace the maturation
+	of nuclear gene phylogeography and phylogenetics and suggest that
+	the abundant instances of gene tree heterogeneity beckon a new generation
+	of phylogenetic methods that focus on estimating species trees as
+	distinct from gene trees. Whole genomes provide a powerful common
+	yardstick on which both phylogeography and phylogenetics can assume
+	their proper place as ends of a continuum.},
+  doi = {10.1007/s10709-008-9293-3},
+  institution = {Department of Organismic and Evolutionary Biology, Harvard University,
+	26 Oxford Street, Cambridge, MA 02138, USA. pbrito@oeb.harvard.edu},
+  keywords = {DNA, Mitochondrial, chemistry; Evolution, Molecular; Genetic Markers;
+	Genetic Speciation; Genome; Geography; Phylogeny; Sequence Analysis,
+	DNA; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {18651229},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1007/s10709-008-9293-3}
+}
+
+@ARTICLE{Brumfield:2008,
+  author = {Robb T Brumfield and Liang Liu and David E Lum and Scott V Edwards},
+  title = {Comparison of species tree methods for reconstructing the phylogeny
+	of bearded manakins (Aves: Pipridae, Manacus) from multilocus sequence
+	data.},
+  journal = {Syst Biol},
+  year = {2008},
+  volume = {57},
+  pages = {719--731},
+  number = {5},
+  month = {Oct},
+  abstract = {Although the power of multi-locus data in estimating species trees
+	is apparent, it is also clear that the analytical methodologies for
+	doing so are still maturing. For example, of the methods currently
+	available for estimating species trees from multilocus data, the
+	Bayesian method introduced by Liu and Pearl (2007; BEST) is the only
+	one that provides nodal support values. Using gene sequences from
+	five nuclear loci, we explored two analytical methods (deep coalescence
+	and BEST) to reconstruct the species tree of the five primary Manacus
+	OTUs: M. aurantiacus, M. candei, M. vitellinus, populations of M.
+	manacus from west of the Andes (M. manacus (w)), and populations
+	of M. manacus from east of the Andes (M. manacus (e)). Both BEST
+	and deep coalescence supported a sister relationship between M. vitellinus
+	and M. manacus (w). A lower probability tree from the BEST analysis
+	and one of the most parsimonious deep coalescence trees also supported
+	a sister relationship between M. candei and M. aurantiacus. Because
+	hybrid zones connect the distributions of most Manacus species, we
+	examined the potential influence of post-divergence gene flow on
+	the sister relationship of parapatrically distributed M. vitellinus
+	and M. manacus (w). An isolation-with-migration (IM) analysis found
+	relatively high levels of gene flow between M. vitellinus and M.
+	manacus (w). Whether the gene flow is obscuring a true sister relationship
+	between M. manacus (w) and M. manacus (e) remained unclear, pointing
+	to the need for more detailed models accommodating multispecies,
+	multilocus DNA sequence data.},
+  doi = {10.1080/10635150802422290},
+  institution = {Museum of Natural Science, Baton Rouge, Louisiana 70803, USA. brumfld@lsu.edu},
+  keywords = {Animals; Birds, classification/genetics; Demography; Evolution, Molecular;
+	Likelihood Functions; Models, Genetic; Phylogeny; Recombination,
+	Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {904007372},
+  pmid = {18853359},
+  timestamp = {2009.09.22},
+  url = {http://dx.doi.org/10.1080/10635150802422290}
+}
+
+@ARTICLE{Bryant:2006,
+  author = {David Bryant and Jens Lagergren},
+  title = {Compatibility of unrooted phylogenetic trees is FPT},
+  journal = {Theoretical Computer Science},
+  year = {2006},
+  volume = {351},
+  pages = {296 - 302},
+  number = {3},
+  note = {Parameterized and Exact Computation},
+  abstract = {A collection of T1,T2,...,Tk of unrooted, leaf labelled (phylogenetic)
+	trees, all with different leaf sets, is said to be compatible if
+	there exists a tree T such that each tree Ti can be obtained from
+	T by deleting leaves and contracting edges. Determining compatibility
+	is NP-hard, and the fastest algorithm to date has worst case complexity
+	of around [Omega](nk) time, n being the number of leaves. Here, we
+	present an O(nf(k)) algorithm, proving that compatibility of unrooted
+	phylogenetic trees is fixed parameter tractable (FPT) with respect
+	to the number k of trees.},
+  doi = {DOI: 10.1016/j.tcs.2005.10.033},
+  issn = {0304-3975},
+  url = {http://www.sciencedirect.com/science/article/B6V1G-4HHX2C4-1/2/b19065763d9448fe5242876dc270acfd}
+}
+
+@ARTICLE{Carstens:2007,
+  author = {Bryan C Carstens and L. Lacey Knowles},
+  title = {Estimating species phylogeny from gene-tree probabilities despite
+	incomplete lineage sorting: an example from Melanoplus grasshoppers.},
+  journal = {Syst Biol},
+  year = {2007},
+  volume = {56},
+  pages = {400--411},
+  number = {3},
+  month = {Jun},
+  abstract = {Estimating phylogenetic relationships among closely related species
+	can be extremely difficult when there is incongruence among gene
+	trees and between the gene trees and the species tree. Here we show
+	that incorporating a model of the stochastic loss of gene lineages
+	by genetic drift into the phylogenetic estimation procedure can provide
+	a robust estimate of species relationships, despite widespread incomplete
+	sorting of ancestral polymorphism. This approach is applied to a
+	group of montane Melanoplus grasshoppers for which genealogical discordance
+	among loci and incomplete lineage sorting obscures any obvious phylogenetic
+	relationships among species. Unlike traditional treatments where
+	gene trees estimated using standard phylogenetic methods are implicitly
+	equated with the species tree, with the coalescent-based approach
+	the species tree is modeled probabilistically from the estimated
+	gene trees. The estimated species phylogeny (the ESP) is calculated
+	for the grasshoppers from multiple gene trees reconstructed for nuclear
+	loci and a mitochondrial gene. This empirical application is coupled
+	with a simulation study to explore the performance of the coalescent-based
+	approach. Specifically, we test the accuracy of the ESP given the
+	data based on analyses of simulated data matching the multilocus
+	data collected in Melanoplus (i.e., data were simulated for each
+	locus with the same number of base pairs and locus-specific mutational
+	models). The results of the study show that ESPs can be computed
+	using the coalescent-based approach long before reciprocal monophyly
+	has been achieved, and that these statistical estimates are accurate.
+	This contrasts with analyses of the empirical data collected in Melanoplus
+	and simulated data based on concatenation of multiple loci, for which
+	the incomplete lineage sorting of recently diverged species posed
+	significant problems. The strengths and potential challenges associated
+	with incorporating an explicit model of gene-lineage coalescence
+	into the phylogenetic procedure to obtain an ESP, as illustrated
+	by application to Melanoplus, versus concatenation and consensus
+	approaches are discussed. This study represents a fundamental shift
+	in how species relationships are estimated - the relationship between
+	the gene trees and the species phylogeny is modeled probabilistically
+	rather than equating gene trees with a species tree.},
+  doi = {10.1080/10635150701405560},
+  institution = {Department of Ecology and Evolutionary Biology, Museum of Zoology,
+	University of Michigan, Ann Arbor, MI 48109-1079, USA.},
+  keywords = {Animals; Computer Simulation; Genetic Speciation; Genetic Variation;
+	Grasshoppers, classification/genetics; Likelihood Functions; Models,
+	Genetic; Phylogeny; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {778979727},
+  pmid = {17520504},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1080/10635150701405560}
+}
+
+@ARTICLE{Charleston:1994,
+  author = {M. A. Charleston and M. D. Hendy and D. Penny},
+  title = {The effects of sequence length, tree topology, and number of taxa
+	on the performance of phylogenetic methods.},
+  journal = {J Comput Biol},
+  year = {1994},
+  volume = {1},
+  pages = {133--151},
+  number = {2},
+  abstract = {Simulations were used to study the performance of several character-based
+	and distance-based phylogenetic methods in obtaining the correct
+	tree from pseudo-randomly generated input data. The study included
+	all the topologies of unrooted binary trees with from 4 to 10 pendant
+	vertices (taxa) inclusive. The length of the character sequences
+	used ranged from 10 to 10(5) characters exponentially. The methods
+	studied include Closest Tree, Compatibility, Li's method, Maximum
+	Parsimony, Neighbor-joining, Neighborliness, and UPGMA. We also provide
+	a modification to Li's method (SimpLi) which is consistent with additive
+	data. We give estimations of the sequence lengths required for given
+	confidence in the output of these methods under the assumptions of
+	molecular evolution used in this study. A notation for characterizing
+	all tree topologies is described. We show that when the number of
+	taxa, the maximum path length, and the minimum edge length are held
+	constant, there it little but significant dependence of the performance
+	of the methods on the tree topology. We show that those methods that
+	are consistent with the model used perform similarly, whereas the
+	inconsistent methods, UPGMA and Li's method, perform very poorly.},
+  institution = {Department of Mathematics, Massey University, Palmerston North, New
+	Zealand.},
+  keywords = {Base Sequence; Computer Simulation; DNA, classification; Models, Biological;
+	Phylogeny; RNA, classification; Reproducibility of Results; Sequence
+	Alignment, methods},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {8790460},
+  timestamp = {2009.09.22}
+}
+
+@ARTICLE{Cranston2009,
+  author = {Karen A Cranston and Bonnie Hurwitz and Doreen Ware and Lincoln Stein
+	and Rod A Wing},
+  title = {Species trees from highly incongruent gene trees in rice.},
+  journal = {Syst Biol},
+  year = {2009},
+  volume = {58},
+  pages = {489--500},
+  number = {5},
+  month = {Oct},
+  __markedentry = {[goshng]},
+  abstract = {Several methods have recently been developed to infer multilocus phylogenies
+	by incorporating information from topological incongruence of the
+	individual genes. In this study, we investigate 2 such methods, Bayesian
+	concordance analysis and Bayesian estimation of species trees. Our
+	test data are a collection of genes from cultivated rice (genus Oryza)
+	and the most closely related wild species, generated using a high-throughput
+	sequencing protocol and bioinformatics pipeline. Trees inferred from
+	independent genes display levels of topological incongruence that
+	far exceed that seen in previous data sets analyzed with these species
+	tree methods. We identify differences in phylogenetic results between
+	inference methods that incorporate gene tree incongruence. Finally,
+	we discuss the challenges of scaling these analyses for data sets
+	with thousands of gene trees and extensive levels of missing data.},
+  doi = {10.1093/sysbio/syp054},
+  institution = {Department of Ecology and Evolutionary Biology, University of Arizona,
+	Tucson, AZ 85721, USA. kcranston@fieldmuseum.org},
+  keywords = {Base Sequence; Bayes Theorem; Classification, methods; Computational
+	Biology, methods; Genes, genetics; Models, Genetic; Oryza sativa,
+	genetics; Phylogeny; Sequence Alignment; Sequence Analysis, DNA;
+	Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {syp054},
+  pmid = {20525603},
+  timestamp = {2011.06.13},
+  url = {http://dx.doi.org/10.1093/sysbio/syp054}
+}
+
+@ARTICLE{Degnan:2006,
+  author = {James H Degnan and Noah A Rosenberg},
+  title = {Discordance of species trees with their most likely gene trees.},
+  journal = {PLoS Genet},
+  year = {2006},
+  volume = {2},
+  pages = {e68},
+  number = {5},
+  month = {May},
+  abstract = {Because of the stochastic way in which lineages sort during speciation,
+	gene trees may differ in topology from each other and from species
+	trees. Surprisingly, assuming that genetic lineages follow a coalescent
+	model of within-species evolution, we find that for any species tree
+	topology with five or more species, there exist branch lengths for
+	which gene tree discordance is so common that the most likely gene
+	tree topology to evolve along the branches of a species tree differs
+	from the species phylogeny. This counterintuitive result implies
+	that in combining data on multiple loci, the straightforward procedure
+	of using the most frequently observed gene tree topology as an estimate
+	of the species tree topology can be asymptotically guaranteed to
+	produce an incorrect estimate. We conclude with suggestions that
+	can aid in overcoming this new obstacle to accurate genomic inference
+	of species phylogenies.},
+  doi = {10.1371/journal.pgen.0020068},
+  institution = {Department of Biostatistics, Harvard School of Public Health, Boston,
+	Massachusetts, USA. jdegnan@hsph.harvard.edu},
+  keywords = {Algorithms; Animals; Computational Biology, methods; Evolution, Molecular;
+	Genetic Speciation; Genetics; Genetics, Population; Genomics, methods;
+	Humans; Models, Genetic; Models, Statistical; Phylogeny; Species
+	Specificity; Stochastic Processes},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {16733550},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1371/journal.pgen.0020068}
+}
+
+@ARTICLE{Degnan:2005,
+  author = {James H Degnan and Laura A Salter},
+  title = {Gene tree distributions under the coalescent process.},
+  journal = {Evolution},
+  year = {2005},
+  volume = {59},
+  pages = {24--37},
+  number = {1},
+  month = {Jan},
+  abstract = {Under the coalescent model for population divergence, lineage sorting
+	can cause considerable variability in gene trees generated from any
+	given species tree. In this paper, we derive a method for computing
+	the distribution of gene tree topologies given a bifurcating species
+	tree for trees with an arbitrary number of taxa in the case that
+	there is one gene sampled per species. Applications for gene tree
+	distributions include determining exact probabilities of topological
+	equivalence between gene trees and species trees and inferring species
+	trees from multiple datasets. In addition, we examine the shapes
+	of gene tree distributions and their sensitivity to changes in branch
+	lengths, species tree shape, and tree size. The method for computing
+	gene tree distributions is implemented in the computer program COAL.},
+  institution = {Department of Mathematics and Statistics, University of New Mexico,
+	Albuquerque, New Mexico 87131, USA. james@stat.unm.edu},
+  keywords = {Genetic Speciation; Genetics, Population; Models, Genetic; Phylogeny;
+	Probability; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {15792224},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Eckert:2008,
+  author = {Andrew J Eckert and Bryan C Carstens},
+  title = {Does gene flow destroy phylogenetic signal? The performance of three
+	methods for estimating species phylogenies in the presence of gene
+	flow.},
+  journal = {Mol Phylogenet Evol},
+  year = {2008},
+  volume = {49},
+  pages = {832--842},
+  number = {3},
+  month = {Dec},
+  abstract = {Incomplete lineage sorting has been documented across a diverse set
+	of taxa ranging from song birds to conifers. Such patterns are expected
+	theoretically for species characterized by certain life history characteristics
+	(e.g. long generation times) and those influenced by certain historical
+	demographic events (e.g. recent divergences). A number of methods
+	to estimate the underlying species phylogeny from a set of gene trees
+	have been proposed and shown to be effective when incomplete lineage
+	sorting has occurred. The further effects of gene flow on those methods,
+	however, remain to be investigated. Here, we focus on the performance
+	of three methods of species tree inference, ESP-COAL, minimizing
+	deep coalescence (MDC), and concatenation, when incomplete lineage
+	sorting and gene flow jointly confound the relationship between gene
+	and species trees. Performance was investigated using Monte Carlo
+	coalescent simulations under four models (n-island, stepping stone,
+	parapatric, and allopatric) and three magnitudes of gene flow (N(e)m=0.01,
+	0.10, 1.00). Although results varied by the model and magnitude of
+	gene flow, methods incorporating aspects of the coalescent process
+	(ESP-COAL and MDC) performed well, with probabilities of identifying
+	the correct species tree topology typically increasing to greater
+	than 0.75 when five more loci are sampled. The only exceptions to
+	that pattern included gene flow at moderate to high magnitudes under
+	the n-island and stepping stone models. Concatenation performs poorly
+	relative to the other methods. We extend these results to a discussion
+	of the importance of species and population phylogenies to the fields
+	of molecular systematics and phylogeography using an empirical example
+	from Rhododendron.},
+  doi = {10.1016/j.ympev.2008.09.008},
+  institution = {Section of Evolution and Ecology, University of California at Davis,
+	One Shields Avenue, Davis, CA 95616, USA. ajeckert@ucdavis.edu},
+  keywords = {Computer Simulation; Evolution, Molecular; Gene Flow; Genetic Speciation;
+	Genetics, Population; Geography; Likelihood Functions; Models, Genetic;
+	Models, Statistical; Monte Carlo Method; Phylogeny; Rhododendron,
+	classification/genetics; Sequence Analysis, DNA},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {903(08)00456-9},
+  pmid = {18845264},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1016/j.ympev.2008.09.008}
+}
+
+@ARTICLE{Edwards:2009,
+  author = {Scott V Edwards},
+  title = {Is a new and general theory of molecular systematics emerging?},
+  journal = {Evolution},
+  year = {2009},
+  volume = {63},
+  pages = {1--19},
+  number = {1},
+  month = {Jan},
+  abstract = {The advent and maturation of algorithms for estimating species trees-phylogenetic
+	trees that allow gene tree heterogeneity and whose tips represent
+	lineages, populations and species, as opposed to genes-represent
+	an exciting confluence of phylogenetics, phylogeography, and population
+	genetics, and ushers in a new generation of concepts and challenges
+	for the molecular systematist. In this essay I argue that to better
+	deal with the large multilocus datasets brought on by phylogenomics,
+	and to better align the fields of phylogeography and phylogenetics,
+	we should embrace the primacy of species trees, not only as a new
+	and useful practical tool for systematics, but also as a long-standing
+	conceptual goal of systematics that, largely due to the lack of appropriate
+	computational tools, has been eclipsed in the past few decades. I
+	suggest that phylogenies as gene trees are a "local optimum" for
+	systematics, and review recent advances that will bring us to the
+	broader optimum inherent in species trees. In addition to adopting
+	new methods of phylogenetic analysis (and ideally reserving the term
+	"phylogeny" for species trees rather than gene trees), the new paradigm
+	suggests shifts in a number of practices, such as sampling data to
+	maximize not only the number of accumulated sites but also the number
+	of independently segregating genes; routinely using coalescent or
+	other models in computer simulations to allow gene tree heterogeneity;
+	and understanding better the role of concatenation in influencing
+	topologies and confidence in phylogenies. By building on the foundation
+	laid by concepts of gene trees and coalescent theory, and by taking
+	cues from recent trends in multilocus phylogeography, molecular systematics
+	stands to be enriched. Many of the challenges and lessons learned
+	for estimating gene trees will carry over to the challenge of estimating
+	species trees, although adopting the species tree paradigm will clarify
+	many issues (such as the nature of polytomies and the star tree paradox),
+	raise conceptually new challenges, or provide new answers to old
+	questions.},
+  doi = {10.1111/j.1558-5646.2008.00549.x},
+  institution = { Evolutionary Biology, Harvard University, Cambridge, Massachusetts
+	02138, USA. sedwards@fas.harvard.edu},
+  keywords = {Classification; Genes; Genetic Speciation; Genetic Variation; Models,
+	Genetic; Phylogeny; Polymorphism, Single Nucleotide},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {EVO549},
+  pmid = {19146594},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1111/j.1558-5646.2008.00549.x}
+}
+
+@ARTICLE{Edwards:2000,
+  author = {S. V. Edwards and P. Beerli},
+  title = {Perspective: gene divergence, population divergence, and the variance
+	in coalescence time in phylogeographic studies.},
+  journal = {Evolution},
+  year = {2000},
+  volume = {54},
+  pages = {1839--1854},
+  number = {6},
+  month = {Dec},
+  abstract = {Molecular methods as applied to the biogeography of single species
+	(phylogeography) or multiple codistributed species (comparative phylogeography)
+	have been productively and extensively used to elucidate common historical
+	features in the diversification of the Earth's biota. However, only
+	recently have methods for estimating population divergence times
+	or their confidence limits while taking into account the critical
+	effects of genetic polymorphism in ancestral species become available,
+	and earlier methods for doing so are underutilized. We review models
+	that address the crucial distinction between the gene divergence,
+	the parameter that is typically recovered in molecular phylogeographic
+	studies, and the population divergence, which is in most cases the
+	parameter of interest and will almost always postdate the gene divergence.
+	Assuming that population sizes of ancestral species are distributed
+	similarly to those of extant species, we show that phylogeographic
+	studies in vertebrates suggest that divergence of alleles in ancestral
+	species can comprise from less than 10\% to over 50\% of the total
+	divergence between sister species, suggesting that the problem of
+	ancestral polymorphism in dating population divergence can be substantial.
+	The variance in the number of substitutions (among loci for a given
+	species or among species for a given gene) resulting from the stochastic
+	nature of DNA change is generally smaller than the variance due to
+	substitutions along allelic lines whose coalescence times vary due
+	to genetic drift in the ancestral population. Whereas the former
+	variance can be reduced by further DNA sequencing at a single locus,
+	the latter cannot. Contrary to phylogeographic intuition, dating
+	population divergence times when allelic lines have achieved reciprocal
+	monophyly is in some ways more challenging than when allelic lines
+	have not achieved monophyly, because in the former case critical
+	data on ancestral population size provided by residual ancestral
+	polymorphism is lost. In the former case differences in coalescence
+	time between species pairs can in principle be explained entirely
+	by differences in ancestral population size without resorting to
+	explanations involving differences in divergence time. Furthermore,
+	the confidence limits on population divergence times are severely
+	underestimated when those for number of substitutions per site in
+	the DNA sequences examined are used as a proxy. This uncertainty
+	highlights the importance of multilocus data in estimating population
+	divergence times; multilocus data can in principle distinguish differences
+	in coalescence time (T) resulting from differences in population
+	divergence time and differences in T due to differences in ancestral
+	population sizes and will reduce the confidence limits on the estimates.
+	We analyze the contribution of ancestral population size (theta)
+	to T and the effect of uncertainty in theta on estimates of population
+	divergence (tau) for single loci under reciprocal monophyly using
+	a simple Bayesian extension of Takahata and Satta's and Yang's recent
+	coalescent methods. The confidence limits on tau decrease when the
+	range over which ancestral population size theta is assumed to be
+	distributed decreases and when tau increases; they generally exclude
+	zero when tau/(4Ne) > 1. We also apply a maximum-likelihood method
+	to several single and multilocus data sets. With multilocus data,
+	the criterion for excluding tau = 0 is roughly that l tau/(4Ne) >
+	1, where l is the number of loci. Our analyses corroborate recent
+	suggestions that increasing the number of loci is critical to decreasing
+	the uncertainty in estimates of population divergence time.},
+  institution = {Department of Zoology and Burke Museum, University of Washington,
+	Seattle 98195, USA. edwards@zoology.washington.edu},
+  keywords = {Animals; Gene Frequency; Genetic Variation; Geography; Phylogeny;
+	Vertebrates, genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {11209764},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Edwards:2007,
+  author = {Scott V Edwards and Liang Liu and Dennis K Pearl},
+  title = {High-resolution species trees without concatenation.},
+  journal = {Proc Natl Acad Sci U S A},
+  year = {2007},
+  volume = {104},
+  pages = {5936--5941},
+  number = {14},
+  month = {Apr},
+  abstract = {The vast majority of phylogenetic models focus on resolution of gene
+	trees, despite the fact that phylogenies of species in which gene
+	trees are embedded are of primary interest. We analyze a Bayesian
+	model for estimating species trees that accounts for the stochastic
+	variation expected for gene trees from multiple unlinked loci sampled
+	from a single species history after a coalescent process. Application
+	of the model to a 106-gene data set from yeast shows that the set
+	of gene trees recovered by statistically acknowledging the shared
+	but unknown species tree from which gene trees are sampled is much
+	reduced compared with treating the history of each locus independently
+	of an overarching species tree. The analysis also yields a concentrated
+	posterior distribution of the yeast species tree whose mode is congruent
+	with the concatenated gene tree but can do so with less than half
+	the loci required by the concatenation method. Using simulations,
+	we show that, with large numbers of loci, highly resolved species
+	trees can be estimated under conditions in which concatenation of
+	sequence data will positively mislead phylogeny, and when the proportion
+	of gene trees matching the species tree is <10\%. However, when gene
+	tree/species tree congruence is high, species trees can be resolved
+	with just two or three loci. These results make accessible an alternative
+	paradigm for combining data in phylogenomics that focuses attention
+	on the singularity of species histories and away from the idiosyncrasies
+	and multiplicities of individual gene histories.},
+  doi = {10.1073/pnas.0607004104},
+  institution = {Department of Organismic and Evolutionary Biology, and Museum of
+	Comparative Zoology, Harvard University, Cambridge, MA 02138, USA.
+	sedwards@fas.harvard.edu},
+  keywords = {Alleles; Base Composition; Base Sequence; Bayes Theorem; DNA, Concatenated;
+	DNA, Fungal, genetics; Genomics; Likelihood Functions; Markov Chains;
+	Models, Genetic; Models, Statistical; Molecular Sequence Data; Monte
+	Carlo Method; Phylogeny; Saccharomyces cerevisiae, genetics; Sequence
+	Analysis, DNA; Species Specificity; Stochastic Processes},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {0607004104},
+  pmid = {17392434},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1073/pnas.0607004104}
+}
+
+@ARTICLE{Felsenstein:1981,
+  author = {J. Felsenstein},
+  title = {Evolutionary trees from DNA sequences: a maximum likelihood approach.},
+  journal = {J Mol Evol},
+  year = {1981},
+  volume = {17},
+  pages = {368--376},
+  number = {6},
+  abstract = {The application of maximum likelihood techniques to the estimation
+	of evolutionary trees from nucleic acid sequence data is discussed.
+	A computationally feasible method for finding such maximum likelihood
+	estimates is developed, and a computer program is available. This
+	method has advantages over the traditional parsimony algorithms,
+	which can give misleading results if rates of evolution differ in
+	different lineages. It also allows the testing of hypotheses about
+	the constancy of evolutionary rates by likelihood ratio tests, and
+	gives rough indication of the error of ;the estimate of the tree.},
+  keywords = {Base Sequence; Computers; DNA, genetics; Evolution; Mathematics; Models,
+	Biological; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {7288891},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Feng:2003,
+  author = {Xizhou Feng and Duncan A. Buell and John R. Rose and Peter J. Waddell},
+  title = {Parallel algorithms for Bayesian phylogenetic inference},
+  journal = {Journal of Parallel and Distributed Computing},
+  year = {2003},
+  volume = {63},
+  pages = {707 - 718},
+  number = {7-8},
+  note = {Special Issue on High-Performance Computational Biology},
+  abstract = {The combination of a Markov chain Monte Carlo (MCMC) method with likelihood-based
+	assessment of phylogenies is becoming a popular alternative to direct
+	likelihood optimization. However, MCMC, like maximum likelihood,
+	is a computationally expensive method. To approximate the posterior
+	distribution of phylogenies, a Markov chain is constructed, using
+	the Metropolis algorithm, such that the chain has the posterior distribution
+	of the parameters of phylogenies as its stationary distribution.
+	This paper describes parallel algorithms and their MPI-based parallel
+	implementation for MCMC-based Bayesian phylogenetic inference. Bayesian
+	phylogenetic inference is computationally expensive both in time
+	and in memory requirements. Our variations on MCMC and their implementation
+	were done to permit the study of large phylogenetic problems. In
+	our approach, we can distribute either entire chains or parts of
+	a chain to different processors, since in current models the columns
+	of the data are independent. Evaluations on a 32-node Beowulf cluster
+	suggest the problem scales well. A number of important points are
+	identified, including a superlinear speedup due to more effective
+	cache usage and the point at which additional processors slow down
+	the process due to communication overhead.},
+  doi = {DOI: 10.1016/S0743-7315(03)00079-0},
+  issn = {0743-7315},
+  keywords = {Phylogenetic inference},
+  url = {http://www.sciencedirect.com/science/article/B6WKJ-49039D7-1/2/760073265ef4fc21a18855baec8436b0}
+}
+
+@ARTICLE{Gorecki:2007,
+  author = {Pawel Górecki and Jerzy Tiuryn},
+  title = {Inferring phylogeny from whole genomes.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {e116--e122},
+  number = {2},
+  month = {Jan},
+  abstract = {MOTIVATION: Inferring species phylogenies with a history of gene losses
+	and duplications is a challenging and an important task in computational
+	biology. This problem can be solved by duplication-loss models in
+	which the primary step is to reconcile a rooted gene tree with a
+	rooted species tree. Most modern methods of phylogenetic reconstruction
+	(from sequences) produce unrooted gene trees. This limitation leads
+	to the problem of transforming unrooted gene tree into a rooted tree,
+	and then reconciling rooted trees. The main questions are 'What about
+	biological interpretation of choosing rooting?', 'Can we find efficiently
+	the optimal rootings?', 'Is the optimal rooting unique?'. RESULTS:
+	In this paper we present a model of reconciling unrooted gene tree
+	with a rooted species tree, which is based on a concept of choosing
+	rooting which has minimal reconciliation cost. Our analysis leads
+	to the surprising property that all the minimal rootings have identical
+	distributions of gene duplications and gene losses in the species
+	tree. It implies, in our opinion, that the concept of an optimal
+	rooting is very robust, and thus biologically meaningful. Also, it
+	has nice computational properties. We present a linear time and space
+	algorithm for computing optimal rooting(s). This algorithm was used
+	in two different ways to reconstruct the optimal species phylogeny
+	of five known yeast genomes from approximately 4700 gene trees. Moreover,
+	we determined locations (history) of all gene duplications and gene
+	losses in the final species tree. It is interesting to notice that
+	the top five species trees are the same for both methods. AVAILABILITY:
+	Software and documentation are freely available from http://bioputer.mimuw.edu.pl/~gorecki/urec},
+  doi = {10.1093/bioinformatics/btl296},
+  institution = {Institute of Informatics, Warsaw University Banacha 2, 02-678 Warsaw,
+	Poland. gorecki@mimuw.edu.pl},
+  keywords = {Algorithms; Chromosome Mapping, methods; Conserved Sequence; Evolution,
+	Molecular; Genome, Fungal, genetics; Phylogeny; Proteome, genetics;
+	Sequence Alignment, methods; Sequence Analysis, Protein, methods},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {23/2/e116},
+  pmid = {17237078},
+  review = {Check author name},
+  timestamp = {2009.09.22},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btl296}
+}
+
+@ARTICLE{Gorecki:2007a,
+  author = {Pawel Górecki and Jerzy Tiuryn},
+  title = {URec: a system for unrooted reconciliation.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {511--512},
+  number = {4},
+  month = {Feb},
+  abstract = {URec is a software based on a concept of unrooted reconciliation.
+	It can be used to reconcile a set of unrooted gene trees with a rooted
+	species tree or a set of rooted species trees. Moreover, it computes
+	detailed distribution of gene duplications and gene losses in a species
+	tree. It can be used to infer optimal species phylogenies for a given
+	set of gene trees. URec is implemented in C++ and can be easily compiled
+	under Unix and Windows systems. Availability: Software is freely
+	available for download from our website at http://bioputer.mimuw.edu.pl/~gorecki/urec.
+	This webpage also contains Windows executables and a number of advanced
+	examples with explanations.},
+  doi = {10.1093/bioinformatics/btl634},
+  institution = {Institute of Informatics, Warsaw University, Banacha 2, 02-678 Warsaw,
+	Poland. gorecki@mimuw.edu.pl},
+  keywords = {Algorithms; Computer Simulation; Evolution; Genetic Variation, genetics;
+	Genetics, Population; Models, Genetic; Phylogeny; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btl634},
+  pmid = {17182699},
+  timestamp = {2009.09.22},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btl634}
+}
+
+@ARTICLE{Heled2009,
+  author = {J. Heled and A.J. Drummond},
+  title = {Bayesian inference of species trees from multilocus data},
+  journal = {Mol Biol Evol},
+  year = {2009},
+  owner = {goshng},
+  review = {BEST alternative},
+  timestamp = {2010.03.05}
+}
+
+@ARTICLE{Heled2010,
+  author = {Joseph Heled and Alexei J Drummond},
+  title = {Bayesian inference of species trees from multilocus data.},
+  journal = {Mol Biol Evol},
+  year = {2010},
+  volume = {27},
+  pages = {570--580},
+  number = {3},
+  month = {Mar},
+  __markedentry = {[goshng]},
+  abstract = {Until recently, it has been common practice for a phylogenetic analysis
+	to use a single gene sequence from a single individual organism as
+	a proxy for an entire species. With technological advances, it is
+	now becoming more common to collect data sets containing multiple
+	gene loci and multiple individuals per species. These data sets often
+	reveal the need to directly model intraspecies polymorphism and incomplete
+	lineage sorting in phylogenetic estimation procedures. For a single
+	species, coalescent theory is widely used in contemporary population
+	genetics to model intraspecific gene trees. Here, we present a Bayesian
+	Markov chain Monte Carlo method for the multispecies coalescent.
+	Our method coestimates multiple gene trees embedded in a shared species
+	tree along with the effective population size of both extant and
+	ancestral species. The inference is made possible by multilocus data
+	from multiple individuals per species. Using a multiindividual data
+	set and a series of simulations of rapid species radiations, we demonstrate
+	the efficacy of our new method. These simulations give some insight
+	into the behavior of the method as a function of sampled individuals,
+	sampled loci, and sequence length. Finally, we compare our new method
+	to both an existing method (BEST 2.2) with similar goals and the
+	supermatrix (concatenation) method. We demonstrate that both BEST
+	and our method have much better estimation accuracy for species tree
+	topology than concatenation, and our method outperforms BEST in divergence
+	time and population size estimation.},
+  doi = {10.1093/molbev/msp274},
+  institution = {Department of Computer Science, University of Auckland, New Zealand.
+	jheled@gmail.com},
+  keywords = {Algorithms; Bayes Theorem; Computer Simulation; Evolution, Molecular;
+	Genes; Models, Genetic; Monte Carlo Method; Phylogeny; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {msp274},
+  pmid = {19906793},
+  timestamp = {2011.06.13},
+  url = {http://dx.doi.org/10.1093/molbev/msp274}
+}
+
+@ARTICLE{Hickey:2008,
+  author = {Glenn Hickey and Frank Dehne and Andrew Rau-Chaplin and Christian
+	Blouin},
+  title = {SPR Distance Computation for Unrooted Trees.},
+  journal = {Evol Bioinform Online},
+  year = {2008},
+  volume = {4},
+  pages = {17--27},
+  abstract = {The subtree prune and regraft distance (d(SPR)) between phylogenetic
+	trees is important both as a general means of comparing phylogenetic
+	tree topologies as well as a measure of lateral gene transfer (LGT).
+	Although there has been extensive study on the computation of d(SPR)
+	and similar metrics between rooted trees, much less is known about
+	SPR distances for unrooted trees, which often arise in practice when
+	the root is unresolved. We show that unrooted SPR distance computation
+	is NP-Hard and verify which techniques from related work can and
+	cannot be applied. We then present an efficient heuristic algorithm
+	for this problem and benchmark it on a variety of synthetic datasets.
+	Our algorithm computes the exact SPR distance between unrooted tree,
+	and the heuristic element is only with respect to the algorithm's
+	computation time. Our method is a heuristic version of a fixed parameter
+	tractability (FPT) approach and our experiments indicate that the
+	running time behaves similar to FPT algorithms. For real data sets,
+	our algorithm was able to quickly compute d(SPR) for the majority
+	of trees that were part of a study of LGT in 144 prokaryotic genomes.
+	Our analysis of its performance, especially with respect to searching
+	and reduction rules, is applicable to computing many related distance
+	measures.},
+  institution = {School of Computer Science, Carleton University, Ottawa, Canada K1S
+	5B6.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {19204804},
+  timestamp = {2009.09.22}
+}
+
+@ARTICLE{Hobolth:2007,
+  author = {Asger Hobolth and Ole F Christensen and Thomas Mailund and Mikkel
+	H Schierup},
+  title = {Genomic relationships and speciation times of human, chimpanzee,
+	and gorilla inferred from a coalescent hidden Markov model.},
+  journal = {PLoS Genet},
+  year = {2007},
+  volume = {3},
+  pages = {e7},
+  number = {2},
+  month = {Feb},
+  abstract = {The genealogical relationship of human, chimpanzee, and gorilla varies
+	along the genome. We develop a hidden Markov model (HMM) that incorporates
+	this variation and relate the model parameters to population genetics
+	quantities such as speciation times and ancestral population sizes.
+	Our HMM is an analytically tractable approximation to the coalescent
+	process with recombination, and in simulations we see no apparent
+	bias in the HMM estimates. We apply the HMM to four autosomal contiguous
+	human-chimp-gorilla-orangutan alignments comprising a total of 1.9
+	million base pairs. We find a very recent speciation time of human-chimp
+	(4.1 +/- 0.4 million years), and fairly large ancestral effective
+	population sizes (65,000 +/- 30,000 for the human-chimp ancestor
+	and 45,000 +/- 10,000 for the human-chimp-gorilla ancestor). Furthermore,
+	around 50\% of the human genome coalesces with chimpanzee after speciation
+	with gorilla. We also consider 250,000 base pairs of X-chromosome
+	alignments and find an effective population size much smaller than
+	75\% of the autosomal effective population sizes. Finally, we find
+	that the rate of transitions between different genealogies correlates
+	well with the region-wide present-day human recombination rate, but
+	does not correlate with the fine-scale recombination rates and recombination
+	hot spots, suggesting that the latter are evolutionarily transient.},
+  doi = {10.1371/journal.pgen.0030007},
+  institution = {Bioinformatics Research Center, North Carolina State University,
+	Raleigh, North Carolina, United States of America. asger@daimi.au.dk},
+  keywords = {Animals; Base Sequence; Computer Simulation; Genetic Speciation; Genetics,
+	Population; Genome, Human; Gorilla gorilla, genetics; Hominidae,
+	genetics; Humans; Markov Chains; Models, Theoretical; Molecular Sequence
+	Data; Pan troglodytes, genetics; Phylogeny; Sequence Homology, Nucleic
+	Acid},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {06-PLGE-RA-0277R3},
+  pmid = {17319744},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1371/journal.pgen.0030007}
+}
+
+@ARTICLE{Hudson:1992,
+  author = {R. R. Hudson},
+  title = {Gene trees, species trees and the segregation of ancestral alleles.},
+  journal = {Genetics},
+  year = {1992},
+  volume = {131},
+  pages = {509--513},
+  number = {2},
+  month = {Jun},
+  keywords = {Genes; Models, Genetic; Phylogeny; Polymorphism, Genetic; Probability;
+	Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {1644284},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Jennings:2005,
+  author = {W. Bryan Jennings and Scott V Edwards},
+  title = {Speciational history of Australian grass finches (Poephila) inferred
+	from thirty gene trees.},
+  journal = {Evolution},
+  year = {2005},
+  volume = {59},
+  pages = {2033--2047},
+  number = {9},
+  month = {Sep},
+  abstract = {Multilocus genealogical approaches are still uncommon in phylogeography
+	and historical demography, fields which have been dominated by microsatellite
+	markers and mitochondrial DNA, particularly for vertebrates. Using
+	30 newly developed anonymous nuclear loci, we estimated population
+	divergence times and ancestral population sizes of three closely
+	related species of Australian grass finches (Poephila) distributed
+	across two barriers in northern Australia. We verified that substitution
+	rates were generally constant both among lineages and among loci,
+	and that intralocus recombination was uncommon in our dataset, thereby
+	satisfying two assumptions of our multilocus analysis. The reconstructed
+	gene trees exhibited all three possible tree topologies and displayed
+	considerable variation in coalescent times, yet this information
+	provided the raw data for maximum likelihood and Bayesian estimation
+	of population divergence times and ancestral population sizes. Estimates
+	of these parameters were in close agreement with each other regardless
+	of statistical approach and our Bayesian estimates were robust to
+	prior assumptions. Our results suggest that black-throated finches
+	(Poephila cincta) diverged from long-tailed finches (P. acuticauda
+	and P. hecki) across the Carpentarian Barrier in northeastern Australia
+	around 0.6 million years ago (mya), and that P. acuticauda diverged
+	from P. hecki across the Kimberley Plateau-Arnhem Land Barrier in
+	northwestern Australia approximately 0.3 mya. Bayesian 95\% credibility
+	intervals around these estimates strongly support Pleistocene timing
+	for both speciation events, despite the fact that many gene divergences
+	across the Carpentarian region clearly predated the Pleistocene.
+	Estimates of ancestral effective population sizes for the basal ancestor
+	and long-tailed finch ancestor were large (about 521,000 and about
+	384,000, respectively). Although the errors around the population
+	size parameter estimates are considerable, they are the first for
+	birds taking into account multiple sources of variance.},
+  institution = {Museum of Comparative Zoology, Department of Organismic and Evolutionary
+	Biology, Harvard University, Cambridge, Massachusetts 02138, USA.
+	bjennings@oeb.harvard.edu},
+  keywords = {Animals; Australia; Base Sequence; Bayes Theorem; Evolution, Molecular;
+	Finches, genetics; Geography; Likelihood Functions; Models, Genetic;
+	Molecular Sequence Data; Phylogeny; Population Density; Sequence
+	Analysis, DNA; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {16261740},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Knowles:2007,
+  author = {L. Lacey Knowles and Bryan C Carstens},
+  title = {Delimiting species without monophyletic gene trees.},
+  journal = {Syst Biol},
+  year = {2007},
+  volume = {56},
+  pages = {887--895},
+  number = {6},
+  month = {Dec},
+  abstract = {Genetic data are frequently used to delimit species, where species
+	status is determined on the basis of an exclusivity criterium, such
+	as reciprocal monophyly. Not only are there numerous empirical examples
+	of incongruence between the boundaries inferred from such data compared
+	to other sources like morphology -- especially with recently derived
+	species, but population genetic theory also clearly shows that an
+	inevitable bias in species status results because genetic thresholds
+	do not explicitly take into account how the timing of speciation
+	influences patterns of genetic differentiation. This study represents
+	a fundamental shift in how genetic data might be used to delimit
+	species. Rather than equating gene trees with a species tree or basing
+	species status on some genetic threshold, the relationship between
+	the gene trees and the species history is modeled probabilistically.
+	Here we show that the same theory that is used to calculate the probability
+	of reciprocal monophyly can also be used to delimit species despite
+	widespread incomplete lineage sorting. The results from a preliminary
+	simulation study suggest that very recently derived species can be
+	accurately identified long before the requisite time for reciprocal
+	monophyly to be achieved following speciation. The study also indicates
+	the importance of sampling, both with regards to loci and individuals.
+	Withstanding a thorough investigation into the conditions under which
+	the coalescent-based approach will be effective, namely how the timing
+	of divergence relative to the effective population size of species
+	affects accurate species delimitation, the results are nevertheless
+	consistent with other recent studies (aimed at inferring species
+	relationships), showing that despite the lack of monophyletic gene
+	trees, a signal of species divergence persists and can be extracted.
+	Using an explicit model-based approach also avoids two primary problems
+	with species delimitation that result when genetic thresholds are
+	applied with genetic data -- the inherent biases in species detection
+	arising from when and how speciation occurred, and failure to take
+	into account the high stochastic variance of genetic processes. Both
+	the utility and sensitivities of the coalescent-based approach outlined
+	here are discussed; most notably, a model-based approach is essential
+	for determining whether incompletely sorted gene lineages are (or
+	are not) consistent with separate species lineages, and such inferences
+	require accurate model parameterization (i.e., a range of realistic
+	effective population sizes relative to potential times of divergence
+	for the purported species). It is the goal (and motivation of this
+	study) that genetic data might be used effectively as a source of
+	complementation to other sources of data for diagnosing species,
+	as opposed to the exclusion of other evidence for species delimitation,
+	which will require an explicit consideration of the effects of the
+	temporal dynamic of lineage splitting on genetic data.},
+  doi = {10.1080/10635150701701091},
+  institution = {Department of Ecology and Evolutionary Biology, Museum of Zoology,
+	University of Michigan, Ann Arbor, MI 48109-1079, USA. knowlesl@umich.edu},
+  keywords = {Animals; Classification, methods; Genetic Speciation; Genetics, Population;
+	Models, Biological; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {785835042},
+  pmid = {18027282},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1080/10635150701701091}
+}
+
+@ARTICLE{Knowles2011,
+  author = {Lacey L Knowles and Pavel B Klimov},
+  title = {Estimating phylogenetic relationships despite discordant gene trees
+	across loci: the species tree of a diverse species group of feather
+	mites (Acari: Proctophyllodidae).},
+  journal = {Parasitology},
+  year = {2011},
+  pages = {1--10},
+  month = {Apr},
+  __markedentry = {[goshng]},
+  abstract = {SUMMARYWith the increased availability of multilocus sequence data,
+	the lack of concordance of gene trees estimated for independent loci
+	has focused attention on both the biological processes producing
+	the discord and the methodologies used to estimate phylogenetic relationships.
+	What has emerged is a suite of new analytical tools for phylogenetic
+	inference - species tree approaches. In contrast to traditional phylogenetic
+	methods that are stymied by the idiosyncrasies of gene trees, approaches
+	for estimating species trees explicitly take into account the cause
+	of discord among loci and, in the process, provides a direct estimate
+	of phylogenetic history (i.e. the history of species divergence,
+	not divergence of specific loci). We illustrate the utility of species
+	tree estimates with an analysis of a diverse group of feather mites,
+	the pinnatus species group (genus Proctophyllodes). Discord among
+	four sequenced nuclear loci is consistent with theoretical expectations,
+	given the short time separating speciation events (as evident by
+	short internodes relative to terminal branch lengths in the trees).
+	Nevertheless, many of the relationships are well resolved in a Bayesian
+	estimate of the species tree; the analysis also highlights ambiguous
+	aspects of the phylogeny that require additional loci. The broad
+	utility of species tree approaches is discussed, and specifically,
+	their application to groups with high speciation rates - a history
+	of diversification with particular prevalence in host/parasite systems
+	where species interactions can drive rapid diversification.},
+  doi = {10.1017/S003118201100031X},
+  institution = {ary Biology, Museum of Zoology, 1109 Geddes Ave., Ann Arbor, Michigan
+	48109-1079, USA.},
+  language = {eng},
+  medline-pst = {aheadofprint},
+  owner = {goshng},
+  pii = {S003118201100031X},
+  pmid = {21554840},
+  timestamp = {2011.06.13},
+  url = {http://dx.doi.org/10.1017/S003118201100031X}
+}
+
+@ARTICLE{Kubatko:2009,
+  author = {Laura S Kubatko and Bryan C Carstens and L. Lacey Knowles},
+  title = {STEM: species tree estimation using maximum likelihood for gene trees
+	under coalescence.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {971--973},
+  number = {7},
+  month = {Apr},
+  abstract = {SUMMARY: STEM is a software package written in the C language to obtain
+	maximum likelihood (ML) estimates for phylogenetic species trees
+	given a sample of gene trees under the coalescent model. It includes
+	options to compute the ML species tree, search the space of all species
+	trees for the k trees of highest likelihood and compute ML branch
+	lengths for a user-input species tree. AVAILABILITY: The STEM package,
+	including source code, is freely available at http://www.stat.osu.edu/~lkubatko/software/STEM/.
+	SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics
+	online.},
+  doi = {10.1093/bioinformatics/btp079},
+  institution = {Departments of Statistics and Evolution, Ecology, and Organismal
+	Biology, The Ohio State University, Columbus, OH 43210, USA. lkubatko@stat.osu.edu},
+  keywords = {Algorithms; Computer Simulation; Genes; Likelihood Functions; Phylogeny;
+	Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btp079},
+  pmid = {19211573},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btp079}
+}
+
+@ARTICLE{Kubatko:2007,
+  author = {Laura Salter Kubatko and James H Degnan},
+  title = {Inconsistency of phylogenetic estimates from concatenated data under
+	coalescence.},
+  journal = {Syst Biol},
+  year = {2007},
+  volume = {56},
+  pages = {17--24},
+  number = {1},
+  month = {Feb},
+  abstract = {Although multiple gene sequences are becoming increasingly available
+	for molecular phylogenetic inference, the analysis of such data has
+	largely relied on inference methods designed for single genes. One
+	of the common approaches to analyzing data from multiple genes is
+	concatenation of the individual gene data to form a single supergene
+	to which traditional phylogenetic inference procedures - e.g., maximum
+	parsimony (MP) or maximum likelihood (ML) - are applied. Recent empirical
+	studies have demonstrated that concatenation of sequences from multiple
+	genes prior to phylogenetic analysis often results in inference of
+	a single, well-supported phylogeny. Theoretical work, however, has
+	shown that the coalescent can produce substantial variation in single-gene
+	histories. Using simulation, we combine these ideas to examine the
+	performance of the concatenation approach under conditions in which
+	the coalescent produces a high level of discord among individual
+	gene trees and show that it leads to statistically inconsistent estimation
+	in this setting. Furthermore, use of the bootstrap to measure support
+	for the inferred phylogeny can result in moderate to strong support
+	for an incorrect tree under these conditions. These results highlight
+	the importance of incorporating variation in gene histories into
+	multilocus phylogenetics.},
+  doi = {10.1080/10635150601146041},
+  institution = {Department of Statistics and Evolution, The Ohio State University,
+	Columbus, Ohio 43210, USA. lkubatko@stat.ohio-state.edu},
+  keywords = {Classification, methods; Computer Simulation; Genes, genetics; Likelihood
+	Functions; Models, Genetic; Phylogeny; Research Design},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {771129708},
+  pmid = {17366134},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1080/10635150601146041}
+}
+
+@ARTICLE{Kuhner1994,
+  author = {M. K. Kuhner and J. Felsenstein},
+  title = {A simulation comparison of phylogeny algorithms under equal and unequal
+	evolutionary rates.},
+  journal = {Mol Biol Evol},
+  year = {1994},
+  volume = {11},
+  pages = {459--468},
+  number = {3},
+  month = {May},
+  abstract = {Using simulated data, we compared five methods of phylogenetic tree
+	estimation: parsimony, compatibility, maximum likelihood, Fitch-Margoliash,
+	and neighbor joining. For each combination of substitution rates
+	and sequence length, 100 data sets were generated for each of 50
+	trees, for a total of 5,000 replications per condition. Accuracy
+	was measured by two measures of the distance between the true tree
+	and the estimate of the tree, one measure sensitive to accuracy of
+	branch lengths and the other not. The distance-matrix methods (Fitch-Margoliash
+	and neighbor joining) performed best when they were constrained from
+	estimating negative branch lengths; all comparisons with other methods
+	used this constraint. Parsimony and compatibility had similar results,
+	with compatibility generally inferior; Fitch-Margoliash and neighbor
+	joining had similar results, with neighbor joining generally slightly
+	inferior. Maximum likelihood was the most successful method overall,
+	although for short sequences Fitch-Margoliash and neighbor joining
+	were sometimes better. Bias of the estimates was inferred by measuring
+	whether the independent estimates of a tree for different data sets
+	were closer to the true tree than to each other. Parsimony and compatibility
+	had particular difficulty with inaccuracy and bias when substitution
+	rates varied among different branches. When rates of evolution varied
+	among different sites, all methods showed signs of inaccuracy and
+	bias.},
+  institution = {Department of Genetics, University of Washington, Seattle 98195.},
+  keywords = {Algorithms; Computer Simulation; Evolution; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {8015439},
+  timestamp = {2010.03.06}
+}
+
+@ARTICLE{Leache2009,
+  author = {Adam D Leaché},
+  title = {Species tree discordance traces to phylogeographic clade boundaries
+	in North American fence lizards (Sceloporus).},
+  journal = {Syst Biol},
+  year = {2009},
+  volume = {58},
+  pages = {547--559},
+  number = {6},
+  month = {Dec},
+  __markedentry = {[goshng]},
+  abstract = {I investigated the impacts of phylogeographic sampling decisions on
+	species tree estimation in the Sceloporus undulatus species group,
+	a recent radiation of small, insectivorous lizards connected by parapatric
+	and peripatric distribution across North America, using a variety
+	of species tree inference methods (Bayesian estimation of species
+	trees, Bayesian untangling of concordance knots, and minimize deep
+	coalescences). Phylogenetic analyses of 16 specimens representing
+	4 putative species within S. "undulatus" using complete (8 loci,
+	>5.5 kb) and incomplete (29 loci, >23.6 kb) nuclear data sets result
+	in species trees that share features with the mitochondrial DNA (mtDNA)
+	genealogy at the phylogeographic level but provide new insights into
+	the evolutionary history of the species group. The concatenated nuclear
+	data and mtDNA data both recover 4 major clades connecting populations
+	across North America; however, instances of discordance are localized
+	at the contact zones between adjacent phylogeographic groups. A random
+	sub-sampling experiment designed to vary the phylogeographic samples
+	included across hundreds of replicate species tree inferences suggests
+	that inaccurate species assignments can result in inferred phylogenetic
+	relationships that are dependent upon which particular populations
+	are used as exemplars to represent species and can lead to increased
+	estimates of effective population size. For the phylogeographic data
+	presented here, reassigning specimens with introgressed mtDNA genomes
+	to their prospective species, or excluding them from the analysis
+	altogether, produces species tree topologies that are distinctly
+	different from analyses that utilize mtDNA-based species assignments.
+	Evolutionary biologists working at the interface of phylogeography
+	and phylogenetics are likely to encounter multiple processes influencing
+	gene trees congruence, which increases the relevance of estimating
+	species trees with multilocus nuclear data and models that accommodate
+	deep coalescence.},
+  doi = {10.1093/sysbio/syp057},
+  institution = {Museum of Vertebrate Zoology, 3101 Valley Life Sciences Building,
+	University of California, Berkeley, CA 94720, USA. aleache@ucdavis.edu},
+  keywords = {Animals; Base Sequence; Bayes Theorem; Classification, methods; Demography;
+	Gene Flow, genetics; Genes, genetics; Genetics, Population; Lizards,
+	genetics; Models, Genetic; Molecular Sequence Data; North America;
+	Phylogeny; Sequence Analysis, DNA; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {syp057},
+  pmid = {20525608},
+  timestamp = {2011.06.13},
+  url = {http://dx.doi.org/10.1093/sysbio/syp057}
+}
+
+@ARTICLE{Liu:2008,
+  author = {Liang Liu},
+  title = {BEST: Bayesian estimation of species trees under the coalescent model.},
+  journal = {Bioinformatics},
+  year = {2008},
+  volume = {24},
+  pages = {2542--2543},
+  number = {21},
+  month = {Nov},
+  abstract = {BEST implements a Bayesian hierarchical model to jointly estimate
+	gene trees and the species tree from multilocus sequences. It provides
+	a new option for estimating species phylogenies within the popular
+	Bayesian phylogenetic program MrBayes. The technique of simulated
+	annealing is adopted along with Metropolis coupling as performed
+	in MrBayes to improve the convergence rate of the Markov Chain Monte
+	Carlo algorithm. AVAILABILITY: http://www.stat.osu.edu/~dkp/BEST.},
+  doi = {10.1093/bioinformatics/btn484},
+  institution = { University, Cambridge, MA, USA. lliu@oeb.harvard.edu},
+  keywords = {Algorithms; Bayes Theorem; Computational Biology, methods; Markov
+	Chains; Models, Genetic; Monte Carlo Method; Phylogeny; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btn484},
+  pmid = {18799483},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btn484}
+}
+
+@ARTICLE{Liu:2008b,
+  author = {Liu, Liang},
+  title = {BEST 2.0: A Bayesian coalescent approach for estimating species trees.},
+  journal = {Bioinformatics (Oxford, England)},
+  year = {2008},
+  month = {September},
+  abstract = {SUMMARY: BEST 2.0 implements a Bayesian hierarchical model to jointly
+	estimate gene trees and the species tree from multilocus sequences.
+	It provides a new option for estimating species phylogenies within
+	the popular Bayesian phylogenetic program MrBayes. The technique
+	of simulated annealing is adopted along with Metropolis coupling
+	as performed in MrBayes to improve the convergence rate of the Markov
+	Chain Monte Carlo algorithm. AVAILABILITY: http://stat.ohio-state.edu/\~{}dkp/BEST.
+	CONTACT: lliu@oeb.harvard.edu.},
+  address = {Musuem of Comparative Zoology, Harvard University, Cambridge, MA.},
+  citeulike-article-id = {3293035},
+  citeulike-linkout-0 = {http://dx.doi.org/10.1093/bioinformatics/btn484},
+  citeulike-linkout-1 = {http://bioinformatics.oxfordjournals.org/cgi/content/abstract/24/21/2542},
+  citeulike-linkout-2 = {http://view.ncbi.nlm.nih.gov/pubmed/18799483},
+  citeulike-linkout-3 = {http://www.hubmed.org/display.cgi?uids=18799483},
+  doi = {10.1093/bioinformatics/btn484},
+  issn = {1460-2059},
+  keywords = {bayesian, coalescent, gene-tree, phylogenetics, species-tree},
+  posted-at = {2008-10-20 19:39:13},
+  priority = {3},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btn484}
+}
+
+@PHDTHESIS{Liu:2006,
+  author = {Liang Liu},
+  title = {Reconstructing posterior distributions of a species phylogeny using
+	estimated gene tree distributions},
+  school = {The Ohio State University},
+  year = {2006},
+  owner = {goshng},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Liu:2007,
+  author = {Liang Liu and Dennis K Pearl},
+  title = {Species trees from gene trees: reconstructing Bayesian posterior
+	distributions of a species phylogeny using estimated gene tree distributions.},
+  journal = {Syst Biol},
+  year = {2007},
+  volume = {56},
+  pages = {504--514},
+  number = {3},
+  month = {Jun},
+  abstract = {The desire to infer the evolutionary history of a group of species
+	should be more viable now that a considerable amount of multilocus
+	molecular data is available. However, the current molecular phylogenetic
+	paradigm still reconstructs gene trees to represent the species tree.
+	Further, commonly used methods of combining data, such as the concatenation
+	method, are known to be inconsistent in some circumstances. In this
+	paper, we propose a Bayesian hierarchical model to estimate the phylogeny
+	of a group of species using multiple estimated gene tree distributions,
+	such as those that arise in a Bayesian analysis of DNA sequence data.
+	Our model employs substitution models used in traditional phylogenetics
+	but also uses coalescent theory to explain genealogical signals from
+	species trees to gene trees and from gene trees to sequence data,
+	thereby forming a complete stochastic model to estimate gene trees,
+	species trees, ancestral population sizes, and species divergence
+	times simultaneously. Our model is founded on the assumption that
+	gene trees, even of unlinked loci, are correlated due to being derived
+	from a single species tree and therefore should be estimated jointly.
+	We apply the method to two multilocus data sets of DNA sequences.
+	The estimates of the species tree topology and divergence times appear
+	to be robust to the prior of the population size, whereas the estimates
+	of effective population sizes are sensitive to the prior used in
+	the analysis. These analyses also suggest that the model is superior
+	to the concatenation method in fitting these data sets and thus provides
+	a more realistic assessment of the variability in the distribution
+	of the species tree that may have produced the molecular information
+	at hand. Future improvements of our model and algorithm should include
+	consideration of other factors that can cause discordance of gene
+	trees and species trees, such as horizontal transfer or gene duplication.},
+  doi = {10.1080/10635150701429982},
+  institution = {Department of Statistics, The Ohio State University, Columbus, OH
+	43210-1293, USA. lliu@oeb.harvard.edu},
+  keywords = { Simulation; Algorithms; Animals; Bayes Theorem; Computational Biology,
+	methods; Finches, classification/genetics; Macaca, classification/genetics;
+	Models, Genetic; Phylogeny; Sequence Analysis, DNA; Time Factors},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {779484657},
+  pmid = {17562474},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1080/10635150701429982}
+}
+
+@ARTICLE{Liu:2008a,
+  author = {Liang Liu and Dennis K Pearl and Robb T Brumfield and Scott V Edwards},
+  title = {Estimating species trees using multiple-allele DNA sequence data.},
+  journal = {Evolution},
+  year = {2008},
+  volume = {62},
+  pages = {2080--2091},
+  number = {8},
+  month = {Aug},
+  abstract = {Several techniques, such as concatenation and consensus methods, are
+	available for combining data from multiple loci to produce a single
+	statement of phylogenetic relationships. However, when multiple alleles
+	are sampled from individual species, it becomes more challenging
+	to estimate relationships at the level of species, either because
+	concatenation becomes inappropriate due to conflicts among individual
+	gene trees, or because the species from which multiple alleles have
+	been sampled may not form monophyletic groups in the estimated tree.
+	We propose a Bayesian hierarchical model to reconstruct species trees
+	from multiple-allele, multilocus sequence data, building on a recently
+	proposed method for estimating species trees from single allele multilocus
+	data. A two-step Markov Chain Monte Carlo (MCMC) algorithm is adopted
+	to estimate the posterior distribution of the species tree. The model
+	is applied to estimate the posterior distribution of species trees
+	for two multiple-allele datasets--yeast (Saccharomyces) and birds
+	(Manacus-manakins). The estimates of the species trees using our
+	method are consistent with those inferred from other methods and
+	genetic markers, but in contrast to other species tree methods, it
+	provides credible regions for the species tree. The Bayesian approach
+	described here provides a powerful framework for statistical testing
+	and integration of population genetics and phylogenetics.},
+  doi = {10.1111/j.1558-5646.2008.00414.x},
+  institution = {Museum of Comparative Zoology, Harvard University, Cambridge, Massachusetts
+	02138, USA. lliu@oeb.harvard.edu},
+  keywords = {Algorithms; Alleles; Animals; Bayes Theorem; Birds, genetics; Computer
+	Simulation; Evolution; Markov Chains; Models, Genetic; Models, Statistical;
+	Models, Theoretical; Monte Carlo Method; Phylogeny; Saccharomyces
+	cerevisiae, genetics; Sequence Analysis, DNA; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {EVO414},
+  pmid = {18462214},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1111/j.1558-5646.2008.00414.x}
+}
+
+@ARTICLE{Liu:2009,
+  author = {Liang Liu and Lili Yu and Laura Kubatko and Dennis K Pearl and Scott
+	V Edwards},
+  title = {Coalescent methods for estimating phylogenetic trees.},
+  journal = {Mol Phylogenet Evol},
+  year = {2009},
+  volume = {53},
+  pages = {320--328},
+  number = {1},
+  month = {Oct},
+  abstract = {We review recent models to estimate phylogenetic trees under the multispecies
+	coalescent. Although the distinction between gene trees and species
+	trees has come to the fore of phylogenetics, only recently have methods
+	been developed that explicitly estimate species trees. Of the several
+	factors that can cause gene tree heterogeneity and discordance with
+	the species tree, deep coalescence due to random genetic drift in
+	branches of the species tree has been modeled most thoroughly. Bayesian
+	approaches to estimating species trees utilizes two likelihood functions,
+	one of which has been widely used in traditional phylogenetics and
+	involves the model of nucleotide substitution, and the second of
+	which is less familiar to phylogeneticists and involves the probability
+	distribution of gene trees given a species tree. Other recent parametric
+	and nonparametric methods for estimating species trees involve parsimony
+	criteria, summary statistics, supertree and consensus methods. Species
+	tree approaches are an appropriate goal for systematics, appear to
+	work well in some cases where concatenation can be misleading, and
+	suggest that sampling many independent loci will be paramount. Such
+	methods can also be challenging to implement because of the complexity
+	of the models and computational time. In addition, further elaboration
+	of the simplest of coalescent models will be required to incorporate
+	commonly known issues such as deviation from the molecular clock,
+	gene flow and other genetic forces.},
+  doi = {10.1016/j.ympev.2009.05.033},
+  institution = {Department of Organismic and Evolutionary Biology, Museum of Comparative
+	Zoology, Harvard University, 26 Oxford street, Cambridge, MA 02138,
+	USA.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S1055-7903(09)00216-4},
+  pmid = {19501178},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1016/j.ympev.2009.05.033}
+}
+
+@ARTICLE{Lunter:2005,
+  author = {Gerton Lunter and István Miklós and Alexei Drummond and Jens Ledet
+	Jensen and Jotun Hein},
+  title = {Bayesian coestimation of phylogeny and sequence alignment.},
+  journal = {BMC Bioinformatics},
+  year = {2005},
+  volume = {6},
+  pages = {83},
+  abstract = {BACKGROUND: Two central problems in computational biology are the
+	determination of the alignment and phylogeny of a set of biological
+	sequences. The traditional approach to this problem is to first build
+	a multiple alignment of these sequences, followed by a phylogenetic
+	reconstruction step based on this multiple alignment. However, alignment
+	and phylogenetic inference are fundamentally interdependent, and
+	ignoring this fact leads to biased and overconfident estimations.
+	Whether the main interest be in sequence alignment or phylogeny,
+	a major goal of computational biology is the co-estimation of both.
+	RESULTS: We developed a fully Bayesian Markov chain Monte Carlo method
+	for coestimating phylogeny and sequence alignment, under the Thorne-Kishino-Felsenstein
+	model of substitution and single nucleotide insertion-deletion (indel)
+	events. In our earlier work, we introduced a novel and efficient
+	algorithm, termed the "indel peeling algorithm", which includes indels
+	as phylogenetically informative evolutionary events, and resembles
+	Felsenstein's peeling algorithm for substitutions on a phylogenetic
+	tree. For a fixed alignment, our extension analytically integrates
+	out both substitution and indel events within a proper statistical
+	model, without the need for data augmentation at internal tree nodes,
+	allowing for efficient sampling of tree topologies and edge lengths.
+	To additionally sample multiple alignments, we here introduce an
+	efficient partial Metropolized independence sampler for alignments,
+	and combine these two algorithms into a fully Bayesian co-estimation
+	procedure for the alignment and phylogeny problem. Our approach results
+	in estimates for the posterior distribution of evolutionary rate
+	parameters, for the maximum a-posteriori (MAP) phylogenetic tree,
+	and for the posterior decoding alignment. Estimates for the evolutionary
+	tree and multiple alignment are augmented with confidence estimates
+	for each node height and alignment column. Our results indicate that
+	the patterns in reliability broadly correspond to structural features
+	of the proteins, and thus provides biologically meaningful information
+	which is not existent in the usual point-estimate of the alignment.
+	Our methods can handle input data of moderate size (10-20 protein
+	sequences, each 100-200 bp), which we analyzed overnight on a standard
+	2 GHz personal computer. CONCLUSION: Joint analysis of multiple sequence
+	alignment, evolutionary trees and additional evolutionary parameters
+	can be now done within a single coherent statistical framework.},
+  doi = {10.1186/1471-2105-6-83},
+  institution = {Department of Statistics, University of Oxford, 1 South Parks Road,
+	Oxford OX1 3TG, UK. lunter@stats.ox.ac.uk},
+  keywords = {Algorithms; Amino Acid Sequence; Animals; Base Sequence; Bayes Theorem;
+	Computational Biology, methods; Computer Simulation; Evolution, Molecular;
+	Gene Deletion; Humans; Likelihood Functions; Markov Chains; Models,
+	Genetic; Models, Statistical; Molecular Sequence Data; Monte Carlo
+	Method; Mutation; Myoglobin, chemistry; Phylogeny; Polymorphism,
+	Single Nucleotide, genetics; Sequence Alignment; Sequence Analysis,
+	DNA; Sequence Homology, Amino Acid; Software; Species Specificity},
+  language = {eng},
+  medline-pst = {epublish},
+  owner = {goshng},
+  pii = {1471-2105-6-83},
+  pmid = {15804354},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1186/1471-2105-6-83}
+}
+
+@ARTICLE{Maddison:1997,
+  author = {Maddison},
+  title = {Gene trees in species trees},
+  journal = {Systematic Biology},
+  year = {1997},
+  volume = {46},
+  pages = {523--536},
+  owner = {goshng},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Maddison:2006,
+  author = {Wayne P Maddison and L. Lacey Knowles},
+  title = {Inferring phylogeny despite incomplete lineage sorting.},
+  journal = {Syst Biol},
+  year = {2006},
+  volume = {55},
+  pages = {21--30},
+  number = {1},
+  month = {Feb},
+  abstract = {It is now well known that incomplete lineage sorting can cause serious
+	difficulties for phylogenetic inference, but little attention has
+	been paid to methods that attempt to overcome these difficulties
+	by explicitly considering the processes that produce them. Here we
+	explore approaches to phylogenetic inference designed to consider
+	retention and sorting of ancestral polymorphism. We examine how the
+	reconstructability of a species (or population) phylogeny is affected
+	by (a) the number of loci used to estimate the phylogeny and (b)
+	the number of individuals sampled per species. Even in difficult
+	cases with considerable incomplete lineage sorting (times between
+	divergences less than 1 N(e) generations), we found the reconstructed
+	species trees matched the "true" species trees in at least three
+	out of five partitions, as long as a reasonable number of individuals
+	per species were sampled. We also studied the tradeoff between sampling
+	more loci versus more individuals. Although increasing the number
+	of loci gives more accurate trees for a given sampling effort with
+	deeper species trees (e.g., total depth of 10 N(e) generations),
+	sampling more individuals often gives better results than sampling
+	more loci with shallower species trees (e.g., depth = 1 N(e)). Taken
+	together, these results demonstrate that gene sequences retain enough
+	signal to achieve an accurate estimate of phylogeny despite widespread
+	incomplete lineage sorting. Continued improvement in our methods
+	to reconstruct phylogeny near the species level will require a shift
+	to a compound model that considers not only nucleotide or character
+	state substitutions, but also the population genetics processes of
+	lineage sorting. [Coalescence; divergence; population; speciation.].},
+  doi = {10.1080/10635150500354928},
+  institution = {Department of Zoology Research Centre, University of British Columbia,
+	V6T 1Z4 Vancouver, B.C., Canada. wmaddisn@interchange.ubc.ca},
+  keywords = {Evolution, Molecular; Genetic Speciation; Genetics, Population; Phylogeny;
+	Polymorphism, Genetic; Selection Bias},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {Q1126T60VN7L1015},
+  pmid = {16507521},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1080/10635150500354928}
+}
+
+@ARTICLE{McGowen2011,
+  author = {Michael R McGowen},
+  title = {Toward the resolution of an explosive radiation-A multilocus phylogeny
+	of oceanic dolphins (Delphinidae).},
+  journal = {Mol Phylogenet Evol},
+  year = {2011},
+  month = {May},
+  __markedentry = {[goshng]},
+  abstract = {Oceanic dolphins (Delphinidae) are the product of a rapid radiation
+	that yielded ?36 extant species of small to medium-sized cetaceans
+	that first emerged in the Late Miocene. Although they are a charismatic
+	group of organisms that have become poster children for marine conservation,
+	many phylogenetic relationships within Delphinidae remain elusive
+	due to the slow molecular evolution of the group and the difficulty
+	of resolving short branches from successive cladogenic events. Here
+	I combine existing and newly generated sequences from four mitochondrial
+	(mt) genes and 20 nuclear (nu) genes to reconstruct a well-supported
+	phylogenetic hypothesis for Delphinidae. This study compares maximum-likelihood
+	and Bayesian inference methods of several data sets including mtDNA,
+	combined nuDNA, gene trees of individual nuDNA loci, and concatenated
+	mtDNA+nuDNA. In addition, I contrast these standard phylogenetic
+	analyses with the species tree reconstruction method of Bayesian
+	concordance analysis (BCA). Despite finding discordance between mtDNA
+	and individual nuDNA loci, the concatenated matrix recovers a completely
+	resolved and robustly supported phylogeny that is also broadly congruent
+	with BCA trees. This study strongly supports groupings such as Delphininae,
+	Lissodelphininae, Globicephalinae, Sotalia+Delphininae, Steno+Orcaella+Globicephalinae,
+	and Leucopleurus acutus, Lagenorhynchus albirostris, and Orcinus
+	orca as basal delphinid taxa.},
+  doi = {10.1016/j.ympev.2011.05.003},
+  institution = {Department of Biology, University of California, Riverside, Spieth
+	Hall, Riverside, CA 92521, USA.},
+  language = {eng},
+  medline-pst = {aheadofprint},
+  owner = {goshng},
+  pii = {S1055-7903(11)00223-5},
+  pmid = {21600295},
+  timestamp = {2011.06.13},
+  url = {http://dx.doi.org/10.1016/j.ympev.2011.05.003}
+}
+
+@ARTICLE{Meng:2009,
+  author = {Chen Meng and Laura Salter Kubatko},
+  title = {Detecting hybrid speciation in the presence of incomplete lineage
+	sorting using gene tree incongruence: a model.},
+  journal = {Theor Popul Biol},
+  year = {2009},
+  volume = {75},
+  pages = {35--45},
+  number = {1},
+  month = {Feb},
+  abstract = {The application of phylogenetic inference methods, to data for a set
+	of independent genes sampled randomly throughout the genome, often
+	results in substantial incongruence in the single-gene phylogenetic
+	estimates. Among the processes known to produce discord between single-gene
+	phylogenies, two of the best studied in a phylogenetic context are
+	hybridization and incomplete lineage sorting. Much recent attention
+	has focused on the development of methods for estimating species
+	phylogenies in the presence of incomplete lineage sorting, but phylogenetic
+	models that allow for hybridization have been more limited. Here
+	we propose a model that allows incongruence in single-gene phylogenies
+	to be due to both hybridization and incomplete lineage sorting, with
+	the goal of determining the contribution of hybridization to observed
+	gene tree incongruence in the presence of incomplete lineage sorting.
+	Using our model, we propose methods for estimating the extent of
+	the role of hybridization in both a likelihood and a Bayesian framework.
+	The performance of our methods is examined using both simulated and
+	empirical data.},
+  doi = {10.1016/j.tpb.2008.10.004},
+  institution = {Department of Mathematics and Statistics, University of New Mexico,
+	Albuquerque, NM 87131, USA.},
+  keywords = {Animals; Bayes Theorem; Computer Simulation; Evolution, Molecular;
+	Gene Flow; Genetic Speciation; Hybridization, Genetic; Likelihood
+	Functions; Models, Genetic; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S0040-5809(08)00111-1},
+  pmid = {19038278},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1016/j.tpb.2008.10.004}
+}
+
+@ARTICLE{Nichols:2001,
+  author = {R. Nichols},
+  title = {Gene trees and species trees are not the same.},
+  journal = {Trends Ecol Evol},
+  year = {2001},
+  volume = {16},
+  pages = {358--364},
+  number = {7},
+  month = {Jul},
+  abstract = {The relationship between species is usually represented as a bifurcating
+	tree with the branching points representing speciation events. The
+	ancestry of genes taken from these species can also be represented
+	as a tree, with the branching points representing ancestral genes.
+	The time back to the branching points, and even the branching order,
+	can be different between the two trees. This possibility is widely
+	recognized, but the discrepancies are often thought to be small.
+	A different picture is emerging from new empirical evidence, particularly
+	that based on multiple loci or on surveys with a wide geographical
+	scope. The discrepancies must be taken into account when estimating
+	the timing of speciation events, especially the more recent branches.
+	On the positive side, the different timings at different loci provide
+	information about the ancestral populations.},
+  institution = {School of Biological Sciences, Queen Mary, University of London,
+	E1 4NS, London, UK},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S0169534701022030},
+  pmid = {11403868},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Oliver:2008,
+  author = {Jeffrey C Oliver},
+  title = {AUGIST: inferring species trees while accommodating gene tree uncertainty.},
+  journal = {Bioinformatics},
+  year = {2008},
+  volume = {24},
+  pages = {2932--2933},
+  number = {24},
+  month = {Dec},
+  abstract = {SUMMARY: AUGIST (accomodating uncertainty in genealogies while inferring
+	species tress) is a new software package for inferring species trees
+	while accommodating uncertainty in gene genealogies. It is written
+	for the Mesquite software system and provides sampling procedures
+	to incorporate uncertainty in gene tree reconstruction while providing
+	confidence estimates for inferred species trees. AVAILABILITY: http://www.lycaenid.org/augist/},
+  doi = {10.1093/bioinformatics/btn556},
+  institution = {Interdisciplinary Program in Insect Science, University of Arizona,
+	Tucson, AZ 85721, USA. jeffrey.oliver@yale.edu},
+  keywords = {Algorithms; Animals; Evolution, Molecular; Genes; Genetic Variation;
+	Humans; Phylogeny; Software; Species Specificity; Uncertainty},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btn556},
+  pmid = {18953045},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btn556}
+}
+
+@ARTICLE{Page:1998,
+  author = {R. D. Page},
+  title = {GeneTree: comparing gene and species phylogenies using reconciled
+	trees.},
+  journal = {Bioinformatics},
+  year = {1998},
+  volume = {14},
+  pages = {819--820},
+  number = {9},
+  abstract = {SUMMARY: GeneTree is a program for comparing gene and species trees
+	using reconciled trees. The program can compute the cost of embedding
+	a gene tree within a species tree, visually display the location
+	and number of gene duplications and losses, and search for optimal
+	species trees. AVAILABILITY: The program is free and is available
+	at ((http://taxonomy.zoology.gla.ac. uk/rod/genetree/genetree.html)).},
+  institution = {sity of Glasgow, Glasgow, G12 8QQ, UK. r.page@bio.gla.ac.uk},
+  keywords = {Algorithms; Classification; Genes, genetics; Online Systems; Phylogeny;
+	Software; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btb113},
+  pmid = {9918954},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Page:1997,
+  author = {R. D. Page and M. A. Charleston},
+  title = {From gene to organismal phylogeny: reconciled trees and the gene
+	tree/species tree problem.},
+  journal = {Mol Phylogenet Evol},
+  year = {1997},
+  volume = {7},
+  pages = {231--240},
+  number = {2},
+  month = {Apr},
+  abstract = {The processes of gene duplication, loss, and lineage sorting can result
+	in incongruence between the phylogenies of genes and those of species.
+	This incongruence complicates the task of inferring the latter from
+	the former. We describe the use of reconciled trees to reconstruct
+	the history of a gene tree with respect to a species tree. Reconciled
+	trees allow the history of the gene tree to be visualized and also
+	quantify the relationship between the two trees. The cost of a reconciled
+	tree is the total number of duplications and gene losses required
+	to reconcile a gene tree with its species tree. We describe the use
+	of heuristic searches to find the species tree which yields the reconciled
+	tree with the lowest cost. This method can be used to infer species
+	trees from one or more gene trees.},
+  doi = {10.1006/mpev.1996.0390},
+  institution = {Division of Environmental and Evolutionary Biology, University of
+	Glasgow, United Kingdom.},
+  keywords = {Animals; Gene Deletion; Genes; Humans; Interleukin-1, genetics; L-Lactate
+	Dehydrogenase, genetics; Models, Genetic; Multigene Family; Phylogeny;
+	Sodium-Potassium-Exchanging ATPase, genetics; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S1055-7903(96)90390-5},
+  pmid = {9126565},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1006/mpev.1996.0390}
+}
+
+@ARTICLE{Pamilo:1988,
+  author = {P. Pamilo and M. Nei},
+  title = {Relationships between gene trees and species trees.},
+  journal = {Mol Biol Evol},
+  year = {1988},
+  volume = {5},
+  pages = {568--583},
+  number = {5},
+  month = {Sep},
+  abstract = {It is well known that a phylogenetic tree (gene tree) constructed
+	from DNA sequences for a genetic locus does not necessarily agree
+	with the tree that represents the actual evolutionary pathway of
+	the species involved (species tree). One of the important factors
+	that cause this difference is genetic polymorphism in the ancestral
+	species. Under the assumption of neutral mutations, this problem
+	can be studied by evaluating the probability (P) that a gene tree
+	has the same topology as that of the species tree. When one gene
+	(allele) is used from each of the species involved, the probability
+	can be expressed as a simple function of Ti = ti/(2N), where ti is
+	the evolutionary time measured in generations for the ith internodal
+	branch of the species tree and N is the effective population size.
+	When any of the Ti's is less than 1, the probability P becomes considerably
+	less than 1.0. This probability cannot be substantially increased
+	by increasing the number of alleles sampled from a locus. To increase
+	the probability, one has to use DNA sequences from many different
+	loci that have evolved independently of each other.},
+  institution = {Center for Demographic and Population Genetics, University of Texas
+	Health Science Center, Houston 77225.},
+  keywords = {Alleles; Animals; DNA, genetics; Evolution; Humans; Models, Genetic;
+	Phylogeny; Polymorphism, Genetic; Probability},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {3193878},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Pollard:2006,
+  author = {Daniel A Pollard and Venky N Iyer and Alan M Moses and Michael B
+	Eisen},
+  title = {Widespread discordance of gene trees with species tree in Drosophila:
+	evidence for incomplete lineage sorting.},
+  journal = {PLoS Genet},
+  year = {2006},
+  volume = {2},
+  pages = {e173},
+  number = {10},
+  month = {Oct},
+  abstract = {The phylogenetic relationship of the now fully sequenced species Drosophila
+	erecta and D. yakuba with respect to the D. melanogaster species
+	complex has been a subject of controversy. All three possible groupings
+	of the species have been reported in the past, though recent multi-gene
+	studies suggest that D. erecta and D. yakuba are sister species.
+	Using the whole genomes of each of these species as well as the four
+	other fully sequenced species in the subgenus Sophophora, we set
+	out to investigate the placement of D. erecta and D. yakuba in the
+	D. melanogaster species group and to understand the cause of the
+	past incongruence. Though we find that the phylogeny grouping D.
+	erecta and D. yakuba together is the best supported, we also find
+	widespread incongruence in nucleotide and amino acid substitutions,
+	insertions and deletions, and gene trees. The time inferred to span
+	the two key speciation events is short enough that under the coalescent
+	model, the incongruence could be the result of incomplete lineage
+	sorting. Consistent with the lineage-sorting hypothesis, substitutions
+	supporting the same tree were spatially clustered. Support for the
+	different trees was found to be linked to recombination such that
+	adjacent genes support the same tree most often in regions of low
+	recombination and substitutions supporting the same tree are most
+	enriched roughly on the same scale as linkage disequilibrium, also
+	consistent with lineage sorting. The incongruence was found to be
+	statistically significant and robust to model and species choice.
+	No systematic biases were found. We conclude that phylogenetic incongruence
+	in the D. melanogaster species complex is the result, at least in
+	part, of incomplete lineage sorting. Incomplete lineage sorting will
+	likely cause phylogenetic incongruence in many comparative genomics
+	datasets. Methods to infer the correct species tree, the history
+	of every base in the genome, and comparative methods that control
+	for and/or utilize this information will be valuable advancements
+	for the field of comparative genomics.},
+  doi = {10.1371/journal.pgen.0020173},
+  institution = {Graduate Group in Biophysics, University of California Berkeley,
+	Berkeley, California, USA.},
+  keywords = {Animals; Base Sequence; Cluster Analysis; Drosophila melanogaster,
+	genetics; Drosophila, classification/genetics; Evolution, Molecular;
+	Genes, Insect, genetics; Genetic Speciation; Likelihood Functions;
+	Models, Genetic; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {05-PLGE-RA-0377R3},
+  pmid = {17132051},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1371/journal.pgen.0020173}
+}
+
+@ARTICLE{Rosenberg:2002,
+  author = {Noah A Rosenberg},
+  title = {The probability of topological concordance of gene trees and species
+	trees.},
+  journal = {Theor Popul Biol},
+  year = {2002},
+  volume = {61},
+  pages = {225--247},
+  number = {2},
+  month = {Mar},
+  abstract = {The concordance of gene trees and species trees is reconsidered in
+	detail, allowing for samples of arbitrary size to be taken from the
+	species. A sense of concordance for gene tree and species tree topologies
+	is clarified, such that if the "collapsed gene tree" produced by
+	a gene tree has the same topology as the species tree, the gene tree
+	is said to be topologically concordant with the species tree. The
+	term speciodendric is introduced to refer to genes whose trees are
+	topologically concordant with species trees. For a given three-species
+	topology, probabilities of each of the three possible collapsed gene
+	tree topologies are given, as are probabilities of monophyletic concordance
+	and concordance in the sense of N. Takahata (1989), Genetics 122,
+	957-966. Increasing the sample size is found to increase the probability
+	of topological concordance, but a limit exists on how much the topological
+	concordance probability can be increased. Suggested sample sizes
+	beyond which this probability can be increased only minimally are
+	given. The results are discussed in terms of implications for molecular
+	studies of phylogenetics and speciation.},
+  doi = {10.1006/tpbi.2001.1568},
+  institution = {Department of Biological Sciences, Stanford University, Stanford,
+	California 94305, USA. noahr@usc.edu},
+  keywords = {Evolution; Haploidy; Models, Genetic; Phylogeny; Population Dynamics;
+	Probability; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S0040580901915680},
+  pmid = {11969392},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1006/tpbi.2001.1568}
+}
+
+@ARTICLE{Rosenberg:2008,
+  author = {Noah A Rosenberg and Randa Tao},
+  title = {Discordance of species trees with their most likely gene trees: the
+	case of five taxa.},
+  journal = {Syst Biol},
+  year = {2008},
+  volume = {57},
+  pages = {131--140},
+  number = {1},
+  month = {Feb},
+  abstract = {Under a coalescent model for within-species evolution, gene trees
+	may differ from species trees to such an extent that the gene tree
+	topology most likely to evolve along the branches of a species tree
+	can disagree with the species tree topology. Gene tree topologies
+	that are more likely to be produced than the topology that matches
+	that of the species tree are termed anomalous, and the region of
+	branch-length space that gives rise to anomalous gene trees (AGTs)
+	is the anomaly zone. We examine the occurrence of anomalous gene
+	trees for the case of five taxa, the smallest number of taxa for
+	which every species tree topology has a nonempty anomaly zone. Considering
+	all sets of branch lengths that give rise to anomalous gene trees,
+	the largest value possible for the smallest branch length in the
+	species tree is greater in the five-taxon case (0.1934 coalescent
+	time units) than in the previously studied case of four taxa (0.1568).
+	The five-taxon case demonstrates the existence of three phenomena
+	that do not occur in the four-taxon case. First, anomalous gene trees
+	can have the same unlabeled topology as the species tree. Second,
+	the anomaly zone does not necessarily enclose a ball centered at
+	the origin in branch-length space, in which all branches are short.
+	Third, as a branch length increases, it is possible for the number
+	of AGTs to increase rather than decrease or remain constant. These
+	results, which help to describe how the properties of anomalous gene
+	trees increase in complexity as the number of taxa increases, will
+	be useful in formulating strategies for evading the problem of anomalous
+	gene trees during species tree inference from multilocus data.},
+  doi = {10.1080/10635150801905535},
+  institution = {Department of Human Genetics, University of Michigan, Ann Arbor,
+	Michigan 48109-2218, USA. rnoah@umich.edu},
+  keywords = {Genetic Speciation; Models, Genetic; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {790911047},
+  pmid = {18300026},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1080/10635150801905535}
+}
+
+@ARTICLE{Slowinski:1997,
+  author = {J. B. Slowinski and A. Knight and A. P. Rooney},
+  title = {Inferring species trees from gene trees: a phylogenetic analysis
+	of the Elapidae (Serpentes) based on the amino acid sequences of
+	venom proteins.},
+  journal = {Mol Phylogenet Evol},
+  year = {1997},
+  volume = {8},
+  pages = {349--362},
+  number = {3},
+  month = {Dec},
+  abstract = {Toward the goal of recovering the phylogenetic relationships among
+	elapid snakes, we separately found the shortest trees from the amino
+	acid sequences for the venom proteins phospholipase A2 and the short
+	neurotoxin, collectively representing 32 species in 16 genera. We
+	then applied a method we term gene tree parsimony for inferring species
+	trees from gene trees that works by finding the species tree which
+	minimizes the number of deep coalescences or gene duplications plus
+	unsampled sequences necessary to fit each gene tree to the species
+	tree. This procedure, which is both logical and generally applicable,
+	avoids many of the problems of previous approaches for inferring
+	species trees from gene trees. The results support a division of
+	the elapids examined into sister groups of the Australian and marine
+	(laticaudines and hydrophiines) species, and the African and Asian
+	species. Within the former clade, the sea snakes are shown to be
+	diphyletic, with the laticaudines and hydrophiines having separate
+	origins. This finding is corroborated by previous studies, which
+	provide support for the usefulness of gene tree parsimony.},
+  doi = {10.1006/mpev.1997.0434},
+  institution = {Department of Biological Sciences, Southeastern Louisiana University,
+	Hammond 70402, USA. jslowinski@calacademy.org},
+  keywords = {Animals; Elapid Venoms, enzymology; Elapidae, classification/genetics;
+	Phospholipases A, chemistry/genetics; Phospholipases A2; Phylogeny;
+	Sequence Homology, Amino Acid; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S1055-7903(97)90434-6},
+  pmid = {9417893},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1006/mpev.1997.0434}
+}
+
+@ARTICLE{Takahata:1989,
+  author = {N. Takahata},
+  title = {Gene genealogy in three related populations: consistency probability
+	between gene and population trees.},
+  journal = {Genetics},
+  year = {1989},
+  volume = {122},
+  pages = {957--966},
+  number = {4},
+  month = {Aug},
+  abstract = {A genealogical relationship among genes at a locus (gene tree) sampled
+	from three related populations was examined with special reference
+	to population relatedness (population tree). A phylogenetically informative
+	event in a gene tree constructed from nucleotide differences consists
+	of interspecific coalescences of genes in each of which two genes
+	sampled from different populations are descended from a common ancestor.
+	The consistency probability between gene and population trees in
+	which they are topologically identical was formulated in terms of
+	interspecific coalescences. It was found that the consistency probability
+	thus derived substantially increases as the sample size of genes
+	increases, unless the divergence time of populations is very long
+	compared to population sizes. Hence, there are cases where large
+	samples at a locus are very useful in inferring a population tree.},
+  institution = {National Institute of Genetics, Shizuoka-Ken, Japan.},
+  keywords = {Diploidy; Gene Frequency; Genes; Genetics, Population; Mathematics;
+	Models, Genetic; Pedigree; Probability},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {2759432},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Takahata:1985,
+  author = {N. Takahata and M. Nei},
+  title = {Gene genealogy and variance of interpopulational nucleotide differences.},
+  journal = {Genetics},
+  year = {1985},
+  volume = {110},
+  pages = {325--344},
+  number = {2},
+  month = {Jun},
+  abstract = {A mathematical theory is developed for computing the probability that
+	m genes sampled from one population (species) and n genes sampled
+	from another are derived from l genes that existed at the time of
+	population splitting. The expected time of divergence between the
+	two most closely related genes sampled from two different populations
+	and the time of divergence (coalescence) of all genes sampled are
+	studied by using this theory. It is shown that the time of divergence
+	between the two most closely related genes can be used as an approximate
+	estimate of the time of population splitting (T) only when T identical
+	to t/(2N) is small, where t and N are the number of generations and
+	the effective population size, respectively. The variance of Nei
+	and Li's estimate (d) of the number of net nucleotide differences
+	between two populations is also studied. It is shown that the standard
+	error (Sd) of d is larger than the mean when T is small (T much less
+	than 1). In this case, Sd is reduced considerably by increasing sample
+	size. When T is large (T greater than 1), however, a large proportion
+	of the variance of d is caused by stochastic factors, and increase
+	in the sample size does not help to reduce Sd. To reduce the stochastic
+	variance of d, one must use data from many independent unlinked gene
+	loci.},
+  keywords = {Analysis of Variance; Animals; Genes; Genetics, Population; Mathematics;
+	Models, Genetic; Nucleotides, analysis; Probability; Species Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {4007484},
+  timestamp = {2009.11.20}
+}
+
+@ARTICLE{Than:2009,
+  author = {Than, Cuong and Nakhleh, Luay},
+  title = {Species Tree Inference by Minimizing Deep Coalescences},
+  journal = {PLoS Comput Biol},
+  year = {2009},
+  volume = {5},
+  pages = {e1000501+},
+  number = {9},
+  month = {September},
+  abstract = {Author Summary Inferring the evolutionary history of a set of species,
+	known as the species tree, is a task of utmost significance in biology
+	and beyond. The traditional approach to accomplishing this task from
+	molecular sequences entails sequencing a gene in the set of species
+	under consideration, reconstructing the gene's evolutionary history,
+	and declaring it to be the species tree. However, recent analyses
+	of multiple gene data sets, made available thanks to advances in
+	sequencing technologies, have indicated that gene trees in the same
+	group of species may disagree with each other, as well as with the
+	species tree. Therefore, the development of methods for inferring
+	the species tree despite such disagreements is imperative. In this
+	paper, we propose such a method, which seeks the tree that minimizes
+	the amount of disagreement between the input set of gene trees and
+	the inferred one. We have implemented our method and studied its
+	performance, in terms of accuracy and computational efficiency, on
+	two biological data sets and a large number of simulated data sets.
+	Our analyses, of both the biological and synthetic data sets, indicate
+	high accuracy of the method, as well as computationally efficient
+	solutions in practice. Hence, our method makes a good candidate for
+	inferring accurate species trees, despite gene tree disagreements,
+	at a genomic scale.},
+  citeulike-article-id = {5772303},
+  citeulike-linkout-0 = {http://dx.doi.org/10.1371/journal.pcbi.1000501},
+  doi = {10.1371/journal.pcbi.1000501},
+  keywords = {gene\_trees, phylogenetics, phylogeny, species\_trees},
+  posted-at = {2009-09-11 10:23:17},
+  priority = {2},
+  publisher = {Public Library of Science},
+  url = {http://dx.doi.org/10.1371/journal.pcbi.1000501}
+}
+
+@ARTICLE{Than:2009a,
+  author = {Cuong Than and Luay Nakhleh},
+  title = {Species tree inference by minimizing deep coalescences.},
+  journal = {PLoS Comput Biol},
+  year = {2009},
+  volume = {5},
+  pages = {e1000501},
+  number = {9},
+  month = {Sep},
+  abstract = {In a 1997 seminal paper, W. Maddison proposed minimizing deep coalescences,
+	or MDC, as an optimization criterion for inferring the species tree
+	from a set of incongruent gene trees, assuming the incongruence is
+	exclusively due to lineage sorting. In a subsequent paper, Maddison
+	and Knowles provided and implemented a search heuristic for optimizing
+	the MDC criterion, given a set of gene trees. However, the heuristic
+	is not guaranteed to compute optimal solutions, and its hill-climbing
+	search makes it slow in practice. In this paper, we provide two exact
+	solutions to the problem of inferring the species tree from a set
+	of gene trees under the MDC criterion. In other words, our solutions
+	are guaranteed to find the tree that minimizes the total number of
+	deep coalescences from a set of gene trees. One solution is based
+	on a novel integer linear programming (ILP) formulation, and another
+	is based on a simple dynamic programming (DP) approach. Powerful
+	ILP solvers, such as CPLEX, make the first solution appealing, particularly
+	for very large-scale instances of the problem, whereas the DP-based
+	solution eliminates dependence on proprietary tools, and its simplicity
+	makes it easy to integrate with other genomic events that may cause
+	gene tree incongruence. Using the exact solutions, we analyze a data
+	set of 106 loci from eight yeast species, a data set of 268 loci
+	from eight Apicomplexan species, and several simulated data sets.
+	We show that the MDC criterion provides very accurate estimates of
+	the species tree topologies, and that our solutions are very fast,
+	thus allowing for the accurate analysis of genome-scale data sets.
+	Further, the efficiency of the solutions allow for quick exploration
+	of sub-optimal solutions, which is important for a parsimony-based
+	criterion such as MDC, as we show. We show that searching for the
+	species tree in the compatibility graph of the clusters induced by
+	the gene trees may be sufficient in practice, a finding that helps
+	ameliorate the computational requirements of optimization solutions.
+	Further, we study the statistical consistency and convergence rate
+	of the MDC criterion, as well as its optimality in inferring the
+	species tree. Finally, we show how our solutions can be used to identify
+	potential horizontal gene transfer events that may have caused some
+	of the incongruence in the data, thus augmenting Maddison's original
+	framework. We have implemented our solutions in the PhyloNet software
+	package, which is freely available at: http://bioinfo.cs.rice.edu/phylonet.},
+  doi = {10.1371/journal.pcbi.1000501},
+  institution = {, United States of America.},
+  keywords = {Animals; Apicomplexa, classification/genetics; Cluster Analysis; Computational
+	Biology, methods; Databases, Genetic; Genetic Speciation; Models,
+	Genetic; Phylogeny; Yeasts, classification/genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {19749978},
+  timestamp = {2009.11.20},
+  url = {http://dx.doi.org/10.1371/journal.pcbi.1000501}
+}
+
+@ARTICLE{Waddell:2002,
+  author = {Peter J Waddell and Hirohisa Kishino and Rissa Ota},
+  title = {Very fast algorithms for evaluating the stability of ML and Bayesian
+	phylogenetic trees from sequence data.},
+  journal = {Genome Inform},
+  year = {2002},
+  volume = {13},
+  pages = {82--92},
+  abstract = {Evolutionary trees sit at the core of all realistic models describing
+	a set of related sequences, including alignment, homology search,
+	ancestral protein reconstruction and 2D/3D structural change. It
+	is important to assess the stochastic error when estimating a tree,
+	including models using the most realistic likelihood-based optimizations,
+	yet computation times may be many days or weeks. If so, the bootstrap
+	is computationally prohibitive. Here we show that the extremely fast
+	"resampling of estimated log likelihoods" or RELL method behaves
+	well under more general circumstances than previously examined. RELL
+	approximates the bootstrap (BP) proportions of trees better that
+	some bootstrap methods that rely on fast heuristics to search the
+	tree space. The BIC approximation of the Bayesian posterior probability
+	(BPP) of trees is made more accurate by including an additional term
+	related to the determinant of the information matrix (which may also
+	be obtained as a product of gradient or score vectors). Such estimates
+	are shown to be very close to MCMC chain values. Our analysis of
+	mammalian mitochondrial amino acid sequences suggest that when model
+	breakdown occurs, as it typically does for sequences separated by
+	more than a few million years, the BPP values are far too peaked
+	and the real fluctuations in the likelihood of the data are many
+	times larger than expected. Accordingly, several ways to incorporate
+	the bootstrap and other types of direct resampling with MCMC procedures
+	are outlined. Genes evolve by a process which involves some sites
+	following a tree close to, but not identical with, the species tree.
+	It is seen that under such a likelihood model BP (bootstrap proportions)
+	and BPP estimates may still be reasonable estimates of the species
+	tree. Since many of the methods studied are very fast computationally,
+	there is no reason to ignore stochastic error even with the slowest
+	ML or likelihood based methods.},
+  institution = {Department of Statistics and Department of Biological Sciences, University
+	of South Carolina, Columbia, SC 29208, USA. waddell@stat.sc.edu},
+  keywords = {Algorithms; Animals; Bayes Theorem; Computational Biology, methods;
+	Data Interpretation, Statistical; Humans; Likelihood Functions; Markov
+	Chains; Monte Carlo Method; Phylogeny; Sequence Analysis, DNA, methods},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {14571377},
+  timestamp = {2009.09.11}
+}
+
+@ARTICLE{Yang:2008,
+  author = {Ziheng Yang},
+  title = {Empirical evaluation of a prior for Bayesian phylogenetic inference.},
+  journal = {Philos Trans R Soc Lond B Biol Sci},
+  year = {2008},
+  volume = {363},
+  pages = {4031--4039},
+  number = {1512},
+  month = {Dec},
+  abstract = {The Bayesian method of phylogenetic inference often produces high
+	posterior probabilities (PPs) for trees or clades, even when the
+	trees are clearly incorrect. The problem appears to be mainly due
+	to large sizes of molecular datasets and to the large-sample properties
+	of Bayesian model selection and its sensitivity to the prior when
+	several of the models under comparison are nearly equally correct
+	(or nearly equally wrong) and are of the same dimension. A previous
+	suggestion to alleviate the problem is to let the internal branch
+	lengths in the tree become increasingly small in the prior with the
+	increase in the data size so that the bifurcating trees are increasingly
+	star-like. In particular, if the internal branch lengths are assigned
+	the exponential prior, the prior mean mu0 should approach zero faster
+	than 1/square root n but more slowly than 1/n, where n is the sequence
+	length. This paper examines the usefulness of this data size-dependent
+	prior using a dataset of the mitochondrial protein-coding genes from
+	the baleen whales, with the prior mean fixed at mu0=0.1n(-2/3). In
+	this dataset, phylogeny reconstruction is sensitive to the assumed
+	evolutionary model, species sampling and the type of data (DNA or
+	protein sequences), but Bayesian inference using the default prior
+	attaches high PPs for conflicting phylogenetic relationships. The
+	data size-dependent prior alleviates the problem to some extent,
+	giving weaker support for unstable relationships. This prior may
+	be useful in reducing apparent conflicts in the results of Bayesian
+	analysis or in making the method less sensitive to model violations.},
+  doi = {10.1098/rstb.2008.0164},
+  institution = {Department of Biology, University College London, Darwin Building,
+	Gower Street, London WC1E 6BT, UK. z.yang@ucl.ac.uk},
+  keywords = {Bayes Theorem; Classification, methods; Data Interpretation, Statistical;
+	Likelihood Functions; Models, Genetic; Phylogeny; Probability},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {363/1512/4031},
+  pmid = {18852106},
+  timestamp = {2009.09.11},
+  url = {http://dx.doi.org/10.1098/rstb.2008.0164}
+}
+
+@comment{jabref-meta: selector_publisher:}
+
+@comment{jabref-meta: selector_author:}
+
+@comment{jabref-meta: selector_journal:}
+
+@comment{jabref-meta: selector_keywords:}
+

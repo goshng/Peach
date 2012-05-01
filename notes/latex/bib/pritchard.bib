@@ -1,0 +1,2107 @@
+% This file was created with JabRef 2.6.
+% Encoding: ISO8859_1
+
+@ARTICLE{Abdo2004,
+  author = {Zaid Abdo and Keith A Crandall and Paul Joyce},
+  title = {Evaluating the performance of likelihood methods for detecting population
+	structure and migration.},
+  journal = {Mol Ecol},
+  year = {2004},
+  volume = {13},
+  pages = {837--851},
+  number = {4},
+  month = {Apr},
+  abstract = {A plethora of statistical models have recently been developed to estimate
+	components of population genetic history. Very few of these methods,
+	however, have been adequately evaluated for their performance in
+	accurately estimating population genetic parameters of interest.
+	In this paper, we continue a research program of evaluation of population
+	genetic methods through computer simulation. Specifically, we examine
+	the software MIGRATEE-N 1.6.8 and test the accuracy of this software
+	to estimate genetic diversity (Theta), migration rates, and confidence
+	intervals. We simulated nucleotide sequence data under a neutral
+	coalescent model with lengths of 500 bp and 1000 bp, and with three
+	different per site Theta values of (0.00025, 0.0025, 0.025) crossed
+	with four different migration rates (0.0000025, 0.025, 0.25, 2.5)
+	to construct 1000 evolutionary trees per-combination per-sequence-length.
+	We found that while MIGRATEE-N 1.6.8 performs reasonably well in
+	estimating genetic diversity (Theta), it does poorly at estimating
+	migration rates and the confidence intervals associated with them.
+	We recommend researchers use this software with caution under conditions
+	similar to those used in this evaluation.},
+  institution = {Department of Mathematics, PO Box 441103, University of Idaho, Moscow,
+	ID 83844-1104, USA.},
+  keywords = {Computer Simulation; Evolution, Molecular; Genetics, Population; Likelihood
+	Functions; Models, Genetic; Phylogeny; Population Dynamics; Software;
+	Variation (Genetics)},
+  owner = {goshng},
+  pii = {2132},
+  pmid = {15012759},
+  review = {Island model simulation study},
+  timestamp = {2008.05.07}
+}
+
+@ARTICLE{Alexander2009,
+  author = {David H Alexander and John Novembre and Kenneth Lange},
+  title = {Fast model-based estimation of ancestry in unrelated individuals.},
+  journal = {Genome Res},
+  year = {2009},
+  volume = {19},
+  pages = {1655--1664},
+  number = {9},
+  month = {Sep},
+  abstract = {Population stratification has long been recognized as a confounding
+	factor in genetic association studies. Estimated ancestries, derived
+	from multi-locus genotype data, can be used to perform a statistical
+	correction for population stratification. One popular technique for
+	estimation of ancestry is the model-based approach embodied by the
+	widely applied program structure. Another approach, implemented in
+	the program EIGENSTRAT, relies on Principal Component Analysis rather
+	than model-based estimation and does not directly deliver admixture
+	fractions. EIGENSTRAT has gained in popularity in part owing to its
+	remarkable speed in comparison to structure. We present a new algorithm
+	and a program, ADMIXTURE, for model-based estimation of ancestry
+	in unrelated individuals. ADMIXTURE adopts the likelihood model embedded
+	in structure. However, ADMIXTURE runs considerably faster, solving
+	problems in minutes that take structure hours. In many of our experiments,
+	we have found that ADMIXTURE is almost as fast as EIGENSTRAT. The
+	runtime improvements of ADMIXTURE rely on a fast block relaxation
+	scheme using sequential quadratic programming for block updates,
+	coupled with a novel quasi-Newton acceleration of convergence. Our
+	algorithm also runs faster and with greater accuracy than the implementation
+	of an Expectation-Maximization (EM) algorithm incorporated in the
+	program FRAPPE. Our simulations show that ADMIXTURE's maximum likelihood
+	estimates of the underlying admixture coefficients and ancestral
+	allele frequencies are as accurate as structure's Bayesian estimates.
+	On real-world data sets, ADMIXTURE's estimates are directly comparable
+	to those from structure and EIGENSTRAT. Taken together, our results
+	show that ADMIXTURE's computational speed opens up the possibility
+	of using a much larger set of markers in model-based ancestry estimation
+	and that its estimates are suitable for use in correcting for population
+	stratification in association studies.},
+  doi = {10.1101/gr.094052.109},
+  institution = {Department of Biomathematics, University of California at Los Angeles,
+	Los Angeles, California 90095, USA. dalexander@ucla.edu},
+  keywords = {Algorithms; Computational Biology; Europe, ethnology; Gene Frequency;
+	Genetic Association Studies; Genetics, Population; Genotype; Humans;
+	Inflammatory Bowel Diseases, ethnology/genetics; Jews, ethnology;
+	Likelihood Functions; Models, Genetic; Polymorphism, Single Nucleotide;
+	Software; Time Factors},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {gr.094052.109},
+  pmid = {19648217},
+  review = {I do not know what this is about. It surely deals with admixture problem.},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1101/gr.094052.109}
+}
+
+@ARTICLE{Baudouin2004,
+  author = {L. Baudouin and S. Piry and J. M. Cornuet},
+  title = {Analytical bayesian approach for assigning individuals to populations.},
+  journal = {J Hered},
+  year = {2004},
+  volume = {95},
+  pages = {217--224},
+  number = {3},
+  abstract = {We propose a general formulation of the Bayesian method for assigning
+	individuals to a population among a predetermined set of reference
+	populations using molecular marker information. Compared to previously
+	published methods, ours allows us to consider different types of
+	prior information about allele frequencies by using a Dirichlet prior
+	probability distribution. It also makes it possible to assign a set
+	of individuals assumed to belong to the same population with increased
+	accuracy using their pooled genotype data. The efficiency of the
+	method is illustrated by application to a group of closely related
+	coconut populations. An interesting feature of the Bayesian procedure
+	is the way it handles imprecise information. With a poor or even
+	incomplete dataset, assignment is still be possible and gives valid
+	results: poor data quality is reflected in an ambiguous result rather
+	than in a false conclusion.},
+  institution = {Département Cultures Pérennes, TA 80/03, CIRAD, Avenue Agropolis,
+	34098 Montpellier CEDEX 5, France. Luc.baudouin@cirad.fr},
+  keywords = {Bayes Theorem; Cocos; Gene Frequency; Genetic Markers; Genetics, Population;
+	Genotype; Models, Biological; Research Design},
+  owner = {goshng},
+  pmid = {15220388},
+  review = {analytical? This is dealing with a single individual assignment given
+	data sets with source populations. Huelsenbeck derived the exactly
+	the same equation in his paper with Andolfatto. Equation (7) of Baudouin's
+	is essentially equal to Equation (4) of Huelsenbeck and Andolfatto's.
+	Note that m! and m_h! in Equation (7) are cancelled out when we consider
+	a single individual. Baudouin's considers two or more individuals
+	that are represented as m.},
+  timestamp = {2008.12.22},
+  url = {http://jhered.oxfordjournals.org/cgi/content/full/95/3/217}
+}
+
+@ARTICLE{Carstens2009,
+  author = {Bryan C Carstens and Holly N Stoute and Noah M Reid},
+  title = {An information-theoretical approach to phylogeography.},
+  journal = {Mol Ecol},
+  year = {2009},
+  volume = {18},
+  pages = {4270--4282},
+  number = {20},
+  month = {Oct},
+  abstract = {Data analysis in phylogeographic investigations is typically conducted
+	in either a qualitative manner, or alternatively via the testing
+	of null hypotheses. The former, where inferences about population
+	processes are derived from geographical patterns of genetic variation,
+	may be subject to confirmation bias and prone to overinterpretation.
+	Testing the predictions of null hypotheses is arguably less prone
+	to bias than qualitative approaches, but only if the tested hypotheses
+	are biologically meaningful. As it is difficult to know a priori
+	if this is the case, there is the general need for additional methodological
+	approaches in phylogeographic research. Here, we explore an alternative
+	method for analysing phylogeographic data that utilizes information
+	theory to quantify the probability of multiple hypotheses given the
+	data. We accomplish this by augmenting the model-selection procedure
+	implemented in ima with calculations of Akaike Information Criterion
+	scores and model probabilities. We generate a ranking of 17 models
+	each representing a set of historical evolutionary processes that
+	may have contributed to the evolution of Plethodon idahoensis, and
+	then quantify the relative strength of support for each hypothesis
+	given the data using metrics borrowed from information theory. Our
+	results suggest that two models have high probability given the data.
+	Each of these models includes population divergence and estimates
+	of ancestral theta that differ from estimates of descendent theta,
+	inferences consistent with prior work in this system. However, the
+	models disagree in that one includes migration as a parameter and
+	one does not, suggesting that there are two regions of parameter
+	space that produce model likelihoods that are similar in magnitude
+	given our data. Results of a simulation study suggest that when data
+	are simulated with migration, most of the optimal models include
+	migration as a parameter, and further that when all of the shared
+	polymorphism results from incomplete lineage sorting, most of the
+	optimal models do not. The results could also indicate a lack of
+	precision, which may be a product of the amount of data that we have
+	collected. In any case, the information-theoretic metrics that we
+	have applied to the analysis of our data are statistically rigorous,
+	as are hypothesis-testing approaches, but move beyond the 'reject/fail
+	to reject' dichotomy of conventional hypothesis testing in a manner
+	that provides considerably more flexibility to researchers.},
+  doi = {10.1111/j.1365-294X.2009.04327.x},
+  institution = {Department of Biological Sciences, Louisiana State University, Baton
+	Rouge, LA 70803, USA. carstens@lsu.edu},
+  keywords = {Animals; Computer Simulation; Evolution, Molecular; Gene Flow; Genetics,
+	Population; Geography; Models, Genetic; Phylogeny; Urodela, genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {MEC4327},
+  pmid = {19765225},
+  review = {A somewhat different approach.},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1111/j.1365-294X.2009.04327.x}
+}
+
+@ARTICLE{Chen2007,
+  author = {Chen, Chibiao and Durand, Eric and Forbes, Florence and Francois,
+	Olivier},
+  title = {Bayesian clustering algorithms ascertaining spatial population structure:
+	a new computer program and a comparison study},
+  journal = {Molecular Ecology Notes},
+  year = {2007},
+  volume = {7},
+  pages = {747--756},
+  number = {5},
+  month = {September},
+  citeulike-article-id = {1602862},
+  citeulike-linkout-0 = {http://dx.doi.org/10.1111/j.1471-8286.2007.01769.x},
+  citeulike-linkout-1 = {http://www.ingentaconnect.com/content/bsc/men/2007/00000007/00000005/art00004},
+  citeulike-linkout-2 = {http://www3.interscience.wiley.com/cgi-bin/abstract/118523860/ABSTRACT},
+  doi = {10.1111/j.1471-8286.2007.01769.x},
+  issn = {1471-8278},
+  keywords = {clustering, genomics, geography, spatial},
+  owner = {goshng},
+  posted-at = {2009-06-22 21:28:32},
+  priority = {2},
+  publisher = {Blackwell Publishing},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1111/j.1471-8286.2007.01769.x}
+}
+
+@ARTICLE{Corander2007a,
+  author = {Jukka Corander and Mats Gyllenberg and Timo Koski},
+  title = {Random partition models and exchangeability for Bayesian identification
+	of population structure.},
+  journal = {Bull Math Biol},
+  year = {2007},
+  volume = {69},
+  pages = {797--815},
+  number = {3},
+  month = {Apr},
+  abstract = {We introduce a Bayesian theoretical formulation of the statistical
+	learning problem concerning the genetic structure of populations.
+	The two key concepts in our derivation are exchangeability in its
+	various forms and random allocation models. Implications of our results
+	to empirical investigation of the population structure are discussed.},
+  doi = {10.1007/s11538-006-9161-1},
+  institution = {Department of Mathematics and Statistics, Rolf Nevanlinna Institute,
+	University of Helsinki, PO Box 68, Helsinki, FIN-00014, Finland.
+	jukka.corander@helsinki.fi},
+  keywords = {Animals; Bayes Theorem; Drosophila melanogaster, genetics; Evolution;
+	Genetics, Population; Models, Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {17086368},
+  timestamp = {2009.07.29},
+  url = {http://dx.doi.org/10.1007/s11538-006-9161-1}
+}
+
+@ARTICLE{Corander2006,
+  author = {Jukka Corander and Pekka Marttinen},
+  title = {Bayesian identification of admixture events using multilocus molecular
+	markers.},
+  journal = {Mol Ecol},
+  year = {2006},
+  volume = {15},
+  pages = {2833--2843},
+  number = {10},
+  month = {Sep},
+  abstract = {Bayesian statistical methods for the estimation of hidden genetic
+	structure of populations have gained considerable popularity in the
+	recent years. Utilizing molecular marker data, Bayesian mixture models
+	attempt to identify a hidden population structure by clustering individuals
+	into genetically divergent groups, whereas admixture models target
+	at separating the ancestral sources of the alleles observed in different
+	individuals. We discuss the difficulties involved in the simultaneous
+	estimation of the number of ancestral populations and the levels
+	of admixture in studied individuals' genomes. To resolve this issue,
+	we introduce a computationally efficient method for the identification
+	of admixture events in the population history. Our approach is illustrated
+	by analyses of several challenging real and simulated data sets.
+	The software (baps), implementing the methods introduced here, is
+	freely available at http://www.rni.helsinki.fi/~jic/bapspage.html.},
+  doi = {10.1111/j.1365-294X.2006.02994.x},
+  institution = {Department of Mathematics and Statistics, PO Box 68, Fin-00014 University
+	of Helsinki, Finland. jukka.corander@helsinki.fi},
+  keywords = {Alleles; Bayes Theorem; Databases, Genetic; Genetic Markers, genetics;
+	Humans; Internet; Population Groups; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {MEC2994},
+  pmid = {16911204},
+  timestamp = {2009.07.29},
+  url = {http://dx.doi.org/10.1111/j.1365-294X.2006.02994.x}
+}
+
+@ARTICLE{Corander2008,
+  author = {Jukka Corander and Pekka Marttinen and Jukka Sirén and Jing Tang},
+  title = {Enhanced Bayesian modelling in BAPS software for learning genetic
+	structures of populations.},
+  journal = {BMC Bioinformatics},
+  year = {2008},
+  volume = {9},
+  pages = {539},
+  abstract = {BACKGROUND: During the most recent decade many Bayesian statistical
+	models and software for answering questions related to the genetic
+	structure underlying population samples have appeared in the scientific
+	literature. Most of these methods utilize molecular markers for the
+	inferences, while some are also capable of handling DNA sequence
+	data. In a number of earlier works, we have introduced an array of
+	statistical methods for population genetic inference that are implemented
+	in the software BAPS. However, the complexity of biological problems
+	related to genetic structure analysis keeps increasing such that
+	in many cases the current methods may provide either inappropriate
+	or insufficient solutions. RESULTS: We discuss the necessity of enhancing
+	the statistical approaches to face the challenges posed by the ever-increasing
+	amounts of molecular data generated by scientists over a wide range
+	of research areas and introduce an array of new statistical tools
+	implemented in the most recent version of BAPS. With these methods
+	it is possible, e.g., to fit genetic mixture models using user-specified
+	numbers of clusters and to estimate levels of admixture under a genetic
+	linkage model. Also, alleles representing a different ancestry compared
+	to the average observed genomic positions can be tracked for the
+	sampled individuals, and a priori specified hypotheses about genetic
+	population structure can be directly compared using Bayes' theorem.
+	In general, we have improved further the computational characteristics
+	of the algorithms behind the methods implemented in BAPS facilitating
+	the analyses of large and complex datasets. In particular, analysis
+	of a single dataset can now be spread over multiple computers using
+	a script interface to the software. CONCLUSION: The Bayesian modelling
+	methods introduced in this article represent an array of enhanced
+	tools for learning the genetic structure of populations. Their implementations
+	in the BAPS software are designed to meet the increasing need for
+	analyzing large-scale population genetics data. The software is freely
+	downloadable for Windows, Linux and Mac OS X systems at http://web.abo.fi/fak/mnf//mate/jc/software/baps.html.},
+  doi = {10.1186/1471-2105-9-539},
+  institution = {Department of Mathematics, Fänriksgatan 3B, Abo Akademi University,
+	Abo, Finland. jukka.corander@abo.fi},
+  keywords = {Algorithms; Alleles; Bayes Theorem; Cluster Analysis; Computational
+	Biology; Databases, Genetic; Genetic Structures; Genetics, Population;
+	Humans; Linkage (Genetics); Models, Genetic; Population; Sequence
+	Analysis, DNA; Software; Stochastic Processes},
+  owner = {goshng},
+  pii = {1471-2105-9-539},
+  pmid = {19087322},
+  review = {Maybe a review for assignment},
+  timestamp = {2009.07.06},
+  url = {http://dx.doi.org/10.1186/1471-2105-9-539}
+}
+
+@ARTICLE{Corander2007,
+  author = {Jukka Corander and Jing Tang},
+  title = {Bayesian analysis of population structure based on linked molecular
+	information.},
+  journal = {Math Biosci},
+  year = {2007},
+  volume = {205},
+  pages = {19--31},
+  number = {1},
+  month = {Jan},
+  abstract = {The Bayesian model-based approach to inferring hidden genetic population
+	structures using multilocus molecular markers has become a popular
+	tool within certain branches of biology. In particular, it has been
+	shown that heterogeneous data arising from genetically dissimilar
+	latent groups of individuals can be effectively modelled using an
+	unsupervised classification formulation. However, most currently
+	employed models ignore potential linkage within the employed molecular
+	information, and can therefore lead to biased inferences under certain
+	circumstances. Utilizing the general theory of graphical models,
+	we develop a framework that accounts for dependences both within
+	linked molecular marker loci and DNA sequence data. Due to a high
+	level of sequence conservation among eukaryotic species, the latter
+	aspect is particularly relevant for analyzing rapidly evolving microbial
+	species. The advantages of incorporating the dependence due to linkage
+	in the classification models are illustrated by analyses of both
+	simulated data and real samples of Bacillus cereus.},
+  doi = {10.1016/j.mbs.2006.09.015},
+  institution = {Department of Mathematics and Statistics, P.O. Box 68, University
+	of Helsinki, 00014 Helsinki, Finland. jukka.corander@helsinki.fi},
+  keywords = {Bacillus cereus, genetics; Base Sequence; Bayes Theorem; Computer
+	Simulation; DNA, Bacterial, genetics; Genetics, Population, methods;
+	Models, Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S0025-5564(06)00183-0},
+  pmid = {17087977},
+  timestamp = {2009.07.29},
+  url = {http://dx.doi.org/10.1016/j.mbs.2006.09.015}
+}
+
+@ARTICLE{Corander2004,
+  author = {Jukka Corander and Patrik Waldmann and Pekka Marttinen and Mikko
+	J Sillanpää},
+  title = {BAPS 2: enhanced possibilities for the analysis of genetic population
+	structure.},
+  journal = {Bioinformatics},
+  year = {2004},
+  volume = {20},
+  pages = {2363--2369},
+  number = {15},
+  month = {Oct},
+  abstract = {Bayesian statistical methods based on simulation techniques have recently
+	been shown to provide powerful tools for the analysis of genetic
+	population structure. We have previously developed a Markov chain
+	Monte Carlo (MCMC) algorithm for characterizing genetically divergent
+	groups based on molecular markers and geographical sampling design
+	of the dataset. However, for large-scale datasets such algorithms
+	may get stuck to local maxima in the parameter space. Therefore,
+	we have modified our earlier algorithm to support multiple parallel
+	MCMC chains, with enhanced features that enable considerably faster
+	and more reliable estimation compared to the earlier version of the
+	algorithm. We consider also a hierarchical tree representation, from
+	which a Bayesian model-averaged structure estimate can be extracted.
+	The algorithm is implemented in a computer program that features
+	a user-friendly interface and built-in graphics. The enhanced features
+	are illustrated by analyses of simulated data and an extensive human
+	molecular dataset. AVAILABILITY: Freely available at http://www.rni.helsinki.fi/~jic/bapspage.html.},
+  doi = {10.1093/bioinformatics/bth250},
+  institution = {Rolf Nevanlinna Institute, P.O. Box 4, Fin-00014 University of Helsinki,
+	Finland. jukka.corander@rni.helsinki.fi},
+  keywords = {Algorithms; Chromosome Mapping, methods; Gene Frequency; Genetic Markers,
+	genetics; Genetic Screening, methods; Genetic Variation; Genetics,
+	Population; Humans; Markov Chains; Models, Genetic; Models, Statistical;
+	Monte Carlo Method; Polymorphism, Single Nucleotide, genetics; Sequence
+	Analysis, DNA, methods; Software; User-Computer Interface},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {bth250},
+  pmid = {15073024},
+  timestamp = {2009.07.29},
+  url = {http://dx.doi.org/10.1093/bioinformatics/bth250}
+}
+
+@ARTICLE{Corander2003,
+  author = {Jukka Corander and Patrik Waldmann and Mikko J Sillanpää},
+  title = {Bayesian analysis of genetic differentiation between populations.},
+  journal = {Genetics},
+  year = {2003},
+  volume = {163},
+  pages = {367--374},
+  number = {1},
+  month = {Jan},
+  abstract = {We introduce a Bayesian method for estimating hidden population substructure
+	using multilocus molecular markers and geographical information provided
+	by the sampling design. The joint posterior distribution of the substructure
+	and allele frequencies of the respective populations is available
+	in an analytical form when the number of populations is small, whereas
+	an approximation based on a Markov chain Monte Carlo simulation approach
+	can be obtained for a moderate or large number of populations. Using
+	the joint posterior distribution, posteriors can also be derived
+	for any evolutionary population parameters, such as the traditional
+	fixation indices. A major advantage compared to most earlier methods
+	is that the number of populations is treated here as an unknown parameter.
+	What is traditionally considered as two genetically distinct populations,
+	either recently founded or connected by considerable gene flow, is
+	here considered as one panmictic population with a certain probability
+	based on marker data and prior information. Analyses of previously
+	published data on the Moroccan argan tree (Argania spinosa) and of
+	simulated data sets suggest that our method is capable of estimating
+	a population substructure, while not artificially enforcing a substructure
+	when it does not exist. The software (BAPS) used for the computations
+	is freely available from http://www.rni.helsinki.fi/~mjs.},
+  institution = {Rolf Nevanlinna Institute, FIN-00014, University of Helsinki, Helsinki,
+	Finland.},
+  keywords = {Bayes Theorem; Geography; Models, Genetic; Population, genetics; Trees,
+	genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {12586722},
+  timestamp = {2009.07.29}
+}
+
+@ARTICLE{Dawson2009,
+  author = {Dawson, K. J. and Belkhir, K.},
+  title = {An agglomerative hierarchical approach to visualization in Bayesian
+	clustering problems},
+  journal = {Heredity},
+  year = {2009},
+  volume = {aop},
+  number = {current},
+  abstract = {\&\#10;An agglomerative hierarchical approach to visualization in
+	Bayesian clustering problems\&\#10;\&\#10;Heredity advance online
+	publication, April 1, 2009. doi:10.1038/hdy.2009.29\&\#10;\&\#10;Authors:
+	K J Dawson\&\#10;\&amp; K Belkhir},
+  citeulike-article-id = {4266484},
+  doi = {10.1038/hdy.2009.29},
+  issn = {0018-067X},
+  owner = {goshng},
+  posted-at = {2009-04-03 00:10:38},
+  publisher = {Nature Publishing Group},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1038/hdy.2009.29}
+}
+
+@ARTICLE{Dawson2001,
+  author = {K. J. Dawson and K. Belkhir},
+  title = {A Bayesian approach to the identification of panmictic populations
+	and the assignment of individuals.},
+  journal = {Genet Res},
+  year = {2001},
+  volume = {78},
+  pages = {59--77},
+  number = {1},
+  month = {Aug},
+  abstract = {We present likelihood-based methods for assigning the individuals
+	in a sample to source populations, on the basis of their genotypes
+	at co-dominant marker loci. The source populations are assumed to
+	be at Hardy-Weinberg and linkage equilibrium, but the allelic composition
+	of these source populations and even the number of source populations
+	represented in the sample are treated as uncertain. The parameter
+	of interest is the partition of the set of sampled individuals, induced
+	by the assignment of individuals to source populations. We present
+	a maximum likelihood method, and then a more powerful Bayesian approach
+	for estimating this sample partition. In general, it will not be
+	feasible to evaluate the evidence supporting each possible partition
+	of the sample. Furthermore, when the number of individuals in the
+	sample is large, it may not even be feasible to evaluate the evidence
+	supporting, individually, each of the most plausible partitions because
+	there may be many individuals which are difficult to assign. To overcome
+	these problems, we use low-dimensional marginals (the 'co-assignment
+	probabilities') of the posterior distribution of the sample partition
+	as measures of 'similarity', and then apply a hierarchical clustering
+	algorithm to identify clusters of individuals whose assignment together
+	is well supported by the posterior distribution. A binary tree provides
+	a visual representation of how well the posterior distribution supports
+	each cluster in the hierarchy. These methods are applicable to other
+	problems where the parameter of interest is a partition of a set.
+	Because the co-assignment probabilities are independent of the arbitrary
+	labelling of source populations, we avoid the label-switching problem
+	of previous Bayesian methods.},
+  institution = {Laboratoire Génome, Populations et Interactions, CNRS UMR 5000, Université
+	de Montpellier II, Place Eugène Bataillon, 34095 Montpellier, France.
+	Kevin.Dawson@bbsrc.ac.uk},
+  keywords = {Algorithms; Alleles; Bayes Theorem; Genes, Dominant; Genetic Markers;
+	Genetics, Population; Humans; Likelihood Functions; Linkage (Genetics);
+	Models, Statistical; Monte Carlo Method; Reproducibility of Results},
+  owner = {goshng},
+  pmid = {11556138},
+  review = {Assignment with Fst},
+  timestamp = {2008.12.22}
+}
+
+@ARTICLE{Durand2009,
+  author = {Eric Durand and Chibiao Chen and Olivier François},
+  title = {Comment on 'On the inference of spatial structure from population
+	genetics data'.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {1802--4; author reply 1805-6},
+  number = {14},
+  month = {Jul},
+  doi = {10.1093/bioinformatics/btp337},
+  keywords = {Genetics, Population; Models, Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btp337},
+  pmid = {19574292},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btp337}
+}
+
+@ARTICLE{Durand2009a,
+  author = {Eric Durand and Flora Jay and Oscar E Gaggiotti and Olivier François},
+  title = {Spatial inference of admixture proportions and secondary contact
+	zones.},
+  journal = {Mol Biol Evol},
+  year = {2009},
+  volume = {26},
+  pages = {1963--1973},
+  number = {9},
+  month = {Sep},
+  abstract = {Genetic admixture of distinct gene pools is the consequence of complex
+	spatiotemporal processes that could have involved massive migration
+	and local mating during the history of a species. However, current
+	methods for estimating individual admixture proportions lack the
+	incorporation of such a piece of information. Here, we extend Bayesian
+	clustering algorithms by including global trend surfaces and spatial
+	autocorrelation in the prior distribution on individual admixture
+	coefficients. We test our algorithm by using spatially explicit and
+	realistic coalescent simulations of colonization followed by secondary
+	contact. By coupling our multiscale spatial analyses with a Bayesian
+	evaluation of model complexity and fit, we show that the algorithm
+	provides a correct description of smooth clinal variation, while
+	still detecting zones of sharp variation when they are present in
+	the data. We also apply our approach to understand the population
+	structure of the killifish, Fundulus heteroclitus, for which the
+	algorithm uncovers a presumed contact zone in the Atlantic coast
+	of North America.},
+  doi = {10.1093/molbev/msp106},
+  institution = {Faculty of Medicine, Laboratoire des Techniques de 1'Ingénierie Médicale
+	et de la Complexité, University Joseph Fourier, Grenoble IT, Group
+	of Mathematical Biology, La Tronche, France.},
+  keywords = {Animals; Bayes Theorem; Computer Simulation; Ecosystem; Europe; Fundulidae,
+	genetics; Gene Pool; Genetics, Population; Linear Models; Models,
+	Genetic; Regression Analysis},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {msp106},
+  pmid = {19461114},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/molbev/msp106}
+}
+
+@ARTICLE{Evanno2005,
+  author = {G. Evanno and S. Regnaut and J. Goudet},
+  title = {Detecting the number of clusters of individuals using the software
+	STRUCTURE: a simulation study.},
+  journal = {Mol Ecol},
+  year = {2005},
+  volume = {14},
+  pages = {2611--2620},
+  number = {8},
+  month = {Jul},
+  abstract = {The identification of genetically homogeneous groups of individuals
+	is a long standing issue in population genetics. A recent Bayesian
+	algorithm implemented in the software STRUCTURE allows the identification
+	of such groups. However, the ability of this algorithm to detect
+	the true number of clusters (K) in a sample of individuals when patterns
+	of dispersal among populations are not homogeneous has not been tested.
+	The goal of this study is to carry out such tests, using various
+	dispersal scenarios from data generated with an individual-based
+	model. We found that in most cases the estimated 'log probability
+	of data' does not provide a correct estimation of the number of clusters,
+	K. However, using an ad hoc statistic DeltaK based on the rate of
+	change in the log probability of data between successive K values,
+	we found that STRUCTURE accurately detects the uppermost hierarchical
+	level of structure for the scenarios we tested. As might be expected,
+	the results are sensitive to the type of genetic marker used (AFLP
+	vs. microsatellite), the number of loci scored, the number of populations
+	sampled, and the number of individuals typed in each sample.},
+  doi = {10.1111/j.1365-294X.2005.02553.x},
+  institution = {Department of Ecology and Evolution, Biology building, University
+	of Lausanne, CH 1015 Lausanne, Switzerland.},
+  keywords = {Bayes Theorem; Computer Simulation; Gene Frequency; Genetics, Population;
+	Microsatellite Repeats; Models, Genetic; Polymorphism, Restriction
+	Fragment Length; Population Dynamics; Sample Size; Software},
+  owner = {goshng},
+  pii = {MEC2553},
+  pmid = {15969739},
+  timestamp = {2008.09.05},
+  url = {http://dx.doi.org/10.1111/j.1365-294X.2005.02553.x}
+}
+
+@ARTICLE{Falush2003,
+  author = {Daniel Falush and Matthew Stephens and Jonathan K Pritchard},
+  title = {Inference of population structure using multilocus genotype data:
+	linked loci and correlated allele frequencies.},
+  journal = {Genetics},
+  year = {2003},
+  volume = {164},
+  pages = {1567--1587},
+  number = {4},
+  month = {Aug},
+  abstract = {We describe extensions to the method of Pritchard et al. for inferring
+	population structure from multilocus genotype data. Most importantly,
+	we develop methods that allow for linkage between loci. The new model
+	accounts for the correlations between linked loci that arise in admixed
+	populations ("admixture linkage disequilibium"). This modification
+	has several advantages, allowing (1) detection of admixture events
+	farther back into the past, (2) inference of the population of origin
+	of chromosomal regions, and (3) more accurate estimates of statistical
+	uncertainty when linked loci are used. It is also of potential use
+	for admixture mapping. In addition, we describe a new prior model
+	for the allele frequencies within each population, which allows identification
+	of subtle population subdivisions that were not detectable using
+	the existing method. We present results applying the new methods
+	to study admixture in African-Americans, recombination in Helicobacter
+	pylori, and drift in populations of Drosophila melanogaster. The
+	methods are implemented in a program, structure, version 2.0, which
+	is available at http://pritch.bsd.uchicago.edu.},
+  keywords = {African Continental Ancestry Group; Algorithms; Alleles; Animals;
+	Bayes Theorem; Chromosomes; Computer Simulation; Drosophila melanogaster;
+	Evolution, Molecular; Female; Gene Frequency; Genetic Drift; Genetic
+	Markers; Genetics, Population; Genotype; Helicobacter pylori; Humans;
+	Linkage (Genetics); Male; Markov Chains; Models, Genetic; Monte Carlo
+	Method; Recombination, Genetic},
+  owner = {goshng},
+  pmid = {12930761},
+  timestamp = {2008.03.31}
+}
+
+@ARTICLE{Francois:2006,
+  author = {Olivier François and Sophie Ancelet and Gilles Guillot},
+  title = {Bayesian clustering using hidden Markov random fields in spatial
+	population genetics.},
+  journal = {Genetics},
+  year = {2006},
+  volume = {174},
+  pages = {805--816},
+  number = {2},
+  month = {Oct},
+  abstract = {We introduce a new Bayesian clustering algorithm for studying population
+	structure using individually geo-referenced multilocus data sets.
+	The algorithm is based on the concept of hidden Markov random field,
+	which models the spatial dependencies at the cluster membership level.
+	We argue that (i) a Markov chain Monte Carlo procedure can implement
+	the algorithm efficiently, (ii) it can detect significant geographical
+	discontinuities in allele frequencies and regulate the number of
+	clusters, (iii) it can check whether the clusters obtained without
+	the use of spatial priors are robust to the hypothesis of discontinuous
+	geographical variation in allele frequencies, and (iv) it can reduce
+	the number of loci required to obtain accurate assignments. We illustrate
+	and discuss the implementation issues with the Scandinavian brown
+	bear and the human CEPH diversity panel data set.},
+  doi = {10.1534/genetics.106.059923},
+  institution = {TIMC, TIMB (Department of Mathematical Biology), La Tronche, France.
+	olivier.francois@imag.fr},
+  keywords = {Animals; Bayes Theorem; Female; Genetics, Population; Humans; Male;
+	Markov Chains; Microsatellite Repeats; Models, Genetic; Polymorphism,
+	Genetic; Ursidae, genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {genetics.106.059923},
+  pmid = {16888334},
+  timestamp = {2009.07.29},
+  url = {http://dx.doi.org/10.1534/genetics.106.059923}
+}
+
+@ARTICLE{Fu2005,
+  author = {Rongwei Fu and Dipak K Dey and Kent E Holsinger},
+  title = {Bayesian models for the analysis of genetic structure when populations
+	are correlated.},
+  journal = {Bioinformatics},
+  year = {2005},
+  volume = {21},
+  pages = {1516--1529},
+  number = {8},
+  month = {Apr},
+  abstract = {MOTIVATION: Population allele frequencies are correlated when populations
+	have a shared history or when they exchange genes. Unfortunately,
+	most models for allele frequency and inference about population structure
+	ignore this correlation. Recent analytical results show that among
+	populations, correlations can be very high, which could affect estimates
+	of population genetic structure. In this study, we propose a mixture
+	beta model to characterize the allele frequency distribution among
+	populations. This formulation incorporates the correlation among
+	populations as well as extending the model to data with different
+	clusters of populations. RESULTS: Using simulated data, we show that
+	in general, the mixture model provides a good approximation of the
+	among-population allele frequency distribution and a good estimate
+	of correlation among populations. Results from fitting the mixture
+	model to a dataset of genotypes at 377 autosomal microsatellite loci
+	from human populations indicate high correlation among populations,
+	which may not be appropriate to neglect. Traditional measures of
+	population structure tend to overestimate the amount of genetic differentiation
+	when correlation is neglected. Inference is performed in a Bayesian
+	framework. CONTACT: fur@ohsu.edu.},
+  doi = {10.1093/bioinformatics/bti178},
+  institution = {Department of Statistics, U-4120, University of Connecticut, Storrs,
+	CT 06269-4120, USA. fur@ohsu.edu},
+  keywords = {Bayes Theorem; Computer Simulation; DNA Mutational Analysis, methods;
+	Gene Expression Profiling, methods; Gene Frequency, genetics; Genetic
+	Variation, genetics; Genetics, Population; Genome, Human; Humans;
+	Models, Genetic; Models, Statistical; Phenotype; Statistics as Topic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {bti178},
+  pmid = {15585534},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/bioinformatics/bti178}
+}
+
+@ARTICLE{Gao2007,
+  author = {Hong Gao and Scott Williamson and Carlos D Bustamante},
+  title = {A Markov chain Monte Carlo approach for joint inference of population
+	structure and inbreeding rates from multilocus genotype data.},
+  journal = {Genetics},
+  year = {2007},
+  volume = {176},
+  pages = {1635--1651},
+  number = {3},
+  month = {Jul},
+  abstract = {Nonrandom mating induces correlations in allelic states within and
+	among loci that can be exploited to understand the genetic structure
+	of natural populations (Wright 1965). For many species, it is of
+	considerable interest to quantify the contribution of two forms of
+	nonrandom mating to patterns of standing genetic variation: inbreeding
+	(mating among relatives) and population substructure (limited dispersal
+	of gametes). Here, we extend the popular Bayesian clustering approach
+	STRUCTURE (Pritchard et al. 2000) for simultaneous inference of inbreeding
+	or selfing rates and population-of-origin classification using multilocus
+	genetic markers. This is accomplished by eliminating the assumption
+	of Hardy-Weinberg equilibrium within clusters and, instead, calculating
+	expected genotype frequencies on the basis of inbreeding or selfing
+	rates. We demonstrate the need for such an extension by showing that
+	selfing leads to spurious signals of population substructure using
+	the standard STRUCTURE algorithm with a bias toward spurious signals
+	of admixture. We gauge the performance of our method using extensive
+	coalescent simulations and demonstrate that our approach can correct
+	for this bias. We also apply our approach to understanding the population
+	structure of the wild relative of domesticated rice, Oryza rufipogon,
+	an important partially selfing grass species. Using a sample of n
+	= 16 individuals sequenced at 111 random loci, we find strong evidence
+	for existence of two subpopulations, which correlates well with geographic
+	location of sampling, and estimate selfing rates for both groups
+	that are consistent with estimates from experimental data (s approximately
+	0.48-0.70).},
+  doi = {10.1534/genetics.107.072371},
+  keywords = {Bayes Theorem; Cluster Analysis; Genes, Plant; Genetics, Population;
+	Genotype; Inbreeding; Markov Chains; Monte Carlo Method; Oryza sativa;
+	Statistics as Topic},
+  owner = {goshng},
+  pii = {genetics.107.072371},
+  pmid = {17483417},
+  timestamp = {2008.03.31},
+  url = {http://dx.doi.org/10.1534/genetics.107.072371}
+}
+
+@ARTICLE{Guillot2009c,
+  author = {Gilles Guillo, T. and Filipe Santo, S.},
+  title = {A computer program to simulate multilocus genotype data with spatially
+	autocorrelated allele frequencies},
+  journal = {Molecular Ecology Resources},
+  year = {2009},
+  volume = {9},
+  pages = {1112--1120},
+  citeulike-article-id = {6597359},
+  posted-at = {2010-01-27 22:46:55},
+  priority = {2}
+}
+
+@ARTICLE{Guillot2009a,
+  author = {Gilles Guillot},
+  title = {On the inference of spatial structure from population genetics data.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {1796--1801},
+  number = {14},
+  month = {Jul},
+  abstract = {MOTIVATION: In a series of recent papers, Tess, a computer program
+	based on the concept of hidden Markov random field, has been proposed
+	to infer the number and locations of panmictic population units from
+	the genotypes and spatial locations of these individuals. The method
+	seems to be of broad appeal as it is conceptually much simpler than
+	other competing methods and it has been reported by its authors to
+	be fast and accurate. However, this methodology is not grounded in
+	a formal statistical inference method and seems to rely to a large
+	extent on arbitrary choices regarding the parameters used. The present
+	article is an investigation of the accuracy of this method and an
+	attempt to assess whether recent results reported on the basis of
+	this method are genuine features of the genetic process or artefacts
+	of the method. Method: I analyse simulated data consisting of populations
+	at Hardy-Weinberg and linkage equilibrium and also data simulated
+	under a scenario of isolation-by-distance at mutation-migration-drift
+	equilibrium. Arabidopsis thaliana data previously analysed with this
+	method are also reconsidered. RESULTS: Using the Tess program under
+	the no-admixture model to analyse data consisting of several genuine
+	HWLE populations with individuals of pure ancestries leads to highly
+	inaccurate results; Using the Tess program under the admixture model
+	to analyse data consisting of a continuous isolation-by-distance
+	population leads to the inference of spurious HWLE populations whose
+	number and features depend on the parameters used. Results previously
+	reported about the A.thaliana using Tess seem to a large extent to
+	be artefacts of the statistical methodology used. The findings go
+	beyond population clustering models and can be an help to design
+	more efficient algorithms based on graphs. AVAILABILITY: The data
+	analysed in the present article are available from http://folk.uio.no/gillesg/Bioinformatics-HMRF.},
+  doi = {10.1093/bioinformatics/btp267},
+  institution = {Centre for Ecological and Evolutionary Synthesis, Department of Biology,
+	University of Oslo, P.O. Box 1066, Blindern 0316, Oslo Norway. gilles.guillot@bio.uio.no},
+  keywords = {Algorithms; Arabidopsis, genetics; Genetics, Population; Linkage Disequilibrium;
+	Markov Chains},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btp267},
+  pmid = {19574291},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btp267}
+}
+
+@ARTICLE{Guillot2008,
+  author = {Gilles Guillot},
+  title = {Inference of structure in subdivided populations at low levels of
+	genetic differentiation--the correlated allele frequencies model
+	revisited.},
+  journal = {Bioinformatics},
+  year = {2008},
+  volume = {24},
+  pages = {2222--2228},
+  number = {19},
+  month = {Oct},
+  abstract = {MOTIVATION: This article considers the problem of estimating population
+	genetic subdivision from multilocus genotype data. A model is considered
+	to make use of genotypes and possibly of spatial coordinates of sampled
+	individuals. A particular attention is paid to the case of low genetic
+	differentiation with the help of a previously described Bayesian
+	clustering model where allele frequencies are assumed to be a priori
+	correlated. Under this model, various problems of inference are considered,
+	in particular the common and difficult, but still unaddressed, situation
+	where the number of populations is unknown. RESULTS: A Markov chain
+	Monte Carlo algorithm and a new post-processing scheme are proposed.
+	It is shown that they significantly improve the accuracy of previously
+	existing algorithms in terms of estimated number of populations and
+	estimated population membership. This is illustrated numerically
+	with data simulated from the prior-likelihood model used in inference
+	and also with data simulated from a Wright-Fisher model. Improvements
+	are also illustrated on a real dataset of eighty-eight wolverines
+	(Gulo gulo) genotyped at 10 microsatellites loci. The interest of
+	the solutions presented here are not specific to any clustering model
+	and are hence relevant to many settings in populations genetics where
+	weakly differentiated populations are assumed or sought. AVAILABILITY:
+	The improvements implemented will be made available in version 3.0.0
+	of the R package Geneland. Informations on how to get and use the
+	software are available from http://folk.uio.no/gillesg/Geneland.html.
+	SUPPLEMENTARY INFORMATION: http://folk.uio.no/gillesg/CFM/SuppMat.pdf.},
+  doi = {10.1093/bioinformatics/btn419},
+  institution = {Department of Biology, Centre for Ecological and Evolutionary Synthesis,
+	University of Oslo, P.O Box 1066 Blindern, 0316 Oslo, Norway. gilles.guillot@bio.uio.no},
+  keywords = {Algorithms; Animals; Gene Frequency; Genetic Drift; Genetics, Population;
+	Genotype; Markov Chains; Microsatellite Repeats; Monte Carlo Method;
+	Mustelidae, genetics; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btn419},
+  pmid = {18710873},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btn419}
+}
+
+@ARTICLE{Guillot2005,
+  author = {Gilles Guillot and Arnaud Estoup and Frédéric Mortier and Jean François
+	Cosson},
+  title = {A spatial statistical model for landscape genetics.},
+  journal = {Genetics},
+  year = {2005},
+  volume = {170},
+  pages = {1261--1280},
+  number = {3},
+  month = {Jul},
+  abstract = {Landscape genetics is a new discipline that aims to provide information
+	on how landscape and environmental features influence population
+	genetic structure. The first key step of landscape genetics is the
+	spatial detection and location of genetic discontinuities between
+	populations. However, efficient methods for achieving this task are
+	lacking. In this article, we first clarify what is conceptually involved
+	in the spatial modeling of genetic data. Then we describe a Bayesian
+	model implemented in a Markov chain Monte Carlo scheme that allows
+	inference of the location of such genetic discontinuities from individual
+	geo-referenced multilocus genotypes, without a priori knowledge on
+	populational units and limits. In this method, the global set of
+	sampled individuals is modeled as a spatial mixture of panmictic
+	populations, and the spatial organization of populations is modeled
+	through the colored Voronoi tessellation. In addition to spatially
+	locating genetic discontinuities, the method quantifies the amount
+	of spatial dependence in the data set, estimates the number of populations
+	in the studied area, assigns individuals to their population of origin,
+	and detects individual migrants between populations, while taking
+	into account uncertainty on the location of sampled individuals.
+	The performance of the method is evaluated through the analysis of
+	simulated data sets. Results show good performances for standard
+	data sets (e.g., 100 individuals genotyped at 10 loci with 10 alleles
+	per locus), with high but also low levels of population differentiation
+	(e.g., FST<0.05). The method is then applied to a set of 88 individuals
+	of wolverines (Gulo gulo) sampled in the northwestern United States
+	and genotyped at 10 microsatellites.},
+  doi = {10.1534/genetics.104.033803},
+  institution = {Unité de Mathématiques et Informatique Appliquées, INRA-INAPG-ENGREF,
+	Paris, France 75231. guillot@inapg.inra.fr},
+  keywords = {Animals; Bayes Theorem; Computer Simulation; Demography; Ecosystem;
+	Genetics, Population; Genotype; Microsatellite Repeats; Models, Genetic;
+	Mustelidae, genetics; Plants, genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {genetics.104.033803},
+  pmid = {15520263},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1534/genetics.104.033803}
+}
+
+@ARTICLE{Guillot2009,
+  author = {Gilles Guillot and Matthieu Foll},
+  title = {Correcting for ascertainment bias in the inference of population
+	structure.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {552--554},
+  number = {4},
+  month = {Feb},
+  abstract = {BACKGROUND: The ascertainment process of molecular markers amounts
+	to disregard loci carrying alleles with low frequencies. This can
+	result in strong biases in inferences under population genetics models
+	if not properly taken into account by the inference algorithm. Attempting
+	to model this censoring process in view of making inference of population
+	structure (i.e.identifying clusters of individuals) brings up challenging
+	numerical difficulties. METHOD: These difficulties are related to
+	the presence of intractable normalizing constants in Metropolis-Hastings
+	acceptance ratios. This can be solved via an Markov chain Monte Carlo
+	(MCMC) algorithm known as single variable exchange algorithm (SVEA).
+	RESULT: We show how this general solution can be implemented for
+	a class of clustering models of broad interest in population genetics
+	that includes the models underlying the computer programs STRUCTURE,
+	GENELAND and GESTE. We also implement the method proposed for a simple
+	example and show that it allows us to reduce the bias substantially.
+	AVAILABILITY: Further details and a computer program implementing
+	the method are available from http://folk.uio.no/gillesg/AscB/.},
+  doi = {10.1093/bioinformatics/btn665},
+  institution = {Centre for Ecological and Evolutionary Synthesis, Department of Biology,
+	University of Oslo, P.O. Box 1066, Blindern 0316, Oslo, Norway. gilles.guillot@bio.uio.no},
+  keywords = {Algorithms; Alleles; Computer Simulation; Gene Frequency; Genetics,
+	Population, methods; Markov Chains; Monte Carlo Method; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btn665},
+  pmid = {19136550},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btn665}
+}
+
+@ARTICLE{Guillot2009b,
+  author = {Gilles Guillot and Raphaël Leblois and Aurélie Coulon and Alain C
+	Frantz},
+  title = {Statistical methods in spatial genetics.},
+  journal = {Mol Ecol},
+  year = {2009},
+  volume = {18},
+  pages = {4734--4756},
+  number = {23},
+  month = {Dec},
+  abstract = {The joint analysis of spatial and genetic data is rapidly becoming
+	the norm in population genetics. More and more studies explicitly
+	describe and quantify the spatial organization of genetic variation
+	and try to relate it to underlying ecological processes. As it has
+	become increasingly difficult to keep abreast with the latest methodological
+	developments, we review the statistical toolbox available to analyse
+	population genetic data in a spatially explicit framework. We mostly
+	focus on statistical concepts but also discuss practical aspects
+	of the analytical methods, highlighting not only the potential of
+	various approaches but also methodological pitfalls.},
+  doi = {10.1111/j.1365-294X.2009.04410.x},
+  institution = {Department of Informatics and Mathematical Modelling, Technical University
+	of Denmark, Copenhagen, Denmark. gigu@imm.dtu.dk},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {MEC4410},
+  pmid = {19878454},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1111/j.1365-294X.2009.04410.x}
+}
+
+@ARTICLE{Harter2004,
+  author = {Abigail V Harter and Keith A Gardner and Daniel Falush and David
+	L Lentz and Robert A Bye and Loren H Rieseberg},
+  title = {Origin of extant domesticated sunflowers in eastern North America.},
+  journal = {Nature},
+  year = {2004},
+  volume = {430},
+  pages = {201--205},
+  number = {6996},
+  month = {Jul},
+  abstract = {Eastern North America is one of at least six regions of the world
+	where agriculture is thought to have arisen wholly independently.
+	The primary evidence for this hypothesis derives from morphological
+	changes in the archaeobotanical record of three important crops--squash,
+	goosefoot and sunflower--as well as an extinct minor cultigen, sumpweed.
+	However, the geographical origins of two of the three primary domesticates--squash
+	and goosefoot--are now debated, and until recently sunflower (Helianthus
+	annuus L.) has been considered the only undisputed eastern North
+	American domesticate. The discovery of 4,000-year-old domesticated
+	sunflower remains from San Andrés, Tabasco, implies an earlier and
+	possibly independent origin of domestication in Mexico and has stimulated
+	a re-examination of the geographical origin of domesticated sunflower.
+	Here we describe the genetic relationships and pattern of genetic
+	drift between extant domesticated strains and wild populations collected
+	from throughout the USA and Mexico. We show that extant domesticates
+	arose in eastern North America, with a substantial genetic bottleneck
+	occurring during domestication.},
+  doi = {10.1038/nature02710},
+  institution = {Department of Biology, Indiana University, Bloomington, Indiana 47405,
+	USA. avharter@bio.indiana.edu},
+  keywords = {Agriculture; Evolution, Molecular; Genetic Drift; Genetic Variation;
+	Genetics, Population; Helianthus; History, Ancient; Mexico; Phylogeny;
+	Time Factors; United States},
+  owner = {goshng},
+  pii = {nature02710},
+  pmid = {15241413},
+  timestamp = {2009.02.27},
+  url = {http://dx.doi.org/10.1038/nature02710}
+}
+
+@ARTICLE{Hinrichs2009,
+  author = {Anthony L Hinrichs and Emma K Larkin and Brian K Suarez},
+  title = {Population stratification and patterns of linkage disequilibrium.},
+  journal = {Genet Epidemiol},
+  year = {2009},
+  volume = {33 Suppl 1},
+  pages = {S88--S92},
+  abstract = {Although the importance of selecting cases and controls from the same
+	population has been recognized for decades, the recent advent of
+	genome-wide association studies has heightened awareness of this
+	issue. Because these studies typically deal with large samples, small
+	differences in allele frequencies between cases and controls can
+	easily reach statistical significance. When, unbeknownst to a researcher,
+	cases and controls have different substructures, the number of false-positive
+	findings is inflated. There have been three recent developments of
+	purely statistical approaches to assessing the ancestral comparability
+	of case and control samples: genomic control, structured association,
+	and multivariate reduction analyses. The widespread use of high-throughput
+	technology has allowed the quick and accurate genotyping of the large
+	number of markers required by these methods. Group 13 dealt with
+	four population stratification issues: single-nucleotide polymorphism
+	marker selection, association testing, nonstandard methods, and linkage
+	disequilibrium calculations in stratified or mixed ethnicity samples.
+	We demonstrated that there are continuous axes of ethnic variation
+	in both data sets of Genetic Analysis Workshop 16. Furthermore, ignoring
+	this structure created P-value inflation for a variety of phenotypes.
+	Principal-components analysis (or multidimensional scaling) can control
+	inflation as covariates in a logistic regression. One can weigh for
+	local ancestry estimation and allow the use of related individuals.
+	Problems arise in the presence of extremely high association or unusually
+	strong linkage disequilibrium (e.g., in chromosomal inversions).
+	Our group also reported a method for performing an association test
+	controlling for substructure, when genome-wide markers are not available,
+	to explicitly compute stratification.},
+  doi = {10.1002/gepi.20478},
+  institution = {Department of Psychiatry, Washington University School of Medicine,
+	St. Louis, Missouri 63110, USA. tony@fire.wustl.edu},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {19924707},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1002/gepi.20478}
+}
+
+@ARTICLE{Hubisz2009,
+  author = {Hubisz, Melissa J. and Falush, Daniel and Stephens, Matthew and Pritchard,
+	Jonathan K.},
+  title = {Inferring weak population structure with the assistance of sample
+	group information},
+  journal = {Molecular Ecology Resources},
+  year = {2009},
+  volume = {9},
+  pages = {1322--1332},
+  number = {5},
+  month = {September},
+  bdsk-url-1 = {http://dx.doi.org/10.1111/j.1755-0998.2009.02591.x},
+  citeulike-article-id = {5453879},
+  citeulike-linkout-0 = {http://dx.doi.org/10.1111/j.1755-0998.2009.02591.x},
+  doi = {10.1111/j.1755-0998.2009.02591.x},
+  issn = {1755098X},
+  posted-at = {2009-08-17 20:09:53},
+  priority = {0},
+  review = {Pritchard group},
+  url = {http://dx.doi.org/10.1111/j.1755-0998.2009.02591.x}
+}
+
+@ARTICLE{Huelsenbeck2007,
+  author = {John P Huelsenbeck and Peter Andolfatto},
+  title = {Inference of population structure under a Dirichlet process model.},
+  journal = {Genetics},
+  year = {2007},
+  volume = {175},
+  pages = {1787--1802},
+  number = {4},
+  month = {Apr},
+  abstract = {Inferring population structure from genetic data sampled from some
+	number of individuals is a formidable statistical problem. One widely
+	used approach considers the number of populations to be fixed and
+	calculates the posterior probability of assigning individuals to
+	each population. More recently, the assignment of individuals to
+	populations and the number of populations have both been considered
+	random variables that follow a Dirichlet process prior. We examined
+	the statistical behavior of assignment of individuals to populations
+	under a Dirichlet process prior. First, we examined a best-case scenario,
+	in which all of the assumptions of the Dirichlet process prior were
+	satisfied, by generating data under a Dirichlet process prior. Second,
+	we examined the performance of the method when the genetic data were
+	generated under a population genetics model with symmetric migration
+	between populations. We examined the accuracy of population assignment
+	using a distance on partitions. The method can be quite accurate
+	with a moderate number of loci. As expected, inferences on the number
+	of populations are more accurate when theta = 4N(e)u is large and
+	when the migration rate (4N(e)m) is low. We also examined the sensitivity
+	of inferences of population structure to choice of the parameter
+	of the Dirichlet process model. Although inferences could be sensitive
+	to the choice of the prior on the number of populations, this sensitivity
+	occurred when the number of loci sampled was small; inferences are
+	more robust to the prior on the number of populations when the number
+	of sampled loci is large. Finally, we discuss several methods for
+	summarizing the results of a Bayesian Markov chain Monte Carlo (MCMC)
+	analysis of population structure. We develop the notion of the mean
+	population partition, which is the partition of individuals to populations
+	that minimizes the squared partition distance to the partitions sampled
+	by the MCMC algorithm.},
+  doi = {10.1534/genetics.106.061317},
+  institution = {Department of Integrative Biology, University of California, Berkeley,
+	California 94720, USA. johnh@berkeley.edu},
+  keywords = {Algorithms; Alleles; Animals; Bayes Theorem; Computer Simulation;
+	Gene Frequency; Genetics, Population; Markov Chains; Mice; Models,
+	Genetic; Models, Statistical; Monte Carlo Method; Ruminants; Songbirds},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {genetics.106.061317},
+  pmid = {17237522},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1534/genetics.106.061317}
+}
+
+@ARTICLE{Intarapanich2009,
+  author = {Apichart Intarapanich and Philip J Shaw and Anunchai Assawamakin
+	and Pongsakorn Wangkumhang and Chumpol Ngamphiw and Kridsadakorn
+	Chaichoompu and Jittima Piriyapongsa and Sissades Tongsima},
+  title = {Iterative pruning PCA improves resolution of highly structured populations.},
+  journal = {BMC Bioinformatics},
+  year = {2009},
+  volume = {10},
+  pages = {382},
+  abstract = {BACKGROUND: Non-random patterns of genetic variation exist among individuals
+	in a population owing to a variety of evolutionary factors. Therefore,
+	populations are structured into genetically distinct subpopulations.
+	As genotypic datasets become ever larger, it is increasingly difficult
+	to correctly estimate the number of subpopulations and assign individuals
+	to them. The computationally efficient non-parametric, chiefly Principal
+	Components Analysis (PCA)-based methods are thus becoming increasingly
+	relied upon for population structure analysis. Current PCA-based
+	methods can accurately detect structure; however, the accuracy in
+	resolving subpopulations and assigning individuals to them is wanting.
+	When subpopulations are closely related to one another, they overlap
+	in PCA space and appear as a conglomerate. This problem is exacerbated
+	when some subpopulations in the dataset are genetically far removed
+	from others. We propose a novel PCA-based framework which addresses
+	this shortcoming. RESULTS: A novel population structure analysis
+	algorithm called iterative pruning PCA (ipPCA) was developed which
+	assigns individuals to subpopulations and infers the total number
+	of subpopulations present. Genotypic data from simulated and real
+	population datasets with different degrees of structure were analyzed.
+	For datasets with simple structures, the subpopulation assignments
+	of individuals made by ipPCA were largely consistent with the STRUCTURE,
+	BAPS and AWclust algorithms. On the other hand, highly structured
+	populations containing many closely related subpopulations could
+	be accurately resolved only by ipPCA, and not by other methods. CONCLUSION:
+	The algorithm is computationally efficient and not constrained by
+	the dataset complexity. This systematic subpopulation assignment
+	approach removes the need for prior population labels, which could
+	be advantageous when cryptic stratification is encountered in datasets
+	containing individuals otherwise assumed to belong to a homogenous
+	population.},
+  doi = {10.1186/1471-2105-10-382},
+  institution = {BIOTEC 113 Thailand Science Park, Paholyothin Road, Klong 1, Klong
+	Luang, Pathumtani 12120, Thailand. apichart.int@nectec.or.th},
+  language = {eng},
+  medline-pst = {epublish},
+  owner = {goshng},
+  pii = {1471-2105-10-382},
+  pmid = {19930644},
+  review = {This was the first article that I came upon that are is related closely
+	the hierarchical assignment project.},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1186/1471-2105-10-382}
+}
+
+@ARTICLE{Jakobsson:2007,
+  author = {Mattias Jakobsson and Noah A Rosenberg},
+  title = {CLUMPP: a cluster matching and permutation program for dealing with
+	label switching and multimodality in analysis of population structure.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {1801--1806},
+  number = {14},
+  month = {Jul},
+  abstract = {MOTIVATION: Clustering of individuals into populations on the basis
+	of multilocus genotypes is informative in a variety of settings.
+	In population-genetic clustering algorithms, such as BAPS, STRUCTURE
+	and TESS, individual multilocus genotypes are partitioned over a
+	set of clusters, often using unsupervised approaches that involve
+	stochastic simulation. As a result, replicate cluster analyses of
+	the same data may produce several distinct solutions for estimated
+	cluster membership coefficients, even though the same initial conditions
+	were used. Major differences among clustering solutions have two
+	main sources: (1) 'label switching' of clusters across replicates,
+	caused by the arbitrary way in which clusters in an unsupervised
+	analysis are labeled, and (2) 'genuine multimodality,' truly distinct
+	solutions across replicates. RESULTS: To facilitate the interpretation
+	of population-genetic clustering results, we describe three algorithms
+	for aligning multiple replicate analyses of the same data set. We
+	have implemented these algorithms in the computer program CLUMPP
+	(CLUster Matching and Permutation Program). We illustrate the use
+	of CLUMPP by aligning the cluster membership coefficients from 100
+	replicate cluster analyses of 600 chickens from 20 different breeds.
+	AVAILABILITY: CLUMPP is freely available at http://rosenberglab.bioinformatics.med.umich.edu/clumpp.html.},
+  doi = {10.1093/bioinformatics/btm233},
+  institution = {Center for Computational Medicine and Biology, Department of Human
+	Genetics, University of Michigan, Ann Arbor, MI, USA. mjakob@umich.edu},
+  keywords = {Algorithms; Animals; Chickens; Cluster Analysis; Computational Biology;
+	Data Interpretation, Statistical; Genetics, Population; Genotype;
+	Models, Genetic; Models, Statistical; Population Dynamics; Software},
+  owner = {goshng},
+  pii = {btm233},
+  pmid = {17485429},
+  timestamp = {2008.10.17},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btm233}
+}
+
+@ARTICLE{Latch2006,
+  author = {Emily K. Latch and Guha Dharmarajan and Jeffrey C. Glaubitz and Olin
+	E. Rhodes},
+  title = {Relative performance of Bayesian clustering software for inferring
+	population substructure and individual assignment at low levels of
+	population differentiation},
+  journal = {Conservation Genetics},
+  year = {2006},
+  volume = {7},
+  pages = {295--302},
+  owner = {goshng},
+  timestamp = {2009.07.27}
+}
+
+@ARTICLE{Limpiti2011,
+  author = {Limpiti, Tulaya and Intarapanich, Apichart and Assawamakin, Anunchai
+	and Shaw, Philip and Wangkumhang, Pongsakorn and Piriyapongsa, Jittima
+	and Ngamphiw, Chumpol and Tongsima, Sissades},
+  title = {{Study of large and highly stratified population datasets by combining
+	iterative pruning principal component analysis and STRUCTURE}},
+  journal = {BMC Bioinformatics},
+  year = {2011},
+  volume = {12},
+  pages = {255+},
+  number = {1},
+  citeulike-article-id = {9451785},
+  citeulike-linkout-0 = {http://dx.doi.org/10.1186/1471-2105-12-255},
+  doi = {10.1186/1471-2105-12-255},
+  issn = {1471-2105},
+  posted-at = {2011-06-23 17:36:07},
+  priority = {2},
+  url = {http://dx.doi.org/10.1186/1471-2105-12-255}
+}
+
+@ARTICLE{Liu2006,
+  author = {Nianjun Liu and Hongyu Zhao},
+  title = {A non-parametric approach to population structure inference using
+	multilocus genotypes.},
+  journal = {Hum Genomics},
+  year = {2006},
+  volume = {2},
+  pages = {353--364},
+  number = {6},
+  month = {Jun},
+  abstract = {Inference of population structure from genetic markers is helpful
+	in diverse situations, such as association and evolutionary studies.
+	In this paper, we describe a two-stage strategy in inferring population
+	structure using multilocus genotype data. In the first stage, we
+	use dimension reduction methods such as singular value decomposition
+	to reduce the dimension of the data, and in the second stage, we
+	use clustering methods on the reduced data to identify population
+	structure. The strategy has the ability to identify population structure
+	and assign each individual to its corresponding subpopulation. The
+	strategy does not depend on any population genetics assumptions (such
+	as Hardy-Weinberg equilibrium and linkage equilibrium between loci
+	within populations) and can be used with any genotype data. When
+	applied to real and simulated data, the strategy is found to have
+	similar or better performance compared with STRUCTURE, the most popular
+	method in current use. Therefore, the proposed strategy provides
+	a useful alternative to analyse population data.},
+  keywords = {Cluster Analysis; Genetic Markers; Genetics, Population; Genotype;
+	Humans; Models, Genetic; Principal Component Analysis; Statistics,
+	Nonparametric},
+  owner = {goshng},
+  pmid = {16848973},
+  timestamp = {2008.03.31}
+}
+
+@ARTICLE{Manel2005,
+  author = {Stephanie Manel and Oscar E Gaggiotti and Robin S Waples},
+  title = {Assignment methods: matching biological questions with appropriate
+	techniques.},
+  journal = {Trends Ecol Evol},
+  year = {2005},
+  volume = {20},
+  pages = {136--142},
+  number = {3},
+  month = {Mar},
+  abstract = {Assignment methods, which use genetic information to ascertain population
+	membership of individuals or groups of individuals, have been used
+	in recent years to study a wide range of evolutionary and ecological
+	processes. In applied studies, the first step of articulating the
+	biological question(s) to be addressed should be followed by selection
+	of the method(s) best suited for the analysis. However, this first
+	step often receives less attention than it should, and the recent
+	proliferation of assignment methods has made the selection step challenging.
+	Here, we review assignment methods and discuss how to match the appropriate
+	methods with the underlying biological questions for several common
+	problems in ecology and conservation (assessing population structure;
+	measuring dispersal and hybridization; and forensics and mixture
+	analysis). We also identify several topics for future research that
+	should ensure that this field remains dynamic and productive.},
+  doi = {10.1016/j.tree.2004.12.004},
+  institution = {Laboratoire d'Ecologie Alpine (LECA), Génomique des Populations et
+	Biodiversité, Université Joseph Fourier, Grenoble, France.},
+  owner = {goshng},
+  pii = {S0169-5347(04)00396-9},
+  pmid = {16701357},
+  timestamp = {2008.05.07},
+  url = {http://dx.doi.org/10.1016/j.tree.2004.12.004}
+}
+
+@ARTICLE{Masuda2009,
+  author = {Masuda, M. and Thrower, F. and Nichols, K. M.},
+  title = {The Effects of Violating Hardy-Weinberg Equilibrium Assumptions on
+	a Cluster-based Population Mixture Analysis of Steelhead Populations
+	in Southeast Alaska},
+  journal = {NORTH AMERICAN JOURNAL OF FISHERIES MANAGEMENT},
+  year = {2009},
+  volume = {29},
+  pages = {140--150},
+  citeulike-article-id = {6597348},
+  posted-at = {2010-01-27 22:35:28},
+  priority = {2},
+  review = {This is the Masuda.}
+}
+
+@ARTICLE{Miclaus2009,
+  author = {Kelci Miclaus and Russ Wolfinger and Wendy Czika},
+  title = {SNP selection and multidimensional scaling to quantify population
+	structure.},
+  journal = {Genet Epidemiol},
+  year = {2009},
+  volume = {33},
+  pages = {488--496},
+  number = {6},
+  month = {Sep},
+  abstract = {In the new era of large-scale collaborative Genome Wide Association
+	Studies (GWAS), population stratification has become a critical issue
+	that must be addressed. In order to build upon the methods developed
+	to control the confounding effect of a structured population, it
+	is extremely important to visualize and quantify that effect. In
+	this work, we develop methodology for single nucleotide polymorphism
+	(SNP) selection and subsequent population stratification visualization
+	based on deviation from Hardy-Weinberg equilibrium in conjunction
+	with non-metric multidimensional scaling (MDS); a distance-based
+	multivariate technique. Through simulation, it is shown that SNP
+	selection based on Hardy-Weinberg disequilibrium (HWD) is robust
+	against confounding linkage disequilibrium patterns that have been
+	problematic in past studies and methods as well as producing a differentiated
+	SNP set. Non-metric MDS is shown to be a multivariate visualization
+	tool preferable to principal components in conjunction with HWD SNP
+	selection through theoretical and empirical study from HapMap samples.
+	The proposed selection tool offers a simple and effective way to
+	select appropriate substructure-informative markers for use in exploring
+	the effect that population stratification may have in association
+	studies.},
+  doi = {10.1002/gepi.20401},
+  institution = {Department of Statistics, North Carolina State University, Raleigh,
+	North Carolina, USA. Kelci.Miclaus@jmp.com},
+  keywords = {Algorithms; Genetic Markers; Genetics, Population, methods; Genome-Wide
+	Association Study; Humans; Polymorphism, Single Nucleotide; Selection,
+	Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {19194989},
+  review = {SAS, NC State Statistics},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1002/gepi.20401}
+}
+
+@ARTICLE{Omeara2009,
+  author = {O'Meara, B.C.},
+  title = {New heuristic methods for joint species delimitation and species
+	tree inference.},
+  journal = {Syst. Biol.},
+  year = {2010},
+  volume = {55},
+  pages = {162--169},
+  owner = {goshng},
+  review = {Joint estimation of assignment and tree},
+  timestamp = {2009.07.14}
+}
+
+@ARTICLE{Onogi2011,
+  author = {Akio Onogi and Masanobu Nurimoto and Mitsuo Morita},
+  title = {Characterization of a Bayesian genetic clustering algorithm based
+	on a Dirichlet process prior and comparison among Bayesian clustering
+	methods},
+  journal = {BMC Bioinformatics},
+  year = {2011},
+  volume = {12},
+  pages = {263},
+  doi = {doi:10.1186/1471-2105-12-263},
+  owner = {goshng},
+  review = {Still publishing papers using DP.},
+  timestamp = {2011.06.28},
+  url = {http://www.biomedcentral.com/1471-2105/12/263}
+}
+
+@ARTICLE{Paetkau1995a,
+  author = {D. Paetkau and W. Calvert and I. Stirling and C. Strobeck},
+  title = {Microsatellite analysis of population structure in Canadian polar
+	bears.},
+  journal = {Mol Ecol},
+  year = {1995},
+  volume = {4},
+  pages = {347--354},
+  number = {3},
+  month = {Jun},
+  abstract = {Attempts to study the genetic population structure of large mammals
+	are often hampered by the low levels of genetic variation observed
+	in these species. Polar bears have particularly low levels of genetic
+	variation with the result that their genetic population structure
+	has been intractable. We describe the use of eight hypervariable
+	microsatellite loci to study the genetic relationships between four
+	Canadian polar bear populations: the northern Beaufort Sea, southern
+	Beaufort Sea, western Hudson Bay, and Davis Strait-Labrador Sea.
+	These markers detected considerable genetic variation, with average
+	heterozygosity near 60\% within each population. Interpopulation
+	differences in allele frequency distribution were significant between
+	all pairs of populations, including two adjacent populations in the
+	Beaufort Sea. Measures of genetic distance reflect the geographic
+	distribution of populations, but also suggest patterns of gene flow
+	which are not obvious from geography and may reflect movement patterns
+	of these animals. Distribution of variation is sufficiently different
+	between the Beaufort Sea populations and the two more eastern ones
+	that the region of origin for a given sample can be predicted based
+	on its expected genotype frequency using an assignment test. These
+	data indicate that gene flow between local populations is restricted
+	despite the long-distance seasonal movements undertaken by polar
+	bears.},
+  institution = {Department of Biological Sciences, University of Alberta, Edmonton,
+	Canada.},
+  keywords = {Animals; Arctic Regions; Base Sequence; Canada; DNA, Satellite; Genetic
+	Markers; Genetics, Population; Models, Genetic; Models, Statistical;
+	Molecular Sequence Data; Ursidae; Variation (Genetics)},
+  owner = {goshng},
+  pmid = {7663752},
+  timestamp = {2008.11.14}
+}
+
+@ARTICLE{Pella2006,
+  author = {Jerome Pella and Michele Masuda},
+  title = {The {Gibbs} and split-merge sampler for population mixture analysis
+	from genetic data with incomplete baselines},
+  journal = {Can. J. Fish. Aquat. Sci.},
+  year = {2006},
+  volume = {63},
+  pages = {576--596},
+  owner = {goshng},
+  timestamp = {2009.04.21}
+}
+
+@ARTICLE{Pella2001,
+  author = {Pella, J. and Masuda, M.},
+  title = {A Bayesian method for identification of stock mixtures from molecular
+	marker data},
+  journal = {Fishery Bulletin},
+  year = {2001},
+  volume = {99},
+  pages = {151--167},
+  citeulike-article-id = {5284790},
+  keywords = {structurama},
+  owner = {goshng},
+  posted-at = {2009-07-27 22:24:37},
+  priority = {2},
+  timestamp = {2010.01.27}
+}
+
+@ARTICLE{Pikkuhookana2009,
+  author = {P. Pikkuhookana and M. J. Sillanpää},
+  title = {Correcting for relatedness in Bayesian models for genomic data association
+	analysis.},
+  journal = {Heredity},
+  year = {2009},
+  volume = {103},
+  pages = {223--237},
+  number = {3},
+  month = {Sep},
+  __markedentry = {[goshng]},
+  abstract = {For small pedigrees, the issue of correcting for known or estimated
+	relatedness structure in population-based Bayesian multilocus association
+	analysis is considered. Two such relatedness corrections: [1] a random
+	term arising from the infinite polygenic model and [2] a fixed covariate
+	following the class D model of Bonney, are compared with the case
+	of no correction using both simulated and real marker and gene-expression
+	data from lymphoblastoid cell lines from four CEPH families. This
+	comparison is performed with clinical quantitative trait locus (cQTL)
+	models-multilocus association models where marker data and expression
+	levels of gene transcripts as well as possible genotype x expression
+	interaction terms are jointly used to explain quantitative trait
+	variation. We found out that regardless of having a correction term
+	in the model, the cQTL-models fit a few extra small-effect components
+	(similar to finite polygenic models) which itself serves as a relatedness
+	correction. For small data and small heritability one may use the
+	covariate model, which clearly outperforms the infinite polygenic
+	model in small data examples.},
+  doi = {10.1038/hdy.2009.56},
+  institution = {Department of Mathematics and Statistics, Rolf Nevanlinna Institute,
+	University of Helsinki, Helsinki, Finland.},
+  keywords = {Bayes Theorem; Cell Line, Tumor; Genome; Genomics; Humans; Models,
+	Genetic; Neoplasms, genetics; Quantitative Trait Loci},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {hdy200956},
+  pmid = {19455182},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1038/hdy.2009.56}
+}
+
+@ARTICLE{Pritchard2000,
+  author = {J. K. Pritchard and M. Stephens and P. Donnelly},
+  title = {Inference of population structure using multilocus genotype data.},
+  journal = {Genetics},
+  year = {2000},
+  volume = {155},
+  pages = {945--959},
+  number = {2},
+  month = {Jun},
+  abstract = {We describe a model-based clustering method for using multilocus genotype
+	data to infer population structure and assign individuals to populations.
+	We assume a model in which there are K populations (where K may be
+	unknown), each of which is characterized by a set of allele frequencies
+	at each locus. Individuals in the sample are assigned (probabilistically)
+	to populations, or jointly to two or more populations if their genotypes
+	indicate that they are admixed. Our model does not assume a particular
+	mutation process, and it can be applied to most of the commonly used
+	genetic markers, provided that they are not closely linked. Applications
+	of our method include demonstrating the presence of population structure,
+	assigning individuals to populations, studying hybrid zones, and
+	identifying migrants and admixed individuals. We show that the method
+	can produce highly accurate assignments using modest numbers of loci-e.g.
+	, seven microsatellite loci in an example using genotype data from
+	an endangered bird species. The software used for this article is
+	available from http://www.stats.ox.ac.uk/ approximately pritch/home.
+	html.},
+  keywords = {Algorithms; Cluster Analysis; Genetics, Population; Genotype; Humans;
+	Models, Genetic},
+  owner = {goshng},
+  pmid = {10835412},
+  timestamp = {2008.03.31}
+}
+
+@ARTICLE{Rambaut2009,
+  author = {Andrew Rambaut and Simon Y W Ho and Alexei J Drummond and Beth Shapiro},
+  title = {Accommodating the effect of ancient DNA damage on inferences of demographic
+	histories.},
+  journal = {Mol Biol Evol},
+  year = {2009},
+  volume = {26},
+  pages = {245--248},
+  number = {2},
+  month = {Feb},
+  abstract = {DNA sequences extracted from ancient remains are increasingly used
+	to generate large population data sets, often spanning tens of thousands
+	of years of population history. Bayesian coalescent methods such
+	as those implemented in the software package BEAST can be used to
+	estimate the demographic history of these populations, sometimes
+	resulting in complex scenarios of fluctuations in population size,
+	which can be correlated with the timing of environmental events,
+	such as glaciations. Recently, however, Axelsson et al. (Axelsson
+	E, Willerslev E, Gilbert MTP, Nielsen R. 2008. The effect of ancient
+	DNA damage on inferences of demographic histories. Mol Biol Evol
+	25:2181-2187.) claimed that many of these complex demographic trends
+	are likely to be the result of postmortem DNA damage, a problem that
+	they investigate by removing all sites involving transitions from
+	ancient sequences prior to analysis. When this solution is applied
+	to a previously published data set of Pleistocene bison, they show
+	that the demographic signal of population expansion and decline disappears.
+	Although some apparently segregating mutations in ancient sequences
+	may be due to postmortem damage, we argue that discarding the data
+	will result in loss of power to detect patterns of population change.
+	Instead, to accommodate this problem, we implement a model in which
+	sequences are the result of a joint process of molecular evolution
+	and postmortem DNA damage within a probabilistic inference framework.
+	Through simulation, we demonstrate the ability of this model to accurately
+	recover evolutionary parameters, demographic history, and DNA damage
+	rates. When this model is applied to the bison data set, we find
+	that the rate of DNA damage is significant but low and that the reconstruction
+	of population size history is nearly identical to previously published
+	estimates.},
+  doi = {10.1093/molbev/msn256},
+  keywords = {Animals; Base Sequence; Bayes Theorem; Bison, genetics; DNA Damage;
+	Evolution, Molecular; Fossils; Genetics, Population; Models, Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {msn256},
+  pmid = {19001634},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/molbev/msn256}
+}
+
+@ARTICLE{Rannala:1997,
+  author = {B. Rannala and J. L. Mountain},
+  title = {Detecting immigration by using multilocus genotypes.},
+  journal = {Proc Natl Acad Sci U S A},
+  year = {1997},
+  volume = {94},
+  pages = {9197--9201},
+  number = {17},
+  month = {Aug},
+  abstract = {Immigration is an important force shaping the social structure, evolution,
+	and genetics of populations. A statistical method is presented that
+	uses multilocus genotypes to identify individuals who are immigrants,
+	or have recent immigrant ancestry. The method is appropriate for
+	use with allozymes, microsatellites, or restriction fragment length
+	polymorphisms (RFLPs) and assumes linkage equilibrium among loci.
+	Potential applications include studies of dispersal among natural
+	populations of animals and plants, human evolutionary studies, and
+	typing zoo animals of unknown origin (for use in captive breeding
+	programs). The method is illustrated by analyzing RFLP genotypes
+	in samples of humans from Australian, Japanese, New Guinean, and
+	Senegalese populations. The test has power to detect immigrant ancestors,
+	for these data, up to two generations in the past even though the
+	overall differentiation of allele frequencies among populations is
+	low.},
+  institution = {Department of Integrative Biology, University of California, Berkeley,
+	CA 94720-3140, USA. bruce@mws4.biol.berkeley.edu},
+  keywords = {Emigration and Immigration; Genetics, Population; Genotype; Humans;
+	Models, Theoretical; Polymorphism, Restriction Fragment Length},
+  owner = {goshng},
+  pmid = {9256459},
+  timestamp = {2008.05.07},
+  url = {http://www.pnas.org/content/94/17/9197.abstract}
+}
+
+@ARTICLE{Reeves2009,
+  author = {Patrick A Reeves and Christopher M Richards},
+  title = {Accurate inference of subtle population structure (and other genetic
+	discontinuities) using principal coordinates.},
+  journal = {PLoS One},
+  year = {2009},
+  volume = {4},
+  pages = {e4269},
+  number = {1},
+  abstract = {BACKGROUND: Accurate inference of genetic discontinuities between
+	populations is an essential component of intraspecific biodiversity
+	and evolution studies, as well as associative genetics. The most
+	widely-used methods to infer population structure are model-based,
+	Bayesian MCMC procedures that minimize Hardy-Weinberg and linkage
+	disequilibrium within subpopulations. These methods are useful, but
+	suffer from large computational requirements and a dependence on
+	modeling assumptions that may not be met in real data sets. Here
+	we describe the development of a new approach, PCO-MC, which couples
+	principal coordinate analysis to a clustering procedure for the inference
+	of population structure from multilocus genotype data. METHODOLOGY/PRINCIPAL
+	FINDINGS: PCO-MC uses data from all principal coordinate axes simultaneously
+	to calculate a multidimensional "density landscape", from which the
+	number of subpopulations, and the membership within subpopulations,
+	is determined using a valley-seeking algorithm. Using extensive simulations,
+	we show that this approach outperforms a Bayesian MCMC procedure
+	when many loci (e.g. 100) are sampled, but that the Bayesian procedure
+	is marginally superior with few loci (e.g. 10). When presented with
+	sufficient data, PCO-MC accurately delineated subpopulations with
+	population F(st) values as low as 0.03 (G'(st)>0.2), whereas the
+	limit of resolution of the Bayesian approach was F(st) = 0.05 (G'(st)>0.35).
+	CONCLUSIONS/SIGNIFICANCE: We draw a distinction between population
+	structure inference for describing biodiversity as opposed to Type
+	I error control in associative genetics. We suggest that discrete
+	assignments, like those produced by PCO-MC, are appropriate for circumscribing
+	units of biodiversity whereas expression of population structure
+	as a continuous variable is more useful for case-control correction
+	in structured association studies.},
+  doi = {10.1371/journal.pone.0004269},
+  institution = {United States Department of Agriculture, Agricultural Research Service,
+	National Center for Genetic Resources Preservation, Fort Collins,
+	Colorado, United States of America.},
+  keywords = {Algorithms; Bayes Theorem; Cluster Analysis; Computer Simulation;
+	Gene Expression Regulation; Gene Flow; Gene Frequency; Genes, Plant;
+	Genetics, Population; Genome, Plant; Genotype; Models, Genetic; Models,
+	Statistical; Models, Theoretical; Reproducibility of Results},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {19172174},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1371/journal.pone.0004269}
+}
+
+@ARTICLE{Rosenberg2005,
+  author = {Noah A Rosenberg and Saurabh Mahajan and Sohini Ramachandran and
+	Chengfeng Zhao and Jonathan K Pritchard and Marcus W Feldman},
+  title = {Clines, clusters, and the effect of study design on the inference
+	of human population structure.},
+  journal = {PLoS Genet},
+  year = {2005},
+  volume = {1},
+  pages = {e70},
+  number = {6},
+  month = {Dec},
+  abstract = {Previously, we observed that without using prior information about
+	individual sampling locations, a clustering algorithm applied to
+	multilocus genotypes from worldwide human populations produced genetic
+	clusters largely coincident with major geographic regions. It has
+	been argued, however, that the degree of clustering is diminished
+	by use of samples with greater uniformity in geographic distribution,
+	and that the clusters we identified were a consequence of uneven
+	sampling along genetic clines. Expanding our earlier dataset from
+	377 to 993 markers, we systematically examine the influence of several
+	study design variables--sample size, number of loci, number of clusters,
+	assumptions about correlations in allele frequencies across populations,
+	and the geographic dispersion of the sample--on the "clusteredness"
+	of individuals. With all other variables held constant, geographic
+	dispersion is seen to have comparatively little effect on the degree
+	of clustering. Examination of the relationship between genetic and
+	geographic distance supports a view in which the clusters arise not
+	as an artifact of the sampling scheme, but from small discontinuous
+	jumps in genetic distance for most population pairs on opposite sides
+	of geographic barriers, in comparison with genetic distance for pairs
+	on the same side. Thus, analysis of the 993-locus dataset corroborates
+	our earlier results: if enough markers are used with a sufficiently
+	large worldwide sample, individuals can be partitioned into genetic
+	clusters that match major geographic subdivisions of the globe, with
+	some individuals from intermediate geographic locations having mixed
+	membership in the clusters that correspond to neighboring regions.},
+  doi = {10.1371/journal.pgen.0010070},
+  keywords = {Alleles; Cluster Analysis; Gene Frequency; Genetics, Population; Genome,
+	Human; Genotype; Geography; Humans; Models, Genetic; Models, Statistical;
+	Multigene Family; Population Groups},
+  owner = {goshng},
+  pmid = {16355252},
+  timestamp = {2008.03.31},
+  url = {http://dx.doi.org/10.1371/journal.pgen.0010070}
+}
+
+@ARTICLE{Shringarpure2009,
+  author = {Suyash Shringarpure and Eric P Xing},
+  title = {mStruct: inference of population structure in light of both genetic
+	admixing and allele mutations.},
+  journal = {Genetics},
+  year = {2009},
+  volume = {182},
+  pages = {575--593},
+  number = {2},
+  month = {Jun},
+  abstract = {Traditional methods for analyzing population structure, such as the
+	Structure program, ignore the influence of the effect of allele mutations
+	between the ancestral and current alleles of genetic markers, which
+	can dramatically influence the accuracy of the structural estimation
+	of current populations. Studying these effects can also reveal additional
+	information about population evolution such as the divergence time
+	and migration history of admixed populations. We propose mStruct,
+	an admixture of population-specific mixtures of inheritance models
+	that addresses the task of structure inference and mutation estimation
+	jointly through a hierarchical Bayesian framework, and a variational
+	algorithm for inference. We validated our method on synthetic data
+	and used it to analyze the Human Genome Diversity Project-Centre
+	d'Etude du Polymorphisme Humain (HGDP-CEPH) cell line panel of microsatellites
+	and HGDP single-nucleotide polymorphism (SNP) data. A comparison
+	of the structural maps of world populations estimated by mStruct
+	and Structure is presented, and we also report potentially interesting
+	mutation patterns in world populations estimated by mStruct.},
+  doi = {10.1534/genetics.108.100222},
+  institution = {School of Computer Science, Carnegie Mellon University, Pittsburgh,
+	PA 15215, USA.},
+  keywords = {Algorithms; Alleles; Computational Biology, methods; Continental Population
+	Groups, genetics; Human Genome Project; Humans; Microsatellite Repeats,
+	genetics; Models, Genetic; Mutation, genetics; Phylogeny; Polymorphism,
+	Single Nucleotide, genetics; Reproducibility of Results; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {genetics.108.100222},
+  pmid = {19363128},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1534/genetics.108.100222}
+}
+
+@ARTICLE{Sohn2007,
+  author = {Kyung-Ah Sohn and Eric P Xing},
+  title = {Spectrum: joint Bayesian inference of population structure and recombination
+	events.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {i479--i489},
+  number = {13},
+  month = {Jul},
+  abstract = {MOTIVATION: While genetic properties such as linkage disequilibrium
+	(LD) and population structure are closely related under a common
+	inheritance process, the statistical methodologies developed so far
+	mostly deal with LD analysis and structural inference separately,
+	using specialized models that do not capture their statistical and
+	genetic relationships. Also, most of these approaches ignore the
+	inherent uncertainty in the genetic complexity of the data and rely
+	on inflexible models built on a closed genetic space. These limitations
+	may make it difficult to infer detailed and consistent structural
+	information from rich genomic data such as populational single nucleotide
+	polymorphisms (SNP) profiles. RESULTS: We propose a new model-based
+	approach to address these issues through joint inference of population
+	structure and recombination events under a non-parametric Bayesian
+	framework; we present Spectrum, an efficient implementation based
+	on our new model. We validated Spectrum on simulated data and applied
+	it to two real SNP datasets, including single-population Daly data
+	and the four-population HapMap data. Our method performs well relative
+	to LDhat 2.0 in estimating the recombination rates and hotspots on
+	these datasets. More interestingly, it generates an ancestral spectrum
+	for representing population structures which not only displays sub-structure
+	based on population founders but also reveals details of the genetic
+	diversity of each individual. It offers an alternative view of the
+	population structures to that offered by Structure 2.1, which ignores
+	chromosome-level mutation and recombination with respect to founders.},
+  doi = {10.1093/bioinformatics/btm171},
+  institution = {School of Computer Science, Carnegie Mellon University, Pittsburgh,
+	PA 15213, USA.},
+  keywords = {Algorithms; Bayes Theorem; Chromosome Mapping, methods; Evolution,
+	Molecular; Genetic Variation, genetics; Genetics, Population; Models,
+	Genetic; Polymorphism, Single Nucleotide, genetics; Recombination,
+	Genetic, genetics; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {23/13/i479},
+  pmid = {17646333},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btm171}
+}
+
+@ARTICLE{Teh2006,
+  author = {Yee Whye Teh and Michael I Jordan and Matthew J Beal and David M
+	Blei},
+  title = {Hierarchical Dirichlet Processes},
+  journal = {Journal of the American Statistical Association},
+  year = {2006},
+  volume = {101},
+  pages = {1566--1581},
+  owner = {goshng},
+  review = {STRUCTURAMA},
+  timestamp = {2011.06.17},
+  url = {http://pubs.amstat.org/doi/abs/10.1198/016214506000000302}
+}
+
+@ARTICLE{Teh2008,
+  author = {Yee Whye Teh and Kenichi Kurihara and Max Welling},
+  title = {Collapsed Variational Inference for HDP},
+  journal = {Adv. Neural Infor. Proc. Syst.},
+  year = {2008},
+  volume = {20},
+  pages = {1481--1488},
+  owner = {goshng},
+  timestamp = {2011.06.17}
+}
+
+@ARTICLE{Wu2006,
+  author = {Baolin Wu and Nianjun Liu and Hongyu Zhao},
+  title = {PSMIX: an R package for population structure inference via maximum
+	likelihood method.},
+  journal = {BMC Bioinformatics},
+  year = {2006},
+  volume = {7},
+  pages = {317},
+  abstract = {BACKGROUND: Inference of population stratification and individual
+	admixture from genetic markers is an integrative part of a study
+	in diverse situations, such as association mapping and evolutionary
+	studies. Bayesian methods have been proposed for population stratification
+	and admixture inference using multilocus genotypes and widely used
+	in practice. However, these Bayesian methods demand intensive computation
+	resources and may run into convergence problem in Markov Chain Monte
+	Carlo based posterior samplings. RESULTS: We have developed PSMIX,
+	an R package based on maximum likelihood method using expectation-maximization
+	algorithm, for inference of population stratification and individual
+	admixture. CONCLUSION: Compared with software based on Bayesian methods
+	(e.g., STRUCTURE), PSMIX has similar accuracy, but more efficient
+	computations.PSMIX and its supplemental documents are freely available
+	at http://bioinformatics.med.yale.edu/PSMIX.},
+  doi = {10.1186/1471-2105-7-317},
+  keywords = {Algorithms; American Native Continental Ancestry Group; Bayes Theorem;
+	Chromosome Mapping; Computer Simulation; European Continental Ancestry
+	Group; Genetics, Population; Humans; Likelihood Functions; Models,
+	Genetic; Software},
+  owner = {goshng},
+  pii = {1471-2105-7-317},
+  pmid = {16792813},
+  timestamp = {2008.03.31},
+  url = {http://dx.doi.org/10.1186/1471-2105-7-317}
+}
+
+@ARTICLE{Zhang2008,
+  author = {Feng Zhang and Yuping Wang and Hong-Wen Deng},
+  title = {Comparison of population-based association study methods correcting
+	for population stratification.},
+  journal = {PLoS One},
+  year = {2008},
+  volume = {3},
+  pages = {e3392},
+  number = {10},
+  abstract = {Population stratification can cause spurious associations in population-based
+	association studies. Several statistical methods have been proposed
+	to reduce the impact of population stratification on population-based
+	association studies. We simulated a set of stratified populations
+	based on the real haplotype data from the HapMap ENCODE project,
+	and compared the relative power, type I error rates, accuracy and
+	positive prediction value of four prevailing population-based association
+	study methods: traditional case-control tests, structured association
+	(SA), genomic control (GC) and principal components analysis (PCA)
+	under various population stratification levels. Additionally, we
+	evaluated the effects of sample sizes and frequencies of disease
+	susceptible allele on the performance of the four analytical methods
+	in the presence of population stratification. We found that the performance
+	of PCA was very stable under various scenarios. Our comparison results
+	suggest that SA and PCA have comparable performance, if sufficient
+	ancestral informative markers are used in SA analysis. GC appeared
+	to be strongly conservative in significantly stratified populations.
+	It may be better to apply GC in the stratified populations with low
+	stratification level. Our study intends to provide a practical guideline
+	for researchers to select proper study methods and make appropriate
+	inference of the results in population-based association studies.},
+  doi = {10.1371/journal.pone.0003392},
+  institution = {Institute of Molecular Genetics, School of Life Science and Technology,
+	Xi'an Jiaotong University, Xi'an, Shaanxi, China.},
+  keywords = {Case-Control Studies; Genetic Predisposition to Disease; Genetics,
+	Population, methods; Humans; Methods; Models, Statistical; Population
+	Groups; Principal Component Analysis; Sample Size},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {18852890},
+  timestamp = {2010.01.27},
+  url = {http://dx.doi.org/10.1371/journal.pone.0003392}
+}
+
+@ARTICLE{Zhang2008a,
+  author = {Yu Zhang},
+  title = {Tree-guided Bayesian inference of population structures.},
+  journal = {Bioinformatics},
+  year = {2008},
+  volume = {24},
+  pages = {965--971},
+  number = {7},
+  month = {Apr},
+  abstract = {MOTIVATION: Inferring population structures using genetic data sampled
+	from a group of individuals is a challenging task. Many methods either
+	consider a fixed population number or ignore the correlation between
+	populations. As a result, they can lose sensitivity and specificity
+	in detecting subtle stratifications. In addition, when a large number
+	of genetic markers are used, many existing algorithms perform rather
+	inefficiently. RESULT: We propose a new Bayesian method to infer
+	population structures using multiple unlinked single nucleotide polymorphisms
+	(SNPs). Our approach explicitly considers the population correlation
+	through a tree hierarchy, and treat the population number as a random
+	variable. Using both simulated and real datasets of worldwide samples,
+	we demonstrate that an incorporated tree can consistently improve
+	the power in detecting subtle population stratifications. A tree-based
+	model often involves a large number of unknown parameters, and the
+	corresponding estimation procedure can be highly inefficient. We
+	further implement a partition method to analytically integrate out
+	all nuisance parameters in the tree. As a result, our method can
+	analyze large SNP datasets with significantly improved convergence
+	rate. AVAILABILITY: http://www.stat.psu.edu/~yuzhang/tips.tar.},
+  doi = {10.1093/bioinformatics/btn070},
+  institution = {Department of Statistics, The Pennsylvania State University, State
+	College, PA, USA. yuzhang@stat.psu.edu},
+  keywords = {Algorithms; Base Sequence; Bayes Theorem; Computer Simulation; DNA
+	Mutational Analysis; Genetics, Population; Models, Genetic; Molecular
+	Sequence Data; Mutation; Polymorphism, Single Nucleotide; Sequence
+	Alignment; Sequence Analysis, DNA},
+  owner = {goshng},
+  pii = {btn070},
+  pmid = {18296461},
+  timestamp = {2008.05.13},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btn070}
+}
+
+@ARTICLE{Zhang2006,
+  author = {Yu Zhang and Tianhua Niu and Jun S Liu},
+  title = {A coalescence-guided hierarchical Bayesian method for haplotype inference.},
+  journal = {Am J Hum Genet},
+  year = {2006},
+  volume = {79},
+  pages = {313--322},
+  number = {2},
+  month = {Aug},
+  abstract = {Haplotype inference from phase-ambiguous multilocus genotype data
+	is an important task for both disease-gene mapping and studies of
+	human evolution. We report a novel haplotype-inference method based
+	on a coalescence-guided hierarchical Bayes model. In this model,
+	a hierarchical structure is imposed on the prior haplotype frequency
+	distributions to capture the similarities among modern-day haplotypes
+	attributable to their common ancestry. As a consequence, the model
+	both allows distinct haplotypes to have different a priori probabilities
+	according to the inferred hierarchical ancestral structure and results
+	in a proper joint posterior distribution for all the parameters of
+	interest. A Markov chain-Monte Carlo scheme is designed to draw from
+	this posterior distribution. By using coalescence-based simulation
+	and empirically generated data sets (Whitehead Institute's inflammatory
+	bowel disease data sets and HapMap data sets), we demonstrate the
+	merits of the new method in comparison with HAPLOTYPER and PHASE,
+	with or without the presence of recombination hotspots and missing
+	genotypes.},
+  doi = {10.1086/506276},
+  keywords = {Algorithms; Bayes Theorem; Genetics, Population; Haplotypes; Humans;
+	Models, Genetic},
+  owner = {goshng},
+  pii = {AJHG43172},
+  pmid = {16826521},
+  timestamp = {2008.03.31},
+  url = {http://dx.doi.org/10.1086/506276}
+}
+
+@comment{jabref-meta: selector_publisher:}
+
+@comment{jabref-meta: selector_author:}
+
+@comment{jabref-meta: selector_journal:}
+
+@comment{jabref-meta: selector_keywords:}
+
