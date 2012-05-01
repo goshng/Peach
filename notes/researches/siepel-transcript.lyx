@@ -161,7 +161,7 @@ key "Anders2010"
 We compute total expression intensity
 \begin_inset Formula 
 \[
-M=\psi(\{s_{j}N_{j}\})
+M=\psi\left(\left\{ \frac{N_{j}}{s_{j}}\right\} _{j}\right)
 \]
 
 \end_inset
@@ -199,7 +199,7 @@ We define the likelihood of our model as the probability of short reads
 :
 \begin_inset Formula 
 \[
-\Pr(\bm{X}\mid\bm{l},\bm{\mu})=\prod_{j=1}^{J}\prod_{k=1}^{K}\Pr(X_{j,k}\mid l_{k},\mu_{k})
+\Pr(\bm{X}\mid\bm{s},\bm{\mu})=\prod_{j=1}^{J}\prod_{k=1}^{K}\Pr(X_{j,k}\mid s_{k},\mu_{k})
 \]
 
 \end_inset
@@ -212,17 +212,17 @@ where we assume that segments be expressed independently of one another.
 We define the posterior probability
 \begin_inset Formula 
 \[
-\Pr(\bm{l},\bm{\mu}\mid\bm{X})=\frac{\Pr(\bm{X}\mid\bm{l},\bm{\mu})\Pr(\bm{\mu}\mid\bm{l})\Pr(\bm{l})}{\Pr(\bm{X})}
+\Pr(\bm{s},\bm{\mu}\mid\bm{X})=\frac{\Pr(\bm{X}\mid\bm{s},\bm{\mu})\Pr(\bm{\mu}\mid\bm{l})\Pr(\bm{s})}{\Pr(\bm{X})}
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $\Pr(\bm{l})$
+\begin_inset Formula $\Pr(\bm{s})$
 \end_inset
 
  is the prior probability of the segment configuation, and 
-\begin_inset Formula $\Pr(\bm{\mu}\mid\bm{l})$
+\begin_inset Formula $\Pr(\bm{\mu}\mid\bm{s})$
 \end_inset
 
  is the prior distribution of the expression intensity.
@@ -230,10 +230,202 @@ where
 \end_layout
 
 \begin_layout Standard
+All of the possible segment configurations are equally likely with probability
+ of
+\begin_inset Formula 
+\[
+\Pr(\bm{s})=(K-1)!\prod_{k=1}^{K-1}\frac{1}{L-k}=\prod_{k=1}^{K-1}\frac{k}{L-k}=\frac{1}{{L-1 \choose K-1}}.
+\]
+
+\end_inset
+
+The total number of segment configurations is equal to the number of choices
+ of 
+\begin_inset Formula $K-1$
+\end_inset
+
+ ending positions 
+\begin_inset Formula $\{c_{k}\}_{k=1\ldots K-1}$
+\end_inset
+
+ out of 
+\begin_inset Formula $L-1$
+\end_inset
+
+ genomic positions excluding the last position.
+\end_layout
+
+\begin_layout Standard
+We define the expression intensity of 
+\begin_inset Formula $k$
+\end_inset
+
+-th segment as the fraction of the total number of short reads:
+\begin_inset Formula 
+\[
+\mu_{k}=\delta_{k}M.
+\]
+
+\end_inset
+
+We define the prior distribution of 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+ via a Dirichlet distribution of 
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\Pr(\bm{\mu}\mid\bm{s})=\Pr(\bm{\delta}\mid\bm{s})=\mathrm{Dirichlet}(\bm{\alpha})
+\]
+
+\end_inset
+
+where we choose 
+\begin_inset Formula $\bm{\alpha}$
+\end_inset
+
+ such that the variance of 
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+ be large, rendering uninformative prior on expression intensity of the
+ segments.
+\end_layout
+
+\begin_layout Standard
+We start with an initial random value of 
+\begin_inset Formula $\bm{l}^{(0)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bm{\mu}^{(0)}$
+\end_inset
+
+ to explore the posterior disribution using Markov chain Monte Carlo.
+ We propose a new value of 
+\begin_inset Formula $\bm{l}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bm{\mu}^{*}$
+\end_inset
+
+ given a current value of 
+\begin_inset Formula $\bm{l}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+ using a proposal density distribution.
+\begin_inset Formula 
+\[
+q\left(\bm{s},\bm{\mu}\rightarrow\bm{s}^{*},\bm{\mu}^{*}\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Move of 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We propose a new set of values 
+\begin_inset Formula $\bm{\delta}^{*}$
+\end_inset
+
+ given 
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+ using a Dirichlet distribution.
+\begin_inset Formula 
+\[
+q(\bm{\mu}\rightarrow\bm{\mu}^{*})=q(\bm{\delta}\rightarrow\bm{\delta}^{*})=\mathrm{Dirichlet}(\bm{\delta},\alpha_{\mu}).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Move of 
+\begin_inset Formula $\bm{s}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We propose a new set of values 
+\begin_inset Formula $\bm{s}^{*}$
+\end_inset
+
+ given 
+\begin_inset Formula $\bm{s}$
+\end_inset
+
+ using a Dirichlet distribution.
+\begin_inset Formula 
+\[
+q(\bm{s}\rightarrow\bm{s}^{*})=q(\bm{l}\rightarrow\bm{l}^{*})=\mathrm{Dirichlet}\left(\frac{\bm{l}}{L},\alpha_{s}\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Move of 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bm{s}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We could move two parameter values simultaneously.
+\end_layout
+
+\begin_layout Subsection
+Simulation study
+\end_layout
+
+\begin_layout Standard
+Negative binomial distribution
+\end_layout
+
+\begin_layout Standard
+Size factor
+\end_layout
+
+\begin_layout Standard
+Dispersion function
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -255,7 +447,7 @@ Table of Symbols
 
 \begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="19" columns="2">
+<lyxtabular version="3" rows="22" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="left" valignment="top" width="0">
@@ -471,6 +663,60 @@ End position of
 \begin_inset Text
 
 \begin_layout Plain Layout
+Length of 
+\begin_inset Formula $k$
+\end_inset
+
+-th segment
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\bm{l}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+All of the lengths of the 
+\begin_inset Formula $K$
+\end_inset
+
+ segments
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $s_{k}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Interval of 
 \begin_inset Formula $k$
 \end_inset
@@ -494,7 +740,7 @@ Interval of
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\bm{l}$
+\begin_inset Formula $\bm{s}$
 \end_inset
 
 
@@ -742,6 +988,382 @@ Relative intensity of
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+All of the relative expression intensity of the 
+\begin_inset Formula $K$
+\end_inset
+
+ segments
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Values-of-Symbols"
+
+\end_inset
+
+Values of symbols for simulation study
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="13" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Symbol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $L$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10,000 base pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $K$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\bm{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Segments of equal lengths of 1,000 base pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10,100,10,1000,10,10000,10,1000,10,100 for the 10 segments
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $M$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sum of the ten values of 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $J$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1, 2, 4, 8, or 16
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sigma_{j}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 for all of the samples
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $N_{j}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Equal to 
+\begin_inset Formula $M$
+\end_inset
+
+ for all of the samples
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\bm{X}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Values of 5' end positions randomly sampled using 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $n_{j,k}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of short reads mapped on 
+\begin_inset Formula $k$
+\end_inset
+
+-th segment in sample 
+\begin_inset Formula $j$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -776,7 +1398,7 @@ Relative intensity of
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "/Users/goshng/Documents/Projects/bibliography/bib/siepel-mutans"
+bibfiles "/Users/goshng/Documents/Projects/Peach/notes/latex/bib/siepel-mutans"
 options "plain"
 
 \end_inset
