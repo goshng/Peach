@@ -139,7 +139,7 @@ key "Anders2010"
 
 \begin_layout Standard
 We compute size factors 
-\begin_inset Formula $s_{j}$
+\begin_inset Formula $z_{j}$
 \end_inset
 
  for 
@@ -161,7 +161,7 @@ key "Anders2010"
 We compute total expression intensity
 \begin_inset Formula 
 \[
-M=\psi\left(\left\{ \frac{N_{j}}{s_{j}}\right\} _{j}\right)
+M=\psi\left(\left\{ \frac{N_{j}}{z_{j}}\right\} _{j}\right)
 \]
 
 \end_inset
@@ -170,7 +170,7 @@ where
 \begin_inset Formula $\psi$
 \end_inset
 
- is a prespecified function.
+ is a prespecified function such as a geometric mean function.
  
 \end_layout
 
@@ -410,7 +410,125 @@ Simulation study
 \end_layout
 
 \begin_layout Standard
+Assume that we have a distribution of relative expression strengths of transcrip
+ts or genes.
+ We may use empirical distribution of expression strengths from real data.
+ With or without such a distribution we specify relative expression strengths
+ of 
+\begin_inset Formula $K$
+\end_inset
+
+ segments.
+ We may assume that size factors are constant or changes within some range
+ such as between 0.5 and 1.5.
+ Assuming that variance of the number of short reads follows function 
+\begin_inset Formula $\phi,$
+\end_inset
+
+ we sample 
+\begin_inset Formula $n_{kj}$
+\end_inset
+
+ from the negative binomial distribution with mean 
+\begin_inset Formula $\mu_{kj}=q_{k}z_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma_{kj}^{2}=\phi(q_{k},z_{j}).$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+We ramdomly choose 5
+\begin_inset Formula $'$
+\end_inset
+
+ end positions of 
+\begin_inset Formula $n_{kj}$
+\end_inset
+
+ short reads on 
+\begin_inset Formula $k$
+\end_inset
+
+-th segment in sample 
+\begin_inset Formula $j.$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+We could use the known size factors and function 
+\begin_inset Formula $\phi$
+\end_inset
+
+ for variance estimation.
+ 
+\end_layout
+
+\begin_layout Standard
+Note that our notations are different from those of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Anders2010"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 Negative binomial distribution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Pr(k)={k+r-1 \choose r-1}p^{r}(1-p)^{k}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The two parameters 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $r$
+\end_inset
+
+ can be obtained by mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and variance 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+p=\frac{\mu}{\sigma^{2}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+r=\frac{\mu^{2}}{\sigma^{2}-\mu}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -418,14 +536,120 @@ Size factor
 \end_layout
 
 \begin_layout Standard
+We estimate size factors for samples
+\begin_inset Formula 
+\[
+\hat{s}_{j}=\mathrm{median}_{i}\frac{k_{ij}}{\left(\prod_{j'=1}^{J}k_{ij'}\right)^{1/J}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Dispersion function
+\end_layout
+
+\begin_layout Standard
+We estimate 
+\begin_inset Formula $q_{i}$
+\end_inset
+
+ the common scale for gene 
+\begin_inset Formula $i$
+\end_inset
+
+ before estimating the dispersion function
+\begin_inset Formula 
+\[
+\hat{q}_{i}=\frac{1}{J}\sum_{j=1}^{J}\frac{k_{ij}}{\hat{s}_{j}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We also calculate sample variance of the common scale
+\begin_inset Formula 
+\[
+w_{i}=\frac{1}{J-1}\sum_{j=1}^{J}\left(\frac{k_{ij}}{\hat{s}_{j}}-\hat{q}_{i}\right)^{2}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Anders and Huber (2010) also define
+\begin_inset Formula 
+\[
+z_{i}=\frac{\hat{q}_{i}}{J}\sum_{j=1}^{J}\frac{1}{\hat{s}_{j}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+They obtain a smooth function 
+\begin_inset Formula $\phi(q)$
+\end_inset
+
+ by using local regression on points 
+\begin_inset Formula $(\hat{q}_{i},w_{i})$
+\end_inset
+
+ and estimate the raw variance as
+\begin_inset Formula 
+\[
+\hat{v}(\hat{q}_{i})=\phi(\hat{q}_{i})-z_{i}
+\]
+
+\end_inset
+
+where the variance for the negative binomial probability distribution is
+ assumed to be
+\begin_inset Formula 
+\[
+\sigma_{ij}^{2}=\mu_{ij}+s_{j}^{2}v_{i}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\mu_{ij}=q_{i}s_{j}.
+\]
+
+\end_inset
+
+Now that we have 
+\begin_inset Formula $\phi$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma_{ij}^{2}$
+\end_inset
+
+ we may proceed to compute the value of a negative binomial probability
+ given 
+\begin_inset Formula $\mu_{ij}.$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -837,7 +1061,7 @@ All of the expression intensity parameters
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $n_{j,k}$
+\begin_inset Formula $n_{jk}$
 \end_inset
 
 
@@ -915,7 +1139,7 @@ Total number of reads for sample
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $s_{j}$
+\begin_inset Formula $z_{j}$
 \end_inset
 
 
@@ -1337,7 +1561,7 @@ Values of 5' end positions randomly sampled using
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $n_{j,k}$
+\begin_inset Formula $n_{jk}$
 \end_inset
 
 
