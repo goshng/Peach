@@ -1,1 +1,45 @@
-.
+.Packages
+
+.CMake
+. Version 2.8.8
+. http://cmake.org/cmake/resources/software.html
+
+.yaml
+. Data serializaton
+. http://code.google.com/p/yaml-cpp/
+
+.simpleopt
+. Command line parser
+. http://code.jellycan.com/files/simpleopt-3.5.zip
+
+.GSL
+. FindGSL.cmake
+
+.DESeq
+. Genome sequence length: 2032925
+. Short reads positions along the S. mutans genome: FASTQ001.start (1,19,20)
+. Size factors: 0.8700484 1.0158870 1.1285131
+. Number of transcripts: 
+. mean=q*s, size=q*s/d, d=a0+a1/mean
+. a0, a1 = 0.0269 6.2076
+. q is a parameter
+. mean is computed for each transcript
+
+.Menu manager
+. readline
+. table driven menu
+. Use fileman to suit tux's 
+
+.C++ Classes
+. tuxHelp - shows brief document
+. tux
+
+.Log
+. http://stackoverflow.com/questions/696321/best-logging-framework-for-native-c
+
+.Test computer programs
+. monsters.cpp - http://code.google.com/p/yaml-cpp/wiki/HowToParseADocument This
+program shows a way of parsing a YAML file.
+. yamlEmitter.cpp - http://code.google.com/p/yaml-cpp/wiki/HowToEmitYAML This
+program illustrates usages of emitting a YAML document. 
+. readline.cpp - 

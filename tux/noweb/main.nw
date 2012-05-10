@@ -1,0 +1,3020 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}                                                        
+\usepackage[latin9]{inputenc}                                                   
+\usepackage{mdwlist}           % less spaces between items
+\usepackage{noweb}
+\usepackage{fancyvrb}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in}
+\setlength{\pdfpagewidth}{\paperwidth}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\parskip}{1ex}
+
+\newcommand{\Cclass}[1]{class \textit{#1}}
+\newcommand{\Cmember}[1]{member \textit{#1}}
+\newcommand{\Cmethod}[1]{method \textit{#1}}
+\newcommand{\Cpackage}[1]{package \textit{#1}}
+\newcommand{\program}[1]{\texttt{#1}}
+
+\begin{document}
+\raggedright
+
+\title{Inferring transcript boundaries and expression levels using RNA-seq}
+\author{Sang Chul Choi\\
+Department of Biological Statistics and Computational Biology, \\
+Cornell University,\\
+Ithaca, NY 14850}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+\section{Introduction}
+
+Users comand \program{tux} via \Cclass{Mananger}.
+
+We use \Cclass{Mcmc} to run a number of chains. A chain is a cold chain, and the
+rest of chains are hot chains. The \Cclass{Mcmc} coordinates multiple
+simultaneous runs of chains. We need to know what chains are running in which
+machine. This can be done using MPI. Each chain needs to know what temperature
+to use. The \Cclass{Mcmc} contains \Cmember{temperature} and \Cmember{chainid}
+for accessing chains. 
+
+The \Cclass {Manager} creates a list of temperature using \Cclass{c\_hlinear},
+\Cclass{c\_hgeometric}. It sets \Cmember{chainid} as a sequence of non-negative
+integers. It also sets values of \Cmember{temperature}. We need to set up a list
+of chains before running them. The \Cclass{Mcmc} creates a list of chains and
+executes each chain one at a time using \Cmethod{step}. We have two classes for
+chains. One is for a chain that does the sampling job, and the other is for a
+chain manager. The \Cclass{Mcmc}'s \Cmethod{step} commands all of the chains to
+move a finite number of steps in their own process. The chain manager will be
+run in a separate process. We may need Message Passing Interface (MPI), which
+is an application interface that allows processes to communicate by sending and
+receiving messages. In essence, it facilitates communication when multiple
+computers/processors/cores are performing distributed calculations.
+
+The \Cclass{Mcmc} sends a message of \Cmethod{step} to \Cclass{ChainManager},
+which in turn sends a message of \Cmethod{step} to a list of \Cclass{Chain}.
+A process owns one \Cclass{ChainManager}, which communicates with \Cclass{Mcmc}.
+After finishing all of the messages of \Cmethod{step} in the list of
+\Cclass{Chain}, the \Cclass{ChainManager} sends a message to \Cclass{Mcmc} to
+check whether it can continue to move steps of the chains. The \Cclass{Mcmc}
+would swap chains by receciving necessary values from \Cclass{ChainManager}. 
+
+Members of \Cclass{Manager}:
+\begin{enumerate*}
+\item void show();
+\item void model();
+\item void mcmc(int r = 0); a main MCMC loop. 
+\item void summarize();
+\item void save();
+\item void load();
+\item void help();
+\end{enumerate*}
+
+Members of \Cclass{Mcmc}:
+\begin{enumerate*}
+\item vector<unsigned int> chainid; 
+\item vector<unsigned int> mNumberChainPerProcess; e.g., c(3,3,2) 
+\item vector<unsigned int> mAccumulateNumberChain; e.g., c(0,3,6,8)
+\item vector<double> likelihoodPrior; the sum of likelihood and prior for each
+chain. 
+\item unsigned int lenChain; total length of a chain
+\item unsigned int lenBurnin; length of a burn-in 
+\item unsigned int lenThin; length of a sampling frequency
+\item unsigned int lenSwap; length of a chain swapping frequency
+\item unsigned int lenSwapTry; the number of attempts of swapping two chains.
+This value can be smaller than ${n \choose 2}$ where $n$ is the number of
+chains.
+\item
+\item The followings are nested structures:
+\item struct c\_msg1 mMessage;
+\item 
+\item The following methods are public:
+\item Mcmc ();
+\item \~{}Mcmc ();
+\item int numberChainPerProcess (); computes allocated numbers of chains for
+each process
+\item int createChainManager (unsigned int r);
+\item int step (unsigned int n);
+\item int swap (); swaps chains temperatures
+\item int sample (); 
+\item int save ();
+\item int load ();
+\item
+\item The following methods are private:
+\item int swapChains (); uses values from all of the chains to arrange chain
+temperatures - called by \Cmethod{swap}
+\item double swapWeight (unsigned int, unsigned int); computes an acceptance
+ratio for swapping two chains - called by \Cmethod{swapChains}
+\end{enumerate*}
+
+\Cclass{c\_msg1} is used to send a message to the rank 0 process:
+\begin{enumerate*}
+\item unsigned int processid; the ordered ID of a process
+\item unsigned int chainid; the designated chain ID
+\item double likelihoodPrior; the sum of likelihood and prior of a chain
+\end{enumerate*}
+
+The \Cmethod{swap} for the rank 0 process waits for the rest of processes to
+finish their \Cmethod{step}. Positively ranked processes send the rank 0 process
+a message of likelihood and other values. The rank 0 process uses all of the
+likelihood values to attempt swapping of chain temperature values. It finishes
+the chain swapping by sending the rest of positively ranked processes a message
+of the chosen temperature.
+The \Cclass{ChainManager} sends the chain ID, and the sum of likelihood and
+prior to the rank 0 process for each of the chains that it manages. The rank 0
+process fills \Cmember{chainid} and \Cmember{likelihoodPrior} with those
+received values. Note that the two vectors index chains managed by
+\Cclass{ChainManager}. An element of \Cmember{chainid} is used to reference
+a temperature value. Let us read the \Cmethod{swap} in detail.
+Whatever the ranks are, \Cclass{ChainManager} calls \Cmethod{chainid} and
+\Cmethod{likelihoodPrior} to get chain IDs, and sums of likelihood and prior for
+the chains managed by the \Cclass{ChainManager} of the current rank process.
+We start with the rank 0 process. We need sums of likelihood and prior from each
+chain. We receive a message from each chain. Because \Cclass{ChainManager}
+can contains multiple chains, we have two loops: one for the
+\Cclass{ChainManager} and another for each chain in the \Cclass{ChainManager}.
+A message is stored \Cmember{mMessage}. The \Cmember{processid} of 
+\Cmember{mMessage} is the ordered index of a process that runs one chain. Do not
+be confused by the name process. For example, if 
+\Cmember{mNumberChainPerProcess} is c(3,3,2), the process indices run from 0 to
+7. Processes are different in the assigned chain index, which is stored in
+\Cmember{chainid} of \Cmember{mMessage}. We use \Cmember{processid} to index 
+\Cmember{mChainid} and \Cmember{mLikelihoodPrior}. Now that we have chain
+IDs, and sums of likelihood and prior. We call \Cmethod{swapChains}, and
+rearrange \Cmember{mChainid}. 
+We need to configure chains with the rearranged chain IDs. For the rank 0
+process we find the chain IDs and save them in a vector of size being equal to
+the number of chains in the rank 0 process. We send messages to the rest of
+positively ranked processes. Let us turn to a postively ranked process. Note
+that we have already stored chain IDs and sums of likelihood and prior. We send
+those to the rank 0 process, and wait and receive messages from the rank 0
+process. After getting all of the chain IDs we use \Cclass{ChainManager} to call
+\Cmethod{setChainid}.
+
+
+Members of \Cclass{ChainManager}:
+\begin{enumerate*}
+\item The followings are data members:
+\item vector<Chain> chain; a list of chains
+\item The followings are public:
+\item ChainManager (); creates a single chain
+\item ChainManager (unsigned int n); creates $n$ chains
+\item void delete\_pointed\_to (T* p); function template to delete chains
+\item void chainid (vector<unsigned int>\&); returns a vector of Chain IDs from
+the list of chains
+\item void setChainid (vector<unsigned int>\&); assigns chain IDs 
+\end{enumerate*}
+
+Members of \Cclass{Chain}:
+
+
+\section{Compilation}
+Build a debug version using CMake.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+$ cd output/src
+$ mkdir debug
+$ cd debug
+$ cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
+$ CC=openmpicc CXX=openmpic++ cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
+$ openmpirun -n 2 tux mcmc
+$ make
+$ make VERBOSE=1
+$ cd ..;rm -rf b;mkdir b;cd b;cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
+$ cd ../../..;./run 2;cd output/src;rm -rf b;mkdir b;cd b;cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug;make
+\end{Verbatim}
+
+\section{Code}
+
+\subsection{Tux classes}
+
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Manager - Dispatches user commands
+  show - shows states of data, model, mcmc, and others
+  model - sets model parameters
+  mcmc - executes MCMC to sample from the posterior
+  summarize - summarizes a posterior sample 
+  save - saves the current state of data, model, mcmc, and others to a file
+  load - loads a state of data, model, mcmc, and others from a file
+  help - shows commands and their usages
+
+Mcmc - Command MCMC
+  show - shows a state of MCMC
+  step - samples a next set of parameter values
+  save - saves a current state of MCMC
+  load - loads a state of mcmc from MCMC parts of a file
+  burn - explores a posterior distribution without saving states of MCMC
+  sample - continues to sample parameter values till a next save of a MCMC state
+  swap - swaps chains of different temparatures
+
+ChainManager - A controler of Markov chains
+  step - proceeds to a next step of the chain
+  save - saves a current state of the chain
+  load - laods a state of a chain 
+  temperature - temperature of the chain
+  
+Chain - A Markov chain of parameters
+  step - proceeds to a next step of the chain
+  save - saves a current state of the chain
+  load - laods a state of a chain 
+  temperature - temperature of the chain
+  
+Model - Command Model
+  show - shows a state of model
+  save - saves a current state of model
+  load - loads a state of model
+
+System - Computer system configuration
+  show - shows info of CPUs, GPUs, memory, compute nodes
+
+Help - Command help
+  show - shows help messages by reading messages
+
+Memory - Customized memory management
+
+Probability - Probability distribution
+  rv - add a set of random variables
+  conditionalRv - add a set of conditional random variables
+  d - computes density of the distribution
+  r - generates random deviates of the distribution
+  logD - computes log of density of the distribution
+
+Likelihood - A probability of data given parameters
+Posterior - A probability of parameters given data
+Prior - A probability of paramters
+Proposal - A probability of a set of parameters given another
+
+ProbabilityRatio - A ratio of probabilities
+
+RandomVariable - Random variables; e.g., data, parameters
+
+Mover - Proposal of a new set of parameters
+
+MoverTxBoundaries - Proposal of transcript boundaries
+MoverTxExpression - Proposal of transcript expression
+
+Data - A random variable that does not change
+
+Reads - A data of short reads mapped on a genome
+
+Parameter - A random variable that can vary
+
+Temperature - A parameter of chain IDs 
+TxBoundaries - A parameter of transcript boundaries
+TxExpression - A parameter of transcript expression levels
+
+Summarizer - Command summarize of chains of posterior samples
+  show - shows a state of summarization
+  do - computes summary of posterior samples
+  save - saves a current state of the summary
+  load - loads a state of a summary
+
+Summary - Summary of chains of posterior samples for a parameter
+  mean - computes mean values
+  variance - computes variance to quantify uncertainty
+  autocorrelation - computes autocorrelation
+  save - saves a current state of the summary
+  load - loads a state of a summary
+\end{Verbatim}
+
+\subsection{Copyright}
+<<tux gnu copyright>>=
+// This file is a part of tux.
+//
+// tux is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+// 
+// tux is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with tux. If not, see <http://www.gnu.org/licenses/>.
+@
+
+\subsection{CMake}
+
+Find CMake modules at the following directory:
+\begin{Verbatim}[frame=lines,framesep=5mm]
+/Applications/CMake\ 2.8-8.app/Contents/share/cmake-2.8/Modules/
+\end{Verbatim}
+
+To add a custom CMake package
+\begin{Verbatim}[frame=lines,framesep=5mm]
+cp downloads/FindReadline.cmake output/src/cmake/Modules/
+http://www.vtk.org/Wiki/CMake:How_To_Find_Libraries
+\end{Verbatim}
+
+<<CMakeLists.txt>>=
+cmake_minimum_required(VERSION 2.8)
+
+PROJECT (tux)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+SET (tux_SRCS 
+  "tux.cpp"
+  "tuxHelp.cpp"
+  "tuxManager.cpp"
+  "tuxModel.cpp"
+  "tuxMcmc.cpp"
+  "tuxChainManager.cpp"
+  "tuxChain.cpp"
+  "tuxRandomVariable.cpp"
+  "tuxParameter.cpp"
+  "tuxData.cpp"
+  "tuxSystem.cpp"
+  "tuxProbability.cpp"
+  "tuxLikelihood.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxSummarizer.cpp"
+  "tuxSummary.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxReads.cpp"
+  "tuxXyz.cpp"
+  "xmalloc.c"
+  "xfree.c"
+)
+SET (monsters_SRCS 
+  "monsters.cpp"
+)
+SET (gsl_SRCS 
+  "gsl.cpp"
+)
+SET (yamlEmitter_SRCS 
+  "yamlEmitter.cpp"
+)
+SET (fileman_SRCS 
+  "fileman.cpp"
+  "xmalloc.c"
+  "xfree.c"
+)
+SET (ezlogger_SRCS 
+  "ezlogger.cpp"
+)
+
+# SET (CMAKE_EXE_LINKER_FLAGS "-static")
+ADD_DEFINITIONS(-DHAVE_CONFIG_H) 
+# SET (CMAKE_C_FLAGS_DEBUG "-Wno-write-strings -g3 -ggdb -O0")
+# SET (CMAKE_CXX_FLAGS_DEBUG "-Wno-write-strings -g3 -ggdb -O0")
+SET (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -fpermissive -g3 -ggdb -O0")
+SET (CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -fpermissive -g3 -ggdb -O0")
+
+# YAML
+add_library(yaml STATIC IMPORTED)
+set_property(TARGET yaml PROPERTY IMPORTED_LOCATION /usr/local/lib/libyaml-cpp.a)
+ADD_EXECUTABLE (monsters ${monsters_SRCS})
+target_link_libraries(monsters yaml)
+ADD_EXECUTABLE (yamlEmitter ${yamlEmitter_SRCS})
+target_link_libraries(yamlEmitter yaml)
+
+# GSL
+ADD_EXECUTABLE (gsl ${gsl_SRCS})
+find_package (GSL)
+if (GSL_FOUND)
+  include_directories(${GSL_INCLUDE_DIR})
+  target_link_libraries (gsl ${GSL_LIBRARIES})
+endif (GSL_FOUND)
+
+# EzLogger
+ADD_EXECUTABLE (ezlogger ${ezlogger_SRCS})
+
+# Readline
+# find_package (Readline)
+add_library(readline STATIC IMPORTED)
+set_property(TARGET readline PROPERTY IMPORTED_LOCATION /usr/local/lib/libreadline.a)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+ADD_EXECUTABLE (fileman ${fileman_SRCS})
+target_link_libraries(fileman readline)
+target_link_libraries(fileman -ltermcap)
+
+# TUX
+SET(CMAKE_C_COMPILER openmpicc)
+SET(CMAKE_CXX_COMPILER openmpicxx)
+ADD_EXECUTABLE (tux ${tux_SRCS})
+target_link_libraries(tux mpi readline -ltermcap)
+
+INCLUDE (CheckIncludeFiles)
+CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
+CHECK_INCLUDE_FILES (sys/file.h HAVE_SYS_FILE_H)
+CHECK_INCLUDE_FILES (unistd.h HAVE_UNISTD_H)
+CHECK_INCLUDE_FILES (string.h HAVE_STRING_H)
+CHECK_INCLUDE_FILES (stdlib.h HAVE_STDLIB_H)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+@
+
+\subsection{Main}
+
+<<tux.cpp>>=
+<<tux gnu copyright>>
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif 
+#include <iostream>
+#include <mpi.h>
+#include "simpleopt/SimpleOpt.h"
+#include "simpleopt/SimpleGlob.h"
+#include "ezlogger_headers.hpp"
+#include "rlstdc.h"
+#include "xmalloc.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "tuxHelp.h"
+#include "tuxManager.h"
+#include "tuxXyz.h"
+
+using namespace std;
+using namespace tux;
+
+<<tux interative>>
+<<command line>>
+int 
+main (int argc, char* argv[])
+{
+  axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_very_rarely);
+  EZLOGGERFUNCTRACKER;
+
+  // Interactive Mode
+  if (argc == 1)
+    {
+      char *line, *s;
+
+      progname = argv[0];
+
+      initialize_readline ();	/* Bind our completer. */
+
+      /* Loop reading and executing lines until the user quits. */
+      for ( ; done == 0; )
+        {
+          line = readline ("> ");
+
+          if (!line)
+            break;
+
+          /* Remove leading and trailing whitespace from the line.
+             Then, if there is anything left, add it to the history list
+             and execute it. */
+          s = stripwhite (line);
+
+          if (*s)
+            {
+              add_history (s);
+              execute_line (s);
+            }
+
+          free (line);
+        }
+      return 0;
+    }
+
+  // Batch Mode
+  int sCommand;
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_HELP) 
+            {
+              Help::full ();
+              return 0;
+            }
+          else if (args.OptionId() == OPT_VERSION) 
+            {
+              Help::version ();
+            }
+          else if (args.OptionId() == OPT_MODEL
+                   || args.OptionId() == OPT_MCMC
+                   || args.OptionId() == OPT_SUMMARIZE) 
+            {
+              sCommand = args.OptionId();
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+  Manager m;
+  switch (sCommand)
+    {
+    case OPT_MODEL:
+      cout << "Modelling ..." << endl;
+      break;
+    case OPT_MCMC:
+      cout << "Start MCMC ..." << endl;
+
+      int size,rank;
+      int length;
+      char name[80];
+      MPI_Status status;
+      int workerIdx;
+
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+      MPI_Comm_size(MPI_COMM_WORLD,&size);
+      MPI_Get_processor_name(name,&length);
+ 
+      if (rank==0) {
+              printf("Hello MPI from the server process!\n");
+
+              for (workerIdx=1; workerIdx<size; workerIdx++) {
+                      MPI_Recv(name, 80, MPI_CHAR, workerIdx, 999, MPI_COMM_WORLD, &status);
+                      printf("Hello MPI!\n");
+                      printf(" message from %d of %d on %s\n", workerIdx, size, name);
+              }
+      } else {
+              MPI_Send(name,80,MPI_CHAR,0,999,MPI_COMM_WORLD);
+      }
+
+      m.mcmc (rank); // MCMC Command
+
+      MPI_Finalize(); 
+
+      break;
+    case OPT_SUMMARIZE:
+      cout << "Summarizing a posterior sample ..." << endl;
+      break;
+    }
+
+  return 0;
+}
+@
+
+<<command line>>=
+enum { 
+    OPT_HELP, 
+    OPT_MODEL,
+    OPT_MCMC,
+    OPT_SUMMARIZE,
+    OPT_VERSION,
+    OPT_INFILE,
+    OPT_OUTFILE,
+
+    OPT_CHAIN,
+    OPT_LIKELIHOOD,
+    OPT_PRIOR,
+    OPT_XML,
+    OPT_BUILD,
+    OPT_PRINT,
+    OPT_WHAT,
+    OPT_REMOVE,
+    OPT_FOO, 
+    OPT_BAR, 
+    OPT_HOGE 
+};
+CSimpleOpt::SOption g_rgOptions[] = {
+    // ID TEXT TYPE
+    { OPT_HELP, "--help", SO_NONE    },
+    { OPT_HELP, "-h", SO_NONE    },
+    { OPT_VERSION, "--version", SO_NONE },
+    { OPT_INFILE, "-i",     SO_REQ_SEP },
+    { OPT_OUTFILE, "-o",     SO_REQ_SEP },
+
+    { OPT_FOO,  "-a",     SO_NONE    }, // "-a"
+    { OPT_BAR,  "-b",     SO_NONE    }, // "-b"
+    { OPT_HOGE, "-f",     SO_REQ_SEP }, // "-f ARG"
+    { OPT_PRINT, "-p",     SO_REQ_SEP },
+    { OPT_PRINT, "--print", SO_REQ_SEP },
+    { OPT_WHAT, "-w",     SO_REQ_SEP },
+    { OPT_WHAT, "--what", SO_REQ_SEP },
+    { OPT_INFILE, "--infile",   SO_REQ_SEP },
+    { OPT_OUTFILE, "--outfile",   SO_REQ_SEP },
+
+    // Commands
+    { OPT_MCMC, "mcmc", SO_NONE },
+    { OPT_MODEL, "model", SO_NONE },
+    { OPT_SUMMARIZE, "summarize", SO_NONE },
+
+    { OPT_CHAIN, "chain", SO_NONE },
+    { OPT_LIKELIHOOD, "likelihood", SO_NONE },
+    { OPT_PRIOR, "prior", SO_NONE },
+    { OPT_XML, "xml", SO_NONE },
+    { OPT_BUILD, "build", SO_NONE },
+    { OPT_REMOVE, "--remove", SO_REQ_SEP },
+    SO_END_OF_OPTIONS // END
+};
+@
+
+<<tux interative>>=
+int com_help PARAMS((char *));
+int com_model PARAMS((char *));
+int com_mcmc PARAMS((char *));
+int com_save PARAMS((char *));
+int com_load PARAMS((char *));
+int com_quit PARAMS((char *));
+
+typedef struct {
+  char *name;			/* User printable name of the function. */
+  rl_icpfunc_t *func;		/* Function to call to do the job. */
+  char *doc;			/* Documentation for this function.  */
+} COMMAND;
+
+COMMAND commands[] = {
+  { "help", com_help, "Display this text" },
+  { "?", com_help, "Synonym for `help'" },
+  { "model", com_model, "Model" },
+  { "mcmc", com_mcmc, "MCMC" },
+  { "save", com_save, "Saves a current state to a file" },
+  { "load", com_load, "Loads a state from a file" },
+  { "quit", com_quit, "Quit using Fileman" },
+  { (char *)NULL, (rl_icpfunc_t *)NULL, (char *)NULL }
+};
+
+/* Forward declarations. */
+char *stripwhite (char *string);
+COMMAND* find_command (char *name);
+void too_dangerous (char *caller);
+void initialize_readline ();
+int execute_line (char *line);
+int valid_argument (char *caller, char *arg);
+
+/* The name of this program, as taken from argv[0]. */
+char *progname;
+
+/* When non-zero, this global means the user is done using this program. */
+int done;
+
+char *
+dupstr (char *s)
+{
+  char *r;
+
+  r = (char *) xmalloc (strlen (s) + 1);
+  strcpy (r, s);
+  return (r);
+}
+
+/* Execute a command line. */
+int
+execute_line (char *line)
+{
+  register int i;
+  COMMAND *command;
+  char *word;
+
+  /* Isolate the command word. */
+  i = 0;
+  while (line[i] && whitespace (line[i]))
+    i++;
+  word = line + i;
+
+  while (line[i] && !whitespace (line[i]))
+    i++;
+
+  if (line[i])
+    line[i++] = '\0';
+
+  command = find_command (word);
+
+  if (!command)
+    {
+      fprintf (stderr, "%s: No such command for FileMan.\n", word);
+      return (-1);
+    }
+
+  /* Get argument to command, if any. */
+  while (whitespace (line[i]))
+    i++;
+
+  word = line + i;
+
+  /* Call the function. */
+  return ((*(command->func)) (word));
+}
+
+/* Look up NAME as the name of a command, and return a pointer to that
+   command.  Return a NULL pointer if NAME isn't a command name. */
+COMMAND *
+find_command (char *name)
+{
+  register int i;
+
+  for (i = 0; commands[i].name; i++)
+    if (strcmp (name, commands[i].name) == 0)
+      return (&commands[i]);
+
+  return ((COMMAND *)NULL);
+}
+
+/* Strip whitespace from the start and end of STRING.  Return a pointer
+   into STRING. */
+char *
+stripwhite (char *string)
+{
+  register char *s, *t;
+
+  for (s = string; whitespace (*s); s++)
+    ;
+    
+  if (*s == 0)
+    return (s);
+
+  t = s + strlen (s) - 1;
+  while (t > s && whitespace (*t))
+    t--;
+  *++t = '\0';
+
+  return s;
+}
+
+/* **************************************************************** */
+/*                                                                  */
+/*                  Interface to Readline Completion                */
+/*                                                                  */
+/* **************************************************************** */
+
+char *command_generator PARAMS((const char *, int));
+char **fileman_completion PARAMS((const char *, int, int));
+
+/* Tell the GNU Readline library how to complete.  We want to try to complete
+   on command names if this is the first word in the line, or on filenames
+   if not. */
+void
+initialize_readline ()
+{
+  /* Allow conditional parsing of the ~/.inputrc file. */
+  rl_readline_name = "FileMan";
+
+  /* Tell the completer that we want a crack first. */
+  rl_attempted_completion_function = fileman_completion;
+}
+
+/* Attempt to complete on the contents of TEXT.  START and END bound the
+   region of rl_line_buffer that contains the word to complete.  TEXT is
+   the word to complete.  We can use the entire contents of rl_line_buffer
+   in case we want to do some simple parsing.  Return the array of matches,
+   or NULL if there aren't any. */
+char **
+fileman_completion (const char *text, int start, int end)
+{
+  char **matches;
+
+  matches = (char **)NULL;
+
+  /* If this word is at the start of the line, then it is a command
+     to complete.  Otherwise it is the name of a file in the current
+     directory. */
+  if (start == 0)
+    matches = rl_completion_matches (text, command_generator);
+  if (end == 0) { /* No code! */ }
+    
+  return (matches);
+}
+
+/* Generator function for command completion.  STATE lets us know whether
+   to start from scratch; without any state (i.e. STATE == 0), then we
+   start at the top of the list. */
+char *
+command_generator (const char *text, int state)
+{
+  static int list_index, len;
+  char *name;
+
+  /* If this is a new word to complete, initialize now.  This includes
+     saving the length of TEXT for efficiency, and initializing the index
+     variable to 0. */
+  if (!state)
+    {
+      list_index = 0;
+      len = strlen (text);
+    }
+
+  /* Return the next name which partially matches from the command list. */
+  name = commands[list_index].name;
+  while (name)
+    {
+      list_index++;
+      if (strncmp (name, text, len) == 0)
+        return (dupstr(name));
+      name = commands[list_index].name;
+    }
+
+  /* If no names matched, then return NULL. */
+  return ((char *)NULL);
+}
+
+/* **************************************************************** */
+/*                                                                  */
+/*                       FileMan Commands                           */
+/*                                                                  */
+/* **************************************************************** */
+
+/* String to pass to system ().  This is for the LIST, VIEW and RENAME
+   commands. */
+static char syscom[1024];
+
+/* Print out help for ARG, or for all of the commands if ARG is
+   not present. */
+int
+com_help (char *arg)
+{
+  register int i;
+  int printed = 0;
+
+  for (i = 0; commands[i].name; i++)
+    {
+      if (!*arg || (strcmp (arg, commands[i].name) == 0))
+        {
+          printf ("%s\t\t%s.\n", commands[i].name, commands[i].doc);
+          printed++;
+        }
+    }
+
+  if (!printed)
+    {
+      printf ("No commands match `%s'.  Possibilties are:\n", arg);
+
+      for (i = 0; commands[i].name; i++)
+        {
+          /* Print in six columns. */
+          if (printed == 6)
+            {
+              printed = 0;
+              printf ("\n");
+            }
+
+          printf ("%s\t", commands[i].name);
+          printed++;
+        }
+
+      if (printed)
+        printf ("\n");
+    }
+  return (0);
+}
+
+int
+com_model (char *arg)
+{
+  too_dangerous ("model");
+  return (1);
+}
+
+int
+com_mcmc (char *arg)
+{
+  too_dangerous ("mcmc");
+  return (1);
+}
+
+int
+com_summarize (char *arg)
+{
+  too_dangerous ("summarize");
+  return (1);
+}
+
+int
+com_save (char *arg)
+{
+  too_dangerous ("save");
+  return (1);
+}
+
+int
+com_load (char *arg)
+{
+  too_dangerous ("load");
+  return (1);
+}
+
+/* The user wishes to quit using this program.  Just set DONE non-zero. */
+int
+com_quit (char *arg)
+{
+  done = 1;
+  return (0);
+}
+
+/* Function which tells you that you can't do this. */
+void
+too_dangerous (char *caller)
+{
+  fprintf (stderr,
+           "%s: Too dangerous for me to distribute.  Write it yourself.\n",
+           caller);
+}
+
+/* Return non-zero if ARG is a valid argument for CALLER, else print
+   an error message and return zero. */
+int
+valid_argument (char *caller, char *arg)
+{
+  if (!arg || !*arg)
+    {
+      fprintf (stderr, "%s: Argument required.\n", caller);
+      return (0);
+    }
+
+  return (1);
+}
+
+
+@
+
+\subsection{Help}
+<<tuxHelp.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXHELP_H_
+#define _TUXHELP_H_
+namespace tux {
+class Help {
+public:
+  static void full ();
+  static void version ();
+};
+}
+#endif // _TUXHELP_H_
+
+<<tuxHelp.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxHelp.h"
+using namespace std;
+namespace tux {
+void 
+Help::full ()
+{
+  cout << ""
+"tux Commands Manual\n"
+"\n"
+"NAME\n"
+"   tux -- Transcripts boundaries uncertainty\n"
+"\n"
+"SYNOPSIS\n"
+"   tux [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The program implements a statistical method of inferring uncertainty\n"
+"   of transcript boundaries using RNA-seq data.\n"  
+"   The method is described in Choi (2012).\n"
+"\n"
+"   General options:\n"
+"      -h --help -?\n"
+"         Shows this help message.\n"
+"      --version\n"
+"         Shows the version.\n"
+"      -i --infile [INFILE]\n"
+"         Reads in an input file.\n"
+"      --type\n"
+"         Input and output files are in XML format.\n" 
+"\n"
+"   Commands:\n"
+"      mcmc\n"
+"         Samples recombinant trees.\n"
+"      summarize\n"
+"         Summarizes a posterior sample of recombinant trees.\n"
+"      likelihood\n"
+"         Computes the likelihod of a recombinant tree given data.\n"
+"      prior\n"
+"         Computes the prior of a recombinant tree given model parameters.\n"
+"      xml\n"
+"         Reads and writes XML files.\n"
+"      build\n"
+"         Reads an XML file to build a recombinant tree.\n"
+"      chain\n"
+"         Uses chains.\n"
+"\n"
+"   Command build options:\n"
+"      -w --what [NUMBER]\n"
+"         1 Build a recombiant tree by reading the XML file that is\n"
+"           created by xml --print 5 -o tuxrectree.xml\n"
+"         2 Build a list of events by reading the XML file that is\n"
+"           created by xml --print 6 -o tuxevent.xml\n"
+"      --remove [NUMBER]\n"
+"         Remove a recombinant edge.\n"
+"\n"
+"   Command xml options:\n"
+"      -p --print [NUMBER]\n"
+"         1 Default setting\n"
+"         2 fastsimcoal file\n"
+"         3 tux input file\n"
+"         4 tux output file\n"
+"         5 tux recombinant tree file\n"
+"         6 tux event file\n"
+"         7 tux chain state file\n"
+"\n"
+"   Files:\n"
+"      INFILE\n"
+"         Different commands can be combined with different formats of input\n"
+"         files. An input file with command xml is an XML file.\n" 
+"      OUTFILE\n"
+"\n"
+"   Usages:\n"
+"      tux xml --infile INFILE\n"
+"         Reads in an XML file, and prints it out to standard output.\n"
+"      tux xml --print 1 -o default.xml\n" 
+"         Prints the tux default setting.\n"
+"      tux likelihood -i tuxoutput.xml\n"
+"         Computes the likelihood of data given a recombinant tree.\n"
+"      tux xml --print 5 -o tuxrectree.xml\n"
+"         Creates a recombinant tree in XML format\n"
+"      tux build -w 1 --infile tuxrectree.xml\n"
+"         Build a recombinant tree using an XML file.\n"
+"      tux build -w 1 --remove 1 --infile tuxrectree.xml\n"
+"         Build a recombinant tree using an XML file, and remove the edge.\n"
+"      tux build -w 1 --remove 1 --infile tuxrectree.xml -o partialtree.xml\n"
+"         Build a recombinant tree using an XML file, and remove the edge.\n"
+"      tux xml --print 6 -o tuxevent.xml\n"
+"         Creates a list of events in XML format\n"
+"      tux build -w 2 --infile tuxevent.xml\n"
+"         Build a list of events using an XML file.\n"
+"      tux xml --print 7\n"
+"         Build a list of events using an XML file.\n"
+"      tux xml --print 3 -o tuxinput.xml\n" 
+"         Prints the tux input file.\n"
+"      tux chain --infile tuxinput.xml\n"
+"         Test a chain.\n"
+"\n"
+"AUTHOR\n"
+"   Written by Sang Chul Choi\n"
+"\n"
+"REPORTING BUGS\n"
+"   Report bugs to google group of Transcript Boundaries Uncertainty\n"
+"   at http://groups.google.com/group/transcript-boundaries-uncertainty\n"
+"\n"
+"VERSION\n"
+"   tux 1.0 - Build IMRBUILDDATETIME\n"
+"\n"
+"COPYRIGHT\n"
+"   Copyright (C) 2012- Sang Chul Choi\n"
+"   See the source for copying conditions.\n"
+"   There is NO warranty; not even for MERCHANTABILITY\n"
+"\n"
+"tux 1.0\n"
+"";
+}
+void 
+Help::version ()
+{
+  cout << ""
+"tux 1.0 - Build IMRBUILDDATETIME\n"
+"Written by Sang Chul Choi.\n"
+"\n"
+"Copyright (c) 2012- Sang Chul Choi\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"";
+}
+}
+@
+
+\subsection{Data serialization: YAML}
+<<monsters.cpp>>=
+#include "yaml-cpp/yaml.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+// our data types
+struct Vec3 {
+   float x, y, z;
+};
+
+struct Power {
+   std::string name;
+   int damage;
+};
+
+struct Monster {
+   std::string name;
+   Vec3 position;
+   std::vector <Power> powers;
+};
+
+// now the extraction operators for these types
+void operator >> (const YAML::Node& node, Vec3& v) {
+   node[0] >> v.x;
+   node[1] >> v.y;
+   node[2] >> v.z;
+}
+
+void operator >> (const YAML::Node& node, Power& power) {
+   node["name"] >> power.name;
+   node["damage"] >> power.damage;
+}
+
+void operator >> (const YAML::Node& node, Monster& monster) {
+   node["name"] >> monster.name;
+   node["position"] >> monster.position;
+   const YAML::Node& powers = node["powers"];
+   for(unsigned i=0;i<powers.size();i++) {
+      Power power;
+      powers[i] >> power;
+      monster.powers.push_back(power);
+   }
+}
+
+int main()
+{
+   std::ifstream fin("monsters.yaml");
+   YAML::Parser parser(fin);
+   YAML::Node doc;
+   parser.GetNextDocument(doc);
+   for(unsigned i=0;i<doc.size();i++) {
+      Monster monster;
+      doc[i] >> monster;
+      std::cout << monster.name << "\n";
+   }
+
+   return 0;
+}
+@
+
+\subsection{YAML Emitter}
+<<yamlEmitter.cpp>>=
+#include "yaml-cpp/yaml.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <map>
+int main()
+{
+  YAML::Emitter out;
+  out.SetIndent(8);                                                               
+
+  out << "Hello, World!";
+
+  out << YAML::BeginSeq;
+  out << "eggs";
+  out << "bread";
+  out << "milk";
+  out << YAML::EndSeq;
+
+  out << YAML::BeginMap;
+  out << YAML::Key << "name";
+  out << YAML::Value << "Ryan Braun";
+  out << YAML::Key << "position";
+  out << YAML::Value << "LF";
+  out << YAML::EndMap;
+
+  out << YAML::BeginMap;
+  out << YAML::Key << "name";
+  out << YAML::Value << "Barack Obama";
+  out << YAML::Key << "children";
+  out << YAML::Value << YAML::BeginSeq << "Sasha" << "Malia" << YAML::EndSeq;
+  out << YAML::EndMap;
+
+  out << YAML::Literal << "A\n B\n  C";
+
+  out << YAML::Flow;
+  out << YAML::BeginSeq << 2 << 3 << 5 << 7 << 11 << YAML::EndSeq;
+
+  out << YAML::BeginMap;
+  out << YAML::Key << "method";
+  out << YAML::Value << "least squares";
+  out << YAML::Comment("should we change this method?");
+  out << YAML::EndMap;
+
+  out << YAML::BeginSeq;
+  out << YAML::Anchor("fred");
+  out << YAML::BeginMap;
+  out << YAML::Key << "name" << YAML::Value << "Fred";
+  out << YAML::Key << "age" << YAML::Value << "42";
+  out << YAML::EndMap;
+  out << YAML::Alias("fred");
+  out << YAML::EndSeq;
+   
+  std::vector <int> squares;
+  squares.push_back(1);
+  squares.push_back(4);
+  squares.push_back(9);
+  squares.push_back(16);
+
+  std::map <std::string, int> ages;
+  ages["Daniel"] = 26;
+  ages["Jesse"] = 24;
+
+  out << YAML::BeginSeq;
+  out << YAML::Flow << squares;
+  out << ages;
+  out << YAML::EndSeq;
+
+
+//. Genome sequence length: 2032925
+//. Short reads positions along the S. mutans genome: FASTQ001.start (1,19,20)
+//. Size factors: 0.8700484 1.0158870 1.1285131
+//. Number of transcripts: 
+//. mean=q*s, size=q*s/d, d=a0+a1/mean
+//. a0, a1 = 0.0269 6.2076
+//. q is a parameter
+//. mean is computed for each transcript
+  out << YAML::BeginMap;
+  out << YAML::Key << "GenomeLength" << YAML::Value << 2032925;
+  out << YAML::Key << "SizeFactor" << YAML::Value << YAML::Flow; 
+  out << YAML::BeginSeq << 0.8700484 << 1.0158870 << 1.1285131 << YAML::EndSeq;
+  out << YAML::Key << "Alpha0" << YAML::Value << 0.0269;
+  out << YAML::Key << "Alpha1" << YAML::Value << 6.2076;
+  out << YAML::Key << "NumberK" << YAML::Value << 500;
+  out << YAML::Key << "ShortReads" << YAML::Value << YAML::Flow;
+  out << YAML::BeginSeq;
+  // Read values from FASTQ001.start and write them to YAML.
+  std::ifstream myfile ("../../../downloads/FASTQ001.start");
+  if (myfile.is_open())
+  {
+    double value;
+    while ( myfile.good() )
+    {
+      myfile >> value;
+      out << value;
+    }
+    myfile.close();
+  }
+  // out << 0.8700484 << 1.0158870 << 1.1285131;
+  out << YAML::EndSeq;
+  out << YAML::EndMap;
+
+  std::cout << "Here's the output YAML:\n" << out.c_str(); 
+
+  return 0;
+}
+@
+
+\subsection{GNU Scientific Library}
+<<gsl.cpp>>=
+#include <stdio.h>
+#include <gsl/gsl_sf_bessel.h>
+     
+int main (void)
+{
+  double x = 5.0;
+  double y = gsl_sf_bessel_J0 (x);
+  printf ("J0(%g) = %.18e\n", x, y);
+  return 0;
+}
+@
+
+\subsection{EzLogger Library}
+<<ezlogger.cpp>>=
+// Example code for EZLOGGER macros
+#include "ezlogger_headers.hpp"
+
+void some_funcxx()
+{
+        EZLOGGERFUNCTRACKER;
+}
+
+void some_funcx()
+{
+        EZLOGGERFUNCTRACKER;
+        some_funcxx();
+}
+
+void some_func6()
+{
+        EZLOGGERFUNCTRACKER;
+        EZLOGGERDISPLAY_STACK;
+}
+
+void some_func5(int &x)
+{
+        EZLOGGERFUNCTRACKER;
+        --x;
+        if (x > 0)
+                some_func5(x); //test recursion
+        else
+                some_func6();
+}
+
+void some_func4()
+{
+        EZLOGGERFUNCTRACKER;
+        int x = 3;
+        some_func5(x);
+}
+
+void some_func3()
+{
+        EZLOGGERFUNCTRACKER;
+        some_funcx();
+        some_funcxx();
+        some_func4();
+}
+
+void some_func2()
+{
+        EZLOGGERFUNCTRACKER;
+        some_funcx();
+        some_funcxx();
+        some_func3();
+        some_funcxx();
+}
+
+void some_func1()
+{
+        EZLOGGERFUNCTRACKER;
+        some_funcx();
+        some_func2();
+        some_funcxx();
+}
+
+int main(int argc, char**argv)
+{
+        axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_very_rarely);
+        EZLOGGERFUNCTRACKER;
+        int ReturnValue = 99;
+        EZLOGGER_PRG_MAIN_ARG(argc, argv);
+        EZDBGONLYLOGGER_PRG_MAIN_ARG(argc, argv);
+        EZLOGGERVL_PRG_MAIN_ARG(axter::log_often, argc, argv);
+        int i = 123;
+        std::string somedata = "Hello World";
+        EZLOGGER(i);
+        EZDBGONLYLOGGER(i);
+        EZLOGGERVL(axter::log_often)(i);
+
+        EZLOGGERVAR(somedata);
+        EZDBGONLYLOGGERVAR(somedata);
+        EZLOGGERVLVAR(axter::log_often, somedata);
+        
+        bool SomeConditionVar = true;
+        EZLOGGERVAR(SomeConditionVar == false);
+        EZDBGONLYLOGGERVAR(SomeConditionVar == false);
+        EZLOGGERVLVAR(axter::log_often, SomeConditionVar == true);
+
+        EZLOGGERVLVARIFY(axter::log_often, SomeConditionVar == false);
+
+        EZLOGGERSTREAM << somedata << " " << i << std::endl;
+        EZLOGGERSTREAM << somedata << " next line " << i << std::endl;
+        EZLOGGERSTREAM2(std::cerr) << somedata << " next line " << i << std::endl;
+        EZDBGONLYLOGGERSTREAM << somedata << " " << i << std::endl;
+        EZDBGONLYLOGGERSTREAM << somedata << " next line " << i << std::endl;
+        EZLOGGERVLSTREAM(axter::log_often) << somedata << " " << i << std::endl;
+        // EZLOGGERVLSTREAM(axter::levels(axter::log_often, axter::warn, __FUNCSIG__ /*or GNU PRETTY_FUNCTION*/,"Xyz Facility")) << somedata << " " << i << std::endl;
+
+        EZLOGGERPRINT("i = %i and somedata = %s", i, somedata.c_str());
+        EZDBGONLYLOGGERPRINT("i = %i and somedata = %s", i, somedata.c_str());
+        EZLOGGERVLPRINT(axter::log_often)("i = %i and somedata = %s", i, somedata.c_str());
+        //Alternative method
+        EZLOGGERVL(axter::log_often).cprint("i = %i and somedata = %s", i, somedata.c_str());
+        EZLOGGER.cprint("i = %i and somedata = %s", i, somedata.c_str());
+
+        if (1)
+        {
+                EZLOGGERMARKER;
+                EZDBGONLYLOGGERMARKER;
+                EZLOGGERVLMARKER(axter::log_often);
+        }
+
+        some_func1();
+
+        return EZLOGGERVAR(ReturnValue);
+}
+@
+
+\subsection{Manager}
+<<tuxManager.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMANAGER_H_
+#define _TUXMANAGER_H_
+#include <iostream>
+#include <cmath>
+#include <vector>
+using namespace std;
+namespace tux {
+class Manager {
+public:
+  void show();
+  void model();
+  void mcmc(int r = 0);
+  void summarize();
+  void save();
+  void load();
+  void help();
+
+  struct c_unique {
+    unsigned int current;
+    c_unique() {current=0;}
+    unsigned int operator()() {return current++;}
+  } uniqueNumber;
+
+  struct c_hlinear {
+    double halpha;
+    unsigned int i;
+    c_hlinear () {i=0; halpha=0.5;}
+    double operator()() {
+      double v = 1.0 / (1.0 + halpha * i);
+      i++; 
+      return v;
+    }
+  } hlinearNumber;
+
+  struct c_hgeometric {
+    unsigned int numChain;
+    double halpha, hbeta;
+    unsigned int i;
+    c_hgeometric () {i=0; numChain = 10; halpha=0.95; hbeta=0.2;}
+    double operator()() {
+      double v = 1 
+                 - (1 - hbeta) * i 
+                 * pow (halpha, (double) (numChain - 1 - i)) 
+                 / (double) (numChain - 1);
+      i++;
+      return v; 
+    }
+  } hgeometricNumber;
+
+  template <class T> struct c_print {
+    void operator() (T i) {std::cout << " " << i;}
+  };
+
+};
+
+}
+#endif // _TUXMANAGER_H_
+
+<<tuxManager.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include "tuxModel.h"
+#include "tuxMcmc.h"
+#include "tuxManager.h"
+using namespace std;
+namespace tux {
+
+void 
+Manager::show()
+{
+  return;
+}
+void 
+Manager::model()
+{
+  return;
+}
+void 
+Manager::mcmc(int r)
+{
+  Mcmc m;
+  m.lenChain = 5;
+  m.lenBurnin = 1;
+  m.lenThin = 3;
+  m.lenSwap = 2;
+  m.lenSwapTry = 1;
+  m.mNumberProcess = 2; 
+  m.mNumberChain = 5;
+  m.numberChainPerProcess ();
+  m.createChainManager ((unsigned int)r);
+
+  m.mLikelihoodPrior.resize (m.lenChain);
+
+  m.mChainid.resize(m.lenChain);                                                   
+  uniqueNumber.current = 0;                                                     
+  generate (m.mChainid.begin(), m.mChainid.end(), uniqueNumber);                  
+//  c_print<unsigned int> printInt;                                               
+//  for_each (m.chainid.begin(), m.chainid.end(), printInt);                      
+//  cout << endl;                                                                 
+                                                                                
+  m.mTemperature.resize(m.lenChain);                                               
+  hlinearNumber.halpha = 0.1;
+  generate (m.mTemperature.begin(), m.mTemperature.end(), hlinearNumber);         
+//  c_print<double> printDouble ;                                                 
+//  for_each (m.temperature.begin(), m.temperature.end(), printDouble);           
+//  cout << endl;  
+
+  hgeometricNumber.numChain = m.lenChain;
+  hgeometricNumber.halpha = 0.98;
+  hgeometricNumber.hbeta = 0.7;
+  generate (m.mTemperature.begin(), m.mTemperature.end(), hgeometricNumber);         
+//  for_each (m.temperature.begin(), m.temperature.end(), printDouble);           
+//  cout << endl;  
+
+  unsigned int s = 0;
+  while (s < m.lenChain) 
+    {
+      unsigned int sThin = 0;
+      while (sThin < m.lenThin)
+        {
+          s += m.lenSwap; 
+          sThin++;
+          m.step (m.lenSwap);
+          m.swap ();
+        }
+      if (m.lenBurnin < s)
+        {
+          m.sample ();
+        }
+    }
+  
+  return;
+}
+void 
+Manager::summarize()
+{
+  return;
+}
+void 
+Manager::save()
+{
+  return;
+}
+void 
+Manager::load()
+{
+  return;
+}
+void 
+Manager::help()
+{
+  return;
+}
+}
+@
+
+\subsection{Model}
+<<tuxModel.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMODEL_H_
+#define _TUXMODEL_H_
+namespace tux {
+class Model {
+public:
+  void full ();
+};
+}
+#endif // _TUXMODEL_H_
+
+<<tuxModel.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxModel.h"
+using namespace std;
+namespace tux {
+void 
+Model::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Mcmc}
+<<tuxMcmc.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMCMC_H_
+#define _TUXMCMC_H_
+#include <vector>
+#include "tuxChainManager.h"
+using namespace std;
+namespace tux {
+class Mcmc {
+public:
+  unsigned int mRank; 
+  vector<double> mTemperature;
+  vector<unsigned int> mChainid;
+  vector<double> mLikelihoodPrior;
+  vector<unsigned int> mNumberChainPerProcess;
+  vector<unsigned int> mAccumulateNumberChain;
+  unsigned int mNumberProcess; 
+  unsigned int mNumberChain;
+
+  unsigned int lenChain;
+  unsigned int lenBurnin;
+  unsigned int lenThin;
+  unsigned int lenSwap;
+  unsigned int lenSwapTry;
+
+  ChainManager mChainManager;
+
+  struct c_setNumberChainPerProcess {
+    unsigned int current;
+    unsigned int numberChainPerProcess;
+    unsigned int numberRemainingChain;
+    c_setNumberChainPerProcess () {current=0;}
+    unsigned int operator() () { 
+      if (current++ < numberRemainingChain)
+        return numberChainPerProcess + 1;
+      else
+        return numberChainPerProcess;
+    }
+  } setNumberChainPerProcess;
+
+  template <class T> struct c_print {
+    void operator() (T i) {std::cout << " " << i;}
+  };
+
+  struct c_msg1 {
+    unsigned int processid;
+    unsigned int chainid;
+    double likelihoodPrior;
+    void set (unsigned int x, unsigned int y, double z) {
+      processid = x; chainid = y; likelihoodPrior = z;
+    }
+  } mMessage;
+
+private:
+  double swapWeight (unsigned int ci, unsigned int cj);
+  int swapChains ();
+public:
+  Mcmc ();
+  ~Mcmc ();
+  int numberChainPerProcess ();
+  int createChainManager (unsigned int r);
+  int step (unsigned int n);
+  int swap ();
+  int sample ();
+  int save ();
+  int load ();
+};
+}
+#endif // _TUXMCMC_H_
+
+<<tuxMcmc.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <numeric>
+#include <functional>
+#include <algorithm>
+#include <mpi.h>
+#include <cassert>
+#include "ezlogger_headers.hpp"
+#include "tuxMcmc.h"
+#include "tuxChainManager.h"
+using namespace std;
+namespace tux {
+Mcmc::Mcmc () {}
+Mcmc::~Mcmc () {}
+int 
+Mcmc::numberChainPerProcess ()
+{
+  setNumberChainPerProcess.current = 0;
+  setNumberChainPerProcess.numberChainPerProcess 
+    = mNumberChain / mNumberProcess; 
+  setNumberChainPerProcess.numberRemainingChain
+    = mNumberChain % mNumberProcess;
+
+  mNumberChainPerProcess.resize (mNumberProcess); 
+  generate (mNumberChainPerProcess.begin(), 
+            mNumberChainPerProcess.end(), 
+            setNumberChainPerProcess);
+
+  // Construct a vector of partial sum.
+  vector<unsigned int>::iterator iter1;
+  mAccumulateNumberChain.clear();
+  mAccumulateNumberChain.push_back(0);
+  unsigned int j = 0;
+  for (iter1 = mNumberChainPerProcess.begin();
+       iter1 != mNumberChainPerProcess.end();
+       iter1++)
+    {
+      mAccumulateNumberChain.push_back(
+        accumulate(mNumberChainPerProcess.begin(),iter1+1,0)
+        );
+      j++;
+    }
+  
+//  c_print<unsigned int> printInt;                                               
+//  for_each (mNumberChainPerProcess.begin(), 
+//            mNumberChainPerProcess.end(), 
+//            printInt);                      
+//  cout << endl;                                                                 
+
+  return 0;
+}
+int 
+Mcmc::createChainManager (unsigned int r)
+{
+  mRank = r; 
+
+  // Create chains for a chain manager.
+  unsigned int n = mNumberChainPerProcess.at(r);
+  mChainManager.createChain (n);
+  // Set chain ID by using a vector of partial sum.
+  mChainManager.setChainid (mAccumulateNumberChain[r],
+                            mAccumulateNumberChain[r+1]-1);
+
+  return 0;
+}
+int
+Mcmc::step (unsigned int n)
+{
+  mChainManager.step (n);
+  return 0;
+}
+int
+Mcmc::swap ()
+{
+  EZLOGGERFUNCTRACKER;
+  MPI_Status status;
+
+  // Get chain IDs and likelihood prior sum values.
+  vector<unsigned int> v1;
+  mChainManager.chainid (v1);
+  vector<double> v2;
+  mChainManager.likelihoodPrior (v2);
+
+  if (mRank==0) 
+    {
+      // Receive messages to fill chain IDs and sums of likelihood and prior.
+      for (unsigned int workerIdx = 0; workerIdx < mNumberProcess; workerIdx++) 
+        {
+          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
+               i < mAccumulateNumberChain[workerIdx+1];
+               i++, j++)
+            {
+              if (mRank == workerIdx)
+                {
+                  mMessage.set (i, v1.at(j), v2.at(j)); 
+                }
+              else
+                {
+                  MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, workerIdx, 999, MPI_COMM_WORLD, &status);
+                }
+              mChainid.at(mMessage.processid) = mMessage.chainid;
+              mLikelihoodPrior.at(mMessage.processid) = mMessage.likelihoodPrior;
+            }
+        }
+     
+      stringstream result;
+      copy(mChainid.begin(), mChainid.end(), 
+           ostream_iterator<unsigned int>(result, " "));
+      EZLOGGERPRINT("Before Rank 0 chain IDs: %s",result.str().c_str());  
+
+      // Swap chains.
+      swapChains ();
+
+      copy(mChainid.begin(), mChainid.end(), 
+           ostream_iterator<unsigned int>(result, " "));
+      EZLOGGERPRINT("After Rank 0 chain IDs: %s",result.str().c_str());  
+      
+      // Send messages
+      v1.clear();
+      v1.resize(mNumberChainPerProcess.at(mRank));
+      for (unsigned int workerIdx = 0; workerIdx < mNumberProcess; workerIdx++) 
+        {
+          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
+               i < mAccumulateNumberChain[workerIdx+1];
+               i++, j++)
+            {
+              unsigned int pid = mAccumulateNumberChain[workerIdx] + j;
+              mMessage.set (pid, mChainid.at(pid), 0); 
+              if (mRank == workerIdx)
+                {
+                  v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
+                    = mMessage.chainid;
+                }
+              else
+                {
+                  MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, workerIdx, 999, MPI_COMM_WORLD);
+                }
+            }
+        }
+      mChainManager.setChainid (v1);
+
+      // Check if the message passing.
+      mChainid.assign (lenChain,9);
+      copy(mChainid.begin(), mChainid.end(), 
+           ostream_iterator<unsigned int>(result, " "));
+      EZLOGGERPRINT("After reset 0 chain IDs: %s",result.str().c_str());  
+    }
+  else 
+    {
+      // Send messages to rank 0 process
+      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
+           i < mAccumulateNumberChain[mRank+1];
+           i++, j++)
+        {
+          mMessage.set (i, v1.at(j), v2.at(j)); 
+          MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 0, 999, MPI_COMM_WORLD);
+        }
+
+      // Wait for the decision of the rank 0 process.
+      v1.clear();
+      v1.resize(mNumberChainPerProcess.at(mRank));
+      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
+           i < mAccumulateNumberChain[mRank+1];
+           i++, j++)
+        {
+          MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 0, 999, MPI_COMM_WORLD, &status);
+          assert(mMessage.processid - mAccumulateNumberChain.at(mRank) < v1.size());
+          v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
+            = mMessage.chainid;
+        }
+      mChainManager.setChainid (v1);
+    }
+
+  return 0;
+}
+int
+Mcmc::sample ()
+{
+  return 0;
+}
+int
+Mcmc::save ()
+{
+  return 0;
+}
+int
+Mcmc::load ()
+{
+  return 0;
+}
+
+double
+Mcmc::swapWeight (unsigned int ci, unsigned int cj)
+{
+  // Note that sumj is the sum of likelihood and prior.
+  double sumi; 
+  double sumj;
+  sumi = mLikelihoodPrior.at(ci);
+  sumj = mLikelihoodPrior.at(cj);
+  unsigned int bi = mChainid.at(ci);
+  unsigned int bj = mChainid.at(cj);
+  return (mTemperature[bi] - mTemperature[bj]) * (sumj - sumi);
+}
+
+int
+Mcmc::swapChains ()
+{
+#define  MINSWAP  0.1
+#define  BETADJUST  1.414
+#define  INCADJUST  1.414
+#define  MINHEAT  0.0001
+#define  MAXHEAT  0.2
+#define  MAXINC  100
+#define  MININC  0.1
+#define  PAUSESWAP 1000
+#define  SWAPDIST 7
+  for (unsigned i = 0; i < lenSwapTry; i++)
+    {
+      unsigned int ci, cj;
+      ci = 1;
+      cj = 4;
+    
+//    do
+//    {
+//      ci = (int) (uniform () * numchains);
+//    } while (ci < 0 || ci >= numchains);
+//    
+//    if (numchains < 2*SWAPDIST + 3)
+//    {
+//      cjmin = 0;
+//      cjrange = numchains;
+//    }
+//    else
+//    {
+//      cjmin = IMAX(0,ci-SWAPDIST);
+//      cjrange = IMIN(numchains, ci+SWAPDIST) -cjmin;
+//    }
+//    do
+//    {
+//      cj = cjmin + (int) (uniform () * cjrange);
+//    } while (cj == ci || cj < 0 || cj >= numchains);
+//
+//    if ((ci == 0 && cj == 1) || (ci == 1 && cj == 0))
+//      sw01d++;
+//    if ((ci == 1 && cj == 2) || (ci == 2 && cj == 1))
+//      sw12d++;
+//    if (ci < cj)
+//    {
+//      swapcount[cj][ci]++;
+//    }
+//    else
+//    {
+//      swapcount[ci][cj]++;
+//    }
+
+      double metropolishastingsterm = swapWeight (ci, cj);
+      metropolishastingsterm = 1;
+      if (metropolishastingsterm >= 0)
+          //|| metropolishastingsterm > uniform ())
+        {
+          unsigned int t = mChainid.at(ci);
+          mChainid.at(ci) = mChainid.at(cj); 
+          mChainid.at(cj) = t;
+        }
+//    {
+//
+//      swapptr = C[ci];
+//      C[ci] = C[cj];
+//      C[cj] = swapptr;
+//      if (ci < cj)
+//
+//      {
+//        swapcount[ci][cj]++;
+//      }
+//      else
+//      {
+//        swapcount[cj][ci]++;
+//      }
+//      if ((ci == 0 && cj == 1) || (ci == 1 && cj == 0))
+//        sw01++;
+//      if ((ci == 1 && cj == 2) || (ci == 2 && cj == 1))
+//        sw12++;
+//      if (ci == 0 || cj == 0)
+//        swap0ok |= 1;
+//    }
+  }
+  return 0;
+}
+}
+@
+
+\subsection{ChainManager}
+<<tuxChainManager.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXCHAINMANAGER_H_
+#define _TUXCHAINMANAGER_H_
+#include <vector>
+#include "tuxChain.h"
+using namespace std;
+namespace tux {
+class Chain;
+class ChainManager {
+public:
+  vector<Chain*> mChain;
+public:
+  ChainManager ();
+  void createChain (unsigned int);
+  ~ChainManager ();
+  void step (unsigned int);
+  void setChainid (unsigned int, unsigned int);
+  void setChainid (vector<unsigned int>& v);
+  void chainid (vector<unsigned int>&);
+  void likelihoodPrior (vector<double>&);
+
+  struct c_unique {
+    Chain* operator() () {return new Chain;}
+  } uniqueChain;
+
+  struct c_step {
+    unsigned int n;
+    void operator() (Chain *i) { i->step (n);}
+  } stepChain;
+
+//  struct c_setStep {
+//    unsigned int mStep;
+//    void operator() (Chain *i) { i->mStep = mStep;}
+//  } setStepChain;
+};
+}
+#endif // _TUXCHAINMANAGER_H_
+
+<<tuxChainManager.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cassert>
+#include "tuxChain.h"
+#include "tuxChainManager.h"
+#include "ezlogger_headers.hpp"
+using namespace std;
+namespace tux {
+
+template <typename T>
+void delete_pointed_to (T* p)
+{
+  delete p;
+}
+ChainManager::ChainManager ()
+{
+}
+void 
+ChainManager::createChain (unsigned int n)
+{
+  mChain.resize (n);
+  generate (mChain.begin(), mChain.end(), uniqueChain);
+}
+ChainManager::~ChainManager ()
+{
+  for_each (mChain.begin(), mChain.end(), delete_pointed_to<Chain>);
+}
+void 
+ChainManager::step (unsigned int n)
+{
+  // Send step messages to all of the managed chains. 
+  stepChain.n = n;
+//  for_each (mChain.begin(), mChain.end(), setStepChain);
+  for_each (mChain.begin(), mChain.end(), stepChain);
+  return;
+}
+void 
+ChainManager::setChainid (unsigned int s, unsigned int e)
+{
+  cout << "s: " << s << ", e: " << e << ", size: " << mChain.size() << endl;
+  assert (e - s + 1 == mChain.size());
+  vector<Chain*>::iterator iter1;
+  unsigned int i = 0;
+  for (iter1 = mChain.begin();
+       iter1 != mChain.end();
+       iter1++)
+    {
+      (*iter1)->chainid = s + i;
+      i++;
+    }
+}
+void 
+ChainManager::setChainid (vector<unsigned int>& v)
+{
+  assert (v.size() == mChain.size());
+  vector<Chain*>::iterator iter1;
+  vector<unsigned int>::iterator iter2;
+  for (iter1 = mChain.begin(), iter2 = v.begin();
+       iter1 != mChain.end();
+       iter1++, iter2++)
+    {
+      (*iter1)->chainid = *iter2;
+    }
+}
+void 
+ChainManager::chainid (vector<unsigned int>& v)
+{
+  vector<Chain*>::iterator iter1;
+  for (iter1 = mChain.begin();
+       iter1 != mChain.end();
+       iter1++)
+    {
+      v.push_back((*iter1)->chainid);
+    }
+}
+void 
+ChainManager::likelihoodPrior (vector<double>& v)
+{
+  vector<Chain*>::iterator iter1;
+  for (iter1 = mChain.begin();
+       iter1 != mChain.end();
+       iter1++)
+    {
+      v.push_back((*iter1)->likelihoodPrior);
+    }
+}
+}
+@
+
+\subsection{Chain}
+<<tuxChain.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXCHAIN_H_
+#define _TUXCHAIN_H_
+namespace tux {
+class Chain {
+public:
+  unsigned int chainid;
+  double likelihoodPrior;
+  double mBeta;
+  unsigned int mStep;
+public:
+  Chain ();
+  void step (unsigned int n = 0);
+};
+}
+#endif // _TUXCHAIN_H_
+
+<<tuxChain.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <cassert>
+#include "tuxChain.h"
+using namespace std;
+namespace tux {
+Chain::Chain ()
+{
+  mBeta = 1; 
+  mStep = 0;
+  likelihoodPrior = 0;
+}
+void 
+Chain::step (unsigned int n)
+{
+  assert (n > 0);
+  cout << chainid << ":";
+  for (unsigned int i = 0; i < n; i++, mStep++)
+    {
+      cout << " " << mStep;
+    }
+  cout << endl;
+  return;
+}
+}
+@
+
+\subsection{RandomVariable}
+<<tuxRandomVariable.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXRANDOMVARIABLE_H_
+#define _TUXRANDOMVARIABLE_H_
+namespace tux {
+class RandomVariable {
+public:
+  void full ();
+};
+}
+#endif // _TUXRANDOMVARIABLE_H_
+
+<<tuxRandomVariable.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxRandomVariable.h"
+using namespace std;
+namespace tux {
+void 
+RandomVariable::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Parameter}
+<<tuxParameter.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXPARAMETER_H_
+#define _TUXPARAMETER_H_
+namespace tux {
+class Parameter {
+public:
+  void full ();
+};
+}
+#endif // _TUXPARAMETER_H_
+
+<<tuxParameter.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxParameter.h"
+using namespace std;
+namespace tux {
+void 
+Parameter::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Data}
+<<tuxData.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXDATA_H_
+#define _TUXDATA_H_
+namespace tux {
+class Data {
+public:
+  void full ();
+};
+}
+#endif // _TUXDATA_H_
+
+<<tuxData.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxData.h"
+using namespace std;
+namespace tux {
+void 
+Data::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{System}
+<<tuxSystem.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSYSTEM_H_
+#define _TUXSYSTEM_H_
+namespace tux {
+class System {
+public:
+  void full ();
+};
+}
+#endif // _TUXSYSTEM_H_
+
+<<tuxSystem.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxSystem.h"
+using namespace std;
+namespace tux {
+void 
+System::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Probability}
+<<tuxProbability.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXPROBABILITY_H_
+#define _TUXPROBABILITY_H_
+namespace tux {
+class Probability {
+public:
+  void full ();
+};
+}
+#endif // _TUXPROBABILITY_H_
+
+<<tuxProbability.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxProbability.h"
+using namespace std;
+namespace tux {
+void 
+Probability::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Likelihood}
+<<tuxLikelihood.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXLIKELIHOOD_H_
+#define _TUXLIKELIHOOD_H_
+namespace tux {
+class Likelihood {
+public:
+  void full ();
+};
+}
+#endif // _TUXLIKELIHOOD_H_
+
+<<tuxLikelihood.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxLikelihood.h"
+using namespace std;
+namespace tux {
+void 
+Likelihood::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Mover}
+<<tuxMover.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMOVER_H_
+#define _TUXMOVER_H_
+namespace tux {
+class Mover {
+public:
+  void full ();
+};
+}
+#endif // _TUXMOVER_H_
+
+<<tuxMover.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxMover.h"
+using namespace std;
+namespace tux {
+void 
+Mover::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{MoverTxBoundaries}
+<<tuxMoverTxBoundaries.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMOVERTXBOUNDARIES_H_
+#define _TUXMOVERTXBOUNDARIES_H_
+namespace tux {
+class MoverTxBoundaries {
+public:
+  void full ();
+};
+}
+#endif // _TUXMOVERTXBOUNDARIES_H_
+
+<<tuxMoverTxBoundaries.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxMoverTxBoundaries.h"
+using namespace std;
+namespace tux {
+void 
+MoverTxBoundaries::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{MoverTxExpression}
+<<tuxMoverTxExpression.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMOVERTXEXPRESSION_H_
+#define _TUXMOVERTXEXPRESSION_H_
+namespace tux {
+class MoverTxExpression {
+public:
+  void full ();
+};
+}
+#endif // _TUXMOVERTXEXPRESSION_H_
+
+<<tuxMoverTxExpression.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxMoverTxExpression.h"
+using namespace std;
+namespace tux {
+void 
+MoverTxExpression::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Summarizer}
+<<tuxSummarizer.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSUMMARIZER_H_
+#define _TUXSUMMARIZER_H_
+namespace tux {
+class Summarizer {
+public:
+  void full ();
+};
+}
+#endif // _TUXSUMMARIZER_H_
+
+<<tuxSummarizer.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxSummarizer.h"
+using namespace std;
+namespace tux {
+void 
+Summarizer::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Summary}
+<<tuxSummary.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSUMMARY_H_
+#define _TUXSUMMARY_H_
+namespace tux {
+class Summary {
+public:
+  void full ();
+};
+}
+#endif // _TUXSUMMARY_H_
+
+<<tuxSummary.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxSummary.h"
+using namespace std;
+namespace tux {
+void 
+Summary::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{TxBoundaries}
+<<tuxTxBoundaries.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXTXBOUNDARIES_H_
+#define _TUXTXBOUNDARIES_H_
+namespace tux {
+class TxBoundaries {
+public:
+  void full ();
+};
+}
+#endif // _TUXTXBOUNDARIES_H_
+
+<<tuxTxBoundaries.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxTxBoundaries.h"
+using namespace std;
+namespace tux {
+void 
+TxBoundaries::full ()
+{
+  return;
+}
+}
+@
+
+
+
+\subsection{TxExpression}
+<<tuxTxExpression.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXTXEXPRESSION_H_
+#define _TUXTXEXPRESSION_H_
+namespace tux {
+class TxExpression {
+public:
+  void full ();
+};
+}
+#endif // _TUXTXEXPRESSION_H_
+
+<<tuxTxExpression.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxTxExpression.h"
+using namespace std;
+namespace tux {
+void 
+TxExpression::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Reads}
+<<tuxReads.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXREADS_H_
+#define _TUXREADS_H_
+namespace tux {
+class Reads {
+public:
+  void full ();
+};
+}
+#endif // _TUXREADS_H_
+
+<<tuxReads.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxReads.h"
+using namespace std;
+namespace tux {
+void 
+Reads::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{Xyz}
+<<tuxXyz.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXXYZ_H_
+#define _TUXXYZ_H_
+namespace tux {
+class Xyz {
+public:
+  void full ();
+};
+}
+#endif // _TUXXYZ_H_
+
+<<tuxXyz.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxXyz.h"
+using namespace std;
+namespace tux {
+void 
+Xyz::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{GNU Readline Library}
+<<config.h.in>>=
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
+
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+#cmakedefine HAVE_MALLOC_H 1
+#cmakedefine HAVE_SYS_FILE_H
+#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_STRING_H
+#cmakedefine HAVE_STDLIB_H
+
+#endif /* _CONFIG_H_ */
+
+<<fileman.cpp>>=
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif 
+
+#include "rlstdc.h"
+
+#include <sys/types.h>
+#ifdef HAVE_SYS_FILE_H
+#  include <sys/file.h>
+#endif
+#include <sys/stat.h>
+
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
+#include <fcntl.h>
+#include <stdio.h>
+#include <errno.h>
+
+#if defined (HAVE_STRING_H)
+#  include <string.h>
+#else /* !HAVE_STRING_H */
+#  include <strings.h>
+#endif /* !HAVE_STRING_H */
+
+#ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
+
+#include <time.h>
+
+#include "xmalloc.h"
+
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
+// extern char *xmalloc PARAMS((size_t));
+
+/* The names of functions that actually do the manipulation. */
+int com_list PARAMS((char *));
+int com_view PARAMS((char *));
+int com_rename PARAMS((char *));
+int com_stat PARAMS((char *));
+int com_pwd PARAMS((char *));
+int com_delete PARAMS((char *));
+int com_help PARAMS((char *));
+int com_cd PARAMS((char *));
+int com_quit PARAMS((char *));
+
+/* A structure which contains information on the commands this program
+   can understand. */
+
+typedef struct {
+  char *name;			/* User printable name of the function. */
+  rl_icpfunc_t *func;		/* Function to call to do the job. */
+  char *doc;			/* Documentation for this function.  */
+} COMMAND;
+
+COMMAND commands[] = {
+  { "cd", com_cd, "Change to directory DIR" },
+  { "delete", com_delete, "Delete FILE" },
+  { "help", com_help, "Display this text" },
+  { "?", com_help, "Synonym for `help'" },
+  { "list", com_list, "List files in DIR" },
+  { "ls", com_list, "Synonym for `list'" },
+  { "pwd", com_pwd, "Print the current working directory" },
+  { "quit", com_quit, "Quit using Fileman" },
+  { "rename", com_rename, "Rename FILE to NEWNAME" },
+  { "stat", com_stat, "Print out statistics on FILE" },
+  { "view", com_view, "View the contents of FILE" },
+  { (char *)NULL, (rl_icpfunc_t *)NULL, (char *)NULL }
+};
+
+/* Forward declarations. */
+char *stripwhite (char *string);
+COMMAND* find_command (char *name);
+void too_dangerous (char *caller);
+void initialize_readline ();
+int execute_line (char *line);
+int valid_argument (char *caller, char *arg);
+
+/* The name of this program, as taken from argv[0]. */
+char *progname;
+
+/* When non-zero, this global means the user is done using this program. */
+int done;
+
+char *
+dupstr (char *s)
+{
+  char *r;
+
+  r = (char *) xmalloc (strlen (s) + 1);
+  strcpy (r, s);
+  return (r);
+}
+
+int
+main (int argc, char **argv)
+{
+  char *line, *s;
+
+  progname = argv[0];
+  if (argc == 1) { }
+
+  initialize_readline ();	/* Bind our completer. */
+
+  /* Loop reading and executing lines until the user quits. */
+  for ( ; done == 0; )
+    {
+      line = readline ("FileMan: ");
+
+      if (!line)
+        break;
+
+      /* Remove leading and trailing whitespace from the line.
+         Then, if there is anything left, add it to the history list
+         and execute it. */
+      s = stripwhite (line);
+
+      if (*s)
+        {
+          add_history (s);
+          execute_line (s);
+        }
+
+      free (line);
+    }
+  exit (0);
+}
+
+/* Execute a command line. */
+int
+execute_line (char *line)
+{
+  register int i;
+  COMMAND *command;
+  char *word;
+
+  /* Isolate the command word. */
+  i = 0;
+  while (line[i] && whitespace (line[i]))
+    i++;
+  word = line + i;
+
+  while (line[i] && !whitespace (line[i]))
+    i++;
+
+  if (line[i])
+    line[i++] = '\0';
+
+  command = find_command (word);
+
+  if (!command)
+    {
+      fprintf (stderr, "%s: No such command for FileMan.\n", word);
+      return (-1);
+    }
+
+  /* Get argument to command, if any. */
+  while (whitespace (line[i]))
+    i++;
+
+  word = line + i;
+
+  /* Call the function. */
+  return ((*(command->func)) (word));
+}
+
+/* Look up NAME as the name of a command, and return a pointer to that
+   command.  Return a NULL pointer if NAME isn't a command name. */
+COMMAND *
+find_command (char *name)
+{
+  register int i;
+
+  for (i = 0; commands[i].name; i++)
+    if (strcmp (name, commands[i].name) == 0)
+      return (&commands[i]);
+
+  return ((COMMAND *)NULL);
+}
+
+/* Strip whitespace from the start and end of STRING.  Return a pointer
+   into STRING. */
+char *
+stripwhite (char *string)
+{
+  register char *s, *t;
+
+  for (s = string; whitespace (*s); s++)
+    ;
+    
+  if (*s == 0)
+    return (s);
+
+  t = s + strlen (s) - 1;
+  while (t > s && whitespace (*t))
+    t--;
+  *++t = '\0';
+
+  return s;
+}
+
+/* **************************************************************** */
+/*                                                                  */
+/*                  Interface to Readline Completion                */
+/*                                                                  */
+/* **************************************************************** */
+
+char *command_generator PARAMS((const char *, int));
+char **fileman_completion PARAMS((const char *, int, int));
+
+/* Tell the GNU Readline library how to complete.  We want to try to complete
+   on command names if this is the first word in the line, or on filenames
+   if not. */
+void
+initialize_readline ()
+{
+  /* Allow conditional parsing of the ~/.inputrc file. */
+  rl_readline_name = "FileMan";
+
+  /* Tell the completer that we want a crack first. */
+  rl_attempted_completion_function = fileman_completion;
+}
+
+/* Attempt to complete on the contents of TEXT.  START and END bound the
+   region of rl_line_buffer that contains the word to complete.  TEXT is
+   the word to complete.  We can use the entire contents of rl_line_buffer
+   in case we want to do some simple parsing.  Return the array of matches,
+   or NULL if there aren't any. */
+char **
+fileman_completion (const char *text, int start, int end)
+{
+  char **matches;
+
+  if (end == 0) {}
+
+  matches = (char **)NULL;
+
+  /* If this word is at the start of the line, then it is a command
+     to complete.  Otherwise it is the name of a file in the current
+     directory. */
+  if (start == 0)
+    matches = rl_completion_matches (text, command_generator);
+
+  return (matches);
+}
+
+/* Generator function for command completion.  STATE lets us know whether
+   to start from scratch; without any state (i.e. STATE == 0), then we
+   start at the top of the list. */
+char *
+command_generator (const char *text, int state)
+{
+  static int list_index, len;
+  char *name;
+
+  /* If this is a new word to complete, initialize now.  This includes
+     saving the length of TEXT for efficiency, and initializing the index
+     variable to 0. */
+  if (!state)
+    {
+      list_index = 0;
+      len = strlen (text);
+    }
+
+  /* Return the next name which partially matches from the command list. */
+  name = commands[list_index].name;
+  while (name) 
+    {
+      list_index++;
+
+      if (strncmp (name, text, len) == 0)
+        return (dupstr(name));
+      name = commands[list_index].name;
+    }
+
+  /* If no names matched, then return NULL. */
+  return ((char *)NULL);
+}
+
+/* **************************************************************** */
+/*                                                                  */
+/*                       FileMan Commands                           */
+/*                                                                  */
+/* **************************************************************** */
+
+/* String to pass to system ().  This is for the LIST, VIEW and RENAME
+   commands. */
+static char syscom[1024];
+
+/* List the file(s) named in arg. */
+int
+com_list (char *arg)
+{
+  if (!arg)
+    arg = "";
+
+  sprintf (syscom, "ls -FClg %s", arg);
+  return (system (syscom));
+}
+
+int 
+com_view (char *arg)
+{
+  if (!valid_argument ("view", arg))
+    return 1;
+
+#if defined (__MSDOS__)
+  /* more.com doesn't grok slashes in pathnames */
+  sprintf (syscom, "less %s", arg);
+#else
+  sprintf (syscom, "more %s", arg);
+#endif
+  return (system (syscom));
+}
+
+int
+com_rename (char *arg)
+{
+#if defined (__MSDOS__)
+  /* more.com doesn't grok slashes in pathnames */
+  sprintf (syscom, "rename %s", arg);
+#else
+  sprintf (syscom, "rename %s", arg);
+#endif
+  too_dangerous (syscom);
+  return (1);
+}
+
+int
+com_stat (char *arg)
+{
+  struct stat finfo;
+
+  if (!valid_argument ("stat", arg))
+    return (1);
+
+  if (stat (arg, &finfo) == -1)
+    {
+      perror (arg);
+      return (1);
+    }
+
+  printf ("Statistics for `%s':\n", arg);
+
+  printf ("%s has %d link%s, and is %d byte%s in length.\n",
+	  arg,
+          finfo.st_nlink,
+          (finfo.st_nlink == 1) ? "" : "s",
+          (int) finfo.st_size,
+          (finfo.st_size == 1) ? "" : "s");
+  printf ("Inode Last Change at: %s", ctime (&finfo.st_ctime));
+  printf ("      Last access at: %s", ctime (&finfo.st_atime));
+  printf ("    Last modified at: %s", ctime (&finfo.st_mtime));
+  return (0);
+}
+
+int
+com_delete (char *arg)
+{
+#if defined (__MSDOS__)
+  /* more.com doesn't grok slashes in pathnames */
+  sprintf (syscom, "delete %s", arg);
+#else
+  sprintf (syscom, "delete %s", arg);
+#endif
+  too_dangerous (syscom);
+  return (1);
+}
+
+/* Print out help for ARG, or for all of the commands if ARG is
+   not present. */
+int
+com_help (char *arg)
+{
+  register int i;
+  int printed = 0;
+
+  for (i = 0; commands[i].name; i++)
+    {
+      if (!*arg || (strcmp (arg, commands[i].name) == 0))
+        {
+          printf ("%s\t\t%s.\n", commands[i].name, commands[i].doc);
+          printed++;
+        }
+    }
+
+  if (!printed)
+    {
+      printf ("No commands match `%s'.  Possibilties are:\n", arg);
+
+      for (i = 0; commands[i].name; i++)
+        {
+          /* Print in six columns. */
+          if (printed == 6)
+            {
+              printed = 0;
+              printf ("\n");
+            }
+
+          printf ("%s\t", commands[i].name);
+          printed++;
+        }
+
+      if (printed)
+        printf ("\n");
+    }
+  return (0);
+}
+
+/* Change to the directory ARG. */
+int
+com_cd (char *arg)
+{
+  if (chdir (arg) == -1)
+    {
+      perror (arg);
+      return 1;
+    }
+
+  com_pwd ("");
+  return (0);
+}
+
+/* Print out the current working directory. */
+int
+com_pwd (char *ignore)
+{
+  char dir[1024], *s;
+
+  s = getcwd (dir, sizeof(dir) - 1);
+  if (s == 0)
+    {
+      printf ("Error getting pwd: %s %s\n", dir, ignore);
+      return 1;
+    }
+
+  printf ("Current directory is %s %s\n", dir, ignore);
+  return 0;
+}
+
+/* The user wishes to quit using this program.  Just set DONE non-zero. */
+int
+com_quit (char *arg)
+{
+#if defined (__MSDOS__)
+  /* more.com doesn't grok slashes in pathnames */
+  sprintf (syscom, "quit %s", arg);
+#else
+  sprintf (syscom, "quit %s", arg);
+#endif
+  done = 1;
+  return (0);
+}
+
+/* Function which tells you that you can't do this. */
+void
+too_dangerous (char *caller)
+{
+  fprintf (stderr,
+           "%s: Too dangerous for me to distribute.  Write it yourself.\n",
+           caller);
+}
+
+/* Return non-zero if ARG is a valid argument for CALLER, else print
+   an error message and return zero. */
+int
+valid_argument (char *caller, char *arg)
+{
+  if (!arg || !*arg)
+    {
+      fprintf (stderr, "%s: Argument required.\n", caller);
+      return (0);
+    }
+
+  return (1);
+}
+@
+
+
+\end{document}

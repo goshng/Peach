@@ -1,0 +1,3 @@
+#!/bin/bash
+asciidoc -a toc doc/Manual
+lynx doc/Manual.html

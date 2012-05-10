@@ -1,0 +1,76 @@
+Transcript Boundaries Uncertainty
+=================================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+tux
+
+Commands
+--------
+
+tux -h --help 
+shows an on-line help message.
+
+tux
+runs in an interactive mode
+
+tux help
+shows an on-line help message.
+
+tux model -h or --help
+shows an on-line help message for model command
+
+tux mcmc -h or --help
+shows an on-line help message for mcmc command
+
+tux summarize -h or --help
+shows an on-line help message for summarize command
+
+tux save -h or --help
+shows an on-line help message for save command
+
+tux load -h or --help
+shows an on-line help message for load command
+
+tux --version
+shows the version of tux
+
+
+Resources
+---------
+
+CMake
+~~~~~
+.CMake Tutorials
+----
+http://www-flc.desy.de/ldcoptimization/documents/talks/CMake_Tutorial.pdf
+http://www.cmake.org/Wiki/CMake_FAQ
+http://www.cmake.org/Wiki/CMake/Tutorials/Exporting_and_Importing_Targets
+----
+
+.CMake installation directory
+----
+/Applications/CMake\ 2.8-8.app/Contents/share/cmake-2.8/Modules/
+----
+
+
+Resources
+---------
+
+CMake
+~~~~~
+.CMake Tutorials
+----
+http://www-flc.desy.de/ldcoptimization/documents/talks/CMake_Tutorial.pdf
+http://www.cmake.org/Wiki/CMake_FAQ
+http://www.cmake.org/Wiki/CMake/Tutorials/Exporting_and_Importing_Targets
+----
+
+.CMake installation directory
+----
+/Applications/CMake\ 2.8-8.app/Contents/share/cmake-2.8/Modules/
+----
+
+.CMake and Open MPI
+----
+http://eothred.wordpress.com/2010/02/25/hello-world-cmakeopenmpi/
+----
