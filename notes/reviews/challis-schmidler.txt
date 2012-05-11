@@ -1,0 +1,36 @@
+The revision of the manuscript, MBE-11-1006, has been greatly improved in its
+clarity of the exposition. I do not have major concerns, but have minor
+comments and typos. It would have been great if the authors wrote changes in the
+revision in bold font.
+
+Page 4 (Lines 41-43): 3d -> 3D or three dimensional
+
+Page 12 (Lines 57-59) - Page 13 (Lines 1-28): The authors did two sets of
+simulations: one without insertion and deletion, and the other with them. They,
+then, applied their structure-sequence inference to either of them. Around Page
+13 (Lines 15-16), they refer to the first set of simulation as ``when alignment
+is known'' and the second set of simulation as ``when alignment uncertainty is
+accounted for.'' These references seem to be confusing because they are not
+contrasted. If one is referred to as ``alignment is known'', then the other
+could be referred to as ``alignment is unknown.'' Or, the first set could be
+referred to as ``alignment uncertainty is not accounted for''. It is more
+confusing because readers would have to guess whether the same inferrence
+procedure of sequence-structure inferences were applied to both of the sets of
+simulation data sets, or somewhat different inference procedures were applied.
+From the paragraph at the top of Page 13, it seems that the same procedure is
+applied to both of the two sets. It may not be the case after reading the
+paragraph. 
+
+Page 13 (Lines 46-52): This has the same issues above as Page 13 (Lines 1-28).
+
+Page 14 (Lines 30-32): ``Around t=2'' of Figure 2A or 2B?
+
+Page 14 (Lines 56-58) - Page 15 (Lines 25-27): The authors write that
+``consistent with the results obtained by Hein et al. (2000) for shorter
+evoltuionary distrances.'' But, Figure 3B is consistent with the Hein's
+estimate whereas Figures 3A and 3C are not. Furthermore, Figure 3B is for sea
+cucumber, which is between lamprey and clam in evolutionary distances.  
+
+
+
+
