@@ -212,7 +212,7 @@ where we assume that segments be expressed independently of one another.
 We define the posterior probability
 \begin_inset Formula 
 \[
-\Pr(\bm{s},\bm{\mu}\mid\bm{X})=\frac{\Pr(\bm{X}\mid\bm{s},\bm{\mu})\Pr(\bm{\mu}\mid\bm{l})\Pr(\bm{s})}{\Pr(\bm{X})}
+\Pr(\bm{s},\bm{\mu}\mid\bm{X})=\frac{\Pr(\bm{X}\mid\bm{s},\bm{\mu})\Pr(\bm{\mu}\mid s)\Pr(\bm{s})}{\Pr(\bm{X})}
 \]
 
 \end_inset
@@ -298,7 +298,7 @@ where we choose
 
 \begin_layout Standard
 We start with an initial random value of 
-\begin_inset Formula $\bm{l}^{(0)}$
+\begin_inset Formula $\bm{s}^{(0)}$
 \end_inset
 
  and 

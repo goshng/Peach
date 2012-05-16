@@ -45,7 +45,9 @@ CPPFILE=( tux.cpp \
           tuxData.cpp \
           tuxSystem.cpp \
           tuxProbability.cpp \
+          tuxProbTxBoundaries.cpp \
           tuxLikelihood.cpp \
+          tuxMoverManager.cpp \
           tuxMover.cpp \
           tuxMoverTxBoundaries.cpp \
           tuxMoverTxExpression.cpp \
@@ -64,7 +66,9 @@ HPPFILE=( tuxManager.h \
           tuxData.h \
           tuxSystem.h \
           tuxProbability.h \
+          tuxProbTxBoundaries.h \
           tuxLikelihood.h \
+          tuxMoverManager.h \
           tuxMover.h \
           tuxMoverTxBoundaries.h \
           tuxMoverTxExpression.h \
@@ -75,6 +79,7 @@ HPPFILE=( tuxManager.h \
           tuxReads.h \
           tuxMcmc.h \
           tuxChainManager.h \
+          gtypes.h \
           tuxChain.h )
 notangle -RCMakeLists.txt $NOWEBFILE > $OUTSRC/CMakeLists.txt
 

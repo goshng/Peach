@@ -2,6 +2,7 @@
 \usepackage[T1]{fontenc}                                                        
 \usepackage[latin9]{inputenc}                                                   
 \usepackage{mdwlist}           % less spaces between items
+\usepackage{bm}                % bold math letters
 \usepackage{noweb}
 \usepackage{fancyvrb}
 \usepackage[letterpaper]{geometry}
@@ -15,6 +16,7 @@
 \newcommand{\Cmethod}[1]{method \textit{#1}}
 \newcommand{\Cpackage}[1]{package \textit{#1}}
 \newcommand{\program}[1]{\texttt{#1}}
+\newcommand{\Cfile}[1]{\texttt{#1}}
 
 \begin{document}
 \raggedright
@@ -64,6 +66,10 @@ would swap chains by receciving necessary values from \Cclass{ChainManager}.
 
 Members of \Cclass{Manager}:
 \begin{enumerate*}
+\item Data member
+\item mNumberProcess; The program should know the number of CPUs to create
+resources for jobs.
+\item Method
 \item void show();
 \item void model();
 \item void mcmc(int r = 0); a main MCMC loop. 
@@ -169,7 +175,142 @@ the list of chains
 \end{enumerate*}
 
 Members of \Cclass{Chain}:
+\begin{enumerate*}
+\item Data Member:
+\item unsigned int chainid; the ID of a chain
+\item double likelihoodPrior; the sum of likelihood and prior
+\item double mBeta; the temperature 
+\item unsigned int mStep; the number of steps
+\item Parameter* mTxBoundaries; a set of transcript boundaries
+\item Parameter* mTxExpression; a set of transcript expression
+\item Data* mTxData; a set of short reads alignment data
+\end{enumerate*}
 
+The chain uses \Cclass{Probability} and \Cclass{RandomVariable} to change the
+value of \Cclass{Parameter}. The \Cclass{Data} is a \Cclass{RandomVariable} that
+does not change its value. The \Cclass{Probability} is not a part of the chain. 
+The chain must contain objects of \Cclass{RandomVariable}. The \Cclass{Mover} is
+applied to \Cclass{ChainManager} or \Cclass{Mcmc}. The \Cclass{Chain} may have
+access to \Cclass{Mover}. There are multiple possible movers of parameters. The
+\Cclass{Chain} is manipulated to switch from one mover to another. Each step
+multiple movers are chosen to be applied to \Cclass{Chain}. The \Cclass{Mover}
+may have access to \Cclass{Probability}: it could use some \Cclass{Probability}
+to replace a current state of \Cclass{Parameter} with another. The
+\Cclass{Chain} has an object of \Cclass{MoverManager}, which manages several
+\Cclass{Mover} objects. The \Cclass{MoverManager} is operational in that it
+returns a \Cclass{Mover} among the set of \Cclass{Mover} objects with
+multinomial probability.
+
+Members of \Cclass{MoverManager}:
+\begin{enumerate*}
+\item Data Member:
+\item vector<Mover*> mMover; a set of \Cclass{Mover} objects.
+The \Cclass{MoverManager} owns the \Cclass{Mover} object elements in
+\Cmember{mMover}. The \Cmethod{add} allocates the memory of a \Cclass{Mover}
+object. The \Cclass{MoverManager}'s destructor must deallocate the memory.
+\item gsl\_ran\_discrete\_t* mGslRanDiscrete; a lookup tabl for the discrete
+random number generator
+\item Method:
+\item MoverManager (); 
+\item ~MoverManager ();
+\item void add (const unsigned int, const double); a mover of ID with weight
+\item Mover* choose ();
+\end{enumerate*}
+
+A \Cclass{Mover} may contain many different things. We would give an identifier
+for a mover. A mover should be subclassed from the abstract \Cclass{Mover}.  
+
+The \Cclass{Probability} is tightly linked with \Cclass{RandomVariable}. Two
+sets of random variables are considered: one that is concerned, and the other
+that is conditioned. We can sample random variates of the former set from
+\Cclass{Probability}. We can compute the probability density for a specific
+set of random variates. The set of random variables that are conditioned is
+optional. We use \Cclass{Probability} for non-standard valued random variables.
+We would use simpler functions or classes for sampling a random variate from a
+uniform. 
+
+Let us consider usages of \Cclass{Probability}. We want a negative binomial with
+two parameters: mean and variance. The probability of a segment configuration is
+distributed as a uniform with a probability of $\frac{1}{{L-1 \choose K-1}}$
+where $L$ is the length of a genome where we have $K$ segments. A $k$-th segment
+boundary is between $c_{k-1}+1$ and $c_k$ inclusively. The $c_0$ is 0, and $c_K$
+is $L$. We impose a Dirichlet on expression level $\bm{\mu}$. An expression
+level of $k$-th segment is $\mu_k$, which is $\delta_k M$ where $M$ is the total
+expression level of a RNA-seq experiment. We should give a ``very''
+uninformative prior on $\bm{\mu}$ using a set of values $\bm{\alpha}$. We use a
+lagarithmic scale of $\bm{\mu}$. Given the prior we start with $\bm{s}^{(0)}$
+and $\bm{\mu}^{(0)}$. These two values are sampled from each of their prior
+distribution. The boundary value, $\bm{s}^{(0)}$, consists of
+$\{c_{k}\}_{k=1\ldots K-1}$ where $c_k$ is the end position of $k$-th segment.
+We need $K-1$ positive values. The expression value, $\bm{\mu}^{(0)}$, consists
+of $K$ real values. We use $\bm{\delta}^{(0)}$ which is a set of fractions, and
+only need $K-1$ values. We convert them in logarithmic scale. Let us go to
+\Cclass{TxBoundaries} and \Cclass{TxExpression}, which are \Cclass{Parameter},
+which in turn is \Cclass{RandomVariable}. A random variate is created from a
+probability distribution. A class of \Cclass{Probability}, or a probability of a
+set of transcript boundaries, would create an object of \Cclass{TxBoundaries}.
+Let us create a probability of a set of transcript boundaries:
+\Cclass{ProbTxBoundaries}. 
+
+Members of \Cclass{Probability}
+\begin{enumerate*}
+\item Data members:
+\item vector<RandomVariable*> mV; a list of random variables
+\item vector<RandomVariable*> mC; a list of conditioning random variables
+\item
+\item virtual double d () = 0; a value of a probability
+\item virtual RandomVariable* r () = 0; a random variate
+\end{enumerate*}
+
+Members of \Cclass{ProbTxBoundaries}
+\begin{enumerate*}
+\item Data members:
+\item double d (); a value of a probability of a transcipt boundaries
+\item RandomVariable* r (); a random variate of a transcript boundaries
+\end{enumerate*}
+
+Members of \Cclass{RandomVariable}
+\begin{enumerate*}
+\item Data members:
+\end{enumerate*}
+
+Members of \Cclass{Parameter}
+\begin{enumerate*}
+\item Data members:
+\end{enumerate*}
+
+Members of \Cclass{TxBoundaries}
+\begin{enumerate*}
+\item Data members:
+\item vector<unsigned int> mC; the end position of $c_k$ where $k$ runs from 0
+to $K$. $c_0$ is 0, and $c_K$ is $L$. \Cmember{mC} runs from 0 to $K-1$. The
+$0$-th element is $c_1$, and $K-1$-th element is $c_K$. 
+\end{enumerate*}
+The \Cclass{TxBoundaries} object is created by \Cclass{ProbTxBoundaries}.
+
+Members of \Cclass{ProbTxBoundaries}
+\begin{enumerate*}
+\item Data members:
+\item unsigned int mL; the length of a genome
+\item unsigned int mK; the number of segments
+\item Method
+\item double d (); logarithmic value of $1/{(L-1) \choose (K-1)}$
+\item RandomVariable* r (); a random variate of \Cclass{TxBoundaries} object
+\end{enumerate*}
+
+Global variables
+\begin{enumerate*}
+\item const gsl\_rng *gGslRng; the main function calls MPI\_Init function to create
+processes. Prior to that function call we should create as many seeds as
+processes.
+\end{enumerate*}
+
+We borrow \Cfile{gtypes.h} from gnome's \Cfile{glib/gtypes.h}. 
+
+Main function
+\begin{enumerate*}
+\item OPT\_MCMC: creates multiple random seeds using a single seed.
+\end{enumerate*}
 
 \section{Compilation}
 Build a debug version using CMake.
@@ -328,7 +469,9 @@ SET (tux_SRCS
   "tuxData.cpp"
   "tuxSystem.cpp"
   "tuxProbability.cpp"
+  "tuxProbTxBoundaries.cpp"
   "tuxLikelihood.cpp"
+  "tuxMoverManager.cpp"
   "tuxMover.cpp"
   "tuxMoverTxBoundaries.cpp"
   "tuxMoverTxExpression.cpp"
@@ -418,7 +561,10 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DI
 #  include <config.h>
 #endif 
 #include <iostream>
+#include <algorithm>
+#include <vector>
 #include <mpi.h>
+#include <gsl/gsl_rng.h>
 #include "simpleopt/SimpleOpt.h"
 #include "simpleopt/SimpleGlob.h"
 #include "ezlogger_headers.hpp"
@@ -432,14 +578,28 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DI
 
 using namespace std;
 using namespace tux;
-
+gsl_rng* gGslRng;
 <<tux interative>>
 <<command line>>
+
+namespace tux {
+  struct c_gslrng {
+    unsigned long int operator()() {
+      return gsl_ran_get (gGslRng);
+    }
+  } gslrngRandomNumber;
+}
+
 int 
 main (int argc, char* argv[])
 {
   axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_very_rarely);
   EZLOGGERFUNCTRACKER;
+
+  const gsl_rng_type* T;
+  gsl_rng_evn_setup();
+  T = gsl_rng_default;
+  gGslRng = gsl_rng_alloc(T);
 
   // Interactive Mode
   if (argc == 1)
@@ -503,6 +663,8 @@ main (int argc, char* argv[])
         }
     }
   Manager m;
+  m.mNumberProcess = 2;
+  m.mSeed = 100;
   switch (sCommand)
     {
     case OPT_MODEL:
@@ -510,6 +672,10 @@ main (int argc, char* argv[])
       break;
     case OPT_MCMC:
       cout << "Start MCMC ..." << endl;
+      
+      gsl_rng_set(gGslRng,m.mSeed);
+      m.mProcessSeed.resize(m.mNumberProcess); 
+      generate (m.mProcessSeed.begin(), m.mProcessSeed.begin(), gslrngRandomNumber);
 
       int size,rank;
       int length;
@@ -521,18 +687,26 @@ main (int argc, char* argv[])
       MPI_Comm_rank(MPI_COMM_WORLD,&rank);
       MPI_Comm_size(MPI_COMM_WORLD,&size);
       MPI_Get_processor_name(name,&length);
- 
-      if (rank==0) {
-              printf("Hello MPI from the server process!\n");
 
-              for (workerIdx=1; workerIdx<size; workerIdx++) {
-                      MPI_Recv(name, 80, MPI_CHAR, workerIdx, 999, MPI_COMM_WORLD, &status);
-                      printf("Hello MPI!\n");
-                      printf(" message from %d of %d on %s\n", workerIdx, size, name);
-              }
-      } else {
-              MPI_Send(name,80,MPI_CHAR,0,999,MPI_COMM_WORLD);
-      }
+      if (rank==0) 
+        {
+          printf("Hello MPI from the server process!\n");
+
+          for (workerIdx=1; workerIdx<size; workerIdx++) 
+            {
+              MPI_Recv(name, 80, MPI_CHAR, workerIdx, 999, MPI_COMM_WORLD, &status);
+              printf("Hello MPI!\n");
+              printf(" message from %d of %d on %s\n", workerIdx, size, name);
+            }
+        } 
+      else 
+        {
+          MPI_Send(name,80,MPI_CHAR,0,999,MPI_COMM_WORLD);
+        }
+
+      // Now we are in one of the processes.
+      // Reset the gGslRng.
+      gsl_rng_set(gGslRng,m.mProcessSeed.at(rank));
 
       m.mcmc (rank); // MCMC Command
 
@@ -544,6 +718,7 @@ main (int argc, char* argv[])
       break;
     }
 
+  gsl_rng_free (gGslRng);
   return 0;
 }
 @
@@ -1370,6 +1545,85 @@ int main(int argc, char**argv)
 }
 @
 
+\subsection{Types}
+<<gtypes.h>>=
+<<tux gnu copyright>>
+#ifndef __G_TYPES_H__
+#define __G_TYPES_H__
+
+#include <config.h>
+
+__BEGIN_DECLS
+
+/* Provide type definitions for commonly used types.
+ * These are useful because a "gint8" can be adjusted
+ * to be 1 byte (8 bits) on all platforms. Similarly and
+ * more importantly, "gint32" can be adjusted to be
+ * 4 bytes (32 bits) on all platforms.
+ */
+
+typedef char   gchar;
+typedef short  gshort;
+typedef int    gint;
+typedef long   glong;
+typedef gint   gboolean;
+
+typedef unsigned char   guchar;
+typedef unsigned short  gushort;
+typedef unsigned int    guint;
+typedef unsigned long   gulong;
+
+typedef float   gfloat;
+typedef double  gdouble;
+
+typedef signed char gint8;
+typedef unsigned char guint8;
+typedef signed short gint16;
+typedef unsigned short guint16;
+typedef signed int gint32;
+typedef unsigned int guint32;
+typedef signed long gint64;
+typedef unsigned long guint64;
+
+/* Define min and max constants for the fixed size numerical types */
+#define G_MININT8	((gint8)  0x80)
+#define G_MAXINT8	((gint8)  0x7f)
+#define G_MAXUINT8	((guint8) 0xff)
+
+#define G_MININT16	((gint16)  0x8000)
+#define G_MAXINT16	((gint16)  0x7fff)
+#define G_MAXUINT16	((guint16) 0xffff)
+
+#define G_MININT32	((gint32)  0x80000000)
+#define G_MAXINT32	((gint32)  0x7fffffff)
+#define G_MAXUINT32	((guint32) 0xffffffff)
+
+/* Portable endian checks and conversions
+ *
+ * glibconfig.h defines G_BYTE_ORDER which expands to one of
+ * the below macros.
+ */
+#define G_LITTLE_ENDIAN 1234
+#define G_BIG_ENDIAN    4321
+#define G_PDP_ENDIAN    3412		/* unused, need specific PDP check */	
+
+
+/* Basic bit swapping functions
+ */
+#define GUINT16_SWAP_LE_BE_CONSTANT(val)	((guint16) ( \
+    (guint16) ((guint16) (val) >> 8) |	\
+    (guint16) ((guint16) (val) << 8)))
+
+#define GUINT32_SWAP_LE_BE_CONSTANT(val)	((guint32) ( \
+    (((guint32) (val) & (guint32) 0x000000ffU) << 24) | \
+    (((guint32) (val) & (guint32) 0x0000ff00U) <<  8) | \
+    (((guint32) (val) & (guint32) 0x00ff0000U) >>  8) | \
+    (((guint32) (val) & (guint32) 0xff000000U) >> 24)))
+
+__END_DECLS
+#endif /* __G_TYPES_H__ */
+@
+
 \subsection{Manager}
 <<tuxManager.h>>=
 <<tux gnu copyright>>
@@ -1381,6 +1635,10 @@ int main(int argc, char**argv)
 using namespace std;
 namespace tux {
 class Manager {
+public:
+  unsigned int mNumberProcess;
+  unsigned long int mSeed;
+  vector<unsigned long int> mProcessSeed;
 public:
   void show();
   void model();
@@ -2060,15 +2318,24 @@ ChainManager::likelihoodPrior (vector<double>& v)
 <<tux gnu copyright>>
 #ifndef _TUXCHAIN_H_
 #define _TUXCHAIN_H_
+#include <vector>
+#include "tuxMoverManager.h"
 namespace tux {
+class Parameter;
+class Data;
 class Chain {
 public:
   unsigned int chainid;
   double likelihoodPrior;
   double mBeta;
   unsigned int mStep;
+  Parameter* mTxBoundaries;
+  Parameter* mTxExpression;
+  Data* mTxData;
+  MoverManager mMoverManager;
 public:
   Chain ();
+  ~Chain ();
   void step (unsigned int n = 0);
 };
 }
@@ -2078,6 +2345,8 @@ public:
 <<tux gnu copyright>>
 #include <iostream>
 #include <cassert>
+#include "tuxMover.h"
+#include "tuxMoverManager.h"
 #include "tuxChain.h"
 using namespace std;
 namespace tux {
@@ -2087,6 +2356,9 @@ Chain::Chain ()
   mStep = 0;
   likelihoodPrior = 0;
 }
+Chain::~Chain ()
+{
+}
 void 
 Chain::step (unsigned int n)
 {
@@ -2095,6 +2367,11 @@ Chain::step (unsigned int n)
   for (unsigned int i = 0; i < n; i++, mStep++)
     {
       cout << " " << mStep;
+      Mover* m = mMoverManager.choose ();
+      // The Mover m needs to get RandomVariables from Chain.
+      // We need to access members of MoverTxBoundaries.
+      // 
+      m->step ();
     }
   cout << endl;
   return;
@@ -2109,8 +2386,6 @@ Chain::step (unsigned int n)
 #define _TUXRANDOMVARIABLE_H_
 namespace tux {
 class RandomVariable {
-public:
-  void full ();
 };
 }
 #endif // _TUXRANDOMVARIABLE_H_
@@ -2121,11 +2396,6 @@ public:
 #include "tuxRandomVariable.h"
 using namespace std;
 namespace tux {
-void 
-RandomVariable::full ()
-{
-  return;
-}
 }
 @
 
@@ -2134,10 +2404,9 @@ RandomVariable::full ()
 <<tux gnu copyright>>
 #ifndef _TUXPARAMETER_H_
 #define _TUXPARAMETER_H_
+#include "tuxRandomVariable.h"
 namespace tux {
-class Parameter {
-public:
-  void full ();
+class Parameter: public RandomVariable {
 };
 }
 #endif // _TUXPARAMETER_H_
@@ -2148,10 +2417,78 @@ public:
 #include "tuxParameter.h"
 using namespace std;
 namespace tux {
-void 
-Parameter::full ()
+}
+@
+
+\subsection{TxBoundaries}
+<<tuxTxBoundaries.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXTXBOUNDARIES_H_
+#define _TUXTXBOUNDARIES_H_
+#include <vector>
+#include "tuxParameter.h"
+using namespace std;
+namespace tux {
+class TxBoundaries: public Parameter {
+public:
+  vector<unsigned int> mC;
+public:
+  TxBoundaries ();
+  ~TxBoundaries ();
+};
+}
+#endif // _TUXTXBOUNDARIES_H_
+
+<<tuxTxBoundaries.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <vector>
+#include "tuxTxBoundaries.h"
+using namespace std;
+namespace tux {
+TxBoundaries::TxBoundaries () 
 {
-  return;
+    
+}
+TxBoundaries::~TxBoundaries () 
+{
+  
+}
+}
+@
+
+\subsection{TxExpression}
+<<tuxTxExpression.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXTXEXPRESSION_H_
+#define _TUXTXEXPRESSION_H_
+#include <vector>
+#include "tuxParameter.h"
+using namespace std;
+namespace tux {
+class TxExpression: public Parameter {
+public:
+  vector<double> mDelta;
+public:
+  TxExpression ();
+  ~TxExpression ();
+};
+}
+#endif // _TUXTXEXPRESSION_H_
+
+<<tuxTxExpression.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxTxExpression.h"
+using namespace std;
+namespace tux {
+TxExpression::TxExpression ()
+{
+ 
+}
+TxExpression::~TxExpression ()
+{
+ 
 }
 }
 @
@@ -2183,42 +2520,22 @@ Data::full ()
 }
 @
 
-\subsection{System}
-<<tuxSystem.h>>=
-<<tux gnu copyright>>
-#ifndef _TUXSYSTEM_H_
-#define _TUXSYSTEM_H_
-namespace tux {
-class System {
-public:
-  void full ();
-};
-}
-#endif // _TUXSYSTEM_H_
-
-<<tuxSystem.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxSystem.h"
-using namespace std;
-namespace tux {
-void 
-System::full ()
-{
-  return;
-}
-}
-@
-
 \subsection{Probability}
 <<tuxProbability.h>>=
 <<tux gnu copyright>>
 #ifndef _TUXPROBABILITY_H_
 #define _TUXPROBABILITY_H_
+#include <vector>
+#include "tuxRandomVariable.h"
+using namespace std;
 namespace tux {
 class Probability {
+protected:
+  vector<RandomVariable*> mV;
+  vector<RandomVariable*> mC;
 public:
-  void full ();
+  virtual double d () = 0;
+  virtual RandomVariable* r () = 0;
 };
 }
 #endif // _TUXPROBABILITY_H_
@@ -2229,10 +2546,75 @@ public:
 #include "tuxProbability.h"
 using namespace std;
 namespace tux {
-void 
-Probability::full ()
+}
+@
+
+\subsection{ProbTxBoundaries}
+<<tuxProbTxBoundaries.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXPROBTXBOUNDARIES_H_
+#define _TUXPROBTXBOUNDARIES_H_
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "tuxProbability.h"
+
+extern gsl_rng* gGslRng;
+
+namespace tux {
+class ProbTxBoundaries : public Probability {
+public:
+  unsigned int mL;
+  unsigned int mK;
+public:
+  double d ();
+  Parameter* r (); 
+  double op_multiply (double i) { return i*mL; }
+  unsigned int op_cast_unsigned_int (double i) { return static_cast<unsigned int>(i+0.5); }
+
+  struct c_uniform {
+    double a;
+    double b;
+    c_uniform () {a=0;b=1;}
+    double operator()() {
+      return gsl_ran_flat (gGslRng,a,b);
+    }
+  } gslrngUniform;
+
+};
+}
+#endif // _TUXPROBTXBOUNDARIES_H_
+
+<<tuxProbTxBoundaries.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <gsl/gsl_sf_gamma.h>
+#include "tuxTxBoundaries.h"
+#include "tuxProbTxBoundaries.h"
+using namespace std;
+namespace tux {
+double
+ProbTxBoundaries::d ()
 {
-  return;
+  return -gsl_sf_lnchoose(mL-1,mK-1);
+}
+Parameter* 
+ProbTxBoundaries::r ()
+{
+  vector<double> a(mK);
+  generate(a.begin(),a.end(),gslrngUniform);
+  vector<double> b(mK);
+  transform(a.begin(),a.end(),b.begin(),op_multiply);
+  vector<unsigned int> c(mK);
+  transform(b.begin(),b.end(),c.begin(),op_cast_unsigned_int);
+  // We could have combine op_multiply and op_cast_unsigned_int.
+  // I do this just for the sake of learning C++.
+  // We could have used gsl_rng_uniform_int.
+  // Set the transcript boundaries to the sampled value c.
+  Parameter* v = new TxBoundaries;
+  v->mC = c;
+  return v;
 }
 }
 @
@@ -2264,6 +2646,89 @@ Likelihood::full ()
 }
 @
 
+\subsection{MoverManager}
+<<tuxMoverManager.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMOVERMANAGER_H_
+#define _TUXMOVERMANAGER_H_
+#include <vector>
+#include <gsl/gsl_randist.h>
+namespace tux {
+class Mover;
+class MoverManager {
+public:
+  vector<Mover*> mMover;
+  vector<unsigned int> mId;
+  vector<double> mWeight;
+  gsl_ran_discrete_t* mGslRanDiscrete;
+public:
+  MoverManager ();
+  ~MoverManager ();
+  void add (const unsigned int, const double);
+  Mover* choose ();
+
+  template <class T> struct c_delete {
+    void operator() (T i) {delete i;}
+  };
+};
+}
+#endif // _TUXMOVERMANAGER_H_
+
+<<tuxMoverManager.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <cassert>
+#include <gsl/gsl_block.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "tuxMover.h"
+#include "tuxMoverManager.h"
+extern gsl_rng* gGslRng;
+using namespace std;
+namespace tux {
+MoverManager::MoverManager ()
+{
+
+}
+MoverManager::~MoverManager ()
+{
+  c_delete<Mover*> deleteMover;
+  for_each (mMover.begin(), mMover.end(), deleteMover);           
+}
+// FIXME: MoverTxBoundaries should be created in a method of class Chain.
+//        Then, Chain can connect its Parameters and Data to MoverTxBoundaries.
+//        It passes the connected MoverTxBoundaries to MoverManager.
+void
+MoverManager::add (const unsigned int id, const double weight)
+{
+  mId.push_back(id); 
+  mWeight.push_back(weight);
+  Mover* m;
+  switch (id) 
+    {
+    case 1: m = new MoverTxBoundaries;
+    break;
+    case 2: m = new MoverTxBoundaries;
+    break;
+    }
+  mMover.push_back(m);
+  if (mMover.size() > 1)
+    {
+      size_t k = mMover.size();
+      gsl_block* w = gsl_block_alloc(k);
+      mGslRanDiscrete = gsl_ran_discrete_preproc (k,w->data); 
+    }
+}
+Mover*
+MoverManager::choose()
+{
+  assert (mMover.size() > 1);
+  size_t k = gsl_ran_discrete(gGslRng,mGslRanDiscrete);
+  return mMover.at(k);
+}
+}
+@
+
 \subsection{Mover}
 <<tuxMover.h>>=
 <<tux gnu copyright>>
@@ -2272,7 +2737,7 @@ Likelihood::full ()
 namespace tux {
 class Mover {
 public:
-  void full ();
+  virtual int step () = 0;
 };
 }
 #endif // _TUXMOVER_H_
@@ -2283,11 +2748,6 @@ public:
 #include "tuxMover.h"
 using namespace std;
 namespace tux {
-void 
-Mover::full ()
-{
-  return;
-}
 }
 @
 
@@ -2296,10 +2756,12 @@ Mover::full ()
 <<tux gnu copyright>>
 #ifndef _TUXMOVERTXBOUNDARIES_H_
 #define _TUXMOVERTXBOUNDARIES_H_
+#include "txMover.h"
 namespace tux {
-class MoverTxBoundaries {
+class MoverTxBoundaries: Mover {
 public:
-  void full ();
+  MoverTxBoundaries ();
+  int step ();
 };
 }
 #endif // _TUXMOVERTXBOUNDARIES_H_
@@ -2311,9 +2773,8 @@ public:
 using namespace std;
 namespace tux {
 void 
-MoverTxBoundaries::full ()
+MoverTxBoundaries::MoverTxBoundaries ()
 {
-  return;
 }
 }
 @
@@ -2399,61 +2860,6 @@ Summary::full ()
 }
 @
 
-\subsection{TxBoundaries}
-<<tuxTxBoundaries.h>>=
-<<tux gnu copyright>>
-#ifndef _TUXTXBOUNDARIES_H_
-#define _TUXTXBOUNDARIES_H_
-namespace tux {
-class TxBoundaries {
-public:
-  void full ();
-};
-}
-#endif // _TUXTXBOUNDARIES_H_
-
-<<tuxTxBoundaries.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxTxBoundaries.h"
-using namespace std;
-namespace tux {
-void 
-TxBoundaries::full ()
-{
-  return;
-}
-}
-@
-
-
-
-\subsection{TxExpression}
-<<tuxTxExpression.h>>=
-<<tux gnu copyright>>
-#ifndef _TUXTXEXPRESSION_H_
-#define _TUXTXEXPRESSION_H_
-namespace tux {
-class TxExpression {
-public:
-  void full ();
-};
-}
-#endif // _TUXTXEXPRESSION_H_
-
-<<tuxTxExpression.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxTxExpression.h"
-using namespace std;
-namespace tux {
-void 
-TxExpression::full ()
-{
-  return;
-}
-}
-@
 
 \subsection{Reads}
 <<tuxReads.h>>=
@@ -2476,6 +2882,33 @@ using namespace std;
 namespace tux {
 void 
 Reads::full ()
+{
+  return;
+}
+}
+@
+
+\subsection{System}
+<<tuxSystem.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSYSTEM_H_
+#define _TUXSYSTEM_H_
+namespace tux {
+class System {
+public:
+  void full ();
+};
+}
+#endif // _TUXSYSTEM_H_
+
+<<tuxSystem.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxSystem.h"
+using namespace std;
+namespace tux {
+void 
+System::full ()
 {
   return;
 }
