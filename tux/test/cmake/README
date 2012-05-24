@@ -1,0 +1,252 @@
+CMake, CTest, CDash, and CPack
+==============================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+.Build a test s001
+----
+./build s001
+----
+
+.To create a CMake HTML documentation
+----
+cmake --help-html|lynx -stdin
+----
+
+Tutorials and testing.
+
+----
+cmake .. --graphviz=a
+dot -Tpng:gd a > a.png
+----
+
+CDash
+-----
+
+----
+http://public.kitware.com/Wiki/CDash
+----
+
+
+
+
+
+Create a CMakeList
+----
+http://www.cmake.org/cmake/help/cmake_tutorial.html
+----
+
+Download an installation file of cmake.
+----
+http://www.cmake.org/files/v2.8/cmake-2.8.8.tar.gz
+----
+
+A first step of the tutorial of CMake.
+----
+test/cmake/cmake-2.8.8/Tests/Tutorial/Step1/CMakeLists.txt
+----
+
+We need a file, CMakeLists.txt, to run cmake on. A single-line CMakeLists file is required.
+----
+add_executable(hello hello.cxx)
+----
+
+.hello.cpp
+----
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+int main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+    fprintf(stdout,"Usage: %s number\n",argv[0]);
+    return 1;
+    }
+  double inputValue = atof(argv[1]);
+  double outputValue = sqrt(inputValue);
+  fprintf(stdout,"The square root of %g is %g\n",
+          inputValue, outputValue);
+  return 0;
+}
+----
+
+See s001 for the test of the example above.
+
+.Two more lines
+----
+cmake_minimum_required (VERSION 2.8)
+project (hello)
+add_executable(hello hello.cxx)
+----
+
+Let us use Step1 example as a s002. 
+----
+cmake-2.8.8/Tests/Tutorial/Step1
+----
+
+We can create a config header file with variables replaced by values in
+CMakeLists file.
+
+.Set a variable in CMakeLists and create a config header file
+----
+set (Tutorial_VERSION_MAJOR 1)
+configure_file (                                                                   
+  "${PROJECT_SOURCE_DIR}/TutorialConfig.h.in"                                      
+  "${PROJECT_BINARY_DIR}/TutorialConfig.h"                                         
+)    
+----
+
+.The definition in the config header in file
+----
+#define Tutorial_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
+----
+
+.This will be replaced by the following line
+----
+#define Tutorial_VERSION_MAJOR 1
+----
+
+Let us use Step1 example as a s003. 
+----
+cmake-2.8.8/Tests/Tutorial/Step2
+----
+
+In this example, we give an option for users to choose a system library or a
+customized library when computing square root of a number. We create a
+subdirectory and place source codes and CMakeLists file for our own library. The
+CMakeLists file has a single line.
+
+----
+add_library(MathFunctions mysqrt.cxx)
+----
+
+In the main CMakeLists file, we define a variable with ON or OFF. Users can
+change the option using ccmake or editing CMakeCache.txt file.
+
+----
+option(USE_MYMATH "Use tutorial provided math implementation" ON)
+----
+
+Because we wish to use the option variable in our source code, we define the
+variable in the config header in file.
+
+----
+#cmakedefine USE_MYMATH
+----
+
+Then, we can select lines by querying the variable.
+
+----
+#ifdef USE_MYMATH                                                                  
+  double outputValue = mysqrt(inputValue);                                      
+#else                                                                           
+  double outputValue = sqrt(inputValue);                                        
+#endif
+----
+
+We can use the variable not only in the source code but also in CMakeLists file.
+We evaluate the variable to add the header directoy, add CMakeLists file in the
+subdirectory. We add library name and link the library to the executable.
+
+----
+if (USE_MYMATH)                                                                 
+  include_directories ("${PROJECT_SOURCE_DIR}/MathFunctions")                   
+  add_subdirectory (MathFunctions)                                              
+  set (EXTRA_LIBS ${EXTRA_LIBS} MathFunctions)                                  
+endif (USE_MYMATH)
+add_executable (Tutorial tutorial.cxx) 
+target_link_libraries (Tutorial  ${EXTRA_LIBS})
+----
+
+Let us use Step1 example as a s004. 
+----
+cmake-2.8.8/Tests/Tutorial/Step3
+----
+
+The Step3 example shows how to add test modules. We need to create test
+executables for classes, or we could test the main executable with different
+options. Let us find unit test library in C++. Let us continue to learn CMake
+and CTest in Step4.
+
+Let us use Step1 example as a s005. 
+----
+cmake-2.8.8/Tests/Tutorial/Step4
+----
+
+.Add a CMake module
+----
+include (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
+----
+
+.A full path to the CheckFunctionExists module
+----
+/Applications/CMake 2.8-8.app/Contents/share/cmake-2.8/Modules/CheckFunctionExists.cmake
+----
+
+It is important that the tests for log and exp are done before the
+configure_file command for TutorialConfig.h. 
+
+Let us use Step1 example as a s006. 
+----
+cmake-2.8.8/Tests/Tutorial/Step5
+----
+
+Let us use Step1 example as a s007. 
+----
+cmake-2.8.8/Tests/Tutorial/Step6
+----
+
+.To create a install package
+----
+../build
+cpack -C CPackConfig.cmake
+cpack -C CPackSourceConfig.cmake
+----
+
+Let us use Step1 example as a s008. 
+----
+cmake-2.8.8/Tests/Tutorial/Step7
+----
+
+s009
+----
+We can print a hello world message while cmake.
+
+.A single line CMakeLists file
+----
+message("Hello, World!")
+----
+
+.To process a CMakeLists file as a script
+----
+cmake -P CMakeLists.txt
+----
+
+s010
+----
+find_library. We find GSL dynamic library to create an example source code.
+
+This variable defaults to false. You can set this variable to true to make CMake
+produce verbose makefiles that show each command line as it is used.
+
+----
+set(CMAKE_VERBOSE_MAKEFILE true)
+----
+
+s011
+----
+find_package. Find perl.
+find_path. Find funnyperl.
+find_program. Find cp.
+
+s012
+----
+foreach.
+
+s013
+----
+function.
+
+Helpful commands
+----------------
+set (CMAKE_BUILD_TYPE DEBUG)

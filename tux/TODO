@@ -16,11 +16,12 @@
 . FindGSL.cmake
 
 .DESeq
+. http://www.bioconductor.org/packages/release/bioc/src/contrib/DESeq_1.8.2.tar.gz
 . Genome sequence length: 2032925
 . Short reads positions along the S. mutans genome: FASTQ001.start (1,19,20)
 . Size factors: 0.8700484 1.0158870 1.1285131
 . Number of transcripts: 
-. mean=q*s, size=q*s/d, d=a0+a1/mean
+. mean=(q*s), size=1/d, d=a0+a1/(q*s)
 . a0, a1 = 0.0269 6.2076
 . q is a parameter
 . mean is computed for each transcript

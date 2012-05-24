@@ -39,6 +39,15 @@ NOWEBFILE=$ROOTDIR/noweb/main.nw
 #          config.h.in )
 
 CPPFILE=( tux.cpp \
+          tux-v1.cpp \
+          tux-gsl.cpp \
+          tux-tx.cpp \
+          tux-prob.cpp \
+          tux-move.cpp \
+          stl-transform.cpp \
+          tuxGsl.cpp \
+          tuxGslRng.cpp \
+          tuxHelp.cpp \
           tuxManager.cpp \
           tuxRandomVariable.cpp \
           tuxParameter.cpp \
@@ -46,6 +55,7 @@ CPPFILE=( tux.cpp \
           tuxSystem.cpp \
           tuxProbability.cpp \
           tuxProbTxBoundaries.cpp \
+          tuxProbTxExpression.cpp \
           tuxLikelihood.cpp \
           tuxMoverManager.cpp \
           tuxMover.cpp \
@@ -56,17 +66,25 @@ CPPFILE=( tux.cpp \
           tuxTxBoundaries.cpp \
           tuxTxExpression.cpp \
           tuxReads.cpp \
+          tuxFixed.cpp \
           ezlogger.cpp \
           tuxMcmc.cpp \
           tuxChainManager.cpp \
+          MathFunctions/MakeTable.cpp \
+          MathFunctions/mysqrt.cpp \
           tuxChain.cpp )
 HPPFILE=( tuxManager.h \
+          tuxHelp.h \
+          tuxGsl.h \
+          tuxGslRng.h \
+          benLogDouble.h \
           tuxRandomVariable.h \
           tuxParameter.h \
           tuxData.h \
           tuxSystem.h \
           tuxProbability.h \
           tuxProbTxBoundaries.h \
+          tuxProbTxExpression.h \
           tuxLikelihood.h \
           tuxMoverManager.h \
           tuxMover.h \
@@ -77,11 +95,14 @@ HPPFILE=( tuxManager.h \
           tuxTxBoundaries.h \
           tuxTxExpression.h \
           tuxReads.h \
+          tuxFixed.h \
           tuxMcmc.h \
           tuxChainManager.h \
+          config.h.in \
           gtypes.h \
           tuxChain.h )
 notangle -RCMakeLists.txt $NOWEBFILE > $OUTSRC/CMakeLists.txt
+notangle -RMathFunctions/CMakeLists.txt $NOWEBFILE > $OUTSRC/MathFunctions/CMakeLists.txt
 
 for f in ${CPPFILE[@]}; do
   notangle -L -R$f $NOWEBFILE > $OUTSRC/$f

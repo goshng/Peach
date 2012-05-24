@@ -1,0 +1,16 @@
+FASTQ001.start
+FASTQ019.start
+FASTQ020.start
+FindGSL.cmake
+FindReadline.cmake
+b
+ezlogger.zip
+readline-6.2.tar.gz
+rlstdc.h
+simpleopt-3.5.zip
+xfree.c
+xmalloc.c
+xmalloc.h
+yaml-cpp-0.3.0.tar.gz
+
+wget http://www.gnu.org/licenses/gpl-3.0.txt
