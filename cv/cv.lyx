@@ -1,5 +1,5 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
-\lyxformat 345
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
 \begin_document
 \begin_header
 \textclass article
@@ -15,18 +15,26 @@
 \usepackage{mathpazo}
 \end_preamble
 \use_default_options false
+\maintain_unincluded_children false
 \language american
+\language_package default
 \inputencoding auto
+\fontencoding global
 \font_roman default
 \font_sans default
 \font_typewriter default
 \font_default_family default
+\use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
 
 \graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
 \paperfontsize 11
 \spacing single
 \use_hyperref false
@@ -34,9 +42,18 @@
 \use_geometry true
 \use_amsmath 1
 \use_esint 0
+\use_mhchem 1
+\use_mathdots 1
 \cite_engine basic
 \use_bibtopic false
+\use_indices false
 \paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
 \leftmargin 0.75in
 \topmargin 1in
 \rightmargin 0.75in
@@ -51,8 +68,9 @@
 \paperpagestyle default
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
 \end_header
 
 \begin_body
@@ -90,7 +108,18 @@ Ithaca, NY 14853
 Education
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -101,7 +130,7 @@ Education
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \noun on
@@ -117,7 +146,7 @@ Ph.D.
  in Bioinformatics
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \noun on
@@ -140,7 +169,18 @@ Bachelor of Science in Life Science, Bachelor of Engineering in Electronic
 Academic Positions
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -151,31 +191,31 @@ Academic Positions
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 2010-- Postdoctoral Associate, Department of Biological Statistics and Computati
 onal Biology, Cornell University
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 2008--10 Research Assistant, Department of Genetics, Rutgers, The State
  University of New Jersey
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 2008 Postdoctoral Associate, Department of Genetics, Rutgers, The State
  University of New Jersey
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 2005--07 Graduate Research Assistant, Bioinformatics Research Center, North
  Carolina State University
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 1996--97 Undergraduate Research Assistant, Life Science, Pohang University
  of Science and Technology
@@ -187,7 +227,18 @@ onal Biology, Cornell University
 Work Experience
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -198,7 +249,7 @@ Work Experience
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \noun on
@@ -213,7 +264,7 @@ Work Experience
 Associate Researcher
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \noun on
@@ -234,7 +285,18 @@ Software Engineer
 Teaching Experience
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -245,7 +307,7 @@ Teaching Experience
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \noun on
@@ -266,7 +328,18 @@ Secondary School English Teacher
 Research Interests
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -277,7 +350,7 @@ Research Interests
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -285,7 +358,7 @@ Research Interests
  Models of protein evolution, population genetics, protein structure prediction.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -299,7 +372,18 @@ Research Interests
 Research Projects: Current and Planned
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -310,7 +394,7 @@ Research Projects: Current and Planned
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -322,7 +406,7 @@ Streptococcus mutans
 .
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -330,7 +414,7 @@ Streptococcus mutans
  Replacing and additive horizontal gene transfer in Streptococcus.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -338,7 +422,7 @@ Streptococcus mutans
  Inference of recombination under a species tree.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -352,7 +436,18 @@ Streptococcus mutans
 Research Publications
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -363,7 +458,20 @@ Research Publications
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
+\labelwidthstring MMMMM
+2012 Choi SC, Rasmussen MD, Hubisz MJ, Gronau I, Stanhope MJ, Siepel A.
+ 2012.
+
+\emph on
+ Replacing and additive horizontal gene transfer in Streptococcus.
+ 
+\emph default
+Mol Biol Evol.
+ (Accepted).
+\end_layout
+
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2011 Choi SC, Hey J.
  2011.
@@ -371,13 +479,9 @@ Research Publications
 \emph on
 Joint inference of population assignment and demographic history.
  Genetics 189: 561-577.
-
-\emph default
- Genetics.
- 189, 561-577.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2009 Choi SC, Stone EA, Kishino H, Thorne JL.
  2009.
@@ -391,7 +495,7 @@ Estimates of natural selection due to protein tertiary structure inform
  441, 45-52.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2008 Choi SC, Redelings BD, Thorne JL.
  2008.
@@ -411,7 +515,7 @@ Basing population genetic inferences and models of molecular evolution upon
  363 3931-3939.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2007 Choi SC.
  2007.
@@ -426,7 +530,7 @@ Statistical inference and biological interpretation via comparatively realistic
  December of 2007.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2007 Choi SC, Hobolth A, Robinson DM, Kishino H, Thorne JL.
  2007.
@@ -439,7 +543,7 @@ Quantifying the impact of protein tertiary structure on molecular evolution.
  24, 1769-1782.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2007 Thorne JL, Choi SC, Yu J, Higgs PG, Kishino H.
  2007.
@@ -452,7 +556,7 @@ Population genetics without intraspecific data
  24, 1667-1677.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 1998 Choi SC.
  1998.
@@ -471,7 +575,18 @@ Tissue culturing and transformation with chrysanthemums
 Contributed Talks and Posters
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -482,7 +597,7 @@ Contributed Talks and Posters
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2009 Choi SC, Hey J.
  
@@ -494,7 +609,7 @@ Inference of Population Assignment using Demographic and Mutation Models
  June 6th of 2009.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2007 Choi SC, Thorne JL, Stone EA, Kishino H.
  
@@ -507,7 +622,7 @@ Combining population genetic and interspecific perspectives on evolutionary
  June of 2007.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2006 Choi SC, Hobolth A, Robinson DM, Kishino H, Thorne JL.
  
@@ -526,7 +641,18 @@ The impact of tertiary structure on protein evolution and a population genetics
 Honors and Awards
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -537,14 +663,14 @@ Honors and Awards
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 2003 Ph.D.
  Study Abroad Award.
  Korea Science and Engineering Foundation.
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 1993--97 Young-il scholarships (4 semesters), Hyo-gok scholarship (1 semester),
  Ji-gok scholarships (2 semesters), and Part-time work scholarships (2 semesters
@@ -558,7 +684,18 @@ Honors and Awards
 Services
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -569,7 +706,7 @@ Services
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -577,7 +714,7 @@ Services
  Reviewer of Molecular Biology and Evolution
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
@@ -591,7 +728,18 @@ Services
 Affiliations
 \series default
 
-\lyxline
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100line%"
+height "1pt"
+
+\end_inset
+
 
 \end_layout
 
@@ -602,7 +750,7 @@ Affiliations
 
 \end_layout
 
-\begin_layout List
+\begin_layout Labeling
 \labelwidthstring MMMMM
 \begin_inset space ~
 \end_inset
