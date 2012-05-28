@@ -41,9 +41,14 @@ NOWEBFILE=$ROOTDIR/noweb/main.nw
 CPPFILE=( tux.cpp \
           tux-v1.cpp \
           tux-gsl.cpp \
+          tux-fixed.cpp \
           tux-tx.cpp \
           tux-prob.cpp \
           tux-move.cpp \
+          tux-chain.cpp \
+          tux-cm.cpp \
+          tux-sum.cpp \
+          yamlEmitter.cpp \
           stl-transform.cpp \
           tuxGsl.cpp \
           tuxGslRng.cpp \

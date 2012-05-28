@@ -1,3 +1,13 @@
+.Tests
+. Reads in setup (Fixed)
+. Reads in data (Reads)
+. MCMC runs
+. Writes TxBoundaries and TxExpression states along with chain information
+. Chain information includes likelihood, chain ID
+. Combine the summary files from different machines
+. Summarize the output
+. Create a wiggle file for uncertainty in transcript boundaries
+
 .Packages
 
 .CMake

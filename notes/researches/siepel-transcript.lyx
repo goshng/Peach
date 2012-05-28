@@ -81,6 +81,15 @@ y, Ithaca, NY 14853, USA
 \end_layout
 
 \begin_layout Section
+TODO
+\end_layout
+
+\begin_layout Enumerate
+log (Dirichlet, and others) in probability computation.
+ Dirichlet random variable in logarithm of values.
+\end_layout
+
+\begin_layout Section
 Abstract
 \end_layout
 
@@ -110,7 +119,68 @@ Introduction
 \begin_layout Standard
 High-throughput sequencing on bacterial genome and transcriptome allowed
  researchers to study different aspects of genomes and transcriptome.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+Discuss different RNA-seq techniques applied to bacterial genome.
+ Mention that we do not discuss RNA-seq on Eukaryotes.
+\end_layout
+
+\begin_layout Standard
+Inferring transcript boundaries using bacterial transcriptome is difficult
  
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+.
+ Transcript boundaries can be inferred using the method.
+ Uncertainty in boundaries needs to be quantified so that researchers can
+ make more informed decisions on the transcript boundaries estimates.
+\end_layout
+
+\begin_layout Standard
+Expression level of annotated regions can be modelled using negative binomial
+ distribution on count variable of short reads mapped on the annotated regions
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Robinson2007"
+
+\end_inset
+
+.
+ There are various methods developed using the negative binomial distribution
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Anders2010"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+See a review of determining differentially expressed genes using RNA-seq
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Oshlack2010"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+We borrow statistical frames on the negative binomial distribution on expression
+ levels to quantify uncertainty in transcript boundaries.
 \end_layout
 
 \begin_layout Section
@@ -118,24 +188,465 @@ Models
 \end_layout
 
 \begin_layout Subsection
-TODO
-\end_layout
-
-\begin_layout Enumerate
-Data generation in a YAML file
-\end_layout
-
-\begin_layout Enumerate
-log (Dirichlet, and others) in probability computation.
- Dirichlet random variable in logarithm of values.
-\end_layout
-
-\begin_layout Subsection
-Fixed number of segments
+Parameters and data
 \end_layout
 
 \begin_layout Standard
-Short reads are aligned to a genomic sequence of length 
+We assume that we are given multiple replicates of RNA-seq data from bacterial
+ transcriptome.
+ We remove adapter sequences 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2011"
+
+\end_inset
+
+ from the short reads, and check quality of the short reads 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Schmieder2011"
+
+\end_inset
+
+.
+ We align short reads to a reference bacterial genome of a single chromosome
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Li2009a"
+
+\end_inset
+
+.
+ We create a pile-up file using samtools 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Li2009b"
+
+\end_inset
+
+.
+ We apply the ParseRNAseq to the pile-up to estimate the number of transcripts
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+.
+ We use gene annotation to count short reads by using 
+\family typewriter
+GenomicFeatures
+\family default
+ Bioconductor R package 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "CarlsonRpackage"
+
+\end_inset
+
+,
+\begin_inset CommandInset citation
+LatexCommand cite
+key "R2011"
+
+\end_inset
+
+,
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Gentleman2004"
+
+\end_inset
+
+.
+ We infer size factors and mean-vaiance equations by applying 
+\family typewriter
+DESeq
+\family default
+ to the count data set 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Anders2010"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+We focus on quantification of uncertainty in transcript boundaries given
+ the prior knowledge about the short reads.
+ We do not attempt to integrate all the procedure above.
+ We could obtain the prior knowledge from other sources, and we here hint
+ at how we could obtain the prior.
+ 
+\end_layout
+
+\begin_layout Standard
+Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Table-of-Symbols"
+
+\end_inset
+
+ shows all of the mathematical symbols used in the manuscript.
+ 
+\end_layout
+
+\begin_layout Subsection
+Posterior distributions
+\end_layout
+
+\begin_layout Paragraph*
+Posterior distribution
+\end_layout
+
+\begin_layout Standard
+We define the posterior probability
+\begin_inset Formula 
+\[
+\Pr(\bm{\mu},\bm{s}\mid\bm{X})=\frac{\Pr(\bm{X}\mid\bm{\mu},\bm{s})\Pr(\bm{\mu}\mid\bm{s})\Pr(\bm{s})}{\Pr(\bm{X})}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Pr(\bm{s})$
+\end_inset
+
+ is the prior probability of the segment configuation, and 
+\begin_inset Formula $\Pr(\bm{\mu}\mid\bm{s})$
+\end_inset
+
+ is the prior distribution of the expression intensity.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+Likelihood
+\end_layout
+
+\begin_layout Standard
+We define the likelihood of our model as the probability of short reads
+ map on the genome conditional on 
+\begin_inset Formula $K$
+\end_inset
+
+ segments and their expression intensity 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\Pr(\bm{X}\mid\bm{s},\bm{\mu})=\prod_{j=1}^{J}\prod_{k=1}^{K}\Pr(X_{jk}\mid s_{k},\mu_{jk})
+\]
+
+\end_inset
+
+where we assume that segments be expressed independently of one another.
+ We have one-to-one correspondence between 
+\begin_inset Formula $s_{k}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{k},$
+\end_inset
+
+ and another one-to-one correspondence between 
+\begin_inset Formula $\mu_{jk}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta_{k}.$
+\end_inset
+
+ We use negative binomial mass function to compute each term in the product.
+\end_layout
+
+\begin_layout Paragraph*
+Prior of 
+\begin_inset Formula $\bm{s}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All of the possible segment configurations are equally likely with probability
+ of
+\begin_inset Formula 
+\[
+\Pr(\bm{s})=(K-1)!\prod_{k=1}^{K-1}\frac{1}{L-k}=\prod_{k=1}^{K-1}\frac{k}{L-k}=\frac{1}{{L-1 \choose K-1}}.
+\]
+
+\end_inset
+
+The total number of segment configurations is equal to the number of choices
+ of 
+\begin_inset Formula $K-1$
+\end_inset
+
+ ending positions 
+\begin_inset Formula $\{c_{k}\}_{k=1\ldots K-1}$
+\end_inset
+
+ out of 
+\begin_inset Formula $L-1$
+\end_inset
+
+ genomic positions excluding the last position.
+ 
+\begin_inset Formula 
+\[
+\bm{s}=\{s_{k}\}=\{(c_{k-1},c_{k}]\}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $c_{0}=0,$
+\end_inset
+
+ and 
+\begin_inset Formula $c_{K}=L.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Prior of 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+ given 
+\begin_inset Formula $\bm{s}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define the prior distribution of 
+\begin_inset Formula $\bm{\mu}$
+\end_inset
+
+ via a Dirichlet distribution of 
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\Pr(\bm{\mu}\mid\bm{s})=\Pr(\bm{\mu})=\Pr(\bm{\delta})=\mathrm{Dirichlet}(\bm{\alpha})
+\]
+
+\end_inset
+
+where we choose 
+\begin_inset Formula $\bm{\alpha}$
+\end_inset
+
+ such that the variance of 
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+ be large, rendering uninformative prior on expression intensity of the
+ segments.
+ 
+\begin_inset Formula 
+\[
+\bm{\alpha}=\{\alpha_{k}\}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha_{k}=1.$
+\end_inset
+
+ We can control the diffuseness of the distribution of 
+\begin_inset Formula $\bm{\delta}$
+\end_inset
+
+ by setting 
+\begin_inset Formula $\alpha_{k}=d$
+\end_inset
+
+ where 
+\begin_inset Formula $d$
+\end_inset
+
+ is greater than or equal to 1.
+ 
+\end_layout
+
+\begin_layout Subsection
+Summarization of posterior samples
+\end_layout
+
+\begin_layout Standard
+We would not attempt to estimate expression levels parameter, which is considere
+d a nuisance parameter.
+ We could simply count number of iterations that a site is in 
+\begin_inset Formula $\left\{ c_{k}\right\} _{k\in\{0,\ldots,K-2\}}.$
+\end_inset
+
+ This is easy to compute.
+\end_layout
+
+\begin_layout Subsection
+Simulation study
+\end_layout
+
+\begin_layout Standard
+We change fixed parameters to assess the power of the method.
+\end_layout
+
+\begin_layout Subsection
+Distance measure of transcript boundaries
+\end_layout
+
+\begin_layout Standard
+We need to measure the distance between two transcript boundaries to assess
+ the power of the method.
+\end_layout
+
+\begin_layout Subsection
+Examples (3 examples)
+\end_layout
+
+\begin_layout Standard
+S.
+ mutans
+\end_layout
+
+\begin_layout Standard
+S.
+ agalactiae
+\end_layout
+
+\begin_layout Standard
+A data from public domain or preferentially with strand information
+\end_layout
+
+\begin_layout Section
+Discussion
+\end_layout
+
+\begin_layout Standard
+We presented a method of quantifying uncertainty in transcript boundaries.
+ 
+\end_layout
+
+\begin_layout Subsection
+Limitations and future directions
+\end_layout
+
+\begin_layout Standard
+The number of transcript segments can be a random variable to be estimated.
+ 
+\end_layout
+
+\begin_layout Standard
+Distance measure between two set of posterior samples would be nicer.
+ This can be used to detecting regions that are differentially expressed
+ in two different condition.
+\end_layout
+
+\begin_layout Standard
+Application of two different condition.
+\end_layout
+
+\begin_layout Standard
+Other likelihood functions can be used because there are some variation
+ in methods of determining differentially expressed genes: DEGseq (poisson),
+ nbseq (different mean-variance function or power of 
+\begin_inset Formula $a_{1}$
+\end_inset
+
+ coefficient), and others.
+\end_layout
+
+\begin_layout Standard
+Expression levels can be summarized for determining differentially expressed
+ regions.
+\end_layout
+
+\begin_layout Standard
+Effects of number of replicates remain to be addressed.
+\end_layout
+
+\begin_layout Standard
+Other fixed parameters could be considered free parameters such as size
+ factors (
+\begin_inset Formula $z_{j}$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Hyper priors can be specified on the prior.
+\end_layout
+
+\begin_layout Standard
+Short reads length might be considered later.
+\end_layout
+
+\begin_layout Standard
+Using 
+\emph on
+de novo
+\emph default
+ assembly method a 
+\emph on
+de Bruin 
+\emph default
+graph can be used as a reference genome.
+ This could lead to a method of determining short reads expressed differentially.
+\end_layout
+
+\begin_layout Section
+Appendix
+\end_layout
+
+\begin_layout Paragraph*
+Equations of expression level of fixed number of segments
+\end_layout
+
+\begin_layout Standard
+We define the expression intensity of 
+\begin_inset Formula $i$
+\end_inset
+
+-th segment in sample 
+\begin_inset Formula $j$
+\end_inset
+
+ as the fraction of the total number of short reads:
+\begin_inset Formula 
+\[
+\mu_{jk}=z_{j}q_{k}=z_{j}M\delta_{k}=N_{j}\delta_{k}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta_{k}$
+\end_inset
+
+ is the fraction of expression level of 
+\begin_inset Formula $k$
+\end_inset
+
+-th segment.
+ Short reads are aligned to a genomic sequence of length 
 \begin_inset Formula $L.$
 \end_inset
 
@@ -246,219 +757,6 @@ A contiguous genome is partitioned into
 \begin_inset Formula $\mu_{k}.$
 \end_inset
 
- 
-\end_layout
-
-\begin_layout Standard
-We define the likelihood of our model as the probability of short reads
- map on the genome conditional on 
-\begin_inset Formula $K$
-\end_inset
-
- segments and their expression intensity 
-\begin_inset Formula $\bm{\mu}$
-\end_inset
-
-:
-\begin_inset Formula 
-\[
-\Pr(\bm{X}\mid\bm{s},\bm{\mu})=\prod_{j=1}^{J}\prod_{k=1}^{K}\Pr(X_{jk}\mid s_{k},\mu_{jk})
-\]
-
-\end_inset
-
-where we assume that segments be expressed independently of one another.
- We have one-to-one correspondence between 
-\begin_inset Formula $s_{k}$
-\end_inset
-
- and 
-\begin_inset Formula $\lambda_{k},$
-\end_inset
-
- and another one-to-one correspondence between 
-\begin_inset Formula $\mu_{jk}$
-\end_inset
-
- and 
-\begin_inset Formula $\delta_{k}.$
-\end_inset
-
- We use negative binomial mass function to compute each term in the product.
-\end_layout
-
-\begin_layout Paragraph*
-Posterior distribution
-\end_layout
-
-\begin_layout Standard
-We define the posterior probability
-\begin_inset Formula 
-\[
-\Pr(\bm{\mu},\bm{s}\mid\bm{X})=\frac{\Pr(\bm{X}\mid\bm{\mu},\bm{s})\Pr(\bm{\mu}\mid\bm{s})\Pr(\bm{s})}{\Pr(\bm{X})}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\Pr(\bm{s})$
-\end_inset
-
- is the prior probability of the segment configuation, and 
-\begin_inset Formula $\Pr(\bm{\mu}\mid\bm{s})$
-\end_inset
-
- is the prior distribution of the expression intensity.
- 
-\end_layout
-
-\begin_layout Paragraph*
-Prior of 
-\begin_inset Formula $\bm{s}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-All of the possible segment configurations are equally likely with probability
- of
-\begin_inset Formula 
-\[
-\Pr(\bm{s})=(K-1)!\prod_{k=1}^{K-1}\frac{1}{L-k}=\prod_{k=1}^{K-1}\frac{k}{L-k}=\frac{1}{{L-1 \choose K-1}}.
-\]
-
-\end_inset
-
-The total number of segment configurations is equal to the number of choices
- of 
-\begin_inset Formula $K-1$
-\end_inset
-
- ending positions 
-\begin_inset Formula $\{c_{k}\}_{k=1\ldots K-1}$
-\end_inset
-
- out of 
-\begin_inset Formula $L-1$
-\end_inset
-
- genomic positions excluding the last position.
- 
-\begin_inset Formula 
-\[
-\bm{s}=\{s_{k}\}=\{(c_{k-1},c_{k}]\}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $c_{0}=0,$
-\end_inset
-
- and 
-\begin_inset Formula $c_{K}=L.$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph*
-Equations of expression level
-\end_layout
-
-\begin_layout Standard
-We define the expression intensity of 
-\begin_inset Formula $i$
-\end_inset
-
--th segment in sample 
-\begin_inset Formula $j$
-\end_inset
-
- as the fraction of the total number of short reads:
-\begin_inset Formula 
-\[
-\mu_{jk}=z_{j}q_{k}=z_{j}M\delta_{k}=N_{j}\delta_{k}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\delta_{k}$
-\end_inset
-
- is the fraction of expression level of 
-\begin_inset Formula $k$
-\end_inset
-
--th segment.
-\end_layout
-
-\begin_layout Paragraph*
-Prior of 
-\begin_inset Formula $\bm{\mu}$
-\end_inset
-
- given 
-\begin_inset Formula $\bm{s}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-We define the prior distribution of 
-\begin_inset Formula $\bm{\mu}$
-\end_inset
-
- via a Dirichlet distribution of 
-\begin_inset Formula $\bm{\delta}$
-\end_inset
-
-:
-\begin_inset Formula 
-\[
-\Pr(\bm{\mu}\mid\bm{s})=\Pr(\bm{\mu})=\Pr(\bm{\delta})=\mathrm{Dirichlet}(\bm{\alpha})
-\]
-
-\end_inset
-
-where we choose 
-\begin_inset Formula $\bm{\alpha}$
-\end_inset
-
- such that the variance of 
-\begin_inset Formula $\bm{\delta}$
-\end_inset
-
- be large, rendering uninformative prior on expression intensity of the
- segments.
- 
-\begin_inset Formula 
-\[
-\bm{\alpha}=\{\alpha_{k}\}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\alpha_{k}=1.$
-\end_inset
-
- We can control the diffuseness of the distribution of 
-\begin_inset Formula $\bm{\delta}$
-\end_inset
-
- by setting 
-\begin_inset Formula $\alpha_{k}=d$
-\end_inset
-
- where 
-\begin_inset Formula $d$
-\end_inset
-
- is greater than or equal to 1.
  
 \end_layout
 
@@ -607,7 +905,7 @@ Move of
 We may wish to move two parameter values simultaneously.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Paragraph*
 Simulation study
 \end_layout
 
@@ -850,10 +1148,6 @@ Now that we have
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsection
-Data simulation using class Likelihood
 \end_layout
 
 \begin_layout Standard
@@ -1593,6 +1887,183 @@ where
  
 \end_layout
 
+\begin_layout Standard
+Sampling with contraint of 
+\begin_inset Formula $x_{k}>\epsilon.$
+\end_inset
+
+ The first thing is that we wish to sample Dirichlet random variates with
+ contraint of minimum value of 
+\begin_inset Formula $\epsilon.$
+\end_inset
+
+ I wish to avoid a situation where a segment is 0 in size.
+ I do not know how to handle the situation.
+ This would be relevant when I consider variable number of segmens.
+ When segments are 0-length, we could remove them.
+ Because I do not know how to hand this situation, I sidestep the situation
+ without any proof.
+ First check if there are values less than 
+\begin_inset Formula $\epsilon.$
+\end_inset
+
+ The value of 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ is equal to the reciprocal of the length of an interval under consideration.
+ The length of an interval can be a whole chromosome, or a subset of the
+ chromosome.
+ Consider a set of segment lengths 
+\begin_inset Formula $\left\{ l_{k}\right\} _{k}.$
+\end_inset
+
+ We partition the set to two disjoint sets: elements of one set, say 
+\begin_inset Formula $A,$
+\end_inset
+
+ are of length being 0, and those of the other set are not.
+ The elements of the former set are 
+\begin_inset Formula $\left\{ l_{k}\right\} $
+\end_inset
+
+ where 
+\begin_inset Formula $l_{k}<1/\sum_{k}l_{k}=\epsilon.$
+\end_inset
+
+ We set the length to 
+\begin_inset Formula $\epsilon,$
+\end_inset
+
+ so that the lengths are at least of minimum length.
+ 
+\begin_inset Formula 
+\[
+a=\left|A\right|\epsilon-\sum_{k\in A}\lambda_{k}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{k}=l_{k}/\sum_{k}l_{k}.$
+\end_inset
+
+ We then compute 
+\begin_inset Formula $l_{k}$
+\end_inset
+
+ where 
+\begin_inset Formula $k\notin A.$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+l_{k}^{*}=l_{k}\left(1-a/\sum_{k\notin A}l_{k}\right).
+\]
+
+\end_inset
+
+This would avoid 0-length segments.
+ I do not know how this would affect the probability density computation.
+\end_layout
+
+\begin_layout Subsubsection
+Dirichlet distribution with constrint of 
+\begin_inset Formula $x_{k}>\epsilon$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We need to sample segments of length 
+\begin_inset Formula $l_{k}$
+\end_inset
+
+ at least 1.
+ Given index set of 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ we convert 
+\begin_inset Formula $l_{k}$
+\end_inset
+
+ to 
+\begin_inset Formula $\lambda_{k}$
+\end_inset
+
+ by dividing it by 
+\begin_inset Formula $\sum_{k\in\kappa}l_{k}.$
+\end_inset
+
+ Consider 
+\begin_inset Formula $\lambda_{k}$
+\end_inset
+
+ as Dirichlet random variate.
+ We compute 
+\begin_inset Formula $\sum_{k\in\kappa}l_{k}-\left|\kappa\right|\epsilon.$
+\end_inset
+
+ After thougths we consider 
+\begin_inset Formula $\left\{ l_{k}\right\} _{k\in\kappa}.$
+\end_inset
+
+ We form 
+\begin_inset Formula $\left\{ \lambda_{k}\right\} _{k\in\kappa}$
+\end_inset
+
+ where 
+\begin_inset Formula $\lambda_{k}=l_{k}/L_{\kappa}$
+\end_inset
+
+ and 
+\begin_inset Formula $L_{\kappa}=\sum_{k\in\kappa}l_{k}.$
+\end_inset
+
+ We sample a new Dirichlet random variate 
+\begin_inset Formula $\lambda_{k}^{*},$
+\end_inset
+
+ and compute the partial sum, 
+\begin_inset Formula $\left\{ \sum_{i=\mathrm{begin}(\kappa)}^{k}\lambda_{i}^{*}=\overline{\lambda_{k}}\right\} _{k\in\kappa}$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathrm{begin}(\kappa)$
+\end_inset
+
+ is the first element of the set 
+\begin_inset Formula $\kappa.$
+\end_inset
+
+ We compute 
+\begin_inset Formula $\left\{ L_{\kappa}^{*}\overline{\lambda_{k}}=c_{k}\right\} _{k\in\kappa}$
+\end_inset
+
+ where 
+\begin_inset Formula $L_{\kappa}^{*}=L_{\kappa}-\left|\kappa\right|,$
+\end_inset
+
+ and convert them to integers.
+ We add a sequence of natural number, or 1,2,3,..., to the first 
+\begin_inset Formula $\left|\kappa\right|-1$
+\end_inset
+
+ elements: 
+\begin_inset Formula $\left\{ c_{k}+\mathrm{order}(k)\right\} _{k\in\kappa}.$
+\end_inset
+
+ We use them as ending positions of the first 
+\begin_inset Formula $\left|\kappa\right|-1$
+\end_inset
+
+ segments.
+ The ending position of the last segment remains unchanged.
+\end_layout
+
 \begin_layout Subsubsection
 TxBoundaries::sampleSegment
 \end_layout
@@ -1623,13 +2094,17 @@ left
 \family typewriter
 right
 \family default
- end positions of a segment.
+ end positions of a segment using 
+\family typewriter
+sampleSegment
+\family default
+.
  The 
 \family typewriter
 left
 \family default
  is uniformly chosen among all of the sites in a chromosome.
- We then use a value 
+ We use a value 
 \family typewriter
 mLengthSampleSegment
 \family default
@@ -1692,11 +2167,11 @@ right
 
  in a vector 
 \family typewriter
-a
+dk
 \family default
  and 
 \family typewriter
-b
+aDk
 \family default
 .
  Note that 
@@ -1704,23 +2179,27 @@ b
 \end_inset
 
  not 
-\begin_inset Formula $k\in[\mathrm{left},\mathrm{right}).$
+\begin_inset Formula $k\in[\mathrm{left},\mathrm{right})$
 \end_inset
 
+ when we create 
+\family typewriter
+dk
+\family default
+ variable.
  We sum 
 \family typewriter
-b
+dk
 \family default
  to find 
 \family typewriter
-s
+sumDk
 \family default
-.
- We find 
-\family typewriter
-bAlpha
-\family default
- as 
+, or 
+\begin_inset Formula $\sum_{k'\in\kappa}\delta_{k'}.$
+\end_inset
+
+ We compute 
 \begin_inset Formula 
 \[
 \left\{ \frac{\delta_{k}}{\sum_{k'\in\kappa}\delta_{k'}}\alpha_{\mathrm{e}}\right\} _{k\in\kappa}
@@ -1728,7 +2207,11 @@ bAlpha
 
 \end_inset
 
-where 
+as 
+\family typewriter
+bAlpha
+\family default
+ where 
 \begin_inset Formula $\alpha_{\mathrm{e}}$
 \end_inset
 
@@ -1756,7 +2239,7 @@ a
 \family default
  by the sum to have a new value of 
 \family typewriter
-a
+aDk
 \family default
 .
  We find 
@@ -1768,7 +2251,11 @@ aAlpha
 \begin_inset Formula $\left\{ \delta_{k}^{*}\right\} _{k\in\kappa}$
 \end_inset
 
- we need to compute the acceptance ratio for the expression level move.
+ in 
+\family typewriter
+aDk
+\family default
+, we need to compute the acceptance ratio for the expression level move.
  An acceptance ratio consists of likelihood ratio, prior ratio, and MH ratio.
  
 \end_layout
@@ -1985,6 +2472,62 @@ lkA
  
 \end_layout
 
+\begin_layout Subsubsection
+Distance of boundaries B from A
+\end_layout
+
+\begin_layout Standard
+We wish to define a distance between two boundaries of 
+\begin_inset Formula $\bm{s}_{A}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bm{s}_{B}.$
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+\left|\bm{s}_{A}-\bm{s}_{B}\right|=\sum_{k_{A}}\min_{k_{B}}\left(\left|c_{k_{A}}-c_{k_{B}}\right|\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $c_{k_{A}}$
+\end_inset
+
+ and 
+\begin_inset Formula $c_{k_{B}}$
+\end_inset
+
+ are the ending positions of 
+\begin_inset Formula $k_{A}$
+\end_inset
+
+-th and 
+\begin_inset Formula $k_{B}$
+\end_inset
+
+-th segments, respectively.
+ The distance measure would allow us to find a boundaries parameter that
+ minimize the sum of the squares of distances from the parameter to all
+ of boundaries in the posterior sample.
+ We would implement this in 
+\family typewriter
+tux-sum.cpp
+\family default
+ test program using 
+\family typewriter
+tux::Summary
+\family default
+ and 
+\family typewriter
+tux::Summarize
+\family default
+ claases.
+\end_layout
+
 \begin_layout Subsection
 Gamma-family GLM
 \end_layout
@@ -2036,7 +2579,7 @@ Table of Symbols
 
 \begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="2">
+<lyxtabular version="3" rows="35" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="left" valignment="top" width="0">
@@ -2134,6 +2677,9 @@ Total number of samples
 \begin_inset Text
 
 \begin_layout Plain Layout
+\begin_inset Formula $j$
+\end_inset
+
 
 \end_layout
 
@@ -2143,7 +2689,11 @@ Total number of samples
 \begin_inset Text
 
 \begin_layout Plain Layout
+Index of one of 
+\begin_inset Formula $J$
+\end_inset
 
+ samples
 \end_layout
 
 \end_inset
@@ -2177,7 +2727,105 @@ Total number of segments
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $X_{j,k}$
+\begin_inset Formula $k$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Index of gene, or transcript segment running from 
+\begin_inset Formula $0$
+\end_inset
+
+ to 
+\begin_inset Formula $K-1$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\phi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mean-variance function of expression level; 
+\begin_inset Formula $a_{0}+a_{1}/\mu$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X_{jk}$
 \end_inset
 
 
@@ -2220,16 +2868,48 @@ Short reads mapped on
 \begin_inset Text
 
 \begin_layout Plain Layout
-End position of 
+1-based ending position of 
 \begin_inset Formula $k$
 \end_inset
 
 -th segment.
- Note that 
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Note that 
+\begin_inset Formula $c_{-1}$
+\end_inset
+
+ is 0, 
 \begin_inset Formula $c_{0}$
 \end_inset
 
- is zero.
+ is ending position of the first segment, and 
+\begin_inset Formula $c_{K}$
+\end_inset
+
+ is 
+\begin_inset Formula $L.$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -2256,7 +2936,11 @@ Length of
 \begin_inset Formula $k$
 \end_inset
 
--th segment
+-th segment, or 
+\begin_inset Formula $c_{k}-c_{k-1}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -2283,7 +2967,38 @@ All of the lengths of the
 \begin_inset Formula $K$
 \end_inset
 
- segments
+ segments, or 
+\begin_inset Formula $\left\{ l_{k}\right\} _{k\in\{0,\ldots,K-1\}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A subset of 
+\begin_inset Formula $\left\{ 0,\ldots,K-1\right\} $
+\end_inset
+
+ used to move transcript boundaries in MCMC
 \end_layout
 
 \end_inset
@@ -2310,12 +3025,8 @@ Fraction of
 \begin_inset Formula $l_{k}$
 \end_inset
 
- with respect to 
-\begin_inset Formula $L,$
-\end_inset
-
- or 
-\begin_inset Formula $\lambda_{k}=l_{k}/\sum_{k}l_{k}$
+ with respect to sum of some segments or 
+\begin_inset Formula $\lambda_{k}=l_{k}/\sum_{k\in\kappa}l_{k}$
 \end_inset
 
 
@@ -2341,7 +3052,6 @@ Fraction of
 \begin_inset Text
 
 \begin_layout Plain Layout
-Interval of 
 \begin_inset Formula $k$
 \end_inset
 
@@ -2639,6 +3349,148 @@ All of the relative expression intensity of the
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\alpha_{\mathrm{b}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiplying factor for proposing a new boundaries
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\alpha_{\mathrm{e}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiplying factor for proposing a new expression
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+total generation length of a chain
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $g$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $g$
+\end_inset
+
+-th index of a state in a chain 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $B$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+number of discarded generations out of the total 
+\begin_inset Formula $G$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -2671,7 +3523,7 @@ All of the relative expression intensity of the
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption

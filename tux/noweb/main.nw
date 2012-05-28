@@ -31,11 +31,16 @@ Ithaca, NY 14850}
 
 \tableofcontents
 
+
 \newpage
 \section{Introduction}
 
 The lyx file is 
 /Users/goshng/Dropbox/Documents/Projects/Peach/notes/researches/siepel-transcript.lyx
+
+\subsection{YAML: Emitter}
+
+Check /usr/local/include/yaml-cpp/emitter.h
 
 We generate a data set under the model. A number of model parameters include:
 \begin{enumerate*}
@@ -88,6 +93,8 @@ After finishing all of the messages of \Cmethod{step} in the list of
 check whether it can continue to move steps of the chains. The \Cclass{Mcmc}
 would swap chains by receciving necessary values from \Cclass{ChainManager}. 
 
+\subsection{Manager}
+
 Members of \Cclass{Manager}:
 \begin{enumerate*}
 \item Data member
@@ -102,6 +109,12 @@ resources for jobs.
 \item void load();
 \item void help();
 \end{enumerate*}
+
+\subsection{Model}
+I do not find a role of \Cclass{Model}, yet. The \Cclass{Fixed} has a similar
+role.
+
+\subsection{Mcmc}
 
 Members of \Cclass{Mcmc}:
 \begin{enumerate*}
@@ -184,6 +197,7 @@ those to the rank 0 process, and wait and receive messages from the rank 0
 process. After getting all of the chain IDs we use \Cclass{ChainManager} to call
 \Cmethod{setChainid}.
 
+\subsection{ChainManager}
 
 Members of \Cclass{ChainManager}:
 \begin{enumerate*}
@@ -196,7 +210,22 @@ Members of \Cclass{ChainManager}:
 \item void chainid (vector<unsigned int>\&); returns a vector of Chain IDs from
 the list of chains
 \item void setChainid (vector<unsigned int>\&); assigns chain IDs 
+\item void createChain (unsigned int n); This must be called only once because
+it creates a vector of \Cclass{Chain}, connects \Cclass{Fixed} and
+\Cclass{Reads}, and calls \Cclass{createParameter} of \Cclass{Chain}. 
 \end{enumerate*}
+
+The \Cclass{ChainManager} owns objects from 
+\Cmember{mTxFixed}, and \Cmember{mTxData}. This runs on a single process or a
+single thread. It owns multiple chains. It is different from \Cclass{Mcmc} in
+that it does call MPI command or threads. 
+
+I think that \Cclass{Mcmc} should be renamed because it has something to do with
+processes and threads. Chain swaps are done in \Cclass{Mcmc}. We might want to
+keep its name. The \Cclass{Mcmc} might have two things in it: process management
+and Markov chains management. 
+
+\subsection{Chain}
 
 Members of \Cclass{Chain}:
 \begin{enumerate*}
@@ -208,11 +237,18 @@ Members of \Cclass{Chain}:
 \item Parameter* mTxBoundaries; a set of transcript boundaries
 \item Parameter* mTxExpression; a set of transcript expression
 \item Data* mTxData; a set of short reads alignment data
+\item public:
+\item TxFixed(); sets mTxFixed
+\item TxReads(); sets mTxReads
+\item createParameter(); creates boundaries and expression parameters
 \end{enumerate*}
 
 The \Cclass{Chain} owns objects from \Cclass{RandomVariable}:
-\Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{mTxData}. The
-first two \Cclass{Parameter} objects change their contents through
+\Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{MoverManager}.
+The \Cclass{Chain} has access to \Cmember{mTxFixed}, and \Cmember{mTxData}.
+The \Cclass{ChainManager} owns objects from 
+\Cmember{mTxFixed}, and \Cmember{mTxData}. 
+The first two \Cclass{Parameter} objects change their contents through
 \Cclass{Mover} objects that are managed by \Cclass{MoverManager}. Methods of
 \Cclass{Chain} would create \Cclass{Parameter} objects. Additionally,
 \Cclass{Mover} objects are created in methods of \Cclass{Chain}. Objects of
@@ -223,33 +259,11 @@ Let us check how we could propose a new state of \Cclass{TxBoundaries}, and
 accept or reject it in \Cclass{MoverTxBoundaries}. Do this 
 in \Cclass{MoverTxExpression} as well.
 
-\Cclass{MoverTxBoundaries} \Cmethod{step}
-\begin{Verbatim}[frame=lines,framesep=5mm]
-  // 1. We choose a subset of the K segments.
-  // 1.1 We choose a site of the L sites.
-  // 1.2 We choose a length from a distribution or fixed value.
-  // 1.3 Group segments in the chosen region.
-  // 2. Find the lengths of the subset of the segments.
-  // 2.1 Sum the lengths.
-  // 2.2 Compute the fractions of the legnths with respect to the sum of the
-  // length.
-  // 2.3 Multiply the factions by a pseudo-concentration parameter.
-  // 3. Use the multiplied factions as a set of concentration parameters to
-  // sample a new set of random variates from the Dirichlet distribution.
-  // 3.1 Multiply the sum of the lengths of the subset to recover a new set of
-  // segments. 
-  // 3.2 Adjust legnths of the segments so that legnths fit the remaining
-  // segments.
-  // 4. Compute acceptance probability by using likelihood, priors, and
-  // Metropolis-Hastings ratio.
-  // 4.1 The priors are p(mu|s)p(s)=p(mu)p(s). This value does not change
-  // before and after the proposal.
-  // 4.2 Count reads on the subset and compute p(x|theta*)/p(x|theta).
-  // Optimization of the likelihood ratio can be done by using forms of the
-  // negative binomial probability functions.
-  // 4.3 Compute the Metropolis-Hastings ratio using the proposal.
-\end{Verbatim}
+We use fstream to create a file and append the chain state to the file. We
+considered \Cclass{Sample}, which did not make sense.
 
+
+\subsection{RandomVariables}
 
 TxBoundaries is created in a method of class Chain.
 MoverTxBoundaries should be also created in a method of class Chain.
@@ -270,6 +284,232 @@ to replace a current state of \Cclass{Parameter} with another. The
 \Cclass{Mover} objects. The \Cclass{MoverManager} is operational in that it
 returns a \Cclass{Mover} among the set of \Cclass{Mover} objects with
 multinomial probability.
+
+\subsection{Parameter}
+
+\subsection{TxBoundaries}
+
+\begin{enumerate*}
+\item public: 
+\item   vector<unsigned int> mC; 1-based ending positions of segments
+\item   unsigned int mLengthSampleSegment; length of interval for choosing
+random segments
+\item public:
+\item   TxBoundaries ();
+\item   ~TxBoundaries ();
+\item   unsigned int size (); the number of segments
+\item   unsigned int L (); the length of the chromosome 
+\item   void seq (unsigned int from, unsigned int to, unsigned int by); 
+\item   void sampleSegment (unsigned int\&, unsigned int\&);
+\end{enumerate*}
+
+\subsection{TxExpression}
+
+\begin{enumerate*}
+\item public:
+\item   vector<double> mDelta; 
+\item public:
+\item   TxExpression ();
+\item   ~TxExpression ();
+\item   void seq (unsigned int); sets the equal-sized delta 
+\item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, 
+                                    const TxExpression \&tx);
+\end{enumerate*}
+
+\subsection{Data}
+
+We do not have members yet. This is just a base of fixed parameters.
+
+We would need to read and write \Cclass{RandomVariable} from and to a file using
+YAML. We have a likelihood that is used to compute the likelihood and to sample
+data given parameters.
+
+\subsection{Reads}
+
+Members of \Cclass{Reads}
+\begin{enumerate*}
+\item public: Data members
+\item   vector<unsigned int> mCount; number of counts of reads at the position.
+We only consider 5' end positions of short reads to count. 
+\item   unsigned int mN; total number of counts derived from \Cmember{mCount}
+\item   unsigned int mJ; j-th short reads
+\item public: Methods
+\item   Reads ();
+\item   ~Reads ();
+\item   unsigned int size (); the length of a chromosome 
+\item   void sample (unsigned int l, unsigned int ul=10); sets counts for each
+site to random values, the random values are between 0 and ul. The number of
+sites becomes $l$
+\item   friend YAML::Emitter operator (YAML::Emitter out, const Reads tx);
+\end{enumerate*}
+
+\subsection{Fixed}
+
+Members of \Cclass{Fixed}
+\begin{enumerate*}
+\item public: Data members
+\item   unsigned int mK; the number of segments
+\item   unsigned int mM; the number of segments
+\item   vector<double> mZ; the size factors
+\item   double mA0; the coefficient $a_0$ of the function $\phi$
+\item   double mA1; the coefficient $a_1$ of the function $\phi$
+\item   double mAlpha; the proposal controller of expression levels
+\item   double mAlphaQBoundaries; the proposal controller of boundaries
+\item   unsigned int mLengthSampleSegment; the length of sampled segments
+\item   double mAlphaPriorExpression; constant $\alpha_k$ value for the
+Dirichlet prior, we would set 0.01 to $\alpha_k$. 
+\item   unsigned int mMcmcLength; total length of a MCMC chain
+\item   unsigned int mMcmcBurnin; length of burn-in of the total length
+\item   unsigned int mMcmcThin; length of generation between sampling
+\item   unsigned int mNumberProcess; the number of processes
+\item   unsigned int mNumberChain; the number of chains
+\item   unsigned int mNumberSwap; the number of swap 
+\item   unsigned int mNumberSwapTry; the number of swap tries
+\item   string mOutfile; the output file name
+\item public: Methods
+\item   Fixed ();
+\item   \~{}Fixed ();
+\item   unsigned int K(); returns the number of segments
+\item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, const Fixed \&t);
+\item   friend void operator$\gg$ (const YAML::Node\& node, Fixed\& t);
+\item   friend ostream\& operator$\ll$ (ostream \&out, const Fixed \&t);
+\end{enumerate*}
+
+
+\subsection{Probability}
+
+The \Cclass{Probability} is tightly linked with \Cclass{RandomVariable}. Two
+sets of random variables are considered: one that is concerned, and the other
+that is conditioned. We can sample random variates of the former set from
+\Cclass{Probability}. We can compute the probability density for a specific
+set of random variates. The set of random variables that are conditioned is
+optional. We use \Cclass{Probability} for non-standard valued random variables.
+We would use simpler functions or classes for sampling a random variate from a
+uniform. 
+
+Let us consider usages of \Cclass{Probability}. We want a negative binomial with
+two parameters: mean and variance. The probability of a segment configuration is
+distributed as a uniform with a probability of $\frac{1}{{L-1 \choose K-1}}$
+where $L$ is the length of a genome where we have $K$ segments. A $k$-th segment
+boundary is between $c_{k-1}+1$ and $c_k$ inclusively. The $c_0$ is 0, and $c_K$
+is $L$. We impose a Dirichlet on expression level $\bm{\mu}$. An expression
+level of $k$-th segment is $\mu_k$, which is $\delta_k M$ where $M$ is the total
+expression level of a RNA-seq experiment. We should give a ``very''
+uninformative prior on $\bm{\mu}$ using a set of values $\bm{\alpha}$. We use a
+lagarithmic scale of $\bm{\mu}$. Given the prior we start with $\bm{s}^{(0)}$
+and $\bm{\mu}^{(0)}$. These two values are sampled from each of their prior
+distribution. The boundary value, $\bm{s}^{(0)}$, consists of
+$\{c_{k}\}_{k=1\ldots K-1}$ where $c_k$ is the end position of $k$-th segment.
+We need $K-1$ positive values. The expression value, $\bm{\mu}^{(0)}$, consists
+of $K$ real values. We use $\bm{\delta}^{(0)}$ which is a set of fractions, and
+only need $K-1$ values. We convert them in logarithmic scale. Let us go to
+\Cclass{TxBoundaries} and \Cclass{TxExpression}, which are \Cclass{Parameter},
+which in turn is \Cclass{RandomVariable}. A random variate is created from a
+probability distribution. A class of \Cclass{Probability}, or a probability of a
+set of transcript boundaries, would create an object of \Cclass{TxBoundaries}.
+Let us create a probability of a set of transcript boundaries:
+\Cclass{ProbTxBoundaries}. 
+
+Members of \Cclass{Probability}
+\begin{enumerate*}
+\item Data members:
+\item vector<RandomVariable*> mV; a list of random variables
+\item vector<RandomVariable*> mC; a list of conditioning random variables
+\item
+\item virtual double d () = 0; a value of a probability
+\item virtual RandomVariable* r () = 0; a random variate
+\end{enumerate*}
+
+\subsection{ProbTxBoundaries}
+
+Members of \Cclass{ProbTxBoundaries}
+\begin{enumerate*}
+\item Data members:
+\item  unsigned int mL; the length of a chromosome 
+\item  unsigned int mK; the number of segments
+\item Methods:
+\item ProbTxBoundaries (unsigned int l, unsigned int k); sets the length of a
+chromsome to l, and the number of segments to k. 
+\item double d (); a value of a probability of a transcipt boundaries
+\item RandomVariable* r (); a random variate of a transcript boundaries.
+\end{enumerate*}
+
+\Cmethod{ProbTxBoundaries::r} - 
+Consider numerical stability in sampling a random variate of transcript
+boundaries. A segment could be 0 in length. I let a segment be at least 1 in
+length. How can I sample Dirichlet random variates that is at least $1/L$? How
+can I sample from Dirichlet distribution? Let us see function 
+gsl\_ran\_dirichlet. We use gsl\_ran\_choose to choose $k$ sites among $L$
+sites. The value of $L$ can be large. Assuming bacterial genomes we use this
+method. Otherwise, we have to use containt Dirichlet distribution.
+We choose $K-1$ sites between 1 and $L-1$ inclusive.
+
+\subsection{ProbTxExpression}
+
+Members of \Cclass{ProbTxExpression}
+\begin{enumerate*}
+\item Data members:
+\item vector<double> mAlpha; a concentration parameter
+\item vector<double> mTheta; a random variate of Dirichlet
+\item Methods:
+\item  ProbTxExpression (const unsigned int k, const double a = 1.L); sets the
+concentration parameter of Dirichlet distribution. The size is $k$, and
+$\alpha_k$ is 1.
+\item  ~ProbTxExpression ();
+\item double d (); a value of a probability of transcipt expressions 
+\item RandomVariable* r (); a random variate of transcript expressions
+\end{enumerate*}
+
+\subsection{Likelihood}
+
+Members of \Cclass{Likelihood}
+\begin{enumerate*}
+\item Data members:
+\item unsigned int mL; the length of a chromosome
+\item unsigned int mK; the number of segments
+\item double mM; the level of total expression 
+\item vector<double> mSizeFactor; a set of size factors
+\item vector<double> mDelta; a set of delta given by TxExpression
+\item vector<unsigned int> mC; a set of segments given by TxBoundaries
+\item vector<unsigned int> mCount; a set of numbers along a chromosome
+\item Methods:
+\item  Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te); creates a
+likelihood object using the three random variables objects
+\item Likelihood (unsigned int l, unsigned int k, double m); 
+$l$ sites along a chromosome, $k$ segments, and $m$ total expression level.
+\item RandomVariable* Likelihood::r (); creates a data set.
+\end{enumerate*}
+
+The \Cclass{Fixed} is created from a YAML file. Two probability classes create
+\Cclass{TxBoundaries} and \Cclass{TxExpression}. The \Cclass{Likelihood} needs
+the three \Cclass{RandomVariable} objects to create \Cclass{Data} object. It
+does not own none of \Cclass{RandomVariable} objects.
+
+\subsection{MoverManager}
+
+Members of \Cclass{MoverManager}:
+\begin{enumerate*}
+\item Data Member:
+\item vector<Mover*> mMover; a set of \Cclass{Mover} objects.
+The \Cclass{MoverManager} owns the \Cclass{Mover} object elements in
+\Cmember{mMover}. The \Cmethod{add} allocates the memory of a \Cclass{Mover}
+object. The \Cclass{MoverManager}'s destructor must deallocate the memory.
+\item vector<unsigned int> mId; why do we need this?
+\item vector<double> mWeight; why do we need this?
+\item gsl\_ran\_discrete\_t* mGslRanDiscrete; a lookup tabl for the discrete
+random number generator
+\item Method:
+\item MoverManager (); 
+\item ~MoverManager ();
+\item void add (Mover*, const unsigned int, const double); adds a mover object
+with an ID and weight.
+\item Mover* choose ();
+\end{enumerate*}
+
+\subsection{Mover}
+
+A \Cclass{Mover} may contain many different things. We would give an identifier
+for a mover. A mover should be subclassed from the abstract \Cclass{Mover}.  
 
 \subsection{MoverTxExpression}
 
@@ -347,116 +587,32 @@ Optimization of the likelihood ratio can be done by using forms of the
 negative binomial probability functions.
 4.3 Compute the Metropolis-Hastings ratio using the proposal.
 
-\subsection{MoverManager}
-
-Members of \Cclass{MoverManager}:
-\begin{enumerate*}
-\item Data Member:
-\item vector<Mover*> mMover; a set of \Cclass{Mover} objects.
-The \Cclass{MoverManager} owns the \Cclass{Mover} object elements in
-\Cmember{mMover}. The \Cmethod{add} allocates the memory of a \Cclass{Mover}
-object. The \Cclass{MoverManager}'s destructor must deallocate the memory.
-\item vector<unsigned int> mId; why do we need this?
-\item vector<double> mWeight; why do we need this?
-\item gsl\_ran\_discrete\_t* mGslRanDiscrete; a lookup tabl for the discrete
-random number generator
-\item Method:
-\item MoverManager (); 
-\item ~MoverManager ();
-\item void add (Mover*, const unsigned int, const double); adds a mover object
-with an ID and weight.
-\item Mover* choose ();
-\end{enumerate*}
-
-A \Cclass{Mover} may contain many different things. We would give an identifier
-for a mover. A mover should be subclassed from the abstract \Cclass{Mover}.  
-
-The \Cclass{Probability} is tightly linked with \Cclass{RandomVariable}. Two
-sets of random variables are considered: one that is concerned, and the other
-that is conditioned. We can sample random variates of the former set from
-\Cclass{Probability}. We can compute the probability density for a specific
-set of random variates. The set of random variables that are conditioned is
-optional. We use \Cclass{Probability} for non-standard valued random variables.
-We would use simpler functions or classes for sampling a random variate from a
-uniform. 
-
-Let us consider usages of \Cclass{Probability}. We want a negative binomial with
-two parameters: mean and variance. The probability of a segment configuration is
-distributed as a uniform with a probability of $\frac{1}{{L-1 \choose K-1}}$
-where $L$ is the length of a genome where we have $K$ segments. A $k$-th segment
-boundary is between $c_{k-1}+1$ and $c_k$ inclusively. The $c_0$ is 0, and $c_K$
-is $L$. We impose a Dirichlet on expression level $\bm{\mu}$. An expression
-level of $k$-th segment is $\mu_k$, which is $\delta_k M$ where $M$ is the total
-expression level of a RNA-seq experiment. We should give a ``very''
-uninformative prior on $\bm{\mu}$ using a set of values $\bm{\alpha}$. We use a
-lagarithmic scale of $\bm{\mu}$. Given the prior we start with $\bm{s}^{(0)}$
-and $\bm{\mu}^{(0)}$. These two values are sampled from each of their prior
-distribution. The boundary value, $\bm{s}^{(0)}$, consists of
-$\{c_{k}\}_{k=1\ldots K-1}$ where $c_k$ is the end position of $k$-th segment.
-We need $K-1$ positive values. The expression value, $\bm{\mu}^{(0)}$, consists
-of $K$ real values. We use $\bm{\delta}^{(0)}$ which is a set of fractions, and
-only need $K-1$ values. We convert them in logarithmic scale. Let us go to
-\Cclass{TxBoundaries} and \Cclass{TxExpression}, which are \Cclass{Parameter},
-which in turn is \Cclass{RandomVariable}. A random variate is created from a
-probability distribution. A class of \Cclass{Probability}, or a probability of a
-set of transcript boundaries, would create an object of \Cclass{TxBoundaries}.
-Let us create a probability of a set of transcript boundaries:
-\Cclass{ProbTxBoundaries}. 
-
-Members of \Cclass{Probability}
-\begin{enumerate*}
-\item Data members:
-\item vector<RandomVariable*> mV; a list of random variables
-\item vector<RandomVariable*> mC; a list of conditioning random variables
-\item
-\item virtual double d () = 0; a value of a probability
-\item virtual RandomVariable* r () = 0; a random variate
-\end{enumerate*}
-
-\subsection{ProbTxBoundaries}
-
-Members of \Cclass{ProbTxBoundaries}
-\begin{enumerate*}
-\item Data members:
-\item  unsigned int mL; the length of a chromosome 
-\item  unsigned int mK; the number of segments
-\item Methods:
-\item ProbTxBoundaries (unsigned int l, unsigned int k); sets the length of a
-chromsome to l, and the number of segments to k. 
-\item double d (); a value of a probability of a transcipt boundaries
-\item RandomVariable* r (); a random variate of a transcript boundaries.
-\end{enumerate*}
-
-\subsection{ProbTxExpression}
-
-Members of \Cclass{ProbTxExpression}
-\begin{enumerate*}
-\item Data members:
-\item vector<double> mAlpha; a concentration parameter
-\item vector<double> mTheta; a random variate of Dirichlet
-\item Methods:
-\item double d (); a value of a probability of transcipt expressions 
-\item RandomVariable* r (); a random variate of transcript expressions
-\end{enumerate*}
-
-\subsection{Likelihood}
-
-Members of \Cclass{Likelihood}
-\begin{enumerate*}
-\item Data members:
-\item unsigned int mL; the length of a chromosome
-\item unsigned int mK; the number of segments
-\item double mM; the level of total expression 
-\item vector<double> mSizeFactor; a set of size factors
-\item vector<double> mDelta; a set of delta given by TxExpression
-\item vector<unsigned int> mC; a set of segments given by TxBoundaries
-\item vector<unsigned int> mCount; a set of numbers along a chromosome
-\item Methods:
-\item Likelihood (unsigned int j, unsigned int l, unsigned int k, double m); $j$
-samples, $l$ sites along a chromosome, $k$ segments, and $m$ total expression
-level.
-\item RandomVariable* Likelihood::r (); creates a data set.
-\end{enumerate*}
+\Cclass{MoverTxBoundaries} \Cmethod{step}
+\begin{Verbatim}[frame=lines,framesep=5mm]
+  // 1. We choose a subset of the K segments.
+  // 1.1 We choose a site of the L sites.
+  // 1.2 We choose a length from a distribution or fixed value.
+  // 1.3 Group segments in the chosen region.
+  // 2. Find the lengths of the subset of the segments.
+  // 2.1 Sum the lengths.
+  // 2.2 Compute the fractions of the legnths with respect to the sum of the
+  // length.
+  // 2.3 Multiply the factions by a pseudo-concentration parameter.
+  // 3. Use the multiplied factions as a set of concentration parameters to
+  // sample a new set of random variates from the Dirichlet distribution.
+  // 3.1 Multiply the sum of the lengths of the subset to recover a new set of
+  // segments. 
+  // 3.2 Adjust legnths of the segments so that legnths fit the remaining
+  // segments.
+  // 4. Compute acceptance probability by using likelihood, priors, and
+  // Metropolis-Hastings ratio.
+  // 4.1 The priors are p(mu|s)p(s)=p(mu)p(s). This value does not change
+  // before and after the proposal.
+  // 4.2 Count reads on the subset and compute p(x|theta*)/p(x|theta).
+  // Optimization of the likelihood ratio can be done by using forms of the
+  // negative binomial probability functions.
+  // 4.3 Compute the Metropolis-Hastings ratio using the proposal.
+\end{Verbatim}
 
 Members of \Cclass{RandomVariable}
 \begin{enumerate*}
@@ -500,55 +656,20 @@ Members of \Cclass{ProbTxBoundaries}
 \item RandomVariable* r (); a random variate of \Cclass{TxBoundaries} object
 \end{enumerate*}
 
-Members of \Cclass{Data}
-\begin{enumerate*}
-\item vector<unsigned int> mCount; number of counts of reads at the position. We
-only consider 5' end positions of short reads to count. 
-\end{enumerate*}
+\subsection{Sample}
+Each chain produces an output file. The output file contains running setup
+(\Cclass{Fixed}), data (\Cclass{Reads}), and samples (\Cclass{Sample}). 
+There are other files such as mc3 file, GSL RNG files. One of the multiple
+chains in MC3 would creates mc3 file as well as chain file. 
 
-We would need to read and write \Cclass{RandomVariable} from and to a file using
-YAML. We have a likelihood that is used to compute the likelihood and to sample
-data given parameters.
+\subsection{Summarizer}
+We reads in posterior sample files from multiple chains to create
+\Cclass{Summary} object. 
 
-Members of \Cclass{Data}
-\begin{enumerate*}
-\item  unsigned int mL; the length of the genome
-\item  unsigned int mK; the number of segments
-\item  double mM; a sequencing depth
-\item  vector<double> mSizeFactor; size factors of all of J samples
-\item  vector<double> mDelta; fractions of short reads on mK segments
-\item  vector<double> mSigma; fractions of mK segment boundaries
-\end{enumerate*}
+\subsection{Summary}
 
-\subsection{Reads}
 
-Members of \Cclass{Reads}
-\begin{enumerate*}
-\item public: Data members
-\item   vector<unsigned int> mCount; counts per sites
-\item   unsigned int mN; total number of counts derived from \Cmember{mCount}
-\item public: Methods
-\item   Reads ();
-\item   ~Reads ();
-\item   void sample (unsigned int l);
-\item   friend YAML::Emitter operator (YAML::Emitter out, const Reads tx);
-\end{enumerate*}
-
-\subsection{Fixed}
-
-\begin{enumerate*}
-\item public:
-\item   double mA0; the coefficient $a_0$ of the function $\phi$
-\item   double mA1; the coefficient $a_1$ of the function $\phi$
-\item   double mAlpha; the proposal controller of expression levels
-\item   unsigned int mLengthSampleSegment; the length of sampled segments
-\item   double mAlphaPriorExpression; constant $\alpha_k$ value for the
-Dirichlet prior, we would set 0.01 to $\alpha_k$. 
-\item public:
-\item   Fixed ();
-\item   ~Fixed ();
-\item   friend YAML::Emitter operator (YAML::Emitter out, const Fixed tx);
-\end{enumerate*}
+\subsection{System}
 
 \subsection{TUX GSL}
 
@@ -590,19 +711,86 @@ We create a data set in a YAML file. This is a test program.
 \begin{Verbatim}[frame=lines,framesep=5mm]
 tux-gsl: tests GSL.
 tux-tx: tests TxBoundaries and TxExpression. 
-tux-prob: creates data.
 tux-move: tests Movers.
 tux-chain: tests Chains.
 tux-sum: tests Summarizer.
 tux-cmd: tests Readline library with tux.
 \end{Verbatim}
 
+\subsection{tux-fixed}
+We creates a \Cclass{Fixed} object and write the object to a file. We also
+change the property of the object by reading in another file. This needs YAML
+library.  We create a yaml file.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+$ ./tux-fixed tux-fixed.out
+$ cp tux-fixed.out fixed.yaml
+$ Edit fixed.yaml
+\end{Verbatim}
+
+The fixed.yaml should look like this.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Fixed:
+  mA0: 0.5
+  mA1: 2.5
+  mAlpha: 1.5
+  mAlphaQBoundaries: 1.7
+  mLengthSampleSegment: 300
+  mAlphaPriorExpression: 0.04
+  mMcmcLength: 3000
+  mMcmcBurnin: 700
+  mMcmcThin: 82
+---
+Reads:
+  - [1, 32, 7, 9, 97, 3, 2, 5, 3, 7]
+  - [2, 12, 7, 9, 98, 3, 1, 2, 3, 8]
+  - [3, 13, 7, 8, 99, 3, 8, 4, 4, 9]
+\end{Verbatim}
+
+\subsection{tux-tx}
+We use fixed.yaml to create tx.yaml.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+$ ./tux-tx tux-tx.out
+$ cp tux-tx.out tx.yaml
+\end{Verbatim}
+
+The tx.yaml should look like the following verbatim section.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Fixed:
+  mA0: 0.5
+  mA1: 2.5
+  mAlpha: 1.5
+  mAlphaQBoundaries: 1.7
+  mLengthSampleSegment: 300
+  mAlphaPriorExpression: 0.04
+  mMcmcLength: 3000
+  mMcmcBurnin: 700
+  mMcmcThin: 82
+---
+Reads:
+  - [1, 32, 7, 9, 97, 3, 2, 5, 3, 7]
+---
+TxBoundaries:
+  - [2, 4, 6, 8, 10]
+---
+TxExpression:
+  - [0.2, 0.2, 0.2, 0.2, 0.2]
+\end{Verbatim}
+
+\subsection{tux-prob}
+We use \Cclass{Probability} to create \Cclass{RandomVariable} objects.
+
 \subsection{tux-move}
 We would read in input files. We change parameters. We do not include chains
 yet.
 
 \subsection{tux-chain}
-We would test a single chain using \Cclass{ChainManager}.
+We would test a single chain using \Cclass{Chain}.
+
+\subsection{tux-cm}
+We would test multiple chains using \Cclass{ChainManager}.
+
+\subsection{tux-mcmc}
+We would test multiple chains in multiple processes.
 
 \subsection{tux-sum}
 We would summarize an output file.
@@ -623,6 +811,26 @@ $ make
 $ make VERBOSE=1
 $ cd ..;rm -rf b;mkdir b;cd b;cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
 $ cd ../../..;./run 2;cd output/src;rm -rf b;mkdir b;cd b;cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug;make
+\end{Verbatim}
+
+Create a PDF document of this document. 
+\begin{Verbatim}[frame=lines,framesep=5mm]
+$ ./run 1
+\end{Verbatim}
+
+Tangle source codes of this document.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+$ mkdir -p output/src
+$ ./run 2
+$ pushd ../../..;./run 2;popd;make
+\end{Verbatim}
+
+To add a project create a source code, add it an executable in the CMakeLists
+file, and tangle the source code by editting sh/noweb-tangle.sh script.
+
+Debugging
+\begin{Verbatim}[frame=lines,framesep=5mm]
+print *(aAlpha._M_impl._M_start)@aAlpha.size()
 \end{Verbatim}
 
 \subsection{CMake}
@@ -672,6 +880,17 @@ cmake_minimum_required(VERSION 2.8)
 project (tux)
 # set (CMAKE_VERBOSE_MAKEFILE true)
 set (CMAKE_BUILD_TYPE DEBUG)
+SET (yamlEmitter_SRCS 
+  "yamlEmitter.cpp"
+)
+set (tux-fixed_SRCS 
+  "tux-fixed.cpp"
+  "tuxGslRng.cpp"
+  "tuxRandomVariable.cpp"
+  "tuxData.cpp"
+  "tuxFixed.cpp"
+  "tuxReads.cpp"
+)
 set (tux-tx_SRCS 
   "tux-tx.cpp"
   "tuxGslRng.cpp"
@@ -680,6 +899,7 @@ set (tux-tx_SRCS
   "tuxTxBoundaries.cpp"
   "tuxTxExpression.cpp"
   "tuxData.cpp"
+  "tuxFixed.cpp"
   "tuxReads.cpp"
 )
 set (tux-prob_SRCS 
@@ -692,6 +912,7 @@ set (tux-prob_SRCS
   "tuxLikelihood.cpp"
   "tuxData.cpp"
   "tuxReads.cpp"
+  "tuxFixed.cpp"
   "tuxProbTxBoundaries.cpp"
   "tuxProbTxExpression.cpp"
 )
@@ -713,6 +934,69 @@ set (tux-move_SRCS
   "tuxFixed.cpp"
   "tuxProbTxBoundaries.cpp"
   "tuxProbTxExpression.cpp"
+)
+set (tux-chain_SRCS 
+  "tux-chain.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxRandomVariable.cpp"
+  "tuxParameter.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxMoverManager.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxLikelihood.cpp"
+  "tuxData.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+  "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
+  "tuxChain.cpp"
+)
+set (tux-cm_SRCS 
+  "tux-cm.cpp"
+  "tuxChainManager.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxRandomVariable.cpp"
+  "tuxParameter.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxMoverManager.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxLikelihood.cpp"
+  "tuxData.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+  "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
+  "tuxChain.cpp"
+)
+set (tux-sum_SRCS 
+  "tux-sum.cpp"
+  "tuxSummarizer.cpp"
+  "tuxChainManager.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxRandomVariable.cpp"
+  "tuxParameter.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxMoverManager.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxLikelihood.cpp"
+  "tuxData.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+  "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
+  "tuxChain.cpp"
 )
 set (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -fpermissive -g3 -ggdb -O0")
 set (CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -fpermissive -g3 -ggdb -O0")
@@ -740,15 +1024,15 @@ if (USE_MYMATH)
   add_subdirectory (MathFunctions)
   set (EXTRA_LIBS ${EXTRA_LIBS} MathFunctions)
 endif (USE_MYMATH)
-add_executable (tux tux-v1.cpp)
+  add_executable (tux tux-v1.cpp)
 target_link_libraries (tux ${EXTRA_LIBS})
 
 # GNU Scientific Library
 find_package (GSL)
 if (GSL_FOUND)
   include_directories (${GSL_INCLUDE_DIR})
-  add_executable (tux-gsl tux-gsl.cpp tuxGslRng.cpp)
-  target_link_libraries (tux-gsl ${GSL_LIBRARIES})
+#  add_executable (tux-gsl tux-gsl.cpp tuxGslRng.cpp)
+#  target_link_libraries (tux-gsl ${GSL_LIBRARIES})
 else (GSL_FOUND)
   message (FATAL_ERROR "No GNU GSL library found")
 endif (GSL_FOUND)
@@ -762,16 +1046,37 @@ else(${YAMLCPP} MATCHES NOTFOUND)
   set_property(TARGET yaml PROPERTY IMPORTED_LOCATION ${YAMLCPP})
   set (tux-tx_LIBS ${tux-tx_LIBS} yaml)
   set (tux-tx_LIBS ${tux-tx_LIBS} ${GSL_LIBRARIES})
-  add_executable (tux-tx ${tux-tx_SRCS})
-  target_link_libraries (tux-tx ${tux-tx_LIBS})
+#  add_executable (tux-tx ${tux-tx_SRCS})
+#  target_link_libraries (tux-tx ${tux-tx_LIBS})
 
   set (tux-prob_LIBS ${tux-tx_LIBS})
-  add_executable (tux-prob ${tux-prob_SRCS})
-  target_link_libraries (tux-prob ${tux-prob_LIBS})
+#  add_executable (tux-prob ${tux-prob_SRCS})
+#  target_link_libraries (tux-prob ${tux-prob_LIBS})
 
   set (tux-move_LIBS ${tux-tx_LIBS})
-  add_executable (tux-move ${tux-move_SRCS})
-  target_link_libraries (tux-move ${tux-move_LIBS})
+#  add_executable (tux-move ${tux-move_SRCS})
+#  target_link_libraries (tux-move ${tux-move_LIBS})
+  
+  set (tux-chain_LIBS ${tux-tx_LIBS})
+#  add_executable (tux-chain ${tux-chain_SRCS})
+#  target_link_libraries (tux-chain ${tux-chain_LIBS})
+  
+  set (tux-cm_LIBS ${tux-tx_LIBS})
+#  add_executable (tux-cm ${tux-cm_SRCS})
+#  target_link_libraries (tux-cm ${tux-cm_LIBS})
+  
+  set (tux-sum_LIBS ${tux-tx_LIBS})
+  add_executable (tux-sum ${tux-sum_SRCS})
+  target_link_libraries (tux-sum ${tux-sum_LIBS})
+  
+  set (tux-fixed_LIBS ${tux-tx_LIBS})
+#  add_executable (tux-fixed ${tux-fixed_SRCS})
+#  target_link_libraries (tux-fixed ${tux-fixed_LIBS})
+
+  set (yamlEmitter_LIBS ${tux-tx_LIBS})
+#  add_executable (yamlEmitter ${yamlEmitter_SRCS})
+#  target_link_libraries (yamlEmitter ${yamlEmitter_LIBS})
+
 endif(${YAMLCPP} MATCHES NOTFOUND)
 
 add_executable (stl-transform stl-transform.cpp)
@@ -803,6 +1108,22 @@ add_test (tuxMoveCreate tux-move ${CMAKE_CURRENT_BINARY_DIR}/tux-move.out)
 add_test (tuxMoveCompare ${CMAKE_COMMAND} -E compare_files 
           ${CMAKE_CURRENT_BINARY_DIR}/tux-move.out
           ${CMAKE_CURRENT_SOURCE_DIR}/tux-move.out)
+add_test (tuxChainCreate tux-chain ${CMAKE_CURRENT_BINARY_DIR}/tux-chain.out)
+add_test (tuxChainCompare ${CMAKE_COMMAND} -E compare_files 
+          ${CMAKE_CURRENT_BINARY_DIR}/tux-chain.out
+          ${CMAKE_CURRENT_SOURCE_DIR}/tux-chain.out)
+add_test (tuxCMCreate tux-cm ${CMAKE_CURRENT_BINARY_DIR}/tux-cm.out)
+add_test (tuxCMCompare ${CMAKE_COMMAND} -E compare_files 
+          ${CMAKE_CURRENT_BINARY_DIR}/tux-cm.out
+          ${CMAKE_CURRENT_SOURCE_DIR}/tux-cm.out)
+add_test (tuxSumCreate tux-sum ${CMAKE_CURRENT_BINARY_DIR}/tux-sum.out)
+add_test (tuxSumCompare ${CMAKE_COMMAND} -E compare_files 
+          ${CMAKE_CURRENT_BINARY_DIR}/tux-sum.out
+          ${CMAKE_CURRENT_SOURCE_DIR}/tux-sum.out)
+add_test (tuxFixedCreate tux-fixed ${CMAKE_CURRENT_BINARY_DIR}/tux-fixed.out)
+add_test (tuxFixedCompare ${CMAKE_COMMAND} -E compare_files 
+          ${CMAKE_CURRENT_BINARY_DIR}/tux-fixed.out
+          ${CMAKE_CURRENT_SOURCE_DIR}/tux-fixed.out)
 
 include (${CMAKE_ROOT}/Modules/InstallRequiredSystemLibraries.cmake)
 set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/gpl-3.0.txt")
@@ -1749,7 +2070,7 @@ Help::version ()
 }
 @
 
-\subsection{Data serialization: YAML}
+\subsection{YAML: data serialization}
 <<monsters.cpp>>=
 #include "yaml-cpp/yaml.h"
 #include <iostream>
@@ -1812,7 +2133,7 @@ int main()
 }
 @
 
-\subsection{YAML Emitter}
+\subsection{YAML: Emitter}
 <<yamlEmitter.cpp>>=
 #include "yaml-cpp/yaml.h"
 #include <iostream>
@@ -1822,7 +2143,7 @@ int main()
 int main()
 {
   YAML::Emitter out;
-  out.SetIndent(8);                                                               
+  out.SetIndent(2); 
 
   out << "Hello, World!";
 
@@ -1915,7 +2236,18 @@ int main()
   out << YAML::EndSeq;
   out << YAML::EndMap;
 
-  std::cout << "Here's the output YAML:\n" << out.c_str(); 
+  out << YAML::BeginSeq;
+  out << YAML::BeginSeq;
+  out << YAML::Flow << squares;
+  out << YAML::Flow << squares;
+  out << YAML::EndSeq;
+  out << YAML::BeginSeq;
+  out << YAML::Flow << squares;
+  out << YAML::Flow << squares;
+  out << YAML::EndSeq;
+  out << YAML::EndSeq;
+
+  std::cout << "Here's the output YAML:\n" << out.c_str() << std::endl;
 
   return 0;
 }
@@ -2738,15 +3070,21 @@ Mcmc::swapChains ()
 #include "tuxChain.h"
 using namespace std;
 namespace tux {
+class Fixed;
+class Reads;
 class Chain;
 class ChainManager {
 public:
+  Fixed* mTxFixed;
+  vector<Reads*> mTxReads;
   vector<Chain*> mChain;
 public:
+  ChainManager (const char * filename);
   ChainManager ();
   void createChain (unsigned int);
   ~ChainManager ();
   void step (unsigned int);
+  void sample ();
   void setChainid (unsigned int, unsigned int);
   void setChainid (vector<unsigned int>& v);
   void chainid (vector<unsigned int>&);
@@ -2760,11 +3098,6 @@ public:
     unsigned int n;
     void operator() (Chain *i) { i->step (n);}
   } stepChain;
-
-//  struct c_setStep {
-//    unsigned int mStep;
-//    void operator() (Chain *i) { i->mStep = mStep;}
-//  } setStepChain;
 };
 }
 #endif // _TUXCHAINMANAGER_H_
@@ -2772,12 +3105,19 @@ public:
 <<tuxChainManager.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
-#include <algorithm>
+#include <sstream>
+#include <fstream>
+#include <algorithm>     // for_each
 #include <vector>
 #include <cassert>
+#include <functional>    // bind2nd, mem_fun
+#include <iomanip>
+// #include "ezlogger_headers.hpp"
+#include "yaml-cpp/yaml.h"
+#include "tuxFixed.h"
+#include "tuxReads.h"
 #include "tuxChain.h"
 #include "tuxChainManager.h"
-#include "ezlogger_headers.hpp"
 using namespace std;
 namespace tux {
 
@@ -2786,6 +3126,25 @@ void delete_pointed_to (T* p)
 {
   delete p;
 }
+ChainManager::ChainManager (const char * filename)
+{
+  std::ifstream fin(filename);
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  mTxFixed = new Fixed;
+  parser.GetNextDocument(doc); doc["Fixed"] >> *mTxFixed;
+  parser.GetNextDocument(doc);
+  const YAML::Node& node = doc["Reads"];
+  vector<Reads*> shortRead;
+  Reads* r;
+  for (unsigned int i = 0; i < node.size(); i++)
+    {
+      r = new Reads(i);
+      doc["Reads"] >> *r;
+      mTxReads.push_back(r);
+    }
+  fin.close();
+}
 ChainManager::ChainManager ()
 {
 }
@@ -2793,11 +3152,21 @@ void
 ChainManager::createChain (unsigned int n)
 {
   mChain.resize (n);
-  generate (mChain.begin(), mChain.end(), uniqueChain);
+  generate(mChain.begin(),mChain.end(), uniqueChain);
+  for_each(mChain.begin(),mChain.end(),
+           bind2nd(mem_fun(&Chain::TxFixed),mTxFixed));
+//  for_each(mChain.begin(),mChain.end(),
+//           bind2nd(mem_fun(&Chain::TxReads),mTxReads));
+  for (vector<Chain*>::iterator i = mChain.begin(); i != mChain.end(); i++)
+    (*i)->TxReads (mTxReads);
+  for_each(mChain.begin(),mChain.end(),
+           mem_fun(&Chain::createParameter));
 }
 ChainManager::~ChainManager ()
 {
-  for_each (mChain.begin(), mChain.end(), delete_pointed_to<Chain>);
+  delete mTxFixed;
+  for_each(mChain.begin(),mChain.end(),delete_pointed_to<Chain>);
+  for_each(mTxReads.begin(),mTxReads.end(),delete_pointed_to<Reads>);
 }
 void 
 ChainManager::step (unsigned int n)
@@ -2811,7 +3180,6 @@ ChainManager::step (unsigned int n)
 void 
 ChainManager::setChainid (unsigned int s, unsigned int e)
 {
-  cout << "s: " << s << ", e: " << e << ", size: " << mChain.size() << endl;
   assert (e - s + 1 == mChain.size());
   vector<Chain*>::iterator iter1;
   unsigned int i = 0;
@@ -2858,6 +3226,29 @@ ChainManager::likelihoodPrior (vector<double>& v)
       v.push_back((*iter1)->likelihoodPrior);
     }
 }
+void 
+ChainManager::sample ()
+{
+  // Write each of the Chains to a separate file.
+  fstream f;
+  for (vector<Chain*>::iterator i = mChain.begin();
+       i != mChain.end();
+       i++)
+    {
+      string fn(mTxFixed->mOutfile);
+      fn += ".";
+      // See http://www.cplusplus.com/articles/D9j2Nwbp
+      string sChainid = 
+        static_cast<ostringstream*>(&(ostringstream() << (*i)->chainid))->str();
+      fn += sChainid;
+      fn += ".p";
+      f.open(fn.c_str(), fstream::out | fstream::app);
+      f << std::scientific << std::fixed;
+      f << std::setprecision(std::numeric_limits<double>::digits);
+      f << **i;
+      f.close();
+    }
+}
 }
 @
 
@@ -2867,24 +3258,37 @@ ChainManager::likelihoodPrior (vector<double>& v)
 #ifndef _TUXCHAIN_H_
 #define _TUXCHAIN_H_
 #include <vector>
+#include <string>
 #include "tuxMoverManager.h"
+using namespace std;
 namespace tux {
-class Parameter;
-class Data;
+class Fixed;
+class Reads;
+class TxBoundaries;
+class TxExpression;
 class Chain {
 public:
   unsigned int chainid;
+
   double likelihoodPrior;
   double mBeta;
   unsigned int mStep;
-  Parameter* mTxBoundaries;
-  Parameter* mTxExpression;
-  Data* mTxData;
+  vector<Reads*> mTxReads;
+  Fixed* mTxFixed;
   MoverManager mMoverManager;
 public:
+  TxBoundaries* mTxBoundaries;
+  TxExpression* mTxExpression;
+public:
   Chain ();
+  Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta = 1.L);
   ~Chain ();
+  void createParameter ();
+  void TxFixed (Fixed* m) {mTxFixed=m;}
+  void TxReads (const vector<Reads*>& shortRead) {mTxReads=shortRead;}
   void step (unsigned int n = 0);
+  void sample ();
+  friend ostream& operator<< (ostream &out, const Chain &t);
 };
 }
 #endif // _TUXCHAIN_H_
@@ -2893,66 +3297,98 @@ public:
 <<tux gnu copyright>>
 #include <iostream>
 #include <cassert>
-#include "tuxMoverTxExpression.h"
+#include <vector>
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
 #include "tuxMoverTxBoundaries.h"
+#include "tuxMoverTxExpression.h"
 #include "tuxMoverManager.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxProbTxBoundaries.h" 
+#include "tuxProbTxExpression.h" 
 #include "tuxChain.h"
+
 using namespace std;
 namespace tux {
 Chain::Chain ()
 {
-  mBeta = 1; 
-  mStep = 0;
-  likelihoodPrior = 0;
-
-  // Create TxBoundaries
-  ProbTxBoundaries factoryTxBoundaries;
-  factoryTxBoundaries.mL = 10;
-  factoryTxBoundaries.mK = 2;
-  mTxBoundaries = factoryTxBoundaries.r (); 
-  // Create TxExpression
-  vector<double> a(factoryTxBoundaries.mK,10.0L);
-  ProbTxExpression factoryTxExpression (a);
-  mTxExpression = factoryTxExpression.r ();
-
-  Mover* m;
-  MoverTxBoundaries* d1;
-  MoverTxExpression* d2;
-
-  // Boundaries Mover
-  m = new MoverTxBoundaries;
-  d1 = dynamic_cast<MoverTxBoundaries*>(m);
-  d1->mTxBoundaries = mTxBoundaries;
-  d1->mTxExpression = mTxExpression;
-  mMoverManager.add (m, 1, 1);
-
-  // Expression Mover
-  m = new MoverTxExpression;
-  d2 = dynamic_cast<MoverTxBoundaries*>(m);
-  d2->mTxBoundaries = mTxBoundaries;
-  d2->mTxExpression = mTxExpression;
-  mMoverManager.add (m, 2, 1);
-
+}
+Chain::Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta)
+{
+  //likelihoodPrior = 0;
+  mTxReads = shortRead;
+  mTxFixed = m;
+  mBeta = beta;
+  createParameter ();
 }
 Chain::~Chain ()
 {
+  delete mTxBoundaries;
+  delete mTxExpression;
+}
+void 
+Chain::createParameter ()
+{
+  mStep = 0;
+  mBeta = 0;
+
+  Reads* r = mTxReads.front();
+  ProbTxBoundaries factoryTxBoundaries (r->size(),mTxFixed->K());
+  mTxBoundaries = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
+  ProbTxExpression factoryTxExpression (mTxFixed->K());
+  mTxExpression = static_cast<TxExpression*>(factoryTxExpression.r());
+
+  // Boundaries Mover
+  MoverTxBoundaries* d1 = new MoverTxBoundaries;
+  d1->mTxBoundaries = mTxBoundaries;
+  d1->mTxExpression = mTxExpression;
+  d1->mFixed = mTxFixed;
+  d1->mReads = mTxReads;
+  mMoverManager.add (d1, 1, 1);
+  // Expression Mover
+  MoverTxExpression* d2 = new MoverTxExpression;
+  d2->mTxBoundaries = mTxBoundaries;
+  d2->mTxExpression = mTxExpression;
+  d2->mFixed = mTxFixed;
+  d2->mReads = mTxReads;
+  mMoverManager.add (d2, 2, 1);
 }
 void 
 Chain::step (unsigned int n)
 {
   assert (n > 0);
-  cout << chainid << ":";
+  //cout << chainid << ":";
   for (unsigned int i = 0; i < n; i++, mStep++)
     {
-      cout << " " << mStep;
+      //cout << " " << mStep;
       Mover* m = mMoverManager.choose ();
-      // The Mover m needs to get RandomVariables from Chain.
-      // We need to access members of MoverTxBoundaries.
-      // 
       m->step ();
     }
   cout << endl;
   return;
+}
+void 
+Chain::sample ()
+{
+  // Append the chain state to a file.
+  // scalar values - beta, likelihood
+  // boundaries
+  // expression
+  //mSample << mTxBoundaries;
+  //mSample << mTxExpression;
+  //mSample << mLikelihood;
+  //mSample.write ();
+
+  //friend Sample& operator<< (Sample &out, const Fixed &t);
+}
+ostream& 
+operator<< (ostream &out, const Chain &t)
+{
+  out << "-" << endl
+      << *(t.mTxBoundaries)
+      << *(t.mTxExpression);
+  return out;
 }
 }
 @
@@ -3004,6 +3440,7 @@ namespace tux {
 <<tux gnu copyright>>
 #ifndef _TUXTXBOUNDARIES_H_
 #define _TUXTXBOUNDARIES_H_
+#include <iostream>
 #include <vector>
 #include "yaml-cpp/yaml.h"
 #include "tuxParameter.h"
@@ -3016,7 +3453,7 @@ public:
 public:
   TxBoundaries ();
   ~TxBoundaries ();
-  unsigned int length () {return mC.size();}
+  unsigned int size () {return mC.size();}
   unsigned int L () {return mC.back();}
   void seq (unsigned int from, unsigned int to, unsigned int by);
   void sampleSegment (unsigned int&, unsigned int&);
@@ -3030,6 +3467,7 @@ public:
   } mSeq;
   friend YAML::Emitter& operator<< (YAML::Emitter &out, 
                                     const TxBoundaries &tx);
+  friend ostream& operator<< (ostream &out, const TxBoundaries &t);
 };
 }
 #endif // _TUXTXBOUNDARIES_H_
@@ -3072,10 +3510,19 @@ operator<< (YAML::Emitter &out, const TxBoundaries &tx)
   out << YAML::EndMap;
   return out;
 }
+ostream& 
+operator<< (ostream &out, const TxBoundaries &t)
+{
+  out << "  - [";
+  copy(t.mC.begin(), t.mC.end() - 1, 
+       ostream_iterator<unsigned int>(out, ", ") );
+  out << t.mC.back() << "]" << endl;
+  return out;
+}
 void
 TxBoundaries::sampleSegment (unsigned int& left, unsigned int& right)
 {
-  assert (mLengthSampleSegment > 100);
+  assert (mLengthSampleSegment > 1);
   unsigned long int l = static_cast<unsigned long int>(mC.back());
   unsigned int s, e, d;
   vector<unsigned int>::iterator upLeft = mC.end();
@@ -3113,6 +3560,9 @@ public:
   TxExpression ();
   ~TxExpression ();
   void seq (unsigned int);
+  friend YAML::Emitter& operator<< (YAML::Emitter &out, 
+                                    const TxExpression &tx);
+  friend ostream& operator<< (ostream &out, const TxExpression &t);
   struct c_seq {
     double by,c;
     c_seq () {by=.1L;c=.0L;}
@@ -3121,8 +3571,6 @@ public:
     }
     double operator()() {c+=by;return c;}
   } mSeq;
-  friend YAML::Emitter& operator<< (YAML::Emitter &out, 
-                                    const TxExpression &tx);
 };
 }
 #endif // _TUXTXEXPRESSION_H_
@@ -3130,6 +3578,7 @@ public:
 <<tuxTxExpression.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <iterator>
 #include "yaml-cpp/yaml.h"
 #include "tuxTxExpression.h"
 using namespace std;
@@ -3158,6 +3607,15 @@ operator<< (YAML::Emitter &out, const TxExpression &tx)
   out << YAML::Value << YAML::BeginSeq;
   out << YAML::Flow << tx.mDelta << YAML::EndSeq;
   out << YAML::EndMap;
+  return out;
+}
+ostream& 
+operator<< (ostream &out, const TxExpression &t)
+{
+  out << "  - [";
+  copy(t.mDelta.begin(), t.mDelta.end() - 1, 
+       ostream_iterator<double>(out, ", ") );
+  out << t.mDelta.back() << "]" << endl;
   return out;
 }
 }
@@ -3189,6 +3647,7 @@ namespace tux {
 <<tux gnu copyright>>
 #ifndef _TUXREADS_H_
 #define _TUXREADS_H_
+#include <iostream>
 #include <vector>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
@@ -3201,12 +3660,16 @@ class Reads: public Data {
 public:
   vector<unsigned int> mCount;
   unsigned int mN;
+  unsigned int mJ;
 public:
-  Reads ();
+  Reads (unsigned int j = 0);
   ~Reads ();
-  void sample (unsigned int l);
-  friend YAML::Emitter& operator<< (YAML::Emitter &out, 
-                                    const Reads &tx);
+  unsigned int size () {return mCount.size();}
+  void sample (unsigned int l, unsigned int ul = 10);
+  friend YAML::Emitter& operator<< (YAML::Emitter &out, const Reads &tx);
+  friend void operator>> (const YAML::Node& node, Reads& t);
+  friend ostream& operator<< (ostream &out, const Reads &t);
+
   struct c_uniformInt {
     unsigned int l;
     c_uniformInt () {l=1000;}
@@ -3214,6 +3677,11 @@ public:
       return static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
     }
   } mUniformInt;
+
+  struct c_print {
+    ostream& mOut;
+    void operator() (unsigned int i) {mOut << " " << i;}
+  } mPrint;
 };
 }
 #endif // _TUXREADS_H_
@@ -3222,36 +3690,57 @@ public:
 <<tuxReads.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <numeric>          // accumulate
+#include <iterator>         // ostream_iterator
+#include <cassert>
 #include "yaml-cpp/yaml.h"
 #include "tuxReads.h"
 <<extern tuxGslRng>>
 using namespace std;
 namespace tux {
-Reads::Reads ()
+Reads::Reads (unsigned int j)
 {
-  
+  mJ = j; 
 }
 Reads::~Reads ()
 {
   
 }
 void
-Reads::sample (unsigned int l)
+Reads::sample (unsigned int l, unsigned int ul)
 {
-  mUniformInt.l = 10;
+  mUniformInt.l = ul;
   mCount.resize(l);
   generate(mCount.begin(),mCount.end(),mUniformInt);
   mN = accumulate(mCount.begin(),mCount.end(),0);
 }
-YAML::Emitter& 
-operator<< (YAML::Emitter &out, const Reads &tx)
+ostream& 
+operator<< (ostream &out, const Reads &t)
 {
-  out << YAML::BeginMap;
-  out << YAML::Key << "Reads";
-  out << YAML::Value << YAML::BeginSeq;
-  out << YAML::Flow << tx.mCount << YAML::EndSeq;
-  out << YAML::EndMap;
+  assert (t.mCount.size() > 0);
+  out << "Reads:" << endl
+      << "  - [";
+  copy(t.mCount.begin(), t.mCount.end() - 1, 
+       ostream_iterator<unsigned int>(out, ", ") );
+  out << t.mCount.back() << "]" << endl;
   return out;
+  
+}
+YAML::Emitter& 
+operator<< (YAML::Emitter &out, const Reads &t)
+{
+  out << YAML::BeginMap 
+      << YAML::Key << "Reads" 
+      << YAML::Value << YAML::BeginSeq << YAML::Flow << t.mCount << YAML::EndSeq
+      << YAML::EndMap;
+  return out;
+}
+void 
+operator>> (const YAML::Node& node, Reads& t)
+{
+  node[t.mJ] >> t.mCount;
+  t.mN = accumulate(t.mCount.begin(),t.mCount.end(),0);
+  return;
 }
 }
 @
@@ -3271,17 +3760,30 @@ using namespace std;
 namespace tux {
 class Fixed: public Data {
 public:
+  unsigned int mK;
+  double mM;
+  vector<double> mZ;
   double mA0;
   double mA1;
   double mAlpha;
   double mAlphaQBoundaries;
   unsigned int mLengthSampleSegment;
   double mAlphaPriorExpression;
+  unsigned int mMcmcLength;
+  unsigned int mMcmcBurnin;
+  unsigned int mMcmcThin;
+  unsigned int mNumberProcess;
+  unsigned int mNumberChain;
+  unsigned int mNumberSwap;
+  unsigned int mNumberSwapTry;
+  string mOutfile;
 public:
   Fixed ();
   ~Fixed ();
-  friend YAML::Emitter& operator<< (YAML::Emitter &out, 
-                                    const Fixed &tx);
+  unsigned int K () {return mK;}
+  friend YAML::Emitter& operator<< (YAML::Emitter &out, const Fixed &t);
+  friend void operator>> (const YAML::Node& node, Fixed& t);
+  friend ostream& operator<< (ostream &out, const Fixed& t);
 };
 }
 #endif // _TUXFIXED_H_
@@ -3303,22 +3805,114 @@ Fixed::~Fixed ()
 {
   
 }
-void
-Fixed::sample (unsigned int l)
+ostream&
+operator<< (ostream &out, const Fixed &t)
 {
-  mUniformInt.l = 10;
-  mCount.resize(l);
-  generate(mCount.begin(),mCount.end(),mUniformInt);
+  out << "Fixed: " << endl
+      << "  " << "mK"
+      << ": " << t.mK << endl
+      << "  " << "mM"
+      << ": " << t.mM << endl
+      << "  " << "mZ"
+      << ": " << endl;
+  for (vector<double>::const_iterator i = t.mZ.begin(); i != t.mZ.end(); i++)
+    {
+      out << "    - " << *i << endl;
+    }
+  out << "  " << "mA0"
+      << ": " << t.mA0 << endl
+      << "  " << "mA1"
+      << ": " << t.mA1 << endl
+      << "  " << "mAlpha"
+      << ": " << t.mAlpha << endl
+      << "  " << "mAlphaQBoundaries"
+      << ": " << t.mAlphaQBoundaries << endl
+      << "  " << "mLengthSampleSegment"
+      << ": " << t.mLengthSampleSegment << endl
+      << "  " << "mAlphaPriorExpression"
+      << ": " << t.mAlphaPriorExpression << endl
+      << "  " << "mMcmcLength"
+      << ": " << t.mMcmcLength << endl
+      << "  " << "mMcmcBurnin"
+      << ": " << t.mMcmcBurnin << endl
+      << "  " << "mMcmcThin"
+      << ": " << t.mMcmcThin << endl
+      << "  " << "mNumberProcess"
+      << ": " << t.mNumberProcess << endl
+      << "  " << "mNumberChain"
+      << ": " << t.mNumberChain << endl
+      << "  " << "mNumberSwap"
+      << ": " << t.mNumberSwap << endl
+      << "  " << "mNumberSwapTry"
+      << ": " << t.mNumberSwapTry << endl
+      << "  " << "mOutfile"
+      << ": " << t.mOutfile << endl;
+  return out;
 }
 YAML::Emitter& 
 operator<< (YAML::Emitter &out, const Fixed &t)
 {
-  out << YAML::BeginMap;
-  out << YAML::Key << "Fixed";
-  out << YAML::Value << YAML::BeginSeq;
-  out << YAML::Flow << t.mA0 << t.mA1 << YAML::EndSeq;
+  out << YAML::BeginMap << YAML::Key << "Fixed" << YAML::Value;
+  out << YAML::BeginMap
+      << YAML::Key << "mK"
+      << YAML::Value << t.mK
+      << YAML::Key << "mM"
+      << YAML::Value << t.mM
+      << YAML::Key << "mZ"
+      << YAML::Value << t.mZ
+      << YAML::Key << "mA0"
+      << YAML::Value << t.mA0
+      << YAML::Key << "mA1"
+      << YAML::Value << t.mA1
+      << YAML::Key << "mAlpha"
+      << YAML::Value << t.mAlpha
+      << YAML::Key << "mAlphaQBoundaries"
+      << YAML::Value << t.mAlphaQBoundaries
+      << YAML::Key << "mLengthSampleSegment"
+      << YAML::Value << t.mLengthSampleSegment
+      << YAML::Key << "mAlphaPriorExpression"
+      << YAML::Value << t.mAlphaPriorExpression
+      << YAML::Key << "mMcmcLength"
+      << YAML::Value << t.mMcmcLength
+      << YAML::Key << "mMcmcBurnin"
+      << YAML::Value << t.mMcmcBurnin
+      << YAML::Key << "mMcmcThin"
+      << YAML::Value << t.mMcmcThin
+      << YAML::Key << "mNumberProcess"
+      << YAML::Value << t.mNumberProcess
+      << YAML::Key << "mNumberChain"
+      << YAML::Value << t.mNumberChain
+      << YAML::Key << "mNumberSwap"
+      << YAML::Value << t.mNumberSwap
+      << YAML::Key << "mNumberSwapTry"
+      << YAML::Value << t.mNumberSwapTry
+      << YAML::Key << "mOutfile"
+      << YAML::Value << t.mOutfile
+      << YAML::EndMap;
   out << YAML::EndMap;
   return out;
+}
+void 
+operator>> (const YAML::Node& node, Fixed& t) 
+{
+  node["mK"] >> t.mK;
+  node["mM"] >> t.mM;
+  node["mZ"] >> t.mZ;
+  node["mA0"] >> t.mA0;
+  node["mA1"] >> t.mA1;
+  node["mAlpha"] >> t.mAlpha;
+  node["mAlphaQBoundaries"] >> t.mAlphaQBoundaries;
+  node["mLengthSampleSegment"] >> t.mLengthSampleSegment;
+  node["mAlphaPriorExpression"] >> t.mAlphaPriorExpression;
+  node["mMcmcLength"] >> t.mMcmcLength;
+  node["mMcmcBurnin"] >> t.mMcmcBurnin;
+  node["mMcmcThin"] >> t.mMcmcThin;
+  node["mNumberProcess"] >> t.mNumberProcess;
+  node["mNumberChain"] >> t.mNumberChain;
+  node["mNumberSwap"] >> t.mNumberSwap;
+  node["mNumberSwapTry"] >> t.mNumberSwapTry;
+  node["mOutfile"] >> t.mOutfile;
+  return;
 }
 }
 @
@@ -3371,21 +3965,27 @@ public:
   double d ();
   RandomVariable* r (); 
 
-  struct c_multiply {
-    double mL;
-    unsigned int operator()(double i) {
-      return static_cast<unsigned int>(i*mL + 0.5L);
-    }
-  } mMultiply;
+  struct c_unique {
+    unsigned int current;
+    c_unique() {current=0;}
+    unsigned int operator()() {return ++current;}
+  } mUniqueNumber;
 
-  struct c_uniform {
-    double a;
-    double b;
-    c_uniform () {a=0;b=1;}
-    double operator()() {
-      return gsl_ran_flat (gGslRng,a,b);
-    }
-  } mUniform;
+//  struct c_multiply {
+//    double mL;
+//    unsigned int operator()(double i) {
+//      return static_cast<unsigned int>(i*mL + 0.5L);
+//    }
+//  } mMultiply;
+
+//  struct c_uniform {
+//    double a;
+//    double b;
+//    c_uniform () {a=0;b=1;}
+//    double operator()() {
+//      return gsl_ran_flat (gGslRng,a,b);
+//    }
+//  } mUniform;
 
 };
 }
@@ -3414,16 +4014,13 @@ ProbTxBoundaries::d ()
 RandomVariable* 
 ProbTxBoundaries::r ()
 {
-  vector<double> a(mK-1);
-  generate(a.begin(),a.end(),mUniform);
-  mMultiply.mL = static_cast<double>(mL);
-  vector<unsigned int> b(mK-1);
-  transform(a.begin(),a.end(),b.begin(),mMultiply);
-  sort (b.begin(), b.end());
-  b.push_back(mL);
-
+  vector<unsigned int> a(mK-1);
+  vector<unsigned int> b(mL-1);
+  generate (b.begin(),b.end(),mUniqueNumber);
+  gsl_ran_choose (gGslRng, &a[0], mK-1, &b[0], mL-1, sizeof(unsigned int));
+  a.push_back(mL);
   TxBoundaries* v = new TxBoundaries;
-  v->mC = b;
+  v->mC = a;
   return v;
 }
 }
@@ -3445,7 +4042,7 @@ public:
   vector<double> mAlpha;
   vector<double> mTheta;
 public:
-  ProbTxExpression (const unsigned int k, const double a);
+  ProbTxExpression (const unsigned int k, const double a = 1.L);
   ~ProbTxExpression ();
   double d ();
   RandomVariable* r (); 
@@ -3523,8 +4120,18 @@ ProbTxExpression::r ()
 <<extern tuxGslRng>>
 using namespace std;
 namespace tux {
+class Fixed;
+class Data;
+class TxBoundaries;
+class TxExpression;
 class Likelihood: public Probability {
 public:
+  Fixed* mFixed;
+  TxBoundaries* mTxBoundaries;
+  TxExpression* mTxExpression;
+  unsigned int mJ;
+
+  // Data members are set by the above RandomVariable objects
   double mA0; // given a_0
   double mA1; // given a_1
   unsigned int mL; // a given chromosome length
@@ -3535,9 +4142,11 @@ public:
   vector<unsigned int> mC; // sample from a uniform Dirichlet distribution
   vector<unsigned int> mCount;
 public:
+  Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te);
   Likelihood (unsigned int, unsigned int, double);
   double d ();
   RandomVariable* r (); 
+  void J (unsigned int j);
   double sizeFactor () const {return mSizeFactor;}
   void sizeFactor (const double s) {mSizeFactor=s;}
   void alpha (const double a0, const double a1) {mA0=a0; mA1=a1;}
@@ -3559,31 +4168,12 @@ public:
     double mSizeFactor;
     unsigned int operator()(double i) {
       double mu = mSizeFactor * mM * i;
-      double n = 1/(a0+a1/mu);
+      double n = 1/(a0+a1/mu); // multiplied by mu?
       double p = n/(n+mu);
       unsigned int k = gsl_ran_negative_binomial(gGslRng, p, n);
       return k; 
     }
   } gslrngNb;
-
-  struct c_read {
-    unsigned int mPosition;
-    vector<unsigned int> mRead;
-    c_read () {};
-    c_read (size_t n) {mRead.resize(n); mPosition = 0;}
-    void resize(size_t n) {mRead.resize(n,0); mPosition = 0;}
-
-    unsigned int operator()(unsigned int n, unsigned int l) {
-      unsigned int s; 
-      for (unsigned int i = 0; i < n; i++)
-        {
-          s = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
-          mRead.at(mPosition + s)++;
-        }
-      mPosition += l;
-      return n;
-    }
-  } gslrngRead;
 
   struct c_subtract {
     unsigned int operator()(unsigned int i, unsigned int j) {
@@ -3624,15 +4214,33 @@ public:
 <<tuxLikelihood.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <functional>       // minus
 #include <vector>
 #include "tuxTxBoundaries.h"
 #include "tuxTxExpression.h"
+#include "tuxFixed.h"
 #include "tuxReads.h"
 #include "tuxProbTxBoundaries.h"
 #include "tuxProbTxExpression.h"
 #include "tuxLikelihood.h"
 using namespace std;
 namespace tux {
+Likelihood::Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te)
+{
+  // Check the three variables are valid. 
+  mFixed = f;
+  mTxBoundaries = tb;
+  mTxExpression = te;
+  mL = tb->L();
+  mK = f->mK;
+  mM = f->mM;
+  mSizeFactor = f->mZ[0];
+  mA0 = f->mA0;
+  mA1 = f->mA1;
+  mC = tb->mC;
+  mDelta = te->mDelta;
+}
+
 Likelihood::Likelihood (unsigned int l, unsigned int k, double m)
 {
   mL = l;
@@ -3653,6 +4261,12 @@ Likelihood::Likelihood (unsigned int l, unsigned int k, double m)
     static_cast<TxExpression*>(priorTxExpression.r());
   mDelta = vTxExpression->mDelta;
   delete vTxExpression;
+}
+void 
+Likelihood::J (unsigned int j) 
+{
+  mJ=j;
+  mSizeFactor = mFixed->mZ.at(mJ);
 }
 double
 Likelihood::d ()
@@ -3681,26 +4295,24 @@ Likelihood::r ()
   gslrngNb.a0 = mA0;
   gslrngNb.a1 = mA1;
   gslrngNb.mM = mM;
-  gslrngNb.mSizeFactor = mSizeFactor;
-  vector<unsigned int> ck(mDelta.size());
-  transform(mDelta.begin(),mDelta.end(),ck.begin(),gslrngNb);
+  gslrngNb.mSizeFactor = mFixed->mZ.at(mJ);
+  vector<unsigned int> nk(mDelta.size());
+  transform(mDelta.begin(),mDelta.end(),nk.begin(),gslrngNb);
    
   // Lengths of segments
-  vector<unsigned int> mLk(mC);
-  mLk.pop_back();
-  mLk.insert(mLk.begin(),0);
-  transform(mLk.begin(),mLk.end(),mC.begin(),mLk.begin(),mSubtract);
+  vector<unsigned int> lk(mC);
+  lk.pop_back();
+  lk.insert(lk.begin(),0);
+  transform(mC.begin(),mC.end(),lk.begin(),lk.begin(),minus<double>());
 
   // Place counts on mRead of gslrngRead.
-  //gslrngRead.resize (mL);
-  //transform(ck.begin(),ck.end(),mLk.begin(),ck.begin(),gslrngRead);
   vector<unsigned int> reads(mL,0);
   unsigned int s; 
   unsigned int p = 0;
-  for (unsigned int i = 0; i < ck.size(); i++)
+  for (unsigned int i = 0; i < nk.size(); i++)
     {
-      unsigned int n = ck.at(i);
-      unsigned int l = mLk.at(i);
+      unsigned int n = nk.at(i);
+      unsigned int l = lk.at(i);
       for (unsigned int j = 0; j < n; j++)
         {
           s = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
@@ -3760,12 +4372,17 @@ using namespace std;
 namespace tux {
 MoverManager::MoverManager ()
 {
-
+  mGslRanDiscrete = NULL;
 }
 MoverManager::~MoverManager ()
 {
   c_delete<Mover*> deleteMover;
   for_each (mMover.begin(), mMover.end(), deleteMover);           
+  if (mGslRanDiscrete != NULL) 
+    {
+      gsl_ran_discrete_free(mGslRanDiscrete);
+      mGslRanDiscrete = NULL;
+    }
 }
 void
 MoverManager::add (Mover* m, const unsigned int id, const double weight)
@@ -3773,11 +4390,16 @@ MoverManager::add (Mover* m, const unsigned int id, const double weight)
   mId.push_back(id); 
   mWeight.push_back(weight);
   mMover.push_back(m);
-  if (mMover.size() > 1)
+
+  size_t k = mMover.size();
+  if (k > 1)
     {
-      size_t k = mMover.size();
-      gsl_block* w = gsl_block_alloc(k);
-      mGslRanDiscrete = gsl_ran_discrete_preproc (k,w->data); 
+      if (mGslRanDiscrete != NULL) 
+        {
+          gsl_ran_discrete_free(mGslRanDiscrete);
+          mGslRanDiscrete = NULL;
+        }
+      mGslRanDiscrete = gsl_ran_discrete_preproc (k,&mWeight[0]); 
     }
 }
 Mover*
@@ -3820,8 +4442,12 @@ namespace tux {
 #include <vector>
 #include <cmath>
 #include <functional> // unary_function
+#include <numeric>    // accumulate
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 #include "tuxMover.h"
 using namespace std;
+<<extern tuxGslRng>>
 namespace tux {
 class TxBoundaries;
 class TxExpression;
@@ -3837,6 +4463,12 @@ public:
 public:
   MoverTxBoundaries ();
   int step ();
+
+  struct c_unique {
+    unsigned int current;
+    c_unique() {current=0;}
+    unsigned int operator()() {return current++;}
+  } uniqueNumber;
 
   struct c_subtract {
     unsigned int operator()(unsigned int i, unsigned int j) {
@@ -3882,15 +4514,24 @@ public:
       return log(gsl_ran_negative_binomial_pdf(k,p,n));
     }
   } probNb;
+
+  struct c_round {
+    unsigned int operator()(double i) {
+      return static_cast<unsigned int>(i + 0.5L);
+    }
+  } mRound;
 };
 }
 #endif // _TUXMOVERTXBOUNDARIES_H_
 
 <<tuxMoverTxBoundaries.cpp>>=
 <<tux gnu copyright>>
+#include <cassert>
+#include <cmath>
 #include <iostream>
-#include <numeric>   // partial_sum
-#include <algorithm>
+#include <numeric>    // partial_sum
+#include <algorithm>  // generate
+#include <functional> // plus
 #include <vector>
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_rng.h>
@@ -3898,6 +4539,8 @@ public:
 #include "tuxTxBoundaries.h"
 #include "tuxTxExpression.h"
 #include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxGsl.h"
 #include "tuxMoverTxBoundaries.h"
 <<extern tuxGslRng>>
 using namespace std;
@@ -3911,52 +4554,73 @@ MoverTxBoundaries::step ()
   mTxBoundaries->mLengthSampleSegment = mFixed->mLengthSampleSegment;
   unsigned int left, right;
   mTxBoundaries->sampleSegment (left, right);
-
-  vector<double> deltaK(mTxExpression->mDelta.begin() + left,
-                        mTxExpression->mDelta.begin() + right + 1);
-
   vector<unsigned int> ck(mTxBoundaries->mC.begin() + left,
                           mTxBoundaries->mC.begin() + right + 1);
-  vector<unsigned int> lK(ck);
-  vector<unsigned int> lKLeft;
+  vector<unsigned int> aCk(ck);
+  vector<double> deltaK(mTxExpression->mDelta.begin() + left,
+                        mTxExpression->mDelta.begin() + right + 1);
+  // Compute lk
+  vector<unsigned int> lk(ck);
+  vector<unsigned int> lkLeft;
   if (left == 0)
-    {
-      lKLeft.push_back(0);
-    }
+    lkLeft.push_back(0);
   else
-    {
-      lKLeft.push_back(mTxBoundaries->mC.at(left - 1);
-    }
-  lKLeft.insert(lKLeft.end(),lK.begin(),lK.end()-1);
-  transform(lK.begin(),lK.end(),lKLeft.begin(),lK.begin(),
-            minus<double>());
+    lkLeft.push_back(mTxBoundaries->mC.at(left - 1));
+  lkLeft.insert(lkLeft.end(),lk.begin(),lk.end()-1);
+  transform(lk.begin(),lk.end(),lkLeft.begin(),lk.begin(),minus<double>());
   
-  unsigned int sumLk = accumulate(lK.begin(),lK.end(),0);
-  vector<double> a(lK.size());
-  transform(lK.begin(), lK.end(), a.begin(), 
+  // Propose new boundaries
+  unsigned int sumLk = accumulate(lk.begin(),lk.end(),0);
+  unsigned int kappa = lk.size();
+  unsigned int sumLkStar = sumLk - kappa;
+  vector<double> b(lk.size());
+  transform(lk.begin(), lk.end(), b.begin(), 
             bind2nd(divides<double>(),static_cast<double>(sumLk)));
-  vector<double> b(a);
+  vector<double> a(lk.size());
+  vector<double> aAlpha(lk.size());
+  vector<double> bAlpha(lk.size());
   transform(b.begin(), b.end(), bAlpha.begin(), 
             bind2nd(multiplies<double>(),mFixed->mAlphaQBoundaries));
-  gsl_ran_dirichlet(gGslRng,k,&bAlpha[0],&a[0]);
+  gsl_ran_dirichlet(gGslRng,kappa,&bAlpha[0],&a[0]);
   transform(a.begin(), a.end(), aAlpha.begin(), 
             bind2nd(multiplies<double>(),mFixed->mAlphaQBoundaries));
+
   // No prior ratio because of uniform prior on TxBoundaries
+  double prExpression = 0;
   // MH ratio.
-  double mhAtoB = gsl_ran_dirichlet_lnpdf(k,&aAlpha[0],&b[0]);
-  double mhBtoA = gsl_ran_dirichlet_lnpdf(k,&bAlpha[0],&a[0]);
+  double mhAtoB = gsl_ran_dirichlet_lnpdf(kappa,&aAlpha[0],&b[0]);
+  double mhBtoA = gsl_ran_dirichlet_lnpdf(kappa,&bAlpha[0],&a[0]);
   double mhExpression = mhAtoB - mhBtoA;
   // Likelihood ratio.
   double likelihoodExpression; 
+  vector<unsigned int> lkA;
   if (mIsData == true)
     {
-      vector<double> aSum(a.size());
-      partial_sum(a.begin(),a.end(),aSum);
-      transform(aSum.begin(), aSum.end(), aSum.begin(), 
-                bind2nd(multiplies<double>(),static_cast<double>(sumLk)));
-      vector<unsigned int> lkA(aSum.begin(),aSum.end());
-      unsigned int sumLkA = accumulate(lkA.begin(),lkA.end(),0);
-      lkA.at(lkA.size()-1) += sumLk - sumLkA;
+      vector<double> aPartialSum(a.size());
+      partial_sum(a.begin(),a.end(),aPartialSum.begin());
+      vector<double> aCkDouble(a.size());
+      transform(aPartialSum.begin(), aPartialSum.end(), aCkDouble.begin(), 
+                bind2nd(multiplies<double>(),static_cast<double>(sumLkStar)));
+      transform (aCkDouble.begin(),aCkDouble.end(),aCk.begin(),mRound);
+      // Now, we have ending positions. We will use the first kappa-1 elements.
+      //aCk.at(aCk.size()-1) = sumLkStar;
+      aCk.back() = sumLkStar;
+      vector<unsigned int> s1(a.size());
+      uniqueNumber.current = lkLeft.front() + 1;
+          
+      generate(s1.begin(),s1.end(),uniqueNumber);                  
+      transform(aCk.begin(),aCk.end(),s1.begin(),aCk.begin(),plus<unsigned int>());
+      assert(aCk.back()==ck.back());
+
+      // Compute lkA
+      lkA = aCk;
+      vector<unsigned int> lkALeft;
+      if (left == 0)
+        lkALeft.push_back(0);
+      else
+        lkALeft.push_back(mTxBoundaries->mC.at(left - 1));
+      lkALeft.insert(lkALeft.end(),lkA.begin(),lkA.end()-1);
+      transform(lkA.begin(),lkA.end(),lkALeft.begin(),lkA.begin(),minus<double>());
 
       // We count reads on the segments.
       vector<double> logNb;
@@ -3966,7 +4630,8 @@ MoverTxBoundaries::step ()
         {
           Reads* d = mReads.at(j);
           cA.clear();
-          unsigned int posA = lKLeft.front();
+          unsigned int posA = lkLeft.front();
+          // Where is lkA?
           for (vector<unsigned int>::iterator i = lkA.begin(); 
                i != lkA.end(); 
                i++)
@@ -3978,9 +4643,9 @@ MoverTxBoundaries::step ()
               cA.push_back(sumCk);
            }
           cB.clear();
-          unsigned int posB = lKLeft.front();
-          for (vector<unsigned int>::iterator i = lK.begin(); 
-               i != lK.end(); 
+          unsigned int posB = lkLeft.front();
+          for (vector<unsigned int>::iterator i = lk.begin(); 
+               i != lk.end(); 
                i++)
             {
               unsigned int sumCk = accumulate(d->mCount.begin() + posB,
@@ -3993,29 +4658,29 @@ MoverTxBoundaries::step ()
           // Compute the probability of observing the counts using a and b.
           for (unsigned int k = 0; k < deltaK.size(); k++)
             {
-              unsigned int xkA = cA.at(k)
-              double muA = d->mNj * deltaK.at(k);
+              unsigned int xkA = cA.at(k);
+              double muA = d->mN * deltaK.at(k);
               double nA = 1.L/(mFixed->mA0 + mFixed->mA1/muA);
               double pA = nA/(nA+muA);
               double vA = gsl_ran_negative_binomial_lnpdf (xkA, pA, nA);
 
-              unsigned int xkB = cB.at(k)
-              double muB = d->mNj * deltaK.at(k);
+              unsigned int xkB = cB.at(k);
+              double muB = d->mN * deltaK.at(k);
               double nB = 1.L/(mFixed->mA0 + mFixed->mA1/muB);
               double pB = nB/(nB+muB);
               double vB = gsl_ran_negative_binomial_lnpdf (xkB, pB, nB);
               logNb.push_back(vA - vB);
             }
         }
-      likelihoodExpression = accumulate(logNb.begin(),logNb.end(),0);
+      likelihoodExpression = accumulate(logNb.begin(),logNb.end(),.0L);
     }
   else
     {
       likelihoodExpression = 0;
     }
-  double alpha = likelihoodExpression + prExpression + mhExpression;
-  double alphaUniform = gsl_rng_uniform (gGslRng);
-  if (alpha < log(alphaUniform))
+  double logAlpha = likelihoodExpression + prExpression + mhExpression;
+  double logAlphaUniform = log(gsl_rng_uniform (gGslRng));
+  if (logAlpha < logAlphaUniform)
     {
       // Reject it.
       // Keep the value of TxExpression* mTxExpression;
@@ -4024,12 +4689,9 @@ MoverTxBoundaries::step ()
     {
       // Accept it.
       // Change the value of TxExpression* mTxExpression;
-      vector<unsigned int> ckA(lkA.size());
-      transform(lkA.begin(), lkA.end(), ckA.begin(), 
-                bind2nd(plus<unsigned int>(),lKLeft.front()));
-      for (unsigned int i = 0; i < ckA.size(); i++)
+      for (unsigned int i = 0; i < aCk.size() - 1; i++)
         {
-          mTxBoundaries->mC.at(i + left) = ckA.at(i);
+          mTxBoundaries->mC.at(i + left) = aCk.at(i);
         }
       // FIXME: Movers checks something about acceptance frequency.
       // Do we need another class? We would have to use this class.
@@ -4089,13 +4751,15 @@ public:
 #include <gsl/gsl_randist.h>
 #include "tuxTxBoundaries.h"
 #include "tuxTxExpression.h"
+#include "tuxGsl.h"
 #include "tuxReads.h"
+#include "tuxFixed.h"
 #include "tuxMoverTxExpression.h"
 using namespace std;
 namespace tux {
 MoverTxExpression::MoverTxExpression ()
 {
-  mAlpha = 1.L;
+//  mAlpha = 1.L;
   mIsData = true;
   mFixed = NULL;
 }
@@ -4106,22 +4770,26 @@ MoverTxExpression::step ()
   unsigned int left, right;
   mTxBoundaries->sampleSegment (left, right);
 
-  vector<double> a(mTxExpression->mDelta.begin() + left,
-                   mTxExpression->mDelta.begin() + right + 1);
+  vector<double> dk(mTxExpression->mDelta.begin() + left,
+                    mTxExpression->mDelta.begin() + right + 1);
 
-  size_t k = static_cast<size_t>(a.size());
-  assert (k > 1);
-  vector<double> b(a);
-  vector<double> aAlpha(k);
-  vector<double> bAlpha(k);
-  double s = accumulate(b.begin(),b.end(),0);
-  transform(b.begin(), b.end(), bAlpha.begin(), 
-            bind2nd(multiplies<double>(),mFixed->mAlpha / s));
-  gsl_ran_dirichlet(gGslRng,k,&bAlpha[0],&a[0]);
-  transform(a.begin(), a.end(), a.begin(), 
-            bind2nd(multiplies<double>(),s));
+  size_t kappa = static_cast<size_t>(dk.size());
+  assert (kappa > 1);
+  vector<double> aDk(dk);
+  vector<double> a(kappa);
+  vector<double> b(kappa);
+  vector<double> aAlpha(kappa);
+  vector<double> bAlpha(kappa);
+  double sumDk = accumulate(dk.begin(),dk.end(),.0L);
+  transform(dk.begin(),dk.end(),b.begin(), 
+            bind2nd(multiplies<double>(),1.L / sumDk));
+  transform(b.begin(),b.end(),bAlpha.begin(), 
+            bind2nd(multiplies<double>(),mFixed->mAlpha));
+  gsl_ran_dirichlet(gGslRng,kappa,&bAlpha[0],&a[0]);
   transform(a.begin(), a.end(), aAlpha.begin(), 
-            bind2nd(multiplies<double>(),mFixed->mAlpha / s));
+            bind2nd(multiplies<double>(),mFixed->mAlpha));
+  transform(a.begin(), a.end(), aDk.begin(), 
+            bind2nd(multiplies<double>(),sumDk));
 
   double priorExpressionAlpha = mFixed->mAlphaPriorExpression - 1.L;
   vector<double> logA(a);
@@ -4136,10 +4804,10 @@ MoverTxExpression::step ()
             logAminusBtimesAlphaMinusOne.begin(), 
             bind2nd(multiplies<double>(),priorExpressionAlpha));
   double prExpression = accumulate(logAminusBtimesAlphaMinusOne.begin(),
-                                   logAminusBtimesAlphaMinusOne.end(),0);
+                                   logAminusBtimesAlphaMinusOne.end(),.0L);
   // MH ratio.
-  double mhAtoB = gsl_ran_dirichlet_lnpdf(k,&aAlpha[0],&b[0]);
-  double mhBtoA = gsl_ran_dirichlet_lnpdf(k,&bAlpha[0],&a[0]);
+  double mhAtoB = gsl_ran_dirichlet_lnpdf(kappa,&aAlpha[0],&b[0]);
+  double mhBtoA = gsl_ran_dirichlet_lnpdf(kappa,&bAlpha[0],&a[0]);
   double mhExpression = mhAtoB - mhBtoA;
   // Likelihood ratio.
   double likelihoodExpression; 
@@ -4147,19 +4815,14 @@ MoverTxExpression::step ()
     {
       vector<unsigned int> ck(mTxBoundaries->mC.begin() + left,
                               mTxBoundaries->mC.begin() + right + 1);
-      vector<unsigned int> lK(ck);
-      vector<unsigned int> lKLeft;
+      vector<unsigned int> lk(ck);
+      vector<unsigned int> lkLeft;
       if (left == 0)
-        {
-          lKLeft.push_back(0);
-        }
+        lkLeft.push_back(0);
       else
-        {
-          lKLeft.push_back(mTxBoundaries->mC.at(left - 1);
-        }
-      lKLeft.insert(lKLeft.end(),lK.begin(),lK.end()-1);
-      transform(lK.begin(),lK.end(),lKLeft.begin(),lK.begin(),
-                minus<double>());
+        lkLeft.push_back(mTxBoundaries->mC.at(left - 1));
+      lkLeft.insert(lkLeft.end(),lk.begin(),lk.end()-1);
+      transform(lk.begin(),lk.end(),lkLeft.begin(),lk.begin(), minus<double>());
 
       // We count reads on the segments.
       vector<double> logNb;
@@ -4168,9 +4831,9 @@ MoverTxExpression::step ()
         {
           Reads* d = mReads.at(j);
           c.clear();
-          unsigned int pos = lKLeft.front();
-          for (vector<unsigned int>::iterator i = lK.begin(); 
-               i != lK.end(); 
+          unsigned int pos = lkLeft.front();
+          for (vector<unsigned int>::iterator i = lk.begin(); 
+               i != lk.end(); 
                i++)
             {
               unsigned int sumCk = accumulate(d->mCount.begin() + pos,
@@ -4182,28 +4845,28 @@ MoverTxExpression::step ()
           // Compute the probability of observing the counts using a and b.
           for (unsigned int k = 0; k < ck.size(); k++)
             {
-              unsigned int xk = c.at(k)
-              double muA = d->mNj * a.at(k);
+              unsigned int xk = c.at(k);
+              double muA = d->mN * a.at(k);
               double nA = 1.L/(mFixed->mA0 + mFixed->mA1/muA);
               double pA = nA/(nA+muA);
               double vA = gsl_ran_negative_binomial_lnpdf (xk, pA, nA);
 
-              double muB = d->mNj * b.at(k);
+              double muB = d->mN * b.at(k);
               double nB = 1.L/(mFixed->mA0 + mFixed->mA1/muB);
               double pB = nB/(nB+muB);
               double vB = gsl_ran_negative_binomial_lnpdf (xk, pB, nB);
               logNb.push_back(vA - vB);
             }
         }
-      likelihoodExpression = accumulate(logNb.begin(),logNb.end(),0);
+      likelihoodExpression = accumulate(logNb.begin(),logNb.end(),.0L);
     }
   else
     {
-      likelihoodExpression = 0;
+      likelihoodExpression = .0L;
     }
-  double alpha = likelihoodExpression + prExpression + mhExpression;
-  double alphaUniform = gsl_rng_uniform (gGslRng);
-  if (alpha < log(alphaUniform))
+  double logAlpha = likelihoodExpression + prExpression + mhExpression;
+  double logAlphaUniform = log(gsl_rng_uniform(gGslRng));
+  if (logAlpha < logAlphaUniform)
     {
       // Reject it.
       // Keep the value of TxExpression* mTxExpression;
@@ -4212,9 +4875,9 @@ MoverTxExpression::step ()
     {
       // Accept it.
       // Change the value of TxExpression* mTxExpression;
-      for (unsigned int i = 0; i < a.size(); i++)
+      for (unsigned int i = 0; i < aDk.size(); i++)
         {
-          mTxExpression->mDelta.at(i + left) = a.at(i);
+          mTxExpression->mDelta.at(i + left) = aDk.at(i);
         }
       // FIXME: Movers checks something about acceptance frequency.
       // Do we need another class? We would have to use this class.
@@ -4222,6 +4885,39 @@ MoverTxExpression::step ()
       // because it would be complicated to access this from class.
     }
   return 0;
+}
+}
+@
+
+\subsection{Sample}
+<<tuxSample.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSAMPLE_H_
+#define _TUXSAMPLE_H_
+#include <fstream>
+namespace tux {
+class Sample {
+public:
+  string mFilename;
+  ofstream mOs;
+public:
+  void open (const char* filename);
+  void close ();
+  void write (); 
+};
+}
+#endif // _TUXSAMPLE_H_
+
+<<tuxSample.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxSample.h"
+using namespace std;
+namespace tux {
+void 
+Sample::full ()
+{
+  return;
 }
 }
 @
@@ -4323,6 +5019,8 @@ gsl_ran_negative_binomial_lnpdf (const unsigned int k,
 <<tuxGsl.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <cmath>
+#include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "tuxGsl.h"
@@ -4337,8 +5035,9 @@ gsl_ran_negative_binomial_lnpdf (const unsigned int k,
   double a = gsl_sf_lngamma (n);                                               
   double b = gsl_sf_lngamma (k + 1.0);                                         
 
-  P = (f-a-b) + n * log(p) + static_cast<double>(k) * log(1 - p); 
+  double P = (f-a-b) + n * log(p) + static_cast<double>(k) * log(1 - p); 
   return P;
+}
 }
 @
 
@@ -5106,7 +5805,7 @@ template<> inline log_double_t exp<log_double_t>(double x) {
 
 \section{Tests}
 
-\subsection{Data generation}
+\subsection{Generation of data}
 Data generation requires procedures. The \Cclass{RandomVariable} and its two
 other subclasses of \Cclass{Parameter} and \Cclass{Data} are abstract. The
 \Cclass{TxBoundaries}, \Cclass{TxExpression}, and \Cclass{Reads} are concrete.  
@@ -5276,137 +5975,6 @@ main (int argc, char *argv[])
 }
 @
 
-\subsection{TxBoundaries, TxExpression, and Reads}
-<<tux-tx.cpp>>=
-#include <fstream>
-#include <gsl/gsl_rng.h>
-#include "config.h"
-#include "tuxGslRng.h"
-#include "tuxTxBoundaries.h"
-#include "tuxTxExpression.h"
-#include "tuxReads.h"
-<<extern tuxGslRng>>
-using namespace tux;
-int 
-main (int argc, char *argv[])
-{
-  if (argc < 2)
-    {
-      return 1;
-    }
-
-  fGslRngAlloc ();
-  //gsl_rng_set(gGslRng,100);
-
-  std::fstream f;
-  f.open (argv[1], std::fstream::out);
-
-  // Add your source codes.
-  YAML::Emitter out;
-
-  // TxBoundaries
-  TxBoundaries txb;
-  txb.seq (100,1000,100); 
-  out << txb;
-
-  // Sample two points
-  out << YAML::BeginMap << YAML::Key << "SegmentSubset";
-  out << YAML::Value << YAML::BeginSeq;
-  unsigned int l1,l2;
-  for (unsigned int i = 0; i < 3; i++)
-    {
-      txb.mLengthSampleSegment = 200;
-      txb.sampleSegment (l1,l2);
-      out << l1 << l2;
-    }
-  out << YAML::EndSeq << YAML::EndMap;
-
-  // TxExpression
-  TxExpression txe;
-  txe.seq (txb.length ());
-  out << txe;
-
-  // Reads
-  Reads shortReads;
-  shortReads.sample (txb.L());
-  out << shortReads;
-
-  // Write the file to a YAML file.
-  f << out.c_str();
-  f << std::endl;
-  f.close();
-
-  fGslRngFree ();
-  return 0;
-}
-@
-
-
-\subsection{ProbTxBoundaries, ProbTxExpression, and Likelihood}
-<<tux-prob.cpp>>=
-#include <fstream>
-#include <gsl/gsl_rng.h>
-#include "config.h"
-#include "tuxGslRng.h"
-#include "tuxProbTxBoundaries.h"
-#include "tuxProbTxExpression.h"
-#include "tuxLikelihood.h"
-#include "tuxTxBoundaries.h"
-#include "tuxTxExpression.h"
-#include "tuxReads.h"
-using namespace tux;
-int 
-main (int argc, char *argv[])
-{
-  if (argc < 2)
-    {
-      return 1;
-    }
-
-  fGslRngAlloc ();
-  std::fstream f;
-  f.open (argv[1], std::fstream::out);
-
-  // Add your source codes.
-  YAML::Emitter out;
-
-  ProbTxBoundaries factoryTxBoundaries (1000,10);
-  out << YAML::BeginMap;
-  out << YAML::Key << "ProbTxBoundaries";
-  out << YAML::Value << factoryTxBoundaries.d (); 
-  out << YAML::EndMap;
-  TxBoundaries* txb = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
-  out << *txb;
-  delete txb;
-
-  ProbTxExpression factoryTxExpression (10,100.L);
-  TxExpression* txe = static_cast<TxExpression*>(factoryTxExpression.r());
-  out << *txe;
-  delete txe;
-
-  // L: 1000, K:10, M:10000 
-  static const double sf[] = {0.8700484, 1.0158870, 1.1285131};
-  vector<double> sizeFactor(sf, sf + sizeof(sf)/sizeof(sf[0]));
-  Likelihood factoryData (1000,10,10000);
-  factoryData.alpha (0.0269, 6.2076);
-  for (vector<double>::iterator i = sizeFactor.begin();
-       i != sizeFactor.end();
-       i++)
-    {
-      factoryData.sizeFactor (*i);
-      Reads* shortRead = static_cast<Reads*>(factoryData.r());
-      out << *shortRead;
-      delete shortRead;
-    }
-
-  f << out.c_str();
-  f << std::endl;
-  f.close();
-
-  fGslRngFree ();
-  return 0;
-}
-@
 
 \subsection{STL}
 <<stl-transform.cpp>>=
@@ -5459,6 +6027,237 @@ main ()
 }
 @
 
+\subsection{Test-Fixed and YAML}
+<<tux-fixed.cpp>>=
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "tuxFixed.h"
+#include "tuxReads.h"
+<<extern tuxGslRng>>
+using namespace tux;
+int 
+main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+      return 1;
+    }
+
+  std::fstream f;
+  f.open (argv[1], std::fstream::out);
+
+  // Add your source codes.
+  YAML::Emitter out;
+
+  Fixed m;
+  m.mK = 5u;
+  static const double sf[] = {0.8700484, 1.0158870, 1.1285131};
+  //vector<double> sizeFactor(sf, sf + sizeof(sf)/sizeof(sf[0]));
+  m.mZ.assign(sf, sf + sizeof(sf)/sizeof(sf[0]));
+  m.mA0 = .1L;
+  m.mA1 = 1.L;
+  m.mAlpha = 1.L;
+  m.mAlphaQBoundaries = 1.L;
+  m.mLengthSampleSegment = 100u;
+  m.mAlphaPriorExpression = .01L;
+  m.mMcmcLength = 1000u;
+  m.mMcmcBurnin = 100u;
+  m.mMcmcThin = 50u;
+  out << m;
+
+  Reads r;
+  static const unsigned int a[] = {16,2,77,29,5,2,3,3,2,3};
+  r.mCount.assign(a,a+sizeof(a)/sizeof(a[0]));
+  out << r;
+  //std::cout << r;
+   
+  // Write the file to a YAML file.
+  f << out.c_str();
+  f << std::endl;
+  f.close();
+
+  // Read in a file.
+  std::ifstream fin("fixed.yaml");
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  std::cout << "Number of docs: " << doc.size() << std::endl;
+  doc["Fixed"] >> m; std::cout << m;
+  // --- separates documents
+  parser.GetNextDocument(doc);
+  std::cout << "Number of another docs: " << doc.size() << std::endl;
+  r.mJ = 0; doc["Reads"] >> r; std::cout << r;
+  r.mJ = 1; doc["Reads"] >> r; std::cout << r;
+  r.mJ = 2; doc["Reads"] >> r; std::cout << r;
+  fin.close();
+
+  fGslRngFree ();
+  return 0;
+}
+@
+
+\subsection{TxBoundaries, TxExpression, and Reads}
+<<tux-tx.cpp>>=
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+<<extern tuxGslRng>>
+using namespace tux;
+int 
+main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+      return 1;
+    }
+
+  fGslRngAlloc ();
+
+  std::fstream f;
+  f.open (argv[1], std::fstream::out);
+
+  // Add your source codes.
+  YAML::Emitter out;
+
+  Fixed m;
+  Reads r;
+  // Read in a file: the same code as tux-fixed.cpp.
+  std::ifstream fin("fixed.yaml");
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  std::cout << "Number of docs: " << doc.size() << std::endl;
+  doc["Fixed"] >> m; out << m;
+  // --- separates documents
+  parser.GetNextDocument(doc);
+  std::cout << "Number of another docs: " << doc.size() << std::endl;
+  r.mJ = 0; doc["Reads"] >> r; out << r;
+  fin.close();
+
+  // TxBoundaries
+  TxBoundaries txb;
+  txb.seq (2,r.size(),2); 
+  out << txb;
+
+  // Sample two points
+//  out << YAML::BeginMap << YAML::Key << "SegmentSubset";
+//  out << YAML::Value << YAML::BeginSeq;
+//  unsigned int l1,l2;
+//  for (unsigned int i = 0; i < 3; i++)
+//    {
+//      txb.mLengthSampleSegment = 200;
+//      txb.sampleSegment (l1,l2);
+//      out << l1 << l2;
+//    }
+//  out << YAML::EndSeq << YAML::EndMap;
+
+  // TxExpression
+  TxExpression txe;
+  txe.seq (txb.size());
+  out << txe;
+
+  // Reads
+  Reads shortReads;
+  shortReads.sample (txb.L());
+  std::cout << shortReads;
+
+  // Write the file to a YAML file.
+  f << out.c_str();
+  f << std::endl;
+  f.close();
+
+  fGslRngFree ();
+  return 0;
+}
+@
+
+\subsection{ProbTxBoundaries, ProbTxExpression, and Likelihood}
+<<tux-prob.cpp>>=
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
+#include "tuxLikelihood.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+using namespace tux;
+int 
+main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+      return 1;
+    }
+
+  fGslRngAlloc ();
+  std::fstream f;
+  f.open (argv[1], std::fstream::out);
+
+  // Add your source codes.
+  YAML::Emitter out;
+  
+  // Read in a YAML file.
+  Fixed m;
+  Reads r;
+  // Read in a file: the same code as tux-fixed.cpp.
+  std::ifstream fin("fixed.yaml");
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  std::cout << "Number of docs: " << doc.size() << std::endl;
+  doc["Fixed"] >> m; out << m;
+  // --- separates documents
+  parser.GetNextDocument(doc);
+  std::cout << "Number of another docs: " << doc.size() << std::endl;
+  r.mJ = 0; doc["Reads"] >> r; out << r;
+  fin.close();
+
+  ProbTxBoundaries factoryTxBoundaries (r.size(),m.K());
+  out << YAML::BeginMap;
+  out << YAML::Key << "ProbTxBoundaries";
+  out << YAML::Value << factoryTxBoundaries.d (); 
+  out << YAML::EndMap;
+  TxBoundaries* txb = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
+  out << *txb; 
+
+  ProbTxExpression factoryTxExpression (m.K());
+  TxExpression* txe = static_cast<TxExpression*>(factoryTxExpression.r());
+  out << *txe;
+
+  // L: 1000, K:10, M:10000 
+  //static const double sf[] = {0.8700484, 1.0158870, 1.1285131};
+  //vector<double> sizeFactor(sf, sf + sizeof(sf)/sizeof(sf[0]));
+  Likelihood factoryData (&m,txb,txe);
+  for (unsigned int i = 0; i < m.mZ.size(); i++)
+    {
+      factoryData.J(i);
+      Reads* shortRead = static_cast<Reads*>(factoryData.r());
+      out << *shortRead;
+      delete shortRead;
+    }
+
+  delete txb;
+  delete txe;
+
+  f << out.c_str();
+  f << std::endl;
+  f.close();
+
+  fGslRngFree ();
+  return 0;
+}
+@
 
 \subsection{Movers}
 <<tux-move.cpp>>=
@@ -5472,6 +6271,7 @@ main ()
 #include "tuxTxBoundaries.h"
 #include "tuxTxExpression.h"
 #include "tuxReads.h"
+#include "tuxFixed.h"
 #include "tuxMoverManager.h"
 #include "tuxMover.h"
 #include "tuxMoverTxBoundaries.h"
@@ -5490,72 +6290,81 @@ main (int argc, char *argv[])
   f.open (argv[1], std::fstream::out);
   YAML::Emitter out;
 
-  // BEGIN of TEST
   // Add your source codes.
-  // Fixed parameter
-  Fixed fixedParameter;
-  fixedParameter.mA0 = 0.0269L;
-  fixedParameter.mA1 = 6.2076L; 
-  fixedParameter.mAlpha = 1.L;
-  fixedParameter.mAlphaQBoundaries = 1.L;
-  fixedParameter.mLengthSampleSegment = 200;
-  fixedParameter.mAlphaPriorExpression = .01L;
-
-  // Boundaries
-  ProbTxBoundaries factoryTxBoundaries (1000,10);
-  TxBoundaries* txb = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
-  txb->mLengthSampleSegment = 200;
-  // Expression
-  ProbTxExpression factoryTxExpression (10,100.L);
-  TxExpression* txe = static_cast<TxExpression*>(factoryTxExpression.r());
-
-  // Data
-  // L: 1000, K:10, M:10000 
-  static const double sf[] = {0.8700484, 1.0158870, 1.1285131};
-  vector<double> sizeFactor(sf, sf + sizeof(sf)/sizeof(sf[0]));
-  Likelihood factoryData (1000,10,10000);
-  factoryData.alpha (0.0269, 6.2076);
-  vector<Reads*> mReads;
-  for (vector<double>::iterator i = sizeFactor.begin();
-       i != sizeFactor.end();
-       i++)
+  // Read in a YAML file.
+  Fixed m;
+  // Read in a file: the same code as tux-fixed.cpp.
+  std::ifstream fin("fixed.yaml");
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  std::cout << "Number of docs: " << doc.size() << std::endl;
+  doc["Fixed"] >> m; out << m;
+  // --- separates documents
+  parser.GetNextDocument(doc);
+  std::cout << "Number of another docs: " << doc.size() << std::endl;
+  const YAML::Node& node = doc["Reads"];
+  vector<Reads*> shortRead;
+  Reads* r;
+  for (unsigned int i = 0; i < node.size(); i++)
     {
-      factoryData.sizeFactor (*i);
-      Reads* shortRead = static_cast<Reads*>(factoryData.r());
-      mReads.push_back(shortRead);
+      r = new Reads(i);
+      doc["Reads"] >> *r;
+      shortRead.push_back(r);
     }
+  fin.close();
+//  for (vector<Reads*>::iterator i = shortRead.begin(); 
+//       i != shortRead.end(); 
+//       i++)
+//    {
+//      std::cout << **i;
+//    }
+  // Initial values;
+  r = shortRead.front();
+  ProbTxBoundaries factoryTxBoundaries (r->size(),m.K());
+  TxBoundaries* txb = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
+  out << *txb; 
+  ProbTxExpression factoryTxExpression (m.K());
+  TxExpression* txe = static_cast<TxExpression*>(factoryTxExpression.r());
+  out << *txe; 
 
   // MCMC
   MoverManager mMoverManager;
-
   MoverTxBoundaries* d1;
   MoverTxExpression* d2;
-
   // Boundaries Mover
   d1 = new MoverTxBoundaries;
   d1->mTxBoundaries = txb;
   d1->mTxExpression = txe;
-  d1->mFixed = &fixedParameter;
-  d1->mReads = mReads;
+  d1->mFixed = &m;
+  d1->mReads = shortRead;
   mMoverManager.add (d1, 1, 1);
   // Expression Mover
   d2 = new MoverTxExpression;
   d2->mTxBoundaries = txb;
   d2->mTxExpression = txe;
-  d2->mFixed = &fixedParameter;
-  d2->mReads = mReads;
+  d2->mFixed = &m;
+  d2->mReads = shortRead;
   mMoverManager.add (d2, 2, 1);
 
-  for (unsigned int i = 0; i < 3; i++)
+  for (unsigned int i = 0; i < m.mMcmcLength; i++)
     {
-      Mover* m = mMoverManager.choose ();
-      m->step ();
+      Mover* mover = mMoverManager.choose ();
+      mover->step ();
+      // Other information for steps.
+      out << *txb;
+      out << *txe;
     }
-
+  // Movers are deleted by MoverManager.
+  // RandomVariables must be removed.
   delete txb;
   delete txe;
-  for (vector<Reads*>::iterator i = mReads.begin(); i != mReads.end(); i++)
-    delete *i;
+  for (vector<Reads*>::iterator i = shortRead.begin(); 
+       i != shortRead.end(); 
+       i++)
+    {
+      delete *i;
+    }
 
   // END of TEST
   f << out.c_str();
@@ -5567,5 +6376,216 @@ main (int argc, char *argv[])
 }
 @
 
+\subsection{Chains and chain manager}
+<<tux-chain.cpp>>=
+#include <iomanip>
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
+#include "tuxLikelihood.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxMoverManager.h"
+#include "tuxMover.h"
+#include "tuxMoverTxBoundaries.h"
+#include "tuxMoverTxExpression.h"
+#include "tuxChain.h"
+using namespace tux;
+int 
+main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+      return 1;
+    }
+
+  fGslRngAlloc ();
+  std::fstream f;
+  f.open (argv[1], std::fstream::out);
+  f << std::scientific;// << std::fixed;
+  f << std::setprecision(std::numeric_limits<double>::digits);
+  //f << std::setprecision(std::numeric_limits<int>::max());
+  YAML::Emitter out;
+
+  // Add your source codes.
+  // Read in a YAML file.
+  Fixed m;
+  // Read in a file: the same code as tux-fixed.cpp.
+  std::ifstream fin("fixed.yaml");
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  std::cout << "Number of docs: " << doc.size() << std::endl;
+  doc["Fixed"] >> m; out << m;
+  // --- separates documents
+  parser.GetNextDocument(doc);
+  std::cout << "Number of another docs: " << doc.size() << std::endl;
+  const YAML::Node& node = doc["Reads"];
+  vector<Reads*> shortRead;
+  Reads* r;
+  for (unsigned int i = 0; i < node.size(); i++)
+    {
+      r = new Reads(i);
+      doc["Reads"] >> *r;
+      shortRead.push_back(r);
+    }
+  fin.close();
+
+  // Create a chain.
+  Chain mChain (&m, shortRead);
+
+  // Run the chain.
+  unsigned int s = 0;
+  while (s < m.mMcmcLength) 
+    {
+      mChain.step (m.mMcmcThin);
+      s += m.mMcmcThin;
+      if (m.mMcmcBurnin < s)
+        {
+          f << mChain;
+          // mChain.sample ();
+        }
+    }
+
+  // Delelet data.
+  for (vector<Reads*>::iterator i = shortRead.begin(); 
+       i != shortRead.end(); 
+       i++)
+    {
+      delete *i;
+    }
+
+  // END of TEST
+  f << out.c_str();
+  f << std::endl;
+  f.close();
+
+  fGslRngFree ();
+  return 0;
+}
+@
+
+<<tux-cm.cpp>>=
+#include <iomanip>
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
+#include "tuxLikelihood.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxMoverManager.h"
+#include "tuxMover.h"
+#include "tuxMoverTxBoundaries.h"
+#include "tuxMoverTxExpression.h"
+#include "tuxChain.h"
+#include "tuxChainManager.h"
+using namespace tux;
+int 
+main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+      return 1;
+    }
+
+  fGslRngAlloc ();
+  std::fstream f;
+  f.open (argv[1], std::fstream::out);
+  f << std::scientific;// << std::fixed;
+  f << std::setprecision(std::numeric_limits<double>::digits);
+  //f << std::setprecision(std::numeric_limits<int>::max());
+  YAML::Emitter out;
+
+  // Create a chain manager.
+  ChainManager mChainManager ("fixed.yaml");
+  mChainManager.createChain (3);
+  mChainManager.setChainid (1,3);
+  unsigned int s = 0;
+  while (s < 10) 
+    {
+      mChainManager.step (1);
+      s += 1;
+      if (2 < s)
+        {
+          mChainManager.sample ();
+        }
+    }
+
+  // END of TEST
+  f << out.c_str();
+  f << std::endl;
+  f.close();
+
+  fGslRngFree ();
+  return 0;
+}
+@
+
+\subsection{Summary}
+
+<<tux-sum.cpp>>=
+#include <iomanip>
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
+#include "tuxLikelihood.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxMoverManager.h"
+#include "tuxMover.h"
+#include "tuxMoverTxBoundaries.h"
+#include "tuxMoverTxExpression.h"
+#include "tuxChain.h"
+#include "tuxChainManager.h"
+
+#include "tuxSummarizer.h"
+using namespace tux;
+int 
+main (int argc, char *argv[])
+{
+  if (argc < 2)
+    {
+      return 1;
+    }
+
+  fGslRngAlloc ();
+  std::fstream f;
+  f.open (argv[1], std::fstream::out);
+  f << std::scientific;// << std::fixed;
+  f << std::setprecision(std::numeric_limits<double>::digits);
+  //f << std::setprecision(std::numeric_limits<int>::max());
+  YAML::Emitter out;
+
+  // Create a chain manager.
+  Summarizer mSum ("fixed.yaml");
+  mSum.do ();
+  f << mSum;
+
+  // END of TEST
+  f << out.c_str();
+  f << std::endl;
+  f.close();
+
+  fGslRngFree ();
+  return 0;
+}
+@
+
+\subsection{MPI}
 
 \end{document}
