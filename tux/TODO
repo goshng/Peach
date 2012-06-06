@@ -48,6 +48,7 @@
 .Log
 . http://stackoverflow.com/questions/696321/best-logging-framework-for-native-c
 . http://developer.gnome.org/glib/2.33/glib-Basic-Types.html
+. How about pantheios? This requires stlsoft, b64, xtests, and shwild.
 
 .GNOME glib
 . http://ftp.gnome.org/pub/GNOME/sources/glib/2.33/glib-2.33.1.tar.xz
@@ -60,4 +61,6 @@ program shows a way of parsing a YAML file.
 program illustrates usages of emitting a YAML document. 
 . readline.cpp - 
 
-
+.Other softwares
+. g++
+. noweb

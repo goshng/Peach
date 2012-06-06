@@ -39,7 +39,9 @@ NOWEBFILE=$ROOTDIR/noweb/main.nw
 #          config.h.in )
 
 CPPFILE=( tux.cpp \
-          tux-v1.cpp \
+#          tux-v1.cpp \
+          monsters.cpp
+          yamlEmitter.cpp \
           tux-gsl.cpp \
           tux-fixed.cpp \
           tux-tx.cpp \
@@ -48,7 +50,7 @@ CPPFILE=( tux.cpp \
           tux-chain.cpp \
           tux-cm.cpp \
           tux-sum.cpp \
-          yamlEmitter.cpp \
+          tux-log.cpp \
           stl-transform.cpp \
           tuxGsl.cpp \
           tuxGslRng.cpp \

@@ -245,22 +245,22 @@ namespace axter
 			static void log_out(const char*FileName, int LineNo, const char*FunctionName, 
 			ext_data levels_format_usage_data, bool endline, const T &Data)
 		{
-			get_log_stream() << get_log_prefix_format(FileName, LineNo, FunctionName, levels_format_usage_data) << to_str(Data);
-			if (endline) get_log_stream() << std::endl;
+			ezlogger_output_policy::get_log_stream() << ezlogger_format_policy::get_log_prefix_format(FileName, LineNo, FunctionName, levels_format_usage_data) << to_str(Data);
+			if (endline) ezlogger_output_policy::get_log_stream() << std::endl;
 		}
 		template<class T1, class T2>
 		static void log_out(const char*FileName, int LineNo, const char*FunctionName, 
 		ext_data levels_format_usage_data, bool endline, const T1 &Data1, const T2 &Data2)
 		{
-			get_log_stream() << get_log_prefix_format(FileName, LineNo, FunctionName, levels_format_usage_data) << to_str(Data1) << ", "  << to_str(Data2);
-			if (endline) get_log_stream() << std::endl;
+			ezlogger_output_policy::get_log_stream() << ezlogger_format_policy::get_log_prefix_format(FileName, LineNo, FunctionName, levels_format_usage_data) << to_str(Data1) << ", "  << to_str(Data2);
+			if (endline) ezlogger_output_policy::get_log_stream() << std::endl;
 		}
 		template<class T1, class T2, class T3>
 			static void log_out(const char*FileName, int LineNo, const char*FunctionName, 
 			ext_data levels_format_usage_data, bool endline, const T1 &Data1, const T2 &Data2, const T3 &Data3)
 		{
-			get_log_stream() << get_log_prefix_format(FileName, LineNo, FunctionName, levels_format_usage_data) << to_str(Data1) << ", "  << to_str(Data2) << ", "  << to_str(Data3);
-			if (endline) get_log_stream() << std::endl;
+			ezlogger_output_policy::get_log_stream() << ezlogger_format_policy::get_log_prefix_format(FileName, LineNo, FunctionName, levels_format_usage_data) << to_str(Data1) << ", "  << to_str(Data2) << ", "  << to_str(Data3);
+			if (endline) ezlogger_output_policy::get_log_stream() << std::endl;
 		}
 	};
 
