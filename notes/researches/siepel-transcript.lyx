@@ -72,7 +72,7 @@ Sang Chul Choi
 \end_layout
 
 \begin_layout Date
-April 30th, 2011
+June 12th, 2011
 \end_layout
 
 \begin_layout Date
@@ -105,7 +105,15 @@ A multiple-chain with MPI (tux-mcmc)
 \end_layout
 
 \begin_layout Enumerate
-tux-manager or the main program, tux.
+A multiple-chain w/o MPI (tux-single)
+\end_layout
+
+\begin_layout Enumerate
+tux-manager or the main program, tux w/o MPI.
+\end_layout
+
+\begin_layout Enumerate
+tux-mpi with MPI
 \end_layout
 
 \begin_layout Enumerate
@@ -2730,10 +2738,18 @@ left
 \family typewriter
 right
 \family default
- of a sampled segment.
- Compute the lengths of the segment: 
+ of a sampled segment 
+\begin_inset Formula $\kappa$
+\end_inset
+
+.
+ The size of 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is 
 \family typewriter
-lK
+kappa
 \family default
 .
  We retrieve 
@@ -2745,13 +2761,27 @@ lK
 deltaK
 \family default
 .
- We also get 
+ We get 
 \begin_inset Formula $\left\{ c_{k}\right\} _{k\in\kappa}$
 \end_inset
 
  using 
 \family typewriter
 ck
+\family default
+.
+ Compute the lengths, 
+\family typewriter
+lk
+\family default
+, of the segments.
+ The 
+\begin_inset Formula $\sum_{k\in\kappa}l_{k}$
+\end_inset
+
+ is 
+\family typewriter
+sumLk
 \family default
 .
  We compute 
@@ -2807,29 +2837,7 @@ a
 .
  Because we let the length of a segment be greater than or equal to 1, the
  proposal of boundaries is a little more complicated than just described.
- 
-\end_layout
-
-\begin_layout Standard
-Let us see the proposal of a new set of boundaries.
- The 
-\begin_inset Formula $\sum_{k'\in\kappa}l_{k'}$
-\end_inset
-
- is 
-\family typewriter
-sumLk
-\family default
-.
- The size of 
-\begin_inset Formula $\kappa$
-\end_inset
-
- is 
-\family typewriter
-kappa
-\family default
-.
+ Let us see the proposal of a new set of boundaries.
  We compute 
 \family typewriter
 sumLkStar
@@ -2895,10 +2903,7 @@ a
 a
 \family default
  until the proposal ratio is well defined.
-\end_layout
-
-\begin_layout Standard
-We compute 
+ We compute 
 \family typewriter
 aAlpha
 \family default
@@ -2911,7 +2916,6 @@ aAlpha
 \end_inset
 
 We have not yet find the actual proposed boundaries.
- We will do that in the likelihood computation.
  We compute the partial sum, 
 \family typewriter
 aPartialSum
@@ -2972,7 +2976,11 @@ s1
 ckA
 \family default
 .
- This 
+ 
+\end_layout
+
+\begin_layout Standard
+This 
 \family typewriter
 ckA
 \family default
@@ -4852,7 +4860,7 @@ Descriptions
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "/home/goshng/Dropbox/Documents/Projects/Peach/notes/latex/bib/siepel-mutans"
+bibfiles "/Users/goshng/Dropbox/Documents/Projects/Peach/notes/latex/bib/siepel-mutans,/home/goshng/Dropbox/Documents/Projects/Peach/notes/latex/bib/siepel-mutans"
 options "plain"
 
 \end_inset

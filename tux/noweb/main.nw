@@ -11,12 +11,17 @@
 \setlength{\pdfpageheight}{\paperheight}
 \setlength{\parskip}{1ex}
 
+\newcommand{\Ccommand}[1]{command \textbf{#1}}
+\newcommand{\Coption}[1]{option \texttt{#1}}
 \newcommand{\Cclass}[1]{class \textit{#1}}
-\newcommand{\Cmember}[1]{member \textit{#1}}
-\newcommand{\Cmethod}[1]{method \textit{#1}}
+\newcommand{\Cmember}[1]{member \texttt{#1}}
+\newcommand{\Cmethod}[1]{method \texttt{#1}}
+\newcommand{\Cglobal}[1]{\texttt{#1}}
+\newcommand{\Cfunction}[1]{function \texttt{#1}}
 \newcommand{\Cpackage}[1]{package \textit{#1}}
-\newcommand{\program}[1]{\texttt{#1}}
-\newcommand{\Cfile}[1]{\texttt{#1}}
+\newcommand{\program}[1]{program \texttt{#1}}
+\newcommand{\library}[1]{\texttt{#1}}
+\newcommand{\Cfile}[1]{file \texttt{#1}}
 
 \begin{document}
 \raggedright
@@ -35,96 +40,136 @@ Ithaca, NY 14850}
 \newpage
 \section{Introduction}
 
-\subsection{Useful info}
-The lyx file is 
-/Users/goshng/Dropbox/Documents/Projects/Peach/notes/researches/siepel-transcript.lyx
+We have two programs: \program{tux} and \program{tuxmpi}. The first program uses
+\Cclass{McmcSingle}, and the latter \Cclass{McmcMpi}. When the openmpi is not
+available, use \program{tux}.
+Read more documentation in the lyx file,
+\Cfile{Peach/notes/researches/siepel-transcript.lyx}.
 
-R package for sampling a Dirichlet random variate.
-library(gtools)
-rdirichlet
-ddirichlet
-
-\subsection{YAML: Emitter}
-
-Check /usr/local/include/yaml-cpp/emitter.h
-
-We generate a data set under the model. A number of model parameters include:
-\begin{enumerate*}
-\item $J$ : 3
-\item $L$ : 1,000 base pairs
-\item $K$ : 5
-\item $\bm{\lambda}$, $\bm{s}$ : a sample from Dirichlet(1)
-\item $\bm{\delta}$, $\bm{\mu}$ : a sample from Dirichlet(1)
-\item $\phi$ : a size as a function of $\mu$
-\item $\bm{z}$ : a sample from uniform between 0.5 and 1.5
-\item We repeat the above of simulation and inference 10 times. Note that we fix
-the sampled values of $\bm{s}$, $\bm{\mu}$, and $\bm{z}$ throughout the 10 times
-of simulation.
-\end{enumerate*}
-We use \Cclass{Likelihood}, \Cclass{ProbTxBoundaries}, and
-\Cclass{ProbTxExpression} to create objects of \Cclass{Reads},
-\Cclass{TxBoundaries}, and \Cclass{TxExpression}. Then, we save them in a YAML
-file. The three objects are serialized to YAML output stream. 
-
-We need testing procedures for classes we use, which requires a fair bit of
-experience of CMake. 
-
-Users comand \program{tux} via \Cclass{Mananger}.
-
-\subsection{GNU Scientific Library}
-
-\begin{enumerate*}
-\item void fGslRngAlloc (); creates an random number generator.
-\item void fGslRngFree (); deletes the random number genrator.
-\item fGslRanDirichlet (vector<double>& alpha, vector<double>& theta, double e);
-samples theta from Dirichlet distribution of concentration parameter
-of alpha until all of the components in theta are greater than e.
-\end{enumerate*}
+\subsection{Tux}
+We describe \Cfile{tux.cpp}. The file is one of the two versions of
+\program{tux} and \program{tuxmpi}. It uses several libraries including
+\library{readline}, \library{yaml-cpp}, \library{SimpleOpt}, \library{gsl}, and
+\library{ezlogger}. The companion of \program{tuxmpi} uses 
+\library{openmpi} to implement an MPI (Message Passing Interface). There are
+other parallelization schemes available: multiple threads, GPUs using CUDA, etc.
+We focus on the MPI implementation first. We borrow the source code of
+\Cfile{fileman.c} to implement shell environment in \Cfile{tux.cpp}. 
+We have three main global-scope objects: \Cglobal{gFixed}, \Cglobal{gShortRead},
+and \Cglobal{gManager}. 
+We log the flow of \program{tux} using \library{ezlogger}. In the
+\Cfunction{main}, we set the verbosity level. 
+\begin{Verbatim}[frame=lines,framesep=5mm]
+axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_very_rarely);
+Use one of log_always, log_often, log_regularly, log_rarely, log_very_rarely.
+\end{Verbatim}
+In addition to the three main global variables, we use \Cglobal{gGslRng}. In the
+\Cfunction{main} use once
+\begin{Verbatim}[frame=lines,framesep=5mm]
+fGslRngAlloc ();
+\end{Verbatim}
+at the start, and call this before exiting the program.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+fGslRngFree ();
+\end{Verbatim}
+We first enter the interactive mode without options. See the batch mode. The
+\program{tux} can show a manual page, its version, or execute commands including
+\Ccommand{fixed}, \Ccommand{mcmc}, and \Ccommand{summarize}. The main option is
+for an input file name: \Coption{-i}, \Coption{--in}, or \Coption{--infile}. The
+input file describes the overall setup of the \program{tux}. We use
+\library{yaml-cpp} to read in the program setup. If no such file with the input
+file name is found, then the \program{tux} exits. The input file contains
+\Cmember{mDatafile}. We read in the file and save it as \Cglobal{gShortRead}.
+With the two global variables ready we can use \Cglobal{gManager}. 
+When we are finished with the batch mode, we delete the memory to each short
+read in \Cglobal{gShortRead}. We also call \Cfunction{fGslRngFree} before the
+exit. Now, let us go \Cclass{Manager}.
 
 \subsection{Manager}
 
-We use \Cclass{Mcmc} to run a number of chains. A chain is a cold chain, and the
-rest of chains are hot chains. The \Cclass{Mcmc} coordinates multiple
-simultaneous runs of chains. We need to know what chains are running in which
-machine. This can be done using MPI. Each chain needs to know what temperature
-to use. The \Cclass{Mcmc} contains \Cmember{temperature} and \Cmember{chainid}
-for accessing chains. 
-
-The \Cclass {Manager} creates a list of temperature using \Cclass{c\_hlinear},
-\Cclass{c\_hgeometric}. It sets \Cmember{chainid} as a sequence of non-negative
-integers. It also sets values of \Cmember{temperature}. We need to set up a list
-of chains before running them. The \Cclass{Mcmc} creates a list of chains and
-executes each chain one at a time using \Cmethod{step}. We have two classes for
-chains. One is for a chain that does the sampling job, and the other is for a
-chain manager. The \Cclass{Mcmc}'s \Cmethod{step} commands all of the chains to
-move a finite number of steps in their own process. The chain manager will be
-run in a separate process. We may need Message Passing Interface (MPI), which
-is an application interface that allows processes to communicate by sending and
-receiving messages. In essence, it facilitates communication when multiple
-computers/processors/cores are performing distributed calculations.
-
-The \Cclass{Mcmc} sends a message of \Cmethod{step} to \Cclass{ChainManager},
-which in turn sends a message of \Cmethod{step} to a list of \Cclass{Chain}.
-A process owns one \Cclass{ChainManager}, which communicates with \Cclass{Mcmc}.
-After finishing all of the messages of \Cmethod{step} in the list of
-\Cclass{Chain}, the \Cclass{ChainManager} sends a message to \Cclass{Mcmc} to
-check whether it can continue to move steps of the chains. The \Cclass{Mcmc}
-would swap chains by receciving necessary values from \Cclass{ChainManager}. 
-
 Members of \Cclass{Manager}:
 \begin{enumerate*}
-\item Data member
-\item mNumberProcess; The program should know the number of CPUs to create
-resources for jobs.
-\item Method
-\item void show();
-\item void model();
-\item void mcmc(int r = 0); a main MCMC loop. 
-\item void summarize();
-\item void save();
-\item void load();
-\item void help();
+\item public: 
+\item   Fixed* mFixed; a mere pointer to the program setup
+\item   vector<Reads*> mTxReads; mere pointers to short reads
+\item   vector<unsigned long int> mProcessSeed; random seeds for separate
+processes
+\item public:
+\item   Manager (); 
+\item   Manager (Fixed* m, const vector<Reads*>\& shortRead);
+\item   void show(); Not Yet Implemented (NYI) - shows the current status in the
+shell
+\item   void model(); Not Yet Implemented (NYI) - shows the current model
+\item   void mcmc(int r); executes an MCMC with rank $r$
+\item   void summarize(); summarizes the posterior sample
+\item   void save(); Not Yet Implemented (NYI) - saves the state of the
+currently running MCMC
+\item   void load(); NYI - loads the state of a saved MCMC
+\item   void help(); NYI - shows the manual page
+\item   string logFilename (unsigned int i); uses mLogfile and mPrefix to create
+a log file name for the $i$ chain.
+\item   string chainFilename (unsigned int i); uses mChainfile and mPrefix to
+create a log file name for the $i$ chain.
 \end{enumerate*}
+
+The \Cclass{Manager} is one of the main global objects. This can access
+\Cclass{Fixed} and \Cclass{Reads}. In the \Cmethod{mcmc} we use \Cclass{Mcmc} to
+run a number of chains. A chain is a cold chain, and the rest of chains are hot
+chains when \Cmember{mNumberProcess} is greater than 1.  The \Cclass{Mcmc}
+coordinates multiple simultaneous runs of chains. We need to know what chains
+are running in which machine. This can be done using MPI. Each chain needs to
+know what temperature to use. The \Cclass{Mcmc} contains \Cmember{temperature}
+and \Cmember{chainid} for accessing chains.  The \Cclass {Manager} creates a
+list of temperature using \Cclass{c\_hlinear}, or \Cclass{c\_hgeometric} setting
+values of \Cmember{temperature}. It sets \Cmember{chainid} as a sequence of
+non-negative integers. We need to set up a list of chains before running them.
+The \Cclass{Mcmc} creates a list of chains and executes each chain one at a time
+using \Cmethod{step}. We have two classes for chains. One is for a chain that
+does the sampling job, and the other is for a chain manager. The \Cclass{Mcmc}'s
+\Cmethod{step} commands all of the chains to move a finite number of steps in
+their own process. The chain manager will be run in a separate process. We use
+Message Passing Interface (MPI), which is an application interface that allows
+processes to communicate by sending and receiving messages. In essence, it
+facilitates communication when multiple computers/processors/cores are
+performing distributed calculations.
+
+Let's see how the communication works.  The \Cclass{Mcmc} sends a message of
+\Cmethod{step} to \Cclass{ChainManager}, which in turn sends a message of
+\Cmethod{step} to a list of \Cclass{Chain}.  A process owns one object of
+\Cclass{ChainManager}, which communicates with \Cclass{Mcmc}.  After finishing
+all of the messages of \Cmethod{step} in the list of \Cclass{Chain}, the
+\Cclass{ChainManager} sends a message to \Cclass{Mcmc} to check whether it can
+continue to move steps of the chains. The \Cclass{Mcmc} would swap chains by
+receciving necessary values from \Cclass{ChainManager}. 
+
+We wish to control the \program{tux} using signals by allowing.  \program{tux}
+to monitor signals. A signal turns off the currently running MCMC, and makes the
+\program{tux} save the states and exit. We use SIGUSR1 or SIGUSR2 to customize
+signals for this purpose.  See
+http://www.alexonlinux.com/signal-handling-in-linux.  The main process or rank 0
+process receives the signal. Depending on the state of the main process we need
+different actions. If the main process was moving the parameter state, then the
+process needs to finish with it. If the main process was swapping chains, then
+the process still needs to finish with it.  Because the main process has to
+communicate the saving message with the rest of worker processes, the on-going
+moves have to be finished. This would not make the \program{tux} stop instantly.
+It would take time for the \program{tux} to stop. We need MPI message passing
+for saving the state of the \program{tux} MCMC.
+
+The \Cmethod{mcmc} creates an instance of \Cclass{McmcSingle} or
+\Cclass{McmcMpi}. We move as many steps as \Cmethod{mNumberSwap}. Then, we swap
+chains. After the swap we save the state of each chain if the thinning count is
+greater than the user specified number, or \Cmember{mMcmcThin}. 
+
+We discuss output files. Each process has a \Cclass{ChainManager} object.
+The process opens an output file and a log file. The output file name consists
+of \Cmember{mChainfile}, and \Cmember{mPrefix}. The process rank ID or chain
+manager ID follows the name with addition extension of ``chain.'' The log file
+name is constructed similarly except for the extension of ``log.'' 
+
+FIXME: We still need to code the \Cmethod{summarize} of \Cclass{Manager}.
+
+FIXME: We also need to code the MPI version of \Cclass{Manager}.
 
 \subsection{Model}
 I do not find a role of \Cclass{Model}, yet. The \Cclass{Fixed} has a similar
@@ -134,47 +179,80 @@ role.
 
 Members of \Cclass{Mcmc}:
 \begin{enumerate*}
-\item vector<unsigned int> chainid; 
-\item vector<unsigned int> mNumberChainPerProcess; e.g., c(3,3,2) 
-\item vector<unsigned int> mAccumulateNumberChain; e.g., c(0,3,6,8)
-\item vector<double> likelihoodPrior; the sum of likelihood and prior for each
-chain. 
-\item unsigned int lenChain; total length of a chain
-\item unsigned int lenBurnin; length of a burn-in 
-\item unsigned int lenThin; length of a sampling frequency
-\item unsigned int lenSwap; length of a chain swapping frequency
-\item unsigned int lenSwapTry; the number of attempts of swapping two chains.
-This value can be smaller than ${n \choose 2}$ where $n$ is the number of
-chains.
-\item
-\item The followings are nested structures:
-\item struct c\_msg1 mMessage;
-\item 
-\item The following methods are public:
-\item Mcmc ();
-\item \~{}Mcmc ();
-\item int numberChainPerProcess (); computes allocated numbers of chains for
-each process
-\item int createChainManager (unsigned int r);
-\item int step (unsigned int n);
-\item int swap (); swaps chains temperatures
-\item int sample (); 
-\item int save ();
-\item int load ();
-\item
-\item The following methods are private:
-\item int swapChains (); uses values from all of the chains to arrange chain
+\item public:
+\item   unsigned int mRank; the process ID, 0 when \Cclass{McmcSingle}
+\item   Fixed* mFixed; a mere pointer to the program setup
+\item   vector<Reads*> mTxReads; mere pointers to short reads
+\item   ChainManager mChainManager; the chain manager
+\item   vector<unsigned int> mChainid; chain IDs of the processes, e.g.,
+c(1,4,0,5,3,2) is the chain IDs for the six processes
+\item   vector<unsigned int> mChainIndex; chain ID indices, e.g., c(2,0,5,4,1,3)
+\item   vector<double> mLogLikelihoodPrior; sums of likelihood and prior of the
+processes
+\item   vector<double> mTemperature; temperature values of the chain IDs
+\item   vector<unsigned int> mNumberChainPerProcess; e.g., c(3,3,2)  
+\item   vector<unsigned int> mAccumulateNumberChain; e.g., c(0,3,6,8)
+\item   vector<vector<unsigned int> > mSwapCount; number of successful swap
+tries between chains
+\item   vector<vector<unsigned int> > mSwapTryCount; number of swap tries
+between chains
+\item public:
+\item   int swapChains (); uses values from all of the chains to arrange chain
 temperatures - called by \Cmethod{swap}
-\item double swapWeight (unsigned int, unsigned int); computes an acceptance
+\item   double swapWeight (unsigned int, unsigned int); computes an acceptance
 ratio for swapping two chains - called by \Cmethod{swapChains}
+\item   Mcmc (Fixed* m, const vector<Reads*>\& shortRead, unsigned int rank);
+\item   ~Mcmc ();
+\item   int numberChainPerProcess (); sets \Cmember{mNumberChainPerProcess} and
+\Cmember{mAccumulateNumberChain} using the number of processors and compute
+nodes
+\item   int createChainManager (unsigned int r); uses \Cmember{mChainManager} to
+create alloted chains for the current rank process
+\item   int step (unsigned int n);
+\item   virtual int swap () = 0;
+\item   int sample ();
+\item   int save ();
+\item   int load ();
+\item   void report (ostream \&out);
+\item   friend ostream\& operator$\ll$ (ostream \&out, const Mcmc \&t);
 \end{enumerate*}
 
-\Cclass{c\_msg1} is used to send a message to the rank 0 process:
+The \Cclass{c\_msg1} is used to send a message to the rank 0 process:
 \begin{enumerate*}
 \item unsigned int processid; the ordered ID of a process
 \item unsigned int chainid; the designated chain ID
 \item double likelihoodPrior; the sum of likelihood and prior of a chain
 \end{enumerate*}
+
+The constructor needs pointers to \Cclass{Fixed} and \Cclass{Reads}. It also needs
+rank ID of the process where the \Cclass{Mcmc} object is created. We compute how
+many chains are needed for each process. Then, we create chains for the current
+process. We also prepare chain IDs, and temperature values. The acceptance ratio
+for chain swaps is prepared in \Cmember{mSwapCount} and \Cmember{SwapTryCount}.
+The \Cclass{McmcSingle} and \Cclass{McmcMpi} implements \Cmethod{swap}. 
+All of the chains managed by \Cclass{ChainManager} have their own chain IDs,
+which are used to index temperature values. We also need the sums of log
+likelihood and log prior to swap chains. We use \Cmethod{chainid} and
+\Cmethod{likelihoodPrior} to access chain IDs and the sum of log likelihood and
+log prior from the chains managed by \Cclass{ChainManager}. 
+We swap chain IDs and the sums of log likelihood and log prior. I have found out
+that I may have to know neighboring chains in temperature values. Let us see
+\Cmethod{swapChains}. We might wish to swap chains nearby.
+For example, we have the following \Cmember{mChainid} and
+\Cmember{mLogLikelihoodPrior}. We find chain IDs using \Cmember{mChainid} with
+process index or ``Index.'' We also want to know the process index using
+``chainIndex'' with chain IDs. We create ``chainIndex'' using \Cmember{mChainid}
+and swap values in ``chainIndex.'' After swaps we can recreate
+\Cmember{mChainid} using ``chainIndex.''
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Index               0  1  2  3  4  5
+mChainid            3  2  0  5  1  4   <- Keep these
+mLogLikelihoodPrior v3 v2 v0 v5 v1 v4  <-   and these values.
+chainIndex          2  4  1  0  5  3   <- We swap indices.
+\end{Verbatim}
+In order to swap chains we choose two chains nearby. See
+\Cfunction{fGslRanMirror}. We give distance of either side and jump distance,
+and get 1-based value from the left-hand side position. 
 
 The \Cmethod{swap} for the rank 0 process waits for the rest of processes to
 finish their \Cmethod{step}. Positively ranked processes send the rank 0 process
@@ -201,7 +279,7 @@ be confused by the name process. For example, if
 \Cmember{mNumberChainPerProcess} is c(3,3,2), the process indices run from 0 to
 7. Processes are different in the assigned chain index, which is stored in
 \Cmember{chainid} of \Cmember{mMessage}. We use \Cmember{processid} to index 
-\Cmember{mChainid} and \Cmember{mLikelihoodPrior}. Now that we have chain
+\Cmember{mChainid} and \Cmember{mLogLikelihoodPrior}. Now that we have chain
 IDs, and sums of likelihood and prior. We call \Cmethod{swapChains}, and
 rearrange \Cmember{mChainid}. 
 We need to configure chains with the rearranged chain IDs. For the rank 0
@@ -213,60 +291,104 @@ those to the rank 0 process, and wait and receive messages from the rank 0
 process. After getting all of the chain IDs we use \Cclass{ChainManager} to call
 \Cmethod{setChainid}.
 
+Chain swaps are done in \Cclass{Mcmc}. We might want to
+keep its name. The \Cclass{Mcmc} might have two things in it: process management
+and Markov chains management. 
+
 \subsection{ChainManager}
 
 Members of \Cclass{ChainManager}:
 \begin{enumerate*}
-\item The followings are data members:
-\item vector<Chain> chain; a list of chains
-\item The followings are public:
-\item ChainManager (); creates a single chain
-\item ChainManager (unsigned int n); creates $n$ chains
-\item void delete\_pointed\_to (T* p); function template to delete chains
-\item void chainid (vector<unsigned int>\&); returns a vector of Chain IDs from
-the list of chains
-\item void setChainid (vector<unsigned int>\&); assigns chain IDs 
-\item void createChain (unsigned int n); This must be called only once because
+\item private:
+\item   ChainManager (); We do not allow a default constructor.
+\item public:
+\item   Fixed* mFixed;
+\item   vector<Reads*> mTxReads;
+\item   vector<Chain*> mChain;
+\item   vector<double> mTemperature; This is a copy from \Cclass{Mcmc}.
+\item public:
+\item   ChainManager (Fixed* m, const vector<Reads*>\& shortRead);
+\item   void createChain (unsigned int); This must be called only once because
 it creates a vector of \Cclass{Chain}, connects \Cclass{Fixed} and
 \Cclass{Reads}, and calls \Cclass{createParameter} of \Cclass{Chain}. 
+\item   ~ChainManager ();
+\item   void step (unsigned int);
+\item   void setChainid (unsigned int s, unsigned int e); assigns chain IDs from
+$s$ and $e$, inclusively.
+\item   void setChainid (vector<unsigned int>\& v); assigns chain IDs using $v$
+when swapping chains.
+\item   void chainid (vector<unsigned int>\&); returns the chain IDs. This is
+used in chain swaps.
+\item   void likelihoodPrior (vector<double>\&); returns the sums of log
+likelihood and log prior. This is used in chain swaps.
+\item   void report (ostream \&out);
+\item   friend ostream\& operator$\ll$ (ostream \&out, const ChainManager \&t);
 \end{enumerate*}
 
-The \Cclass{ChainManager} owns objects from 
-\Cmember{mTxFixed}, and \Cmember{mTxData}. This runs on a single process or a
-single thread. It owns multiple chains. It is different from \Cclass{Mcmc} in
-that it does call MPI command or threads. 
-
-I think that \Cclass{Mcmc} should be renamed because it has something to do with
-processes and threads. Chain swaps are done in \Cclass{Mcmc}. We might want to
-keep its name. The \Cclass{Mcmc} might have two things in it: process management
-and Markov chains management. 
+The \Cclass{ChainManager} does not own objects of \Cmember{mFixed}, and
+\Cmember{mTxReads}. It accesses the two classes using mere pointers to the
+objects of them.  The \Cclass{Mcmc} would not own them either. The
+\Cclass{ChainManager} owns \Cclass{Chain} objects in a vector. After the call of
+the constructor with \Cmember{mFixed} and \Cmember{mTxReads} we call
+\Cmethod{createChain} with specified number of chains to create chains in
+\Cmember{mChain}. We have two version of \Cmethod{setChainid}. We use
+the two-integer argument version when creating chains, and the vector argument
+one when swapping chains.
+We need to send chain IDs and sums of log likelihood and log prior to
+\Cclass{Mcmc}, which uses \Cmethod{chainid} and \Cmethod{likelihoodPrior} to get
+those values.
+The chain of writing sample in a file is as follows.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Manager::mcmc -> operator Mcmc <- operator ChainManager <- operator Chain
+\end{Verbatim}
+We also call \Cmethod{report} starting at \Cmethod{mcmc}.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Manager::mcmc -> Mcmc.report -> ChainManager.report <- Chain.report
+\end{Verbatim}
+The \Cmethod{report} is different from writing samples in a file. It reports
+some summary of each chains activity including chain ID changes, temperature
+changes, likelihood changes, etc. The \Cmethod{report} is called at the end of
+the \Cmethod{mcmc}.
 
 \subsection{Chain}
 
 Members of \Cclass{Chain}:
 \begin{enumerate*}
-\item Data Member:
-\item unsigned int chainid; the ID of a chain
-\item double likelihoodPrior; the sum of likelihood and prior
-\item double mBeta; the temperature 
-\item unsigned int mStep; the number of steps
-\item Parameter* mTxBoundaries; a set of transcript boundaries
-\item Parameter* mTxExpression; a set of transcript expression
-\item Data* mTxData; a set of short reads alignment data
+\item private:
+\item   Chain ();
+\item   void createParameter (); creates boundaries and expression parameters
 \item public:
-\item TxFixed(); sets mTxFixed
-\item TxReads(); sets mTxReads
-\item createParameter(); creates boundaries and expression parameters
+\item   unsigned int mID; the chain ID, which is used to find $\beta$, the
+heating temperature
+\item   unsigned int mStep; the numbers steps
+\item   double mLoglikelihood; the log likelihood
+\item   double mLogLikelihoodPrior; the sum of log likelihood and log prior
+\item   double mBeta; $\beta$ temperature value
+\item   Fixed* mFixed; the program setup
+\item   vector<Reads*> mTxReads; the data
+\item   MoverManager mMoverManager; the mover manager
+\item   TxBoundaries* mTxBoundaries; the first parameter of boundaries
+\item   TxExpression* mTxExpression; the second parameter of expression
+\item public:
+\item   Chain (Fixed* m, const vector<Reads*>\& shortRead, const double beta);
+\item   ~Chain (); deletes the two parameters
+\item   void TxFixed (Fixed* m); sets the program setup
+\item   void TxReads (const vector<Reads*>\& shortRead); sets the data
+\item   void step (unsigned int n); moves $n$ steps
+\item   void report (ostream \&out); writes some summary of the chain activity
+\item   friend ostream\& operator$\ll$ (ostream \&out, const Chain \&t); writes
+the state of the parameters
 \end{enumerate*}
 
 The \Cclass{Chain} owns objects from \Cclass{RandomVariable}:
-\Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{MoverManager}.
-The \Cclass{Chain} has access to \Cmember{mTxFixed}, and \Cmember{mTxData}.
-The \Cclass{ChainManager} owns objects from 
-\Cmember{mTxFixed}, and \Cmember{mTxData}. 
+\Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{mMoverManager}.
+The \Cmember{mMoverManager} is auto variable, and the others are pointers, which
+need to be deleted in the destructor.
+The \Cclass{Chain} has access to \Cmember{mFixed}, and \Cmember{mTxData}.
 The first two \Cclass{Parameter} objects change their contents through
-\Cclass{Mover} objects that are managed by \Cclass{MoverManager}. Methods of
-\Cclass{Chain} would create \Cclass{Parameter} objects. Additionally,
+\Cclass{Mover} objects that are managed by \Cclass{MoverManager}.  The
+\Cmethod{createParameter} would create \Cclass{Parameter} objects.
+Additionally,
 \Cclass{Mover} objects are created in methods of \Cclass{Chain}. Objects of
 \Cclass{Mover}'s subclasses such as \Cclass{MoverTxBoundaries} are allowed to
 access \Cclass{Parameter} members in \Cclass{Chain}. We do this by giving
@@ -275,16 +397,19 @@ Let us check how we could propose a new state of \Cclass{TxBoundaries}, and
 accept or reject it in \Cclass{MoverTxBoundaries}. Do this 
 in \Cclass{MoverTxExpression} as well.
 
-We use fstream to create a file and append the chain state to the file. We
-considered \Cclass{Sample}, which did not make sense.
-
+Where do we set the $\beta$ and chain ID? The $\beta$ is set at the same time
+when chain IDs are set in \Cmethod{setChainid} of \Cclass{ChainManager}.
+Where do we set the likelihood and prior? We have not set this value at all. The
+likelihood and prior values should be specified by \Cclass{Mover} such as
+\Cclass{MoverTxBoundaries}.
 
 \subsection{RandomVariables}
 
-TxBoundaries is created in a method of class Chain.
-MoverTxBoundaries should be also created in a method of class Chain.
-Then, Chain can connect its Parameters and Data to MoverTxBoundaries.
-It passes the connected MoverTxBoundaries to MoverManager.
+The \Cclass{TxBoundaries} is created in a method of class \Cclass{Chain}.  The
+\Cclass{MoverTxBoundaries} should be also created in a method of \Cclass{Chain}.
+Then, \Cclass{Chain} can connect its \Cclass{Parameters} and \Cclass{Data} to
+\Cclass{MoverTxBoundaries}.  It passes the connected \Cclass{MoverTxBoundaries}
+to \Cclass{MoverManager}.
 
 The chain uses \Cclass{Probability} and \Cclass{RandomVariable} to change the
 value of \Cclass{Parameter}. The \Cclass{Data} is a \Cclass{RandomVariable} that
@@ -303,8 +428,12 @@ multinomial probability.
 
 \subsection{Parameter}
 
+This is merely connecting \Cclass{RandomVariable} and other concrete classes
+such as \Cclass{TxBoundaries} or \Cclass{TxExpression}.
+
 \subsection{TxBoundaries}
 
+Members of \Cclass{TxBoundaries}:
 \begin{enumerate*}
 \item public: 
 \item   vector<unsigned int> mC; 1-based ending positions of segments
@@ -313,30 +442,40 @@ multinomial probability.
 for choosing random segments
 \item public:
 \item   TxBoundaries ();
-\item   ~TxBoundaries ();
 \item   unsigned int size (); the number of segments
 \item   unsigned int L (); the length of the chromosome 
 \item   void seq (unsigned int from, unsigned int to, unsigned int by); 
 \item   void sampleSegment (unsigned int\&, unsigned int\&);
+\item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, 
+                                       const TxBoundaries \&tx);
+\item   friend ostream\& operator$\ll$ (ostream \&out, const TxBoundaries \&t);
 \end{enumerate*}
+
+The \Cclass{TxBoundaries}'s main features include writing the content to a file,
+and sampling segments to update. The \Cclass{TxBoundaries} is owned by
+\Cclass{Chain}, and be accessed by \Cclass{MoverTxBoundaries}. 
 
 \subsection{TxExpression}
 
+Members of \Cclass{TxExpression}:
 \begin{enumerate*}
 \item public:
 \item   vector<double> mDelta; 
 \item public:
 \item   TxExpression ();
-\item   ~TxExpression ();
 \item   void seq (unsigned int); sets the equal-sized delta 
 \item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, 
                                     const TxExpression \&tx);
+\item   friend ostream\& operator$\ll$ (ostream \&out, const TxExpression \&t);
 \end{enumerate*}
+
+The \Cclass{TxExpression}'s main features include writing the content to a file,
+and sampling segments to update. The \Cclass{TxExpression} is owned by
+\Cclass{Chain}, and be accessed by \Cclass{MoverTxExpression}. 
 
 \subsection{Data}
 
 We do not have members yet. This is just a base of fixed parameters.
-
 We would need to read and write \Cclass{RandomVariable} from and to a file using
 YAML. We have a likelihood that is used to compute the likelihood and to sample
 data given parameters.
@@ -345,12 +484,12 @@ data given parameters.
 
 Members of \Cclass{Reads}
 \begin{enumerate*}
-\item public: Data members
+\item public: 
 \item   vector<unsigned int> mCount; number of counts of reads at the position.
 We only consider 5' end positions of short reads to count. 
 \item   unsigned int mN; total number of counts derived from \Cmember{mCount}
 \item   unsigned int mJ; j-th short reads
-\item public: Methods
+\item public:
 \item   Reads ();
 \item   ~Reads ();
 \item   unsigned int size (); the length of a chromosome 
@@ -360,17 +499,22 @@ sites becomes $l$
 \item   friend YAML::Emitter operator (YAML::Emitter out, const Reads tx);
 \end{enumerate*}
 
+We create a vector of \Cclass{Reads} to store the data for \program{tux}. We can
+find the index of the data using \Cmember{mJ}. The \Cmember{mN} is the total
+number of short reads.
+
 \subsection{Fixed}
 
 Members of \Cclass{Fixed}
 \begin{enumerate*}
 \item public: Data members
+\item   unsigned long int mSeed; the random number generator seed
 \item   unsigned int mK; the number of segments
 \item   unsigned int mM; the number of segments
 \item   vector<double> mZ; the size factors
 \item   double mA0; the coefficient $a_0$ of the function $\phi$
 \item   double mA1; the coefficient $a_1$ of the function $\phi$
-\item   double mAlpha; the proposal controller of expression levels
+\item   double mAlphaQExpression; the proposal controller of expression levels
 \item   double mAlphaQBoundaries; the proposal controller of boundaries
 \item   unsigned int mLengthSampleSegmentA; the length of sampled segments
 \item   unsigned int mLengthSampleSegmentB; the length of sampled segments
@@ -383,7 +527,11 @@ Dirichlet prior, we would set 0.01 to $\alpha_k$.
 \item   unsigned int mNumberChain; the number of chains
 \item   unsigned int mNumberSwap; the number of swap 
 \item   unsigned int mNumberSwapTry; the number of swap tries
+\item   unsigned int mSwapDistance; the jump distance from a chain ID
+\item   string mPrefix; the prefix of all of output files
 \item   string mOutfile; the output file name
+\item   string mChainfile; the output chain file name
+\item   string mLogfile; the log output file name
 \item   string mDatafile; the output file name
 \item public: Methods
 \item   Fixed (); default setup, when the user does not provide tux with values
@@ -395,7 +543,6 @@ in the input yaml file, it uses the initialized values in this constructor.
 \item   friend ostream\& operator$\ll$ (ostream \&out, const Fixed \&t);
 \end{enumerate*}
 
-
 \subsection{Probability}
 
 The \Cclass{Probability} is tightly linked with \Cclass{RandomVariable}. Two
@@ -406,7 +553,6 @@ set of random variates. The set of random variables that are conditioned is
 optional. We use \Cclass{Probability} for non-standard valued random variables.
 We would use simpler functions or classes for sampling a random variate from a
 uniform. 
-
 Let us consider usages of \Cclass{Probability}. We want a negative binomial with
 two parameters: mean and variance. The probability of a segment configuration is
 distributed as a uniform with a probability of $\frac{1}{{L-1 \choose K-1}}$
@@ -542,62 +688,78 @@ Members of \Cclass{Mover}:
 \item    double acceptanceRatio (); returns the acceptance ratio in percent.
 \end{enumerate*}
 
-\subsection{MoverTxExpression}
-
-\begin{enumerate*}
-\item public: 
-\item  TxBoundaries* mTxBoundaries; a pointer to TxBoundaries
-\item  TxExpression* mTxExpression; a pointer to TxExpression
-\item  Reads* mReads; a pointer to Reads
-\item  double mAlpha; a concentration parameter of Dirichlet
-\item  bool mIsData; a true/false as to whether we compute the likelihood
-\item  double mAverageTotalCount; the average of total reads counts
-\item public:
-\item  MoverTxExpression ();
-\item  MoverTxExpression (Fixed* f, vector<Reads*>& r, 
-                          TxBoundaries* txb, TxExpression* txe); sets program
-                          setup, data, boundaries, and expression.
-\item  int step (); 
-\end{enumerate*}
-
-1. Use MoverTxBoundaries::step to choose a subset of the K segments.
-2. Find delta's for the subset.
-3. Sample a new delta's using the current delta's.
-Take the sum of the a, and multiply a by mAlpha/sum.
-mAlpha is 1. If it is smaller, then the variance of a would be
-larger. Because GSL Dirichlet function needs a memory for a return
-value. a is the new delta of the old delta b.
-4. Compute likelihood, prior, and MH ratio.
-Find the start and end so that we can use parts of delta's in mDelta.
-The random variable class's method can return a random stuff. For example,
-TxBoundaries can return a random subset of boundaries. This seems sensible
-because we use a member of TxBoundaries to get something of the member.
-Let's make a method in TxBoundaries to sample a subset of boundaries.
-
-Use the different theta to compute the likeilhood ratio.
-Compute the prior ratio because we give a diffuse Dirichlet prior.
-Compute the MH ratio based on our move.
-We need to access the prior of gene expression.
-We need a point to the prior probability of expression.
-
-Now, lK contains lengths of the segments.
-
-Nj, a0, a1 are fixed for one sample. These are also fixed parameter.
-They should be a part of data. We need a class of data for storing these
-fixed parameters. Let us assume that we be given those fixed parameters.
-ck, mDelta, 
-ck, and Nj are for each sample.
-gsl\_ran\_negative\_binomial\_pdf (k, p, n);
-k is from ck.
-mu is (Nj * mDelta)
-p is n/(n+mu)
-n is 1/(a0+a1/mu).
-
 \subsection{MoverTxBoundaries}
 
-\begin{enumerate*}
-\item any items
-\end{enumerate*}
+FIXME: we need to compute the total likelihood in somewhere.
+
+In one iteration of boundaries move we choose a series of segment chunks and
+apply a move to each of the chunks. Because moves on different chunks can be
+handled independently, we consider one chunk only.
+
+Find \texttt{left} and \texttt{right} of a sampled segment. Compute
+the lengths of the segment: \texttt{lK}. We retrieve $\left\{ \delta_{k}\right\} _{k\in\kappa}$
+in \texttt{deltaK}. We also get $\left\{ c_{k}\right\} _{k\in\kappa}$
+using \texttt{ck}. We compute $\left\{ l_{k}\right\} _{k\in\kappa}$
+using $\left\{ c_{k}\right\} _{k\in\kappa}.$ We find \texttt{bAlpha}
+\[
+\left\{ \frac{l_{k}}{\sum_{k'\in\kappa}l_{k'}}\alpha_{\mathrm{b}}\right\} 
+\]
+where $\alpha_{\mathrm{b}}$ is \texttt{mAlphaQBoundaries}, and $\sum_{k'\in\kappa}l_{k'}$
+is \texttt{sumLk}. We sample 
+\[
+\left\{ \frac{l_{k}^{*}}{\sum_{k'\in\kappa}l_{k'}}\right\} 
+\]
+from Dirichlet distribution of concentration parameters just above,
+stored in \texttt{a}. Because we let the length of a segment be greater
+than or equal to 1, the proposal of boundaries is a little more complicated
+than just described. 
+
+Let us see the proposal of a new set of boundaries. The $\sum_{k'\in\kappa}l_{k'}$
+is \texttt{sumLk}. The size of $\kappa$ is \texttt{kappa}. We compute
+\texttt{sumLkStar} as $\sum_{k'\in\kappa}l_{k'}-\left|\kappa\right|.$
+The fraction $l_{k}/\sum_{k'\in\kappa}l_{k'}$ is \texttt{b}. We find
+\texttt{bAlpha} 
+\[
+\left\{ \frac{l_{k}}{\sum_{k'\in\kappa}l_{k'}}\alpha_{\mathrm{b}}\right\} 
+\]
+where $\alpha_{\mathrm{b}}$ is \texttt{mAlphaQBoundaries}, and $\sum_{k'\in\kappa}l_{k'}$
+is \texttt{sumLk}. Now, we use \texttt{bAlpha} to sample \texttt{a}.
+We have to check if the sample \texttt{a} does not produce nemerical
+errors when computing the proposal. In that case, we have to resample
+\texttt{a} until the proposal ratio is well defined.
+
+We compute \texttt{aAlpha} as 
+\[
+\left\{ \lambda_{k}^{*}\alpha_{\mathrm{b}}\right\} .
+\]
+We have not yet find the actual proposed boundaries. We will do that
+in the likelihood computation. We compute the partial sum, \texttt{aPartialSum},
+$\left\{ \sum_{i=\mathrm{begin}(\kappa)}^{\mathrm{end}\left(\kappa\right)}\lambda_{i}^{*}=\overline{\lambda_{k}}\right\} _{k\in\kappa}$
+where $\mathrm{begin}(\kappa)$ and $\mathrm{end}\left(\kappa\right)$
+are the first and last elements of the set $\kappa,$ respectively.
+We compute $\left\{ L_{\kappa}^{*}\overline{\lambda_{k}}=l_{k}^{*}\right\} _{k\in\kappa}$
+where $L_{\kappa}^{*}=L_{\kappa}-\left|\kappa\right|,$ and convert
+them to integers, stored in \texttt{ckA}. We let the last value be
+$l_{\mathrm{end}\left(\kappa\right)}=L_{\kappa}^{*}.$ We set $\left\{ l_{k}^{*}\right\} _{k\in\kappa}$
+to $\left\{ c_{\mathrm{begin}\left(\kappa\right)-1}+k\right\} _{k=1}^{\left|\kappa\right|},$
+and store it in \texttt{s1}. Now, we add \texttt{s1} to \texttt{ckA}.
+This \texttt{ckA} is a new boundaries set for $k\in\kappa.$ We compute
+the lengths of the new boundaries set stored in \texttt{lkA}. We use
+them as ending positions of the first $\left|\kappa\right|-1$ segments.
+The ending position of the last segment remains unchanged. Now, we
+need to count reads in the new set of boundaries. The count vector
+is of 0-based position. The number of reads at the first site of the
+first segment of the set $\left|\kappa\right|$ is found at $c_{\mathrm{begin}\left(\kappa\right)-1},$
+which is the right terminal 1-based position of the first segment.
+We store the counts of reads of the set $\kappa^{*}$ in \texttt{cA}.
+Similarly, we compute the counts of reads of the old set $\kappa$
+in \texttt{cB}. We find $\mu_{k}=M\delta_{k},$ $n_{k}=1/\left(a_{0}+a_{1}/\mu_{k}\right),$
+and $p_{k}=n_{k}/\left(n_{k}+\mu_{k}\right),$ stored in \texttt{muB},
+\texttt{nB}, and \texttt{pB}, respectively. We use the three values
+to compute the probability of observing the number of count \texttt{xkB}
+under negative binomial distribution. We compute the probability for
+the new set $\kappa^{*},$ similarly. 
+
 
 1. We choose a subset of the K segments.
 1.1 We choose a site of the L sites.
@@ -692,6 +854,58 @@ Members of \Cclass{ProbTxBoundaries}
 \item RandomVariable* r (); a random variate of \Cclass{TxBoundaries} object
 \end{enumerate*}
 
+\subsection{MoverTxExpression}
+
+\begin{enumerate*}
+\item public: 
+\item  TxBoundaries* mTxBoundaries; a pointer to TxBoundaries
+\item  TxExpression* mTxExpression; a pointer to TxExpression
+\item  Reads* mReads; a pointer to Reads
+\item  double mAlpha; a concentration parameter of Dirichlet
+\item  bool mIsData; a true/false as to whether we compute the likelihood
+\item  double mAverageTotalCount; the average of total reads counts
+\item public:
+\item  MoverTxExpression ();
+\item  MoverTxExpression (Fixed* f, vector<Reads*>\& r, 
+                          TxBoundaries* txb, TxExpression* txe); sets program
+                          setup, data, boundaries, and expression.
+\item  int step (); 
+\end{enumerate*}
+
+1. Use MoverTxBoundaries::step to choose a subset of the K segments.
+2. Find delta's for the subset.
+3. Sample a new delta's using the current delta's.
+Take the sum of the a, and multiply a by mAlpha/sum.
+mAlpha is 1. If it is smaller, then the variance of a would be
+larger. Because GSL Dirichlet function needs a memory for a return
+value. a is the new delta of the old delta b.
+4. Compute likelihood, prior, and MH ratio.
+Find the start and end so that we can use parts of delta's in mDelta.
+The random variable class's method can return a random stuff. For example,
+TxBoundaries can return a random subset of boundaries. This seems sensible
+because we use a member of TxBoundaries to get something of the member.
+Let's make a method in TxBoundaries to sample a subset of boundaries.
+
+Use the different theta to compute the likeilhood ratio.
+Compute the prior ratio because we give a diffuse Dirichlet prior.
+Compute the MH ratio based on our move.
+We need to access the prior of gene expression.
+We need a point to the prior probability of expression.
+
+Now, lK contains lengths of the segments.
+
+Nj, a0, a1 are fixed for one sample. These are also fixed parameter.
+They should be a part of data. We need a class of data for storing these
+fixed parameters. Let us assume that we be given those fixed parameters.
+ck, mDelta, 
+ck, and Nj are for each sample.
+gsl\_ran\_negative\_binomial\_pdf (k, p, n);
+k is from ck.
+mu is (Nj * mDelta)
+p is n/(n+mu)
+n is 1/(a0+a1/mu).
+
+
 \subsection{Sample}
 Each chain produces an output file. The output file contains running setup
 (\Cclass{Fixed}), data (\Cclass{Reads}), and samples (\Cclass{Sample}). 
@@ -700,7 +914,8 @@ chains in MC3 would creates mc3 file as well as chain file.
 
 \subsection{Summarizer}
 We reads in posterior sample files from multiple chains to create
-\Cclass{Summary} object. 
+\Cclass{Summary} object.  
+
 
 \subsection{Summary}
 
@@ -768,7 +983,7 @@ The fixed.yaml should look like this.
 Fixed:
   mA0: 0.5
   mA1: 2.5
-  mAlpha: 1.5
+  mAlphaQExpression: 1.5
   mAlphaQBoundaries: 1.7
   mLengthSampleSegmentA: 300
   mLengthSampleSegmentB: 600
@@ -795,7 +1010,7 @@ The tx.yaml should look like the following verbatim section.
 Fixed:
   mA0: 0.5
   mA1: 2.5
-  mAlpha: 1.5
+  mAlphaQExpression: 1.5
   mAlphaQBoundaries: 1.7
   mLengthSampleSegmentA: 300
   mLengthSampleSegmentB: 600
@@ -838,6 +1053,45 @@ We would test multiple chains in multiple processes.
 
 \subsection{tux-cmd}
 We would test tux commands using Readline library.
+
+
+\subsection{YAML: Emitter}
+
+Check /usr/local/include/yaml-cpp/emitter.h
+
+We generate a data set under the model. A number of model parameters include:
+\begin{enumerate*}
+\item $J$ : 3
+\item $L$ : 1,000 base pairs
+\item $K$ : 5
+\item $\bm{\lambda}$, $\bm{s}$ : a sample from Dirichlet(1)
+\item $\bm{\delta}$, $\bm{\mu}$ : a sample from Dirichlet(1)
+\item $\phi$ : a size as a function of $\mu$
+\item $\bm{z}$ : a sample from uniform between 0.5 and 1.5
+\item We repeat the above of simulation and inference 10 times. Note that we fix
+the sampled values of $\bm{s}$, $\bm{\mu}$, and $\bm{z}$ throughout the 10 times
+of simulation.
+\end{enumerate*}
+We use \Cclass{Likelihood}, \Cclass{ProbTxBoundaries}, and
+\Cclass{ProbTxExpression} to create objects of \Cclass{Reads},
+\Cclass{TxBoundaries}, and \Cclass{TxExpression}. Then, we save them in a YAML
+file. The three objects are serialized to YAML output stream. 
+
+We need testing procedures for classes we use, which requires a fair bit of
+experience of CMake. 
+
+Users comand \program{tux} via \Cclass{Mananger}.
+
+\subsection{GNU Scientific Library}
+
+\begin{enumerate*}
+\item void fGslRngAlloc (); creates an random number generator.
+\item void fGslRngFree (); deletes the random number genrator.
+\item fGslRanDirichlet (vector<double>\& alpha, vector<double>\& theta, double e);
+samples theta from Dirichlet distribution of concentration parameter
+of alpha until all of the components in theta are greater than e.
+\end{enumerate*}
+
 
 \section{Compilation}
 Build a debug version using CMake.
@@ -926,10 +1180,14 @@ Enable dashboard scripting
 
 -D\_DEBUG for having debug log.
 
+cmake ../kdelibs -DCMAKE\_INSTALL\_PREFIX=/opt/kde4
+CMAKE\_BUILD\_TYPE
+
 
 <<CMakeLists.txt>>=
 cmake_minimum_required(VERSION 2.8)
 project (tux)
+# find_package( MPI )
 # set (CMAKE_VERBOSE_MAKEFILE true)
 set (CMAKE_BUILD_TYPE DEBUG)
 SET (yamlEmitter_SRCS 
@@ -1018,8 +1276,6 @@ set (tux-cm_SRCS
   "tuxChainManager.cpp"
   "tuxGsl.cpp"
   "tuxGslRng.cpp"
-  "tuxRandomVariable.cpp"
-  "tuxParameter.cpp"
   "tuxTxBoundaries.cpp"
   "tuxTxExpression.cpp"
   "tuxMoverManager.cpp"
@@ -1027,7 +1283,46 @@ set (tux-cm_SRCS
   "tuxMoverTxBoundaries.cpp"
   "tuxMoverTxExpression.cpp"
   "tuxLikelihood.cpp"
-  "tuxData.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+  "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
+  "tuxChain.cpp"
+)
+set (tux-mcmc_SRCS 
+  "tux-mcmc.cpp"
+  "tuxMcmc.cpp"
+  "tuxMcmcMpi.cpp"
+  "tuxChainManager.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxMoverManager.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxLikelihood.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+  "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
+  "tuxChain.cpp"
+)
+set (tux-single_SRCS 
+  "tux-single.cpp"
+  "tuxMcmc.cpp"
+  "tuxMcmcSingle.cpp"
+  "tuxChainManager.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxMoverManager.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxLikelihood.cpp"
   "tuxReads.cpp"
   "tuxFixed.cpp"
   "tuxProbTxBoundaries.cpp"
@@ -1037,11 +1332,24 @@ set (tux-cm_SRCS
 set (tux-sum_SRCS 
   "tux-sum.cpp"
   "tuxSummarizer.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+)
+set (tux_SRCS 
+  "tux.cpp"
+  "tuxMcmcSingle.cpp"
+  "tuxError.cpp"
+  "tuxSignal.cpp"
+  "tuxHelp.cpp"
+  "tuxManager.cpp"
+  "tuxMcmc.cpp"
   "tuxChainManager.cpp"
   "tuxGsl.cpp"
   "tuxGslRng.cpp"
-  "tuxRandomVariable.cpp"
-  "tuxParameter.cpp"
   "tuxTxBoundaries.cpp"
   "tuxTxExpression.cpp"
   "tuxMoverManager.cpp"
@@ -1049,16 +1357,45 @@ set (tux-sum_SRCS
   "tuxMoverTxBoundaries.cpp"
   "tuxMoverTxExpression.cpp"
   "tuxLikelihood.cpp"
-  "tuxData.cpp"
   "tuxReads.cpp"
   "tuxFixed.cpp"
   "tuxProbTxBoundaries.cpp"
   "tuxProbTxExpression.cpp"
   "tuxChain.cpp"
 )
+set (tuxmpi_SRCS 
+  "tuxmpi.cpp"
+  "tuxMcmcMpi.cpp"
+  "tuxHelp.cpp"
+  "tuxManager.cpp"
+  "tuxMcmc.cpp"
+  "tuxChainManager.cpp"
+  "tuxGsl.cpp"
+  "tuxGslRng.cpp"
+  "tuxTxBoundaries.cpp"
+  "tuxTxExpression.cpp"
+  "tuxMoverManager.cpp"
+  "tuxMover.cpp"
+  "tuxMoverTxBoundaries.cpp"
+  "tuxMoverTxExpression.cpp"
+  "tuxLikelihood.cpp"
+  "tuxReads.cpp"
+  "tuxFixed.cpp"
+  "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
+  "tuxChain.cpp"
+)
+SET (fileman_SRCS 
+  "fileman.cpp"
+)
 set (CMAKE_C_FLAGS_DEBUG "-D_DEBUG -Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -fpermissive -g3 -ggdb -O0")
 set (CMAKE_CXX_FLAGS_DEBUG "-D_DEBUG -Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -g3 -ggdb -O0")
 # set (CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -g3 -ggdb -O0")
+
+# To compile using openmpi compilers
+# Comment the following two lines when compiling without MPI
+#SET(CMAKE_C_COMPILER openmpicc)
+#SET(CMAKE_CXX_COMPILER openmpicxx)
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set (tux_VERSION_MAJOR 0)
@@ -1084,8 +1421,6 @@ if (USE_MYMATH)
   set (EXTRA_LIBS ${EXTRA_LIBS} MathFunctions)
 endif (USE_MYMATH)
 #  set (EXTRA_LIBS ${EXTRA_LIBS})
-  add_executable (tux tux-v1.cpp)
-target_link_libraries (tux ${EXTRA_LIBS})
 
 # add_executable (ezlogger ${ezlogger_SRCS})
 #add_executable (tux-log tux-log.cpp)
@@ -1122,12 +1457,20 @@ else(${YAMLCPP} MATCHES NOTFOUND)
 #  target_link_libraries (tux-move ${tux-move_LIBS})
   
   set (tux-chain_LIBS ${tux-tx_LIBS})
-  add_executable (tux-chain ${tux-chain_SRCS})
-  target_link_libraries (tux-chain ${tux-chain_LIBS})
+#  add_executable (tux-chain ${tux-chain_SRCS})
+#  target_link_libraries (tux-chain ${tux-chain_LIBS})
   
   set (tux-cm_LIBS ${tux-tx_LIBS})
 #  add_executable (tux-cm ${tux-cm_SRCS})
 #  target_link_libraries (tux-cm ${tux-cm_LIBS})
+  
+  set (tux-mcmc_LIBS ${tux-tx_LIBS})
+#  add_executable (tux-mcmc ${tux-mcmc_SRCS})
+#  target_link_libraries (tux-mcmc ${tux-mcmc_LIBS})
+  
+  set (tux-single_LIBS ${tux-tx_LIBS})
+#  add_executable (tux-single ${tux-single_SRCS})
+#  target_link_libraries (tux-single ${tux-single_LIBS})
   
   set (tux-sum_LIBS ${tux-tx_LIBS})
 #  add_executable (tux-sum ${tux-sum_SRCS})
@@ -1145,9 +1488,27 @@ else(${YAMLCPP} MATCHES NOTFOUND)
 #  add_executable (monsters ${monsters_SRCS})
 #  target_link_libraries (monsters ${monsters_LIBS})
 
+  set (tux_LIBS ${tux-tx_LIBS})
 endif(${YAMLCPP} MATCHES NOTFOUND)
 
-# add_executable (stl-transform stl-transform.cpp)
+# Not needed.
+# add_library(readline STATIC IMPORTED)
+# set_property(TARGET readline PROPERTY IMPORTED_LOCATION /usr/local/lib/libreadline.a)
+# include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+# fileman test
+#add_executable (fileman ${fileman_SRCS})
+#target_link_libraries(fileman readline)
+#target_link_libraries(fileman -ltermcap)
+
+# TUX
+#add_executable (tux tux-v1.cpp)
+add_executable (tux ${tux_SRCS})
+target_link_libraries(tux ${tux_LIBS} mpi readline -ltermcap)
+
+#target_link_libraries (tux ${EXTRA_LIBS})
+
+#add_executable (stl-transform stl-transform.cpp)
 
 # Install
 install (TARGETS tux DESTINATION bin)
@@ -1238,51 +1599,8 @@ ENABLE_TESTING()
 
 PROJECT (tux)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-SET (tux_SRCS 
-  "tux.cpp"
-  "tuxHelp.cpp"
-  "tuxManager.cpp"
-  "tuxModel.cpp"
-  "tuxMcmc.cpp"
-  "tuxChainManager.cpp"
-  "tuxChain.cpp"
-  "tuxRandomVariable.cpp"
-  "tuxParameter.cpp"
-  "tuxData.cpp"
-  "tuxSystem.cpp"
-  "tuxProbability.cpp"
-  "tuxProbTxBoundaries.cpp"
-  "tuxProbTxExpression.cpp"
-  "tuxLikelihood.cpp"
-  "tuxMoverManager.cpp"
-  "tuxMover.cpp"
-  "tuxMoverTxBoundaries.cpp"
-  "tuxMoverTxExpression.cpp"
-  "tuxSummarizer.cpp"
-  "tuxSummary.cpp"
-  "tuxTxBoundaries.cpp"
-  "tuxTxExpression.cpp"
-  "tuxReads.cpp"
-  "tuxXyz.cpp"
-  "xmalloc.c"
-  "xfree.c"
-)
-SET (monsters_SRCS 
-  "monsters.cpp"
-)
 SET (gsl_SRCS 
   "gsl.cpp"
-)
-SET (yamlEmitter_SRCS 
-  "yamlEmitter.cpp"
-)
-SET (fileman_SRCS 
-  "fileman.cpp"
-  "xmalloc.c"
-  "xfree.c"
-)
-SET (ezlogger_SRCS 
-  "ezlogger.cpp"
 )
 
 # SET (CMAKE_EXE_LINKER_FLAGS "-static")
@@ -1320,12 +1638,6 @@ ADD_EXECUTABLE (fileman ${fileman_SRCS})
 target_link_libraries(fileman readline)
 target_link_libraries(fileman -ltermcap)
 
-# TUX
-SET(CMAKE_C_COMPILER openmpicc)
-SET(CMAKE_CXX_COMPILER openmpicxx)
-ADD_EXECUTABLE (tux ${tux_SRCS})
-target_link_libraries(tux mpi readline -ltermcap)
-
 INCLUDE (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
 CHECK_INCLUDE_FILES (sys/file.h HAVE_SYS_FILE_H)
@@ -1335,8 +1647,6 @@ CHECK_INCLUDE_FILES (stdlib.h HAVE_STDLIB_H)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 @
-
-
 
 \section{Code}
 
@@ -1451,7 +1761,16 @@ Summary - Summary of chains of posterior samples for a parameter
 
 \subsection{Main}
 
-<<tux.cpp>>=
+<<main gslrngrandomnumber>>=
+namespace tux {
+  struct c_gslrng {
+    unsigned long int operator()() {
+      return gsl_rng_get (gGslRng);
+    }
+  } gslrngRandomNumber;
+}
+
+<<tuxmpi.cpp>>=
 <<tux gnu copyright>>
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
@@ -1461,30 +1780,23 @@ Summary - Summary of chains of posterior samples for a parameter
 #include <vector>
 #include <mpi.h>
 #include <gsl/gsl_rng.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "SimpleOpt.h"
 #include "SimpleGlob.h"
 #include "ezlogger_headers.hpp"
-#include "rlstdc.h"
-#include "xmalloc.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 #include "tuxHelp.h"
 #include "tuxManager.h"
-#include "tuxXyz.h"
+
+<<xmalloc decl>>
+<<xmalloc defn>>
 
 using namespace std;
 using namespace tux;
 gsl_rng* gGslRng;
 <<tux interative>>
 <<command line>>
-
-namespace tux {
-  struct c_gslrng {
-    unsigned long int operator()() {
-      return gsl_ran_get (gGslRng);
-    }
-  } gslrngRandomNumber;
-}
+<<main gslrngrandomnumber>>
 
 int 
 main (int argc, char* argv[])
@@ -1619,10 +1931,267 @@ main (int argc, char* argv[])
 }
 @
 
+<<tux.cpp>>=
+<<tux gnu copyright>>
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif 
+#include <cstdlib>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <gsl/gsl_rng.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "yaml-cpp/yaml.h"
+#include "SimpleOpt.h"
+#include "SimpleGlob.h"
+#include "ezlogger_headers.hpp"
+#include "tuxGslRng.h"
+#include "tuxFixed.h"
+#include "tuxReads.h"
+#include "tuxHelp.h"
+#include "tuxError.h"
+#include "tuxSignal.h"
+#include "tuxManager.h"
+<<xmalloc decl>>
+<<xmalloc defn>>
+using namespace std;
+using namespace tux;
+Fixed gFixed;
+vector<Reads*> gShortRead;
+Manager gManager;
+<<tux createArgvFromChar>>
+<<main tuxlf>>
+<<tux interative>>
+<<command line>>
+<<main gslrngrandomnumber>>
+int 
+main (int argc, char* argv[])
+{
+  axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_very_rarely);
+  EZLOGGERFUNCTRACKER;
+  <<register signal>>
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Create GSL RNG and open an output file.
+  //////////////////////////////////////////////////////////////////////////////
+  fGslRngAlloc ();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Interactive Mode
+  //////////////////////////////////////////////////////////////////////////////
+  if (argc == 1)
+    {
+      char *line, *s;
+      progname = argv[0];
+      initialize_readline (); /* Bind our completer. */
+      /* Loop reading and executing lines until the user quits. */
+      for ( ; done == 0; )
+        {
+          line = readline ("> ");
+          if (!line) break;
+          /* Remove leading and trailing whitespace from the line.
+             Then, if there is anything left, add it to the history list
+             and execute it. */
+          s = stripwhite (line);
+          if (*s)
+            {
+              add_history (s);
+              execute_line (s);
+            }
+          free (line);
+        }
+      fGslRngFree ();
+      return 0;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Batch Mode
+  //////////////////////////////////////////////////////////////////////////////
+  string infilename;
+  int sCommand;
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_HELP) 
+            {
+              Help::full ();
+              return 0;
+            }
+          else if (args.OptionId() == OPT_VERSION) 
+            {
+              Help::version ();
+            }
+          else if (args.OptionId() == OPT_INFILE) 
+            {
+              infilename = args.OptionArg();
+            }
+          else if (args.OptionId() == OPT_MODEL
+                   || args.OptionId() == OPT_FIXED
+                   || args.OptionId() == OPT_MCMC
+                   || args.OptionId() == OPT_SUMMARIZE) 
+            {
+              sCommand = args.OptionId();
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in a YAML file as a Fixed object m.
+  //////////////////////////////////////////////////////////////////////////////
+  ifstream fin(infilename.c_str());
+  if (fin.is_open())
+    {
+      try 
+        {
+          YAML::Parser parser(fin);
+          YAML::Node doc;
+          parser.GetNextDocument(doc);
+          doc["Fixed"] >> gFixed;
+          fin.close();
+        }
+      catch(YAML::BadDereference& e) 
+        {
+          cerr << e.what() << "\n";
+          cerr << "Check if the file ``" << infilename
+               << " is a proper tux yaml file." << endl;
+          fin.close();
+          fGslRngFree ();
+          return 1;
+        }
+      catch(YAML::ParserException& e) 
+        {
+          cerr << e.what() << "\n";
+          fin.close();
+          fGslRngFree ();
+          return 1;
+        }
+    }
+  else
+    {
+      cerr << "Error: Could not open file ``" 
+           << infilename 
+           << "''." << endl;
+      cerr << "Check if the file exists." << endl;
+      fGslRngFree ();
+      return 1;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in data as a vector of Reads objects.
+  //////////////////////////////////////////////////////////////////////////////
+  Reads* r;
+  fin.open(gFixed.mDatafile.c_str());
+  if (fin.is_open()) 
+    {
+      unsigned int i = 0;
+      while (!fin.eof())
+        {
+          r = new Reads(i++);
+          fin >> *r;
+          if (r->mN == 0)
+            {
+            }
+          else 
+            {
+              gShortRead.push_back(r);
+            }
+        }
+      fin.close();
+      // We may need to check if the file has the exact number of numbers.
+      // Otherwise, we'd better exit the program.
+    }
+  else
+    {
+      cerr << "Unable to open file " << gFixed.mDatafile << std::endl;
+      fGslRngFree ();
+      return 1;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Execute the command.
+  //////////////////////////////////////////////////////////////////////////////
+  gManager.mFixed = &gFixed;
+  gManager.mTxReads= gShortRead;
+
+  switch (sCommand)
+    {
+    case OPT_MODEL:
+      cout << "Modelling ..." << endl;
+      break;
+    case OPT_FIXED:
+      cout << gFixed;
+      // gManager.fixed (cout);
+      break;
+    case OPT_MCMC:
+      cout << "Start MCMC ..." << endl;
+      gManager.mcmc (0);
+      break;
+    case OPT_SUMMARIZE:
+      cout << "Summarizing a posterior sample ..." << endl;
+      gManager.summarize ();
+      break;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Delelet data.
+  //////////////////////////////////////////////////////////////////////////////
+  for (vector<Reads*>::iterator it = gShortRead.begin(); 
+       it != gShortRead.end(); 
+       it++)
+    {
+      delete *it;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Close the  output file, and delete GSL RNG.
+  //////////////////////////////////////////////////////////////////////////////
+  fGslRngFree ();
+  return 0;
+}
+@
+
+<<tux createArgvFromChar>>=
+namespace tux {
+int 
+createArgvFromChar (string &c, const char* arg, char*** argv, int* argc)
+{
+  string s(arg);
+  istringstream iss(s);
+  *argc = 0; 
+  do
+    {
+       string sub; iss >> sub; (*argc)++;
+    } 
+  while (iss);
+
+  iss.str(s); iss.clear();
+  (*argv) = (char**) malloc ((*argc)*sizeof(char*));
+  (*argv)[0] = (char*) malloc ((c.size()+1)*sizeof(char));
+  strcpy((*argv)[0],c.c_str());
+  for (int i = 1; i < (*argc); i++)
+    {
+       string sub;
+       iss >> sub;
+       (*argv)[i] = (char*) malloc ((sub.size()+1)*sizeof(char));
+       strcpy((*argv)[i],sub.c_str());
+    }
+  return 0;
+}
+}
 <<command line>>=
 enum { 
     OPT_HELP, 
     OPT_MODEL,
+    OPT_FIXED,
     OPT_MCMC,
     OPT_SUMMARIZE,
     OPT_VERSION,
@@ -1643,27 +2212,22 @@ enum {
 };
 CSimpleOpt::SOption g_rgOptions[] = {
     // ID TEXT TYPE
-    { OPT_HELP, "--help", SO_NONE    },
-    { OPT_HELP, "-h", SO_NONE    },
-    { OPT_VERSION, "--version", SO_NONE },
-    { OPT_INFILE, "-i",     SO_REQ_SEP },
-    { OPT_OUTFILE, "-o",     SO_REQ_SEP },
-
-    { OPT_FOO,  "-a",     SO_NONE    }, // "-a"
-    { OPT_BAR,  "-b",     SO_NONE    }, // "-b"
-    { OPT_HOGE, "-f",     SO_REQ_SEP }, // "-f ARG"
-    { OPT_PRINT, "-p",     SO_REQ_SEP },
-    { OPT_PRINT, "--print", SO_REQ_SEP },
-    { OPT_WHAT, "-w",     SO_REQ_SEP },
-    { OPT_WHAT, "--what", SO_REQ_SEP },
-    { OPT_INFILE, "--infile",   SO_REQ_SEP },
-    { OPT_OUTFILE, "--outfile",   SO_REQ_SEP },
-
+    { OPT_HELP,      "-h",        SO_NONE    },
+    { OPT_HELP,      "--help",    SO_NONE    },
+    { OPT_VERSION,   "--version", SO_NONE    },
+    { OPT_INFILE,    "-i",        SO_REQ_SEP },
+    { OPT_INFILE,    "--in",      SO_REQ_SEP },
+    { OPT_INFILE,    "--infile",  SO_REQ_SEP },
+    { OPT_OUTFILE,   "-o",        SO_REQ_SEP },
+    { OPT_OUTFILE,   "--out",     SO_REQ_SEP },
+    { OPT_OUTFILE,   "--outfile", SO_REQ_SEP },
     // Commands
-    { OPT_MCMC, "mcmc", SO_NONE },
-    { OPT_MODEL, "model", SO_NONE },
-    { OPT_SUMMARIZE, "summarize", SO_NONE },
+    { OPT_MODEL,     "model",     SO_NONE    },
+    { OPT_FIXED,     "fixed",     SO_NONE    },
+    { OPT_MCMC,      "mcmc",      SO_NONE    },
+    { OPT_SUMMARIZE, "summarize", SO_NONE    },
 
+    // Other used commands
     { OPT_CHAIN, "chain", SO_NONE },
     { OPT_LIKELIHOOD, "likelihood", SO_NONE },
     { OPT_PRIOR, "prior", SO_NONE },
@@ -1675,11 +2239,15 @@ CSimpleOpt::SOption g_rgOptions[] = {
 @
 
 <<tux interative>>=
+int com_list PARAMS((char *));
 int com_help PARAMS((char *));
 int com_model PARAMS((char *));
 int com_mcmc PARAMS((char *));
 int com_save PARAMS((char *));
 int com_load PARAMS((char *));
+int com_fixed PARAMS((char *));
+int com_reads PARAMS((char *));
+int com_sum PARAMS((char *));
 int com_quit PARAMS((char *));
 
 typedef struct {
@@ -1689,13 +2257,18 @@ typedef struct {
 } COMMAND;
 
 COMMAND commands[] = {
+  { "list", com_list, "List files in DIR" },
+  { "ls", com_list, "Synonym for `list'" },
   { "help", com_help, "Display this text" },
   { "?", com_help, "Synonym for `help'" },
   { "model", com_model, "Model" },
+  { "fixed", com_fixed, "Fixed" },
+  { "reads", com_reads, "Reads" },
+  { "sum", com_sum, "Summarize" },
   { "mcmc", com_mcmc, "MCMC" },
   { "save", com_save, "Saves a current state to a file" },
   { "load", com_load, "Loads a state from a file" },
-  { "quit", com_quit, "Quit using Fileman" },
+  { "quit", com_quit, "Quit using tux" },
   { (char *)NULL, (rl_icpfunc_t *)NULL, (char *)NULL }
 };
 
@@ -1747,7 +2320,7 @@ execute_line (char *line)
 
   if (!command)
     {
-      fprintf (stderr, "%s: No such command for FileMan.\n", word);
+      fprintf (stderr, "%s: No such command for tux.\n", word);
       return (-1);
     }
 
@@ -1812,7 +2385,7 @@ void
 initialize_readline ()
 {
   /* Allow conditional parsing of the ~/.inputrc file. */
-  rl_readline_name = "FileMan";
+  rl_readline_name = "tux";
 
   /* Tell the completer that we want a crack first. */
   rl_attempted_completion_function = fileman_completion;
@@ -1874,13 +2447,24 @@ command_generator (const char *text, int state)
 
 /* **************************************************************** */
 /*                                                                  */
-/*                       FileMan Commands                           */
+/*                          tux Commands                            */
 /*                                                                  */
 /* **************************************************************** */
 
 /* String to pass to system ().  This is for the LIST, VIEW and RENAME
    commands. */
 static char syscom[1024];
+
+/* List the file(s) named in arg. */
+int
+com_list (char *arg)
+{
+  if (!arg)
+    arg = "";
+
+  sprintf (syscom, "ls -FClg %s", arg);
+  return (system (syscom));
+}
 
 /* Print out help for ARG, or for all of the commands if ARG is
    not present. */
@@ -1925,35 +2509,389 @@ com_help (char *arg)
 int
 com_model (char *arg)
 {
-  too_dangerous ("model");
+  too_dangerous (arg);
   return (1);
 }
 
+enum { 
+    OPT_FIXED_INFILE,
+    OPT_FIXED_SHOW,
+    OPT_FIXED_HELP
+};
+CSimpleOpt::SOption g_fixedOptions[] = {
+    { OPT_FIXED_HELP, "--help", SO_NONE    },
+    { OPT_FIXED_HELP, "-h", SO_NONE    },
+    { OPT_FIXED_INFILE, "-i",     SO_REQ_SEP },
+    { OPT_FIXED_INFILE, "--infile",   SO_REQ_SEP },
+    { OPT_FIXED_SHOW, "-s",   SO_NONE },
+    { OPT_FIXED_SHOW, "--show",   SO_NONE },
+    SO_END_OF_OPTIONS // END
+};
+
+int
+com_fixed (char *arg)
+{
+  string c("fixed");
+  string infilename; 
+
+  if (strlen(arg) == 0)
+    {
+      Help::fixed ();
+      return 0;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int argc;
+  char** argv;
+  createArgvFromChar (c, arg, &argv, &argc);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Use argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int sCommand;
+  CSimpleOpt args(argc, argv, g_fixedOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_FIXED_HELP) 
+            {
+              sCommand = OPT_FIXED_HELP;
+            }
+          else if (args.OptionId() == OPT_FIXED_INFILE) 
+            {
+              infilename = args.OptionArg();
+            }
+          else if (args.OptionId() == OPT_FIXED_SHOW) 
+            {
+              cout << gFixed;
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+
+  if (sCommand == OPT_FIXED_HELP)
+    {
+      Help::fixed ();
+    }
+  else if (infilename.size() > 0)
+    {
+      ifstream fin(infilename.c_str());
+      if (fin.is_open())
+        {
+          YAML::Parser parser(fin);
+          YAML::Node doc;
+          parser.GetNextDocument(doc);
+          doc["Fixed"] >> gFixed;
+          fin.close();
+          cout << "The file ``" << infilename 
+               << "'' has been read successfully." << endl;
+        }
+      else
+        {
+          cout << "Check if the file ``" << infilename << "'' exists." << endl;
+        }
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Finalize argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  for (int i = 0; i < argc; i++)
+    {
+      free(argv[i]);
+    }
+  free(argv);
+
+  return (1);
+}
+
+enum { 
+    OPT_READS_INFILE,
+    OPT_READS_SHOW,
+    OPT_READS_HELP
+};
+CSimpleOpt::SOption g_readsOptions[] = {
+    { OPT_READS_HELP, "--help", SO_NONE    },
+    { OPT_READS_HELP, "-h", SO_NONE    },
+    { OPT_READS_INFILE, "-i",     SO_REQ_SEP },
+    { OPT_READS_INFILE, "--infile",   SO_REQ_SEP },
+    { OPT_READS_SHOW, "-s",   SO_NONE },
+    { OPT_READS_SHOW, "--show",   SO_NONE },
+    SO_END_OF_OPTIONS // END
+};
+int
+com_reads (char *arg)
+{
+  string c("reads");
+  string infilename; 
+
+  if (strlen(arg) == 0)
+    {
+      Help::reads ();
+      return 0;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int argc;
+  char** argv;
+  createArgvFromChar (c, arg, &argv, &argc);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Use argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int sCommand;
+  CSimpleOpt args(argc, argv, g_readsOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_READS_HELP) 
+            {
+              sCommand = OPT_READS_HELP;
+            }
+          else if (args.OptionId() == OPT_READS_INFILE) 
+            {
+              infilename = args.OptionArg();
+            }
+          else if (args.OptionId() == OPT_READS_SHOW) 
+            {
+              for (vector<Reads*>::iterator it = gShortRead.begin(); 
+                   it != gShortRead.end(); 
+                   it++)
+                {
+                  (*it)->summary(cout);
+                }
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+
+  if (sCommand == OPT_READS_HELP)
+    {
+      Help::reads ();
+    }
+  else if (infilename.size() > 0)
+    {
+      Reads* r;
+      ifstream fin(infilename.c_str());
+      if (fin.is_open()) 
+        {
+          unsigned int i = 0;
+          while (!fin.eof())
+            {
+              r = new Reads(i++);
+              fin >> *r;
+              if (r->mN == 0)
+                {
+                  //EZLOGGERSTREAM2(lf) << "Fatal: unable to read in file "
+                                      //<< m.mDatafile << std::endl;
+                }
+              else 
+                {
+                  gShortRead.push_back(r);
+                }
+            }
+          fin.close();
+          cout << "The data file ``" << infilename 
+               << "'' has been read successfully." << endl;
+        }
+      else
+        {
+          cout << "Unable to open file " << infilename << endl;
+          cout << "Check if the file ``" << infilename << "'' exists." << endl;
+        }
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Finalize argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  for (int i = 0; i < argc; i++)
+    {
+      free(argv[i]);
+    }
+  free(argv);
+  return (1);
+}
+
+enum { 
+    OPT_MCMC_HELP,
+    OPT_MCMC_RUN,
+    OPT_MCMC_SHOW
+};
+CSimpleOpt::SOption g_mcmcOptions[] = {
+    { OPT_MCMC_HELP, "-h", SO_NONE    },
+    { OPT_MCMC_HELP, "--help", SO_NONE    },
+    { OPT_MCMC_RUN, "-r",   SO_NONE },
+    { OPT_MCMC_RUN, "--run",   SO_NONE },
+    { OPT_MCMC_SHOW, "-s",   SO_NONE },
+    { OPT_MCMC_SHOW, "--show",   SO_NONE },
+    SO_END_OF_OPTIONS // END
+};
 int
 com_mcmc (char *arg)
 {
-  too_dangerous ("mcmc");
+  string c("mcmc");
+  string infilename; 
+
+  if (strlen(arg) == 0)
+    {
+      Help::mcmc ();
+      return 0;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int argc;
+  char** argv;
+  createArgvFromChar (c, arg, &argv, &argc);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Use argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int sCommand;
+  CSimpleOpt args(argc, argv, g_mcmcOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_MCMC_HELP) 
+            {
+              sCommand = OPT_MCMC_HELP;
+            }
+          else if (args.OptionId() == OPT_MCMC_RUN) 
+            {
+              sCommand = OPT_MCMC_RUN;
+            }
+          else if (args.OptionId() == OPT_MCMC_SHOW) 
+            {
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+
+  if (sCommand == OPT_MCMC_RUN)
+    {
+      gManager.mFixed = &gFixed;
+      gManager.mTxReads= gShortRead;
+      gManager.mcmc (0);
+    }
+  else if (sCommand == OPT_MCMC_HELP)
+    {
+      Help::mcmc ();
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Finalize argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  for (int i = 0; i < argc; i++)
+    {
+      free(argv[i]);
+    }
+  free(argv);
   return (1);
 }
 
+enum { 
+    OPT_SUM_HELP,
+    OPT_SUM_RUN
+};
+CSimpleOpt::SOption g_sumOptions[] = {
+    { OPT_SUM_HELP, "-h", SO_NONE    },
+    { OPT_SUM_HELP, "--help", SO_NONE    },
+    { OPT_SUM_RUN, "-r",   SO_NONE },
+    { OPT_SUM_RUN, "--run",   SO_NONE },
+    SO_END_OF_OPTIONS // END
+};
 int
-com_summarize (char *arg)
+com_sum (char *arg)
 {
-  too_dangerous ("summarize");
+  string c("sum");
+  string infilename; 
+
+  if (strlen(arg) == 0)
+    {
+      Help::sum ();
+      return 0;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int argc;
+  char** argv;
+  createArgvFromChar (c, arg, &argv, &argc);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Use argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  int sCommand;
+  CSimpleOpt args(argc, argv, g_sumOptions);
+  while (args.Next()) 
+    {
+      if (args.LastError() == SO_SUCCESS) 
+        {
+          if (args.OptionId() == OPT_SUM_HELP) 
+            {
+              sCommand = OPT_SUM_HELP;
+            }
+          else if (args.OptionId() == OPT_SUM_RUN) 
+            {
+              sCommand = OPT_SUM_RUN;
+            }
+        }
+      else 
+        {
+          cerr << "Invalid argument: " << args.OptionText() << endl;
+        }
+    }
+
+  if (sCommand == OPT_SUM_RUN)
+    {
+      gManager.mFixed = &gFixed;
+      gManager.mTxReads= gShortRead;
+      gManager.summarize ();
+    }
+  else if (sCommand == OPT_SUM_HELP)
+    {
+      Help::sum ();
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Finalize argc and argv.
+  //////////////////////////////////////////////////////////////////////////////
+  for (int i = 0; i < argc; i++)
+    {
+      free(argv[i]);
+    }
+  free(argv);
   return (1);
 }
 
 int
 com_save (char *arg)
 {
-  too_dangerous ("save");
+  too_dangerous (arg);
   return (1);
 }
 
 int
 com_load (char *arg)
 {
-  too_dangerous ("load");
+  too_dangerous (arg);
   return (1);
 }
 
@@ -1961,6 +2899,8 @@ com_load (char *arg)
 int
 com_quit (char *arg)
 {
+  if (!arg)
+    arg = "";
   done = 1;
   return (0);
 }
@@ -2000,6 +2940,10 @@ namespace tux {
 class Help {
 public:
   static void full ();
+  static void fixed ();
+  static void reads ();
+  static void mcmc ();
+  static void sum ();
   static void version ();
 };
 }
@@ -2121,6 +3065,92 @@ Help::full ()
 "   There is NO warranty; not even for MERCHANTABILITY\n"
 "\n"
 "tux 1.0\n"
+"";
+}
+void 
+Help::fixed ()
+{
+  cout << ""
+"NAME\n"
+"   tux-fixed -- Read in an .yaml file\n"
+"\n"
+"SYNOPSIS\n"
+"   fixed [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The program reads in an .yaml file to setup the program.\n"
+"\n"
+"   General options:\n"
+"      -h --help\n"
+"         Shows this help message.\n"
+"      -i --infile [INFILE]\n"
+"         Reads in an input file.\n"
+"      -s --show\n"
+"         Prints out the input file.\n"
+"";
+}
+void 
+Help::reads ()
+{
+  cout << ""
+"NAME\n"
+"   tux-reads -- Read in a short-reads count file\n"
+"\n"
+"SYNOPSIS\n"
+"   reads [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The command reads in a short-reads count file.\n"
+"\n"
+"   General options:\n"
+"      -h --help\n"
+"         Shows this help message.\n"
+"      -i --infile [INFILE]\n"
+"         Reads in a count file.\n"
+"      -s --show\n"
+"         Prints out some of the count file.\n"
+"";
+}
+void 
+Help::mcmc ()
+{
+  cout << ""
+"NAME\n"
+"   tux-mcmc -- Execute an Markov chain Monte Carlo\n"
+"\n"
+"SYNOPSIS\n"
+"   mcmc [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The command executes an Markov chain Monte Carlo.\n"
+"\n"
+"   General options:\n"
+"      -h --help\n"
+"         Shows this help message.\n"
+"      -r --run\n"
+"         Executes an MCMC.\n"
+"      -s --show\n"
+"         Prints out what?.\n"
+"";
+}
+void 
+Help::sum ()
+{
+  cout << ""
+"NAME\n"
+"   tux-sum -- Summarize a posterior sample\n"
+"\n"
+"SYNOPSIS\n"
+"   sum [OPTION]\n"
+"\n"
+"DESCRIPTION\n"
+"   The command summarizes a posterior sample.\n"
+"\n"
+"   General options:\n"
+"      -h --help\n"
+"         Shows this help message.\n"
+"      -r --run\n"
+"         Executes an MCMC.\n"
 "";
 }
 void 
@@ -2371,12 +3401,23 @@ int
 fGslRanDirichletLnpdf (const size_t K,
                        const double alpha[], const double theta[],
                        gsl_sf_result * result);
+struct c_unique {
+  unsigned int current;
+  c_unique() {current=0;}
+  unsigned int operator()() {return ++current;}
+};
+vector<unsigned int>
+fGslRanTxBoundaries (const unsigned int mL, const unsigned int mK);
+unsigned int
+fGslRanMirror (const unsigned int l, const unsigned int r, 
+               const unsigned int s);
 }
 #endif /* _TUXGSLRNG_H_ */
 @
 
 <<tuxGslRng.cpp>>=
 <<tux gnu copyright>>
+#include <cassert>
 #include <iostream>
 #include <vector>
 #include <algorithm>         // find_if, transform
@@ -2391,6 +3432,7 @@ fGslRanDirichletLnpdf (const size_t K,
 using namespace std;
 namespace tux {
 gsl_rng* gGslRng;
+c_unique gUniqueNumber;
 void 
 fGslRngAlloc () 
 {
@@ -2426,6 +3468,9 @@ fGslRanDirichlet (const vector<double>& alpha, vector<double>& theta, double e)
   if (isS) cerr << endl;
   return;
 }
+// Given bAlpha we sample aTheta. 
+// We check if bTheta is a possible value with aAlpha, which is computed from a.
+// We check whehter there are too small values in aTheta.
 int
 fGslRanDirichletCheck (const vector<double>& bTheta, 
                        const vector<double>& bAlpha, 
@@ -2442,13 +3487,7 @@ fGslRanDirichletCheck (const vector<double>& bTheta,
   do
     {
       s++;
-      if (s % 1000000 == 0) 
-        {
-          cerr << "-";
-        }
-
       gsl_ran_dirichlet(gGslRng,kappa,&bAlpha[0],&aTheta[0]);
-
       it = find_if(aTheta.begin(),aTheta.end(),bind2nd(less<double>(),e));
       if (it != aTheta.end()) 
         {
@@ -2460,12 +3499,11 @@ fGslRanDirichletCheck (const vector<double>& bTheta,
 
       status = fGslRanDirichletLnpdf (kappa,&aAlpha[0],&bTheta[0],&r);
       if (status != GSL_SUCCESS) continue;
-      //double mhAtoB = r.val;
       status = fGslRanDirichletLnpdf (kappa,&bAlpha[0],&aTheta[0],&r);
       if (status != GSL_SUCCESS) continue;
-      //double mhBtoA = r.val;
+      // Use r.val to get the result of the value. double mhBtoA = r.val;
     }
-  while (s < 1000 && status != GSL_SUCCESS);
+  while (s < 100 && status != GSL_SUCCESS);
   return status;
 }
 int
@@ -2508,7 +3546,53 @@ fGslRanDirichletLnpdf (const size_t K,
     }
   result->val = log_p;
   return status;
-}                                       
+}
+vector<unsigned int>
+fGslRanTxBoundaries (const unsigned int mL, const unsigned int mK)
+{
+  vector<unsigned int> a(mK-1);
+  vector<unsigned int> b(mL-1);
+  generate (b.begin(),b.end(),gUniqueNumber);
+  gsl_ran_choose (gGslRng, &a[0], mK-1, &b[0], mL-1, sizeof(unsigned int));
+  a.push_back(mL);
+  return a;
+}
+// x: l + 1 + r
+// x: v in [1,l+r+1]
+unsigned int
+fGslRanMirror (const unsigned int l, const unsigned int r, 
+               const unsigned int s)
+{
+  unsigned int d, f;
+  d = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,s+1));
+  f = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,2UL));
+  assert(f == 0 || f == 1U);
+  if (f == 0)
+    {
+      d += l;
+    }
+  else
+    {
+      if (d < l)
+        d = l - d;
+      else
+        d = d - l;
+    }
+  unsigned int q;
+  q = d / (l+r);
+  unsigned int remainder;
+  remainder = d % (l+r);
+  unsigned int v;
+  if (q % 2 == 0)
+    {
+      v = 1 + remainder;
+    }
+  else
+    {
+      v = l + r + 1 - remainder;
+    }
+  return v;
+}
 }
 @
 
@@ -2727,10 +3811,12 @@ using namespace std;
 namespace tux {
 class Manager {
 public:
-  unsigned int mNumberProcess;
-  unsigned long int mSeed;
+  Fixed* mFixed;
+  vector<Reads*> mTxReads;
   vector<unsigned long int> mProcessSeed;
 public:
+  Manager ();
+  Manager (Fixed* m, const vector<Reads*>& shortRead);
   void show();
   void model();
   void mcmc(int r = 0);
@@ -2738,59 +3824,30 @@ public:
   void save();
   void load();
   void help();
-
-  struct c_unique {
-    unsigned int current;
-    c_unique() {current=0;}
-    unsigned int operator()() {return current++;}
-  } uniqueNumber;
-
-  struct c_hlinear {
-    double halpha;
-    unsigned int i;
-    c_hlinear () {i=0; halpha=0.5;}
-    double operator()() {
-      double v = 1.0 / (1.0 + halpha * i);
-      i++; 
-      return v;
-    }
-  } hlinearNumber;
-
-  struct c_hgeometric {
-    unsigned int numChain;
-    double halpha, hbeta;
-    unsigned int i;
-    c_hgeometric () {i=0; numChain = 10; halpha=0.95; hbeta=0.2;}
-    double operator()() {
-      double v = 1 
-                 - (1 - hbeta) * i 
-                 * pow (halpha, (double) (numChain - 1 - i)) 
-                 / (double) (numChain - 1);
-      i++;
-      return v; 
-    }
-  } hgeometricNumber;
-
-  template <class T> struct c_print {
-    void operator() (T i) {std::cout << " " << i;}
-  };
-
+  string logFilename (unsigned int i);
+  string chainFilename (unsigned int i);
 };
-
 }
 #endif // _TUXMANAGER_H_
 
 <<tuxManager.cpp>>=
 <<tux gnu copyright>>
-#include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <vector>
-#include "tuxModel.h"
-#include "tuxMcmc.h"
+#include "tuxFixed.h"
+//#include "tuxMcmcMpi.h"
+#include "tuxMcmcSingle.h"
 #include "tuxManager.h"
 using namespace std;
 namespace tux {
-
+Manager::Manager ()
+{
+}
+Manager::Manager (Fixed* m, const vector<Reads*>& shortRead)
+  : mFixed(m), mTxReads(shortRead)
+{
+}
 void 
 Manager::show()
 {
@@ -2804,62 +3861,45 @@ Manager::model()
 void 
 Manager::mcmc(int r)
 {
-  Mcmc m;
-  m.lenChain = 5;
-  m.lenBurnin = 1;
-  m.lenThin = 3;
-  m.lenSwap = 2;
-  m.lenSwapTry = 1;
-  m.mNumberProcess = 2; 
-  m.mNumberChain = 5;
-  m.numberChainPerProcess ();
-  m.createChainManager ((unsigned int)r);
+  string cfn = chainFilename (r);
+  ofstream fout(cfn.c_str());
+  if (fout.is_open() == false)
+    {
+      cerr << "Error: Could not open file ``" 
+           << cfn
+           << "'' for MCMC output" << endl;
+      cerr << "Check if the file can be created." << endl;
+      return;
+    }
 
-  m.mLikelihoodPrior.resize (m.lenChain);
-
-  m.mChainid.resize(m.lenChain);                                                   
-  uniqueNumber.current = 0;                                                     
-  generate (m.mChainid.begin(), m.mChainid.end(), uniqueNumber);                  
-//  c_print<unsigned int> printInt;                                               
-//  for_each (m.chainid.begin(), m.chainid.end(), printInt);                      
-//  cout << endl;                                                                 
-                                                                                
-  m.mTemperature.resize(m.lenChain);                                               
-  hlinearNumber.halpha = 0.1;
-  generate (m.mTemperature.begin(), m.mTemperature.end(), hlinearNumber);         
-//  c_print<double> printDouble ;                                                 
-//  for_each (m.temperature.begin(), m.temperature.end(), printDouble);           
-//  cout << endl;  
-
-  hgeometricNumber.numChain = m.lenChain;
-  hgeometricNumber.halpha = 0.98;
-  hgeometricNumber.hbeta = 0.7;
-  generate (m.mTemperature.begin(), m.mTemperature.end(), hgeometricNumber);         
-//  for_each (m.temperature.begin(), m.temperature.end(), printDouble);           
-//  cout << endl;  
+  //McmcMpi m (mFixed,mTxReads,r);
+  McmcSingle mMcmc (mFixed,mTxReads);
 
   unsigned int s = 0;
-  while (s < m.lenChain) 
+  unsigned int sThin = 0;
+  while (s < mFixed->mMcmcLength) 
     {
-      unsigned int sThin = 0;
-      while (sThin < m.lenThin)
+      cerr << "Step: " << s << "\r";
+      mMcmc.step (mFixed->mNumberSwap);
+      s += mFixed->mNumberSwap; sThin += mFixed->mNumberSwap;
+      mMcmc.swap ();
+      if (mFixed->mMcmcBurnin < s)
         {
-          s += m.lenSwap; 
-          sThin++;
-          m.step (m.lenSwap);
-          m.swap ();
-        }
-      if (m.lenBurnin < s)
-        {
-          m.sample ();
+          if (mFixed->mMcmcThin < sThin)
+            {
+              sThin -= mFixed->mMcmcThin;
+              fout << mMcmc;
+            }
         }
     }
-  
+  //mMcmc.report (fout);
+  fout.close();
   return;
 }
 void 
 Manager::summarize()
 {
+  // Do something here.
   return;
 }
 void 
@@ -2876,6 +3916,27 @@ void
 Manager::help()
 {
   return;
+}
+string 
+Manager::logFilename (unsigned int i)
+{
+  string v(mFixed->mLogfile);
+  v += mFixed->mPrefix;
+  // See http://www.cplusplus.com/articles/D9j2Nwbp
+  string sID = static_cast<ostringstream*>(&(ostringstream() << i))->str();
+  v += sID;
+  v += ".log";
+  return v;
+}
+string 
+Manager::chainFilename (unsigned int i)
+{
+  string v(mFixed->mChainfile);
+  v += mFixed->mPrefix;
+  string sID = static_cast<ostringstream*>(&(ostringstream() << i))->str();
+  v += sID;
+  v += ".chain";
+  return v;
 }
 }
 @
@@ -2912,28 +3973,59 @@ Model::full ()
 <<tux gnu copyright>>
 #ifndef _TUXMCMC_H_
 #define _TUXMCMC_H_
+#include <cmath>
 #include <vector>
 #include "tuxChainManager.h"
 using namespace std;
 namespace tux {
+class Fixed;
+class Reads;
 class Mcmc {
 public:
   unsigned int mRank; 
-  vector<double> mTemperature;
+  Fixed* mFixed;
+  vector<Reads*> mTxReads;
+  ChainManager mChainManager;
   vector<unsigned int> mChainid;
-  vector<double> mLikelihoodPrior;
+  vector<unsigned int> mChainIndex;
+  vector<double> mTemperature;
+  vector<double> mLogLikelihoodPrior;
   vector<unsigned int> mNumberChainPerProcess;
   vector<unsigned int> mAccumulateNumberChain;
-  unsigned int mNumberProcess; 
-  unsigned int mNumberChain;
+  vector<vector<unsigned int> > mSwapCount;
+  vector<vector<unsigned int> > mSwapTryCount;
 
-  unsigned int lenChain;
-  unsigned int lenBurnin;
-  unsigned int lenThin;
-  unsigned int lenSwap;
-  unsigned int lenSwapTry;
+  struct c_unique {
+    unsigned int current;
+    c_unique() {current=0;}
+    unsigned int operator()() {return current++;}
+  } uniqueNumber;
 
-  ChainManager mChainManager;
+  struct c_hlinear {
+    double halpha;
+    unsigned int i;
+    c_hlinear () {i=0; halpha=0.5;}
+    double operator()() {
+      double v = 1.0 / (1.0 + halpha * i);
+      i++; 
+      return v;
+    }
+  } hlinearNumber;
+
+  struct c_hgeometric {
+    unsigned int numChain;
+    double halpha, hbeta;
+    unsigned int i;
+    c_hgeometric () {i=0; numChain = 10; halpha=0.95; hbeta=0.2;}
+    double operator()() {
+      double v = 1 
+                 - (1 - hbeta) * i 
+                 * pow (halpha, (double) (numChain - 1 - i)) 
+                 / (double) (numChain - 1);
+      i++;
+      return v; 
+    }
+  } hgeometricNumber;
 
   struct c_setNumberChainPerProcess {
     unsigned int current;
@@ -2962,198 +4054,163 @@ public:
   } mMessage;
 
 private:
+  Mcmc ();
+public:
   double swapWeight (unsigned int ci, unsigned int cj);
   int swapChains ();
-public:
-  Mcmc ();
+  Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
   ~Mcmc ();
   int numberChainPerProcess ();
   int createChainManager (unsigned int r);
   int step (unsigned int n);
-  int swap ();
+  virtual int swap () = 0;
   int sample ();
   int save ();
   int load ();
+  void report (ostream &out);
+  friend ostream& operator<< (ostream &out, const Mcmc &t);
 };
 }
 #endif // _TUXMCMC_H_
 
 <<tuxMcmc.cpp>>=
 <<tux gnu copyright>>
+#include <string>
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <numeric>
+#include <numeric>    // partial_sum
 #include <functional>
-#include <algorithm>
-#include <mpi.h>
+#include <algorithm>  // swap
 #include <cassert>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 #include "ezlogger_headers.hpp"
-#include "tuxMcmc.h"
 #include "tuxChainManager.h"
+#include "tuxFixed.h"
+#include "tuxGslRng.h"
+#include "tuxMcmc.h"
 using namespace std;
+<<extern tuxGslRng>>
 namespace tux {
-Mcmc::Mcmc () {}
+Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
+  : mRank(rank), mFixed(m), mTxReads(shortRead), mChainManager(m,shortRead)
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  numberChainPerProcess ();
+
+  mLogLikelihoodPrior.resize (mFixed->mNumberChain);
+  mChainid.resize(mFixed->mNumberChain);
+  mTemperature.resize(mFixed->mNumberChain);
+
+  // Each chain has a unique ID.
+  uniqueNumber.current = 0;
+  generate (mChainid.begin(),mChainid.end(),uniqueNumber);                  
+
+  // Sets the temperature values
+  hgeometricNumber.numChain = mFixed->mNumberChain;
+  hgeometricNumber.halpha = mFixed->mHAlpha;
+  hgeometricNumber.hbeta = mFixed->mHBeta;
+  generate (mTemperature.begin(),mTemperature.end(),hgeometricNumber);         
+
+  // Swap counts. 
+  mSwapCount.resize(mFixed->mNumberChain);
+  mSwapTryCount.resize(mFixed->mNumberChain);
+  for (unsigned int i = 0; i < mFixed->mNumberChain; i++)
+    {
+      mSwapCount.at(i).resize(mFixed->mNumberChain,0);
+      mSwapTryCount.at(i).resize(mFixed->mNumberChain,0);
+    }
+
+  // This needs to be called at the end of the constructor, partly because
+  // we need to know temperature values.
+  mChainManager.mTemperature = mTemperature;
+  createChainManager (rank);
+////////////////////////////////////////////////////////////////////////////////
+#ifdef _DEBUG
+////////////////////////////////////////////////////////////////////////////////
+  EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) 
+    << "Process rank - " << rank << endl;
+  stringstream ss;
+  string strLog;
+  ss << "mNumberChainPerProcess -";
+  for (unsigned int i = 0; i < mNumberChainPerProcess.size(); i++)
+    {
+      ss << " " << mNumberChainPerProcess.at(i);
+    }
+  ss << endl;
+  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) << strLog;
+  ss.str(string());
+  ss << "mAccumulateNumberChain -";
+  for (unsigned int i = 0; i < mAccumulateNumberChain.size(); i++)
+    {
+      ss << " " << mAccumulateNumberChain.at(i);
+    }
+  ss << endl;
+  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) << strLog;
+  ss.str(string());
+  ss << "mChainid -";
+  for (unsigned int i = 0; i < mChainid.size(); i++)
+    {
+      ss << " " << mChainid.at(i);
+    }
+  ss << endl;
+  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) << strLog;
+  ss.str(string());
+  ss << "mTemperature -";
+  for (unsigned int i = 0; i < mTemperature.size(); i++)
+    {
+      ss << " " << mTemperature.at(i);
+    }
+  ss << endl;
+  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) << strLog;
+////////////////////////////////////////////////////////////////////////////////
+#endif // _DEBUG
+////////////////////////////////////////////////////////////////////////////////
+}
 Mcmc::~Mcmc () {}
 int 
 Mcmc::numberChainPerProcess ()
 {
+  // Allocate chains among processes e.g., (3,3,2).
   setNumberChainPerProcess.current = 0;
   setNumberChainPerProcess.numberChainPerProcess 
-    = mNumberChain / mNumberProcess; 
+    = mFixed->mNumberChain / mFixed->mNumberProcess; 
   setNumberChainPerProcess.numberRemainingChain
-    = mNumberChain % mNumberProcess;
-
-  mNumberChainPerProcess.resize (mNumberProcess); 
+    = mFixed->mNumberChain % mFixed->mNumberProcess;
+  mNumberChainPerProcess.resize (mFixed->mNumberProcess); 
   generate (mNumberChainPerProcess.begin(), 
             mNumberChainPerProcess.end(), 
             setNumberChainPerProcess);
+  unsigned int n;
+  n = accumulate(mNumberChainPerProcess.begin(),
+                 mNumberChainPerProcess.end(),0U);
+  assert (n == mFixed->mNumberChain);
 
-  // Construct a vector of partial sum.
-  vector<unsigned int>::iterator iter1;
-  mAccumulateNumberChain.clear();
-  mAccumulateNumberChain.push_back(0);
-  unsigned int j = 0;
-  for (iter1 = mNumberChainPerProcess.begin();
-       iter1 != mNumberChainPerProcess.end();
-       iter1++)
-    {
-      mAccumulateNumberChain.push_back(
-        accumulate(mNumberChainPerProcess.begin(),iter1+1,0)
-        );
-      j++;
-    }
-  
-//  c_print<unsigned int> printInt;                                               
-//  for_each (mNumberChainPerProcess.begin(), 
-//            mNumberChainPerProcess.end(), 
-//            printInt);                      
-//  cout << endl;                                                                 
-
+  // Construct a vector of partial sum. e.g., (0,3,6,8).
+  mAccumulateNumberChain.resize(mNumberChainPerProcess.size());
+  partial_sum(mNumberChainPerProcess.begin(),
+              mNumberChainPerProcess.end(),
+              mAccumulateNumberChain.begin());
+  mAccumulateNumberChain.insert(mAccumulateNumberChain.begin(),0);
   return 0;
 }
 int 
 Mcmc::createChainManager (unsigned int r)
 {
-  mRank = r; 
-
   // Create chains for a chain manager.
   unsigned int n = mNumberChainPerProcess.at(r);
   mChainManager.createChain (n);
   // Set chain ID by using a vector of partial sum.
   mChainManager.setChainid (mAccumulateNumberChain[r],
                             mAccumulateNumberChain[r+1]-1);
-
   return 0;
 }
 int
 Mcmc::step (unsigned int n)
 {
   mChainManager.step (n);
-  return 0;
-}
-int
-Mcmc::swap ()
-{
-  EZLOGGERFUNCTRACKER;
-  MPI_Status status;
-
-  // Get chain IDs and likelihood prior sum values.
-  vector<unsigned int> v1;
-  mChainManager.chainid (v1);
-  vector<double> v2;
-  mChainManager.likelihoodPrior (v2);
-
-  if (mRank==0) 
-    {
-      // Receive messages to fill chain IDs and sums of likelihood and prior.
-      for (unsigned int workerIdx = 0; workerIdx < mNumberProcess; workerIdx++) 
-        {
-          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
-               i < mAccumulateNumberChain[workerIdx+1];
-               i++, j++)
-            {
-              if (mRank == workerIdx)
-                {
-                  mMessage.set (i, v1.at(j), v2.at(j)); 
-                }
-              else
-                {
-                  MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, workerIdx, 999, MPI_COMM_WORLD, &status);
-                }
-              mChainid.at(mMessage.processid) = mMessage.chainid;
-              mLikelihoodPrior.at(mMessage.processid) = mMessage.likelihoodPrior;
-            }
-        }
-     
-      stringstream result;
-      copy(mChainid.begin(), mChainid.end(), 
-           ostream_iterator<unsigned int>(result, " "));
-      EZLOGGERPRINT("Before Rank 0 chain IDs: %s",result.str().c_str());  
-
-      // Swap chains.
-      swapChains ();
-
-      copy(mChainid.begin(), mChainid.end(), 
-           ostream_iterator<unsigned int>(result, " "));
-      EZLOGGERPRINT("After Rank 0 chain IDs: %s",result.str().c_str());  
-      
-      // Send messages
-      v1.clear();
-      v1.resize(mNumberChainPerProcess.at(mRank));
-      for (unsigned int workerIdx = 0; workerIdx < mNumberProcess; workerIdx++) 
-        {
-          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
-               i < mAccumulateNumberChain[workerIdx+1];
-               i++, j++)
-            {
-              unsigned int pid = mAccumulateNumberChain[workerIdx] + j;
-              mMessage.set (pid, mChainid.at(pid), 0); 
-              if (mRank == workerIdx)
-                {
-                  v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
-                    = mMessage.chainid;
-                }
-              else
-                {
-                  MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, workerIdx, 999, MPI_COMM_WORLD);
-                }
-            }
-        }
-      mChainManager.setChainid (v1);
-
-      // Check if the message passing.
-      mChainid.assign (lenChain,9);
-      copy(mChainid.begin(), mChainid.end(), 
-           ostream_iterator<unsigned int>(result, " "));
-      EZLOGGERPRINT("After reset 0 chain IDs: %s",result.str().c_str());  
-    }
-  else 
-    {
-      // Send messages to rank 0 process
-      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
-           i < mAccumulateNumberChain[mRank+1];
-           i++, j++)
-        {
-          mMessage.set (i, v1.at(j), v2.at(j)); 
-          MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 0, 999, MPI_COMM_WORLD);
-        }
-
-      // Wait for the decision of the rank 0 process.
-      v1.clear();
-      v1.resize(mNumberChainPerProcess.at(mRank));
-      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
-           i < mAccumulateNumberChain[mRank+1];
-           i++, j++)
-        {
-          MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 0, 999, MPI_COMM_WORLD, &status);
-          assert(mMessage.processid - mAccumulateNumberChain.at(mRank) < v1.size());
-          v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
-            = mMessage.chainid;
-        }
-      mChainManager.setChainid (v1);
-    }
-
   return 0;
 }
 int
@@ -3171,102 +4228,382 @@ Mcmc::load ()
 {
   return 0;
 }
-
 double
 Mcmc::swapWeight (unsigned int ci, unsigned int cj)
 {
   // Note that sumj is the sum of likelihood and prior.
-  double sumi; 
-  double sumj;
-  sumi = mLikelihoodPrior.at(ci);
-  sumj = mLikelihoodPrior.at(cj);
-  unsigned int bi = mChainid.at(ci);
-  unsigned int bj = mChainid.at(cj);
-  return (mTemperature[bi] - mTemperature[bj]) * (sumj - sumi);
+  unsigned pi = mChainIndex.at(ci);
+  unsigned pj = mChainIndex.at(cj);
+  double sumi = mLogLikelihoodPrior.at(pi);
+  double sumj = mLogLikelihoodPrior.at(pj);
+  double ti = mTemperature.at(ci);
+  double tj = mTemperature.at(cj);
+  return (ti - tj) * (sumj - sumi);
 }
-
 int
 Mcmc::swapChains ()
 {
-#define  MINSWAP  0.1
-#define  BETADJUST  1.414
-#define  INCADJUST  1.414
-#define  MINHEAT  0.0001
-#define  MAXHEAT  0.2
-#define  MAXINC  100
-#define  MININC  0.1
-#define  PAUSESWAP 1000
-#define  SWAPDIST 7
-  for (unsigned i = 0; i < lenSwapTry; i++)
+  vector<unsigned int> chainIndex(mChainid.size());
+  for (unsigned int i = 0; i < mChainid.size(); i++)
+    chainIndex.at(mChainid.at(i)) = i;
+
+  for (unsigned int i = 0; i < mFixed->mNumberSwapTry; i++)
     {
       unsigned int ci, cj;
-      ci = 1;
-      cj = 4;
-    
-//    do
-//    {
-//      ci = (int) (uniform () * numchains);
-//    } while (ci < 0 || ci >= numchains);
-//    
-//    if (numchains < 2*SWAPDIST + 3)
-//    {
-//      cjmin = 0;
-//      cjrange = numchains;
-//    }
-//    else
-//    {
-//      cjmin = IMAX(0,ci-SWAPDIST);
-//      cjrange = IMIN(numchains, ci+SWAPDIST) -cjmin;
-//    }
-//    do
-//    {
-//      cj = cjmin + (int) (uniform () * cjrange);
-//    } while (cj == ci || cj < 0 || cj >= numchains);
-//
-//    if ((ci == 0 && cj == 1) || (ci == 1 && cj == 0))
-//      sw01d++;
-//    if ((ci == 1 && cj == 2) || (ci == 2 && cj == 1))
-//      sw12d++;
-//    if (ci < cj)
-//    {
-//      swapcount[cj][ci]++;
-//    }
-//    else
-//    {
-//      swapcount[ci][cj]++;
-//    }
-
-      double metropolishastingsterm = swapWeight (ci, cj);
-      metropolishastingsterm = 1;
-      if (metropolishastingsterm >= 0)
-          //|| metropolishastingsterm > uniform ())
+      ci = static_cast<unsigned int>(
+             gsl_rng_uniform_int(gGslRng,
+               static_cast<unsigned long int>(mFixed->mNumberChain))
+             );
+      // We choose cj using a specified step.
+      unsigned int l; // left-side positions available
+      unsigned int r; // right-side available
+      unsigned int b; // 0-th position in the 2*mFixed->mSwapDistance window
+      if (ci < mFixed->mSwapDistance)
+        l = ci;
+      else
+        l = mFixed->mSwapDistance;
+      b = ci - l;
+      if (mFixed->mNumberChain - ci - 1 < mFixed->mSwapDistance)
+        r = mFixed->mNumberChain - ci - 1;
+      else
+        r = mFixed->mSwapDistance;
+      cj = ci;
+      while (cj == ci)
         {
-          unsigned int t = mChainid.at(ci);
-          mChainid.at(ci) = mChainid.at(cj); 
-          mChainid.at(cj) = t;
+          // [1, l + 1 + r] is the range from fGslRanMirror.
+          // So, we subtract 1 from fGslRanMirror.
+          cj = fGslRanMirror (l, r, mFixed->mSwapDistance) - 1 + b;
         }
-//    {
-//
-//      swapptr = C[ci];
-//      C[ci] = C[cj];
-//      C[cj] = swapptr;
-//      if (ci < cj)
-//
-//      {
-//        swapcount[ci][cj]++;
-//      }
-//      else
-//      {
-//        swapcount[cj][ci]++;
-//      }
-//      if ((ci == 0 && cj == 1) || (ci == 1 && cj == 0))
-//        sw01++;
-//      if ((ci == 1 && cj == 2) || (ci == 2 && cj == 1))
-//        sw12++;
-//      if (ci == 0 || cj == 0)
-//        swap0ok |= 1;
-//    }
-  }
+      
+      // Now, we need to know which elements are ci and cj
+      // because chain IDs are not consecutive.
+      unsigned pi = chainIndex.at(ci);
+      unsigned pj = chainIndex.at(cj);
+      double sumi = mLogLikelihoodPrior.at(pi);
+      double sumj = mLogLikelihoodPrior.at(pj);
+      double ti = mTemperature.at(ci);
+      double tj = mTemperature.at(cj);
+      double logAlpha = (ti - tj) * (sumj - sumi);
+
+      double logAlphaUniform = log(gsl_rng_uniform (gGslRng));
+      mSwapTryCount[ci][cj]++; // Later, we will fold the matrix diagonally.
+      if (logAlpha < logAlphaUniform)
+        {
+          // Reject it.
+        }
+      else
+        {
+          // Accept it.
+          mSwapCount[ci][cj]++;
+          std::swap(chainIndex.at(ci),chainIndex.at(cj));
+        }
+    }
+
+  for (unsigned int i = 0; i < mChainid.size(); i++)
+    mChainid.at(chainIndex.at(i)) = i;
+
+  return 0;
+}
+void 
+Mcmc::report (ostream &out)
+{
+  mChainManager.report (out);
+  return;
+}
+ostream& 
+operator<< (ostream &out, const Mcmc &t)
+{
+  out << t.mChainManager;
+  return out;
+}
+}
+
+<<tuxMcmcMpi.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMCMCMPI_H_
+#define _TUXMCMCMPI_H_
+#include <vector>
+#include "tuxMcmc.h"
+#include "tuxChainManager.h"
+using namespace std;
+namespace tux {
+class Fixed;
+class Reads;
+class McmcMpi: public Mcmc {
+private:
+  McmcMpi ();
+public:
+  McmcMpi (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
+  ~McmcMpi ();
+  int swap ();
+};
+}
+#endif // _TUXMCMCMPI_H_
+
+<<tuxMcmcMpi.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <numeric>    // partial_sum
+#include <functional>
+#include <algorithm>  // swap
+#include <mpi.h>
+#include <cassert>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "ezlogger_headers.hpp"
+#include "tuxChainManager.h"
+#include "tuxFixed.h"
+#include "tuxMcmc.h"
+#include "tuxMcmcMpi.h"
+using namespace std;
+<<extern tuxGslRng>>
+namespace tux {
+McmcMpi::McmcMpi (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
+  : Mcmc(m,shortRead,rank)
+{
+}
+McmcMpi::~McmcMpi ()
+{
+}
+int
+McmcMpi::swap ()
+{
+  EZLOGGERFUNCTRACKER;
+  MPI_Status status;
+
+  // Get chain IDs and likelihood prior sum values from each of ChainManagers.
+  vector<unsigned int> v1;
+  mChainManager.chainid (v1);
+  vector<double> v2;
+  mChainManager.likelihoodPrior (v2);
+
+  if (mRank==0) 
+    {
+      // We are at the main process or rank 0 process.
+      // Receive messages to fill chain IDs and sums of likelihood and prior.
+      for (unsigned int workerIdx = 0; 
+           workerIdx < mFixed->mNumberProcess; 
+           workerIdx++) 
+        {
+          for (unsigned int i = mAccumulateNumberChain.at(workerIdx), j = 0;
+               i < mAccumulateNumberChain.at(workerIdx+1);
+               i++, j++)
+            {
+              if (mRank == workerIdx)
+                {
+                  // Process ID, Chain ID, and likelihood/prior value.
+                  mMessage.set (i, v1.at(j), v2.at(j)); 
+                }
+              else
+                {
+                  MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                           workerIdx, 999, MPI_COMM_WORLD, &status);
+                }
+              mChainid.at(mMessage.processid) = mMessage.chainid;
+              mLogLikelihoodPrior.at(mMessage.processid) = mMessage.likelihoodPrior;
+            }
+        }
+     
+//      stringstream result;
+//      copy(mChainid.begin(), mChainid.end(), 
+//           ostream_iterator<unsigned int>(result, " "));
+//      EZLOGGERPRINT("Before Rank 0 chain IDs: %s",result.str().c_str());  
+
+      // Swap chains.
+      swapChains ();
+
+//      copy(mChainid.begin(), mChainid.end(), 
+//           ostream_iterator<unsigned int>(result, " "));
+//      EZLOGGERPRINT("After Rank 0 chain IDs: %s",result.str().c_str());  
+      
+      // Send messages
+      v1.clear();
+      v1.resize(mNumberChainPerProcess.at(mRank));
+      for (unsigned int workerIdx = 0; 
+           workerIdx < mFixed->mNumberProcess; 
+           workerIdx++) 
+        {
+          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
+               i < mAccumulateNumberChain[workerIdx+1];
+               i++, j++)
+            {
+              unsigned int pid = mAccumulateNumberChain[workerIdx] + j;
+              assert (pid == i);
+              mMessage.set (i, mChainid.at(i), .0); 
+              if (mRank == workerIdx)
+                {
+                  //v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
+                    //= mMessage.chainid;
+                  v1.at(j) = mMessage.chainid;
+                }
+              else
+                {
+                  MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                           workerIdx, 999, MPI_COMM_WORLD);
+                }
+            }
+        }
+
+      // Check if the message passing.
+      //mChainid.assign (lenChain,9);
+      //copy(mChainid.begin(), mChainid.end(), 
+           //ostream_iterator<unsigned int>(result, " "));
+      //EZLOGGERPRINT("After reset 0 chain IDs: %s",result.str().c_str());  
+    }
+  else 
+    {
+      // Send messages to rank 0 process
+      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
+           i < mAccumulateNumberChain[mRank+1];
+           i++, j++)
+        {
+          mMessage.set (i, v1.at(j), v2.at(j)); 
+          MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                   0, 999, MPI_COMM_WORLD);
+        }
+
+      // Wait for the decision of the rank 0 process.
+      v1.clear();
+      v1.resize(mNumberChainPerProcess.at(mRank));
+      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
+           i < mAccumulateNumberChain[mRank+1];
+           i++, j++)
+        {
+          MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 0, 999, MPI_COMM_WORLD, &status);
+          assert(mMessage.processid - mAccumulateNumberChain.at(mRank) < v1.size());
+          v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
+            = mMessage.chainid;
+        }
+    }
+  mChainManager.setChainid (v1);
+
+  return 0;
+}
+}
+
+<<tuxMcmcSingle.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMCMCSINGLE_H_
+#define _TUXMCMCSINGLE_H_
+#include <vector>
+#include "tuxMcmc.h"
+#include "tuxChainManager.h"
+using namespace std;
+namespace tux {
+class Fixed;
+class Reads;
+class McmcSingle: public Mcmc {
+private:
+  McmcSingle ();
+public:
+  McmcSingle (Fixed* m, const vector<Reads*>& shortRead);
+  ~McmcSingle ();
+  int swap ();
+};
+}
+#endif // _TUXMCMCSINGLE_H_
+
+<<tuxMcmcSingle.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <numeric>    // partial_sum
+#include <functional>
+#include <algorithm>  // swap
+#include <cassert>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "ezlogger_headers.hpp"
+#include "tuxChainManager.h"
+#include "tuxFixed.h"
+#include "tuxMcmc.h"
+#include "tuxMcmcSingle.h"
+using namespace std;
+<<extern tuxGslRng>>
+namespace tux {
+McmcSingle::McmcSingle (Fixed* m, const vector<Reads*>& shortRead)
+  : Mcmc(m,shortRead,0)
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  assert (mFixed->mNumberProcess == 1);
+}
+McmcSingle::~McmcSingle ()
+{
+}
+int
+McmcSingle::swap ()
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+
+  // Get chain IDs and likelihood+prior sum values from each of ChainManagers.
+  vector<unsigned int> v1;
+  vector<double> v2;
+  mChainManager.chainid (v1);
+  mChainManager.likelihoodPrior (v2);
+
+  assert (mRank == 0);
+  assert (mFixed->mNumberProcess == 1);
+  if (mRank==0) 
+    {
+      for (unsigned int workerIdx = 0; 
+           workerIdx < mFixed->mNumberProcess; 
+           workerIdx++) 
+        {
+          for (unsigned int i = mAccumulateNumberChain.at(workerIdx), j = 0;
+               i < mAccumulateNumberChain.at(workerIdx+1);
+               i++, j++)
+            {
+              if (mRank == workerIdx)
+                {
+                  // Process ID, Chain ID, and likelihood/prior value.
+                  mMessage.set (i, v1.at(j), v2.at(j)); 
+                }
+              else
+                {
+                  assert(0);
+                }
+              mChainid.at(mMessage.processid) = mMessage.chainid;
+              mLogLikelihoodPrior.at(mMessage.processid) = mMessage.likelihoodPrior;
+            }
+        }
+
+      // Swap chains.
+      swapChains ();
+
+      v1.clear();
+      v1.resize(mNumberChainPerProcess.at(mRank));
+      for (unsigned int workerIdx = 0; 
+           workerIdx < mFixed->mNumberProcess; 
+           workerIdx++) 
+        {
+          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
+               i < mAccumulateNumberChain[workerIdx+1];
+               i++, j++)
+            {
+              unsigned int pid = mAccumulateNumberChain[workerIdx] + j;
+              assert (pid == i);
+              mMessage.set (i, mChainid.at(i), .0); 
+              if (mRank == workerIdx)
+                {
+                  //v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
+                    //= mMessage.chainid;
+                  v1.at(j) = mMessage.chainid;
+                }
+              else
+                {
+                  assert (0);
+                }
+            }
+        }
+    }
+
+  mChainManager.setChainid (v1);
+
   return 0;
 }
 }
@@ -3277,39 +4614,32 @@ Mcmc::swapChains ()
 <<tux gnu copyright>>
 #ifndef _TUXCHAINMANAGER_H_
 #define _TUXCHAINMANAGER_H_
+#include <iostream>
 #include <vector>
-#include "tuxChain.h"
 using namespace std;
 namespace tux {
 class Fixed;
 class Reads;
 class Chain;
 class ChainManager {
+private:
+  ChainManager ();
 public:
-  Fixed* mTxFixed;
+  Fixed* mFixed;
   vector<Reads*> mTxReads;
   vector<Chain*> mChain;
+  vector<double> mTemperature;
 public:
-  ChainManager (const char * filename);
-  ChainManager ();
+  ChainManager (Fixed* m, const vector<Reads*>& shortRead);
   void createChain (unsigned int);
   ~ChainManager ();
   void step (unsigned int);
-  void sample ();
-  void createSample ();
   void setChainid (unsigned int, unsigned int);
   void setChainid (vector<unsigned int>& v);
   void chainid (vector<unsigned int>&);
   void likelihoodPrior (vector<double>&);
-
-  struct c_unique {
-    Chain* operator() () {return new Chain;}
-  } uniqueChain;
-
-  struct c_step {
-    unsigned int n;
-    void operator() (Chain *i) { i->step (n);}
-  } stepChain;
+  void report (ostream &out);
+  friend ostream& operator<< (ostream &out, const ChainManager &t);
 };
 }
 #endif // _TUXCHAINMANAGER_H_
@@ -3324,7 +4654,7 @@ public:
 #include <cassert>
 #include <functional>    // bind2nd, mem_fun
 #include <iomanip>
-// #include "ezlogger_headers.hpp"
+#include "ezlogger_headers.hpp"
 #include "yaml-cpp/yaml.h"
 #include "tuxFixed.h"
 #include "tuxReads.h"
@@ -3332,81 +4662,72 @@ public:
 #include "tuxChainManager.h"
 using namespace std;
 namespace tux {
-
 template <typename T>
 void delete_pointed_to (T* p)
 {
   delete p;
 }
-ChainManager::ChainManager (const char * filename)
+ChainManager::ChainManager (Fixed* m, const vector<Reads*>& shortRead)
+  : mFixed(m), mTxReads(shortRead)
 {
-  std::ifstream fin(filename);
-  YAML::Parser parser(fin);
-  YAML::Node doc;
-  mTxFixed = new Fixed;
-  parser.GetNextDocument(doc); doc["Fixed"] >> *mTxFixed;
-  parser.GetNextDocument(doc);
-  const YAML::Node& node = doc["Reads"];
-  vector<Reads*> shortRead;
-  Reads* r;
-  for (unsigned int i = 0; i < node.size(); i++)
-    {
-      r = new Reads(i);
-      doc["Reads"] >> *r;
-      mTxReads.push_back(r);
-    }
-  fin.close();
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
 }
-ChainManager::ChainManager ()
+ChainManager::~ChainManager ()
 {
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  for_each(mChain.begin(),mChain.end(),delete_pointed_to<Chain>);
 }
 void 
 ChainManager::createChain (unsigned int n)
 {
-  mChain.resize (n);
-  generate(mChain.begin(),mChain.end(), uniqueChain);
-  for_each(mChain.begin(),mChain.end(),
-           bind2nd(mem_fun(&Chain::TxFixed),mTxFixed));
-//  for_each(mChain.begin(),mChain.end(),
-//           bind2nd(mem_fun(&Chain::TxReads),mTxReads));
-  for (vector<Chain*>::iterator i = mChain.begin(); i != mChain.end(); i++)
-    (*i)->TxReads (mTxReads);
-  for_each(mChain.begin(),mChain.end(),
-           mem_fun(&Chain::createParameter));
-}
-ChainManager::~ChainManager ()
-{
-  delete mTxFixed;
-  for_each(mChain.begin(),mChain.end(),delete_pointed_to<Chain>);
-  for_each(mTxReads.begin(),mTxReads.end(),delete_pointed_to<Reads>);
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  for (unsigned int i = 0; i < n; i++)
+    {
+      Chain* c = new Chain (mFixed, mTxReads);
+      mChain.push_back(c);
+    }
+  return;
 }
 void 
 ChainManager::step (unsigned int n)
 {
-  // Send step messages to all of the managed chains. 
-  stepChain.n = n;
-//  for_each (mChain.begin(), mChain.end(), setStepChain);
-  for_each (mChain.begin(), mChain.end(), stepChain);
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+//  I used to do this two lines:
+//  stepChain.n = n;
+//  for_each (mChain.begin(), mChain.end(), stepChain);
+//  And, I was wondering if there are ways of doing this using without having
+//    struct c_step {
+//      unsigned int n;
+//      void operator() (Chain *i) { i->step (n);}
+//    } stepChain;
+//  but like this
+//  for_each(mChain.begin(),mChain.end(),bind1st(mem_fun(&Chain::step),this));
+//  I was not happy with either of them. 
+//  Try to think about mem_fun1_t.
+  for (vector<Chain*>::iterator i = mChain.begin(); i != mChain.end(); i++)
+    {
+      (*i)->step(n);
+    }
   return;
 }
 void 
 ChainManager::setChainid (unsigned int s, unsigned int e)
 {
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
   assert (e - s + 1 == mChain.size());
   vector<Chain*>::iterator iter1;
   unsigned int i = 0;
-  for (iter1 = mChain.begin();
-       iter1 != mChain.end();
-       iter1++)
+  for (iter1 = mChain.begin(); iter1 != mChain.end(); iter1++)
     {
-      (*iter1)->chainid = s + i;
+      (*iter1)->mID = s + i;
+      (*iter1)->mBeta = mTemperature.at(s + i);
       i++;
     }
-  createSample ();
 }
 void 
 ChainManager::setChainid (vector<unsigned int>& v)
 {
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
   assert (v.size() == mChain.size());
   vector<Chain*>::iterator iter1;
   vector<unsigned int>::iterator iter2;
@@ -3414,76 +4735,60 @@ ChainManager::setChainid (vector<unsigned int>& v)
        iter1 != mChain.end();
        iter1++, iter2++)
     {
-      (*iter1)->chainid = *iter2;
+      (*iter1)->mID = *iter2;
+      (*iter1)->mBeta = mTemperature.at(*iter2);
     }
-  createSample ();
 }
 void 
 ChainManager::chainid (vector<unsigned int>& v)
 {
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  v.clear();
   vector<Chain*>::iterator iter1;
   for (iter1 = mChain.begin();
        iter1 != mChain.end();
        iter1++)
     {
-      v.push_back((*iter1)->chainid);
+      v.push_back((*iter1)->mID);
     }
 }
 void 
 ChainManager::likelihoodPrior (vector<double>& v)
 {
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  v.clear();
   vector<Chain*>::iterator iter1;
   for (iter1 = mChain.begin();
        iter1 != mChain.end();
        iter1++)
     {
-      v.push_back((*iter1)->likelihoodPrior);
+      v.push_back((*iter1)->mLogLikelihoodPrior);
     }
 }
 void 
-ChainManager::sample ()
+ChainManager::report (ostream &out)
 {
-  // Write each of the Chains to a separate file.
-  fstream f;
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
   for (vector<Chain*>::iterator i = mChain.begin();
        i != mChain.end();
        i++)
     {
-      string fn(mTxFixed->mOutfile);
-      fn += ".";
-      // See http://www.cplusplus.com/articles/D9j2Nwbp
-      string sChainid = 
-        static_cast<ostringstream*>(&(ostringstream() << (*i)->chainid))->str();
-      fn += sChainid;
-      fn += ".p";
-      f.open(fn.c_str(), fstream::out | fstream::app);
-      f << std::scientific << std::fixed;
-      f << std::setprecision(std::numeric_limits<double>::digits);
-      f << **i;
-      f.close();
-    }
-}
-void 
-ChainManager::createSample ()
-{
-  // Create new sample files
-  fstream f;
-  for (vector<Chain*>::iterator i = mChain.begin();
-       i != mChain.end();
-       i++)
-    {
-      string fn(mTxFixed->mOutfile);
-      fn += ".";
-      // See http://www.cplusplus.com/articles/D9j2Nwbp
-      string sChainid = 
-        static_cast<ostringstream*>(&(ostringstream() << (*i)->chainid))->str();
-      fn += sChainid;
-      fn += ".p";
-      f.open(fn.c_str(), fstream::out);
-      f << *((*i)->mTxFixed);
-      f.close();
+      (*i)->report (out);
     }
   return;
+}
+ostream& 
+operator<< (ostream &out, const ChainManager &t)
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
+  for (vector<Chain*>::const_iterator i = t.mChain.begin();
+       i != t.mChain.end();
+       i++)
+    {
+    //  if ((*i)->mID == 0)
+      out << **i;
+    }
+  return out;
 }
 }
 @
@@ -3504,28 +4809,26 @@ class Reads;
 class TxBoundaries;
 class TxExpression;
 class Chain {
+private:
+  Chain ();
+  void createParameter ();
 public:
-  unsigned int chainid;
+  unsigned int mID;
   unsigned int mStep;
-  double mBeta;
   double mLoglikelihood;
-
-  double likelihoodPrior;
+  double mLogLikelihoodPrior;
+  double mBeta;
+  Fixed* mFixed;
   vector<Reads*> mTxReads;
-  Fixed* mTxFixed;
   MoverManager mMoverManager;
-public:
   TxBoundaries* mTxBoundaries;
   TxExpression* mTxExpression;
 public:
-  Chain ();
   Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta = 1.L);
   ~Chain ();
-  void createParameter ();
-  void TxFixed (Fixed* m) {mTxFixed=m;}
+  void TxFixed (Fixed* m) {mFixed=m;}
   void TxReads (const vector<Reads*>& shortRead) {mTxReads=shortRead;}
-  void step (unsigned int n = 0);
-  void sample ();
+  void step (unsigned int n);
   void report (ostream &out);
   friend ostream& operator<< (ostream &out, const Chain &t);
 };
@@ -3551,16 +4854,11 @@ public:
 
 using namespace std;
 namespace tux {
-Chain::Chain ()
-{
-}
 Chain::Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta)
+  : mID(0), mStep(0), mLoglikelihood(.0), mLogLikelihoodPrior(.0),
+    mBeta(beta), mFixed(m), mTxReads(shortRead)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
-  //likelihoodPrior = 0;
-  mTxReads = shortRead;
-  mTxFixed = m;
-  mBeta = beta;
   createParameter ();
 }
 Chain::~Chain ()
@@ -3572,23 +4870,21 @@ Chain::~Chain ()
 void 
 Chain::createParameter ()
 {
-  mStep = 0;
-  mBeta = 0;
-
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
   Reads* r = mTxReads.front();
-  ProbTxBoundaries factoryTxBoundaries (r->size(),mTxFixed->K());
+  ProbTxBoundaries factoryTxBoundaries (r->size(),mFixed->K());
   mTxBoundaries = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
-  ProbTxExpression factoryTxExpression (mTxFixed->K());
+  ProbTxExpression factoryTxExpression (mFixed->K());
   mTxExpression = static_cast<TxExpression*>(factoryTxExpression.r());
 
   // Boundaries Mover
-  MoverTxBoundaries* d1 = new MoverTxBoundaries (mTxFixed, 
+  MoverTxBoundaries* d1 = new MoverTxBoundaries (mFixed, 
                                                  mTxReads, 
                                                  mTxBoundaries, 
                                                  mTxExpression);
   mMoverManager.add (d1, 1, 1);
   // Expression Mover
-  MoverTxExpression* d2 = new MoverTxExpression (mTxFixed, 
+  MoverTxExpression* d2 = new MoverTxExpression (mFixed, 
                                                  mTxReads, 
                                                  mTxBoundaries, 
                                                  mTxExpression);
@@ -3597,7 +4893,7 @@ Chain::createParameter ()
 void 
 Chain::step (unsigned int n)
 {
-  assert (n > 0);
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
   for (unsigned int i = 0; i < n; i++, mStep++)
     {
       EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) 
@@ -3608,35 +4904,21 @@ Chain::step (unsigned int n)
   return;
 }
 void 
-Chain::sample ()
-{
-  // Append the chain state to a file.
-  // scalar values - beta, likelihood
-  // boundaries
-  // expression
-  //mSample << mTxBoundaries;
-  //mSample << mTxExpression;
-  //mSample << mLikelihood;
-  //mSample.write ();
-
-  //friend Sample& operator<< (Sample &out, const Fixed &t);
-}
-void 
 Chain::report (ostream &out)
 {
   out << mMoverManager << endl;
+  return;
 }
 ostream& 
 operator<< (ostream &out, const Chain &t)
 {
   out << "-" << endl
-      << "  - [" << t.chainid << ", " << t.mStep << "]" << endl
+      << "  - [" << t.mID << ", " << t.mStep << "]" << endl
       << "  - [" << t.mBeta << ", " << t.mLoglikelihood << "]" << endl
       << *(t.mTxBoundaries)
       << *(t.mTxExpression);
   return out;
 }
-
 }
 @
 
@@ -3701,7 +4983,6 @@ public:
   unsigned int mLengthSampleSegmentB;
 public:
   TxBoundaries ();
-  ~TxBoundaries ();
   unsigned int size () {return mC.size();}
   unsigned int L () {return mC.back();}
   void seq (unsigned int from, unsigned int to, unsigned int by);
@@ -3740,10 +5021,6 @@ TxBoundaries::TxBoundaries ()
 {
   mLengthSampleSegmentA = 0;
   mLengthSampleSegmentB = 0;
-}
-TxBoundaries::~TxBoundaries () 
-{
-  
 }
 void 
 TxBoundaries::seq (unsigned int from, unsigned int to, unsigned int by)
@@ -3839,7 +5116,6 @@ public:
   vector<double> mDelta;
 public:
   TxExpression ();
-  ~TxExpression ();
   void seq (unsigned int);
   friend YAML::Emitter& operator<< (YAML::Emitter &out, 
                                     const TxExpression &tx);
@@ -3865,10 +5141,6 @@ public:
 using namespace std;
 namespace tux {
 TxExpression::TxExpression ()
-{
- 
-}
-TxExpression::~TxExpression ()
 {
  
 }
@@ -3933,7 +5205,6 @@ namespace tux {
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "yaml-cpp/yaml.h"
-#include "ezlogger_headers.hpp"
 #include "tuxData.h"
 <<extern tuxGslRng>>
 using namespace std;
@@ -3945,13 +5216,13 @@ public:
   unsigned int mJ;
 public:
   Reads (unsigned int j = 0);
-  ~Reads ();
   unsigned int size () {return mCount.size();}
   void sample (unsigned int l, unsigned int ul = 10);
   friend YAML::Emitter& operator<< (YAML::Emitter &out, const Reads &tx);
   friend void operator>> (const YAML::Node& node, Reads& t);
   friend ostream& operator<< (ostream &out, const Reads &t);
   friend istream& operator>> (istream &in, Reads &t);
+  void summary (ostream &out);
 
   struct c_uniformInt {
     unsigned int l;
@@ -3960,11 +5231,6 @@ public:
       return static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
     }
   } mUniformInt;
-
-//  struct c_print {
-//    ostream& mOut;
-//    void operator() (unsigned int i) {mOut << " " << i;}
-//  } mPrint;
 };
 }
 #endif // _TUXREADS_H_
@@ -3978,6 +5244,7 @@ public:
 #include <iterator>         // ostream_iterator
 #include <cassert>
 #include "yaml-cpp/yaml.h"
+#include "ezlogger_headers.hpp"
 #include "tuxReads.h"
 <<extern tuxGslRng>>
 <<extern tuxlf>>
@@ -3987,10 +5254,6 @@ Reads::Reads (unsigned int j)
 {
   mN = 0;
   mJ = j; 
-}
-Reads::~Reads ()
-{
-  
 }
 void
 Reads::sample (unsigned int l, unsigned int ul)
@@ -4010,7 +5273,6 @@ operator<< (ostream &out, const Reads &t)
        ostream_iterator<unsigned int>(out, ", ") );
   out << t.mCount.back() << "]" << endl;
   return out;
-  
 }
 istream& operator>> (istream &fin, Reads &t)
 {
@@ -4106,6 +5368,12 @@ operator>> (const YAML::Node& node, Reads& t)
   t.mN = accumulate(t.mCount.begin(),t.mCount.end(),0);
   return;
 }
+void 
+Reads::summary (ostream &out)
+{
+  out << "Reads #" << mJ << " - " << mN << endl;
+  return;
+}
 }
 @
 
@@ -4124,12 +5392,13 @@ using namespace std;
 namespace tux {
 class Fixed: public Data {
 public:
+  unsigned long int mSeed;
   unsigned int mK;
   double mM;
   vector<double> mZ;
   double mA0;
   double mA1;
-  double mAlpha;
+  double mAlphaQExpression;
   double mAlphaQBoundaries;
   unsigned int mLengthSampleSegmentA;
   unsigned int mLengthSampleSegmentB;
@@ -4141,7 +5410,13 @@ public:
   unsigned int mNumberChain;
   unsigned int mNumberSwap;
   unsigned int mNumberSwapTry;
+  unsigned int mSwapDistance;
+  double mHAlpha;
+  double mHBeta;
+  string mPrefix;
   string mOutfile;
+  string mChainfile;
+  string mLogfile;
   string mDatafile;
   bool mIsData;
 public:
@@ -4166,12 +5441,15 @@ using namespace std;
 namespace tux {
 Fixed::Fixed ()
   : 
-    mAlpha(100.0), mAlphaQBoundaries(100.0),
+    mAlphaQExpression(100.0), mAlphaQBoundaries(100.0),
     mLengthSampleSegmentA(5000U),
     mLengthSampleSegmentB(15000U),
     mMcmcLength(1000000U), mMcmcBurnin(500000U), mMcmcThin(5000U),
     mNumberProcess(1U), mNumberChain(1U), mNumberSwap(0U), mNumberSwapTry(0U),
-    mOutfile("tux.out"), mDatafile("tux.in"),
+    mSwapDistance(7),
+    mHAlpha(0.98), mHBeta(.9), 
+    mPrefix("tux"), mOutfile(".out"), mChainfile(".chain"), mLogfile(".log"), 
+    mDatafile("tux.in"),
     mIsData(true)
 {
   
@@ -4184,6 +5462,8 @@ ostream&
 operator<< (ostream &out, const Fixed &t)
 {
   out << "Fixed: " << endl
+      << "  " << "mSeed"
+      << ": " << t.mSeed << endl
       << "  " << "mK"
       << ": " << t.mK << endl
       << "  " << "mM"
@@ -4198,8 +5478,8 @@ operator<< (ostream &out, const Fixed &t)
       << ": " << t.mA0 << endl
       << "  " << "mA1"
       << ": " << t.mA1 << endl
-      << "  " << "mAlpha"
-      << ": " << t.mAlpha << endl
+      << "  " << "mAlphaQExpression"
+      << ": " << t.mAlphaQExpression << endl
       << "  " << "mAlphaQBoundaries"
       << ": " << t.mAlphaQBoundaries << endl
       << "  " << "mLengthSampleSegmentA"
@@ -4222,8 +5502,20 @@ operator<< (ostream &out, const Fixed &t)
       << ": " << t.mNumberSwap << endl
       << "  " << "mNumberSwapTry"
       << ": " << t.mNumberSwapTry << endl
+      << "  " << "mSwapDistance"
+      << ": " << t.mSwapDistance << endl
+      << "  " << "mHAlpha"
+      << ": " << t.mHAlpha << endl
+      << "  " << "mHBeta"
+      << ": " << t.mHBeta << endl
+      << "  " << "mPrefix"
+      << ": " << t.mPrefix << endl
       << "  " << "mOutfile"
       << ": " << t.mOutfile << endl
+      << "  " << "mChainfile"
+      << ": " << t.mChainfile << endl
+      << "  " << "mLogfile"
+      << ": " << t.mLogfile << endl
       << "  " << "mDatafile"
       << ": " << t.mDatafile << endl;
   if (t.mIsData == true) 
@@ -4238,6 +5530,8 @@ operator<< (YAML::Emitter &out, const Fixed &t)
 {
   out << YAML::BeginMap << YAML::Key << "Fixed" << YAML::Value;
   out << YAML::BeginMap
+      << YAML::Key << "mSeed"
+      << YAML::Value << t.mSeed
       << YAML::Key << "mK"
       << YAML::Value << t.mK
       << YAML::Key << "mM"
@@ -4248,8 +5542,8 @@ operator<< (YAML::Emitter &out, const Fixed &t)
       << YAML::Value << t.mA0
       << YAML::Key << "mA1"
       << YAML::Value << t.mA1
-      << YAML::Key << "mAlpha"
-      << YAML::Value << t.mAlpha
+      << YAML::Key << "mAlphaQExpression"
+      << YAML::Value << t.mAlphaQExpression
       << YAML::Key << "mAlphaQBoundaries"
       << YAML::Value << t.mAlphaQBoundaries
       << YAML::Key << "mLengthSampleSegmentA"
@@ -4272,8 +5566,20 @@ operator<< (YAML::Emitter &out, const Fixed &t)
       << YAML::Value << t.mNumberSwap
       << YAML::Key << "mNumberSwapTry"
       << YAML::Value << t.mNumberSwapTry
+      << YAML::Key << "mSwapDistance"
+      << YAML::Value << t.mSwapDistance
+      << YAML::Key << "mHAlpha"
+      << YAML::Value << t.mHAlpha
+      << YAML::Key << "mHBeta"
+      << YAML::Value << t.mHBeta
+      << YAML::Key << "mPrefix"
+      << YAML::Value << t.mPrefix
       << YAML::Key << "mOutfile"
       << YAML::Value << t.mOutfile
+      << YAML::Key << "mChainfile"
+      << YAML::Value << t.mChainfile
+      << YAML::Key << "mLogfile"
+      << YAML::Value << t.mLogfile
       << YAML::Key << "mDatafile"
       << YAML::Value << t.mDatafile
       << YAML::Key << "mIsData"
@@ -4285,12 +5591,13 @@ operator<< (YAML::Emitter &out, const Fixed &t)
 void 
 operator>> (const YAML::Node& node, Fixed& t) 
 {
+  node["mSeed"] >> t.mSeed;
   node["mK"] >> t.mK;
   node["mM"] >> t.mM;
   node["mZ"] >> t.mZ;
   node["mA0"] >> t.mA0;
   node["mA1"] >> t.mA1;
-  node["mAlpha"] >> t.mAlpha;
+  node["mAlphaQExpression"] >> t.mAlphaQExpression;
   node["mAlphaQBoundaries"] >> t.mAlphaQBoundaries;
   node["mLengthSampleSegmentA"] >> t.mLengthSampleSegmentA;
   node["mLengthSampleSegmentB"] >> t.mLengthSampleSegmentB;
@@ -4302,7 +5609,13 @@ operator>> (const YAML::Node& node, Fixed& t)
   node["mNumberChain"] >> t.mNumberChain;
   node["mNumberSwap"] >> t.mNumberSwap;
   node["mNumberSwapTry"] >> t.mNumberSwapTry;
+  node["mSwapDistance"] >> t.mSwapDistance;
+  node["mHAlpha"] >> t.mHAlpha;
+  node["mHBeta"] >> t.mHBeta;
+  node["mPrefix"] >> t.mPrefix;
   node["mOutfile"] >> t.mOutfile;
+  node["mChainfile"] >> t.mChainfile;
+  node["mLogfile"] >> t.mLogfile;
   node["mDatafile"] >> t.mDatafile;
   node["mIsData"] >> t.mIsData;
   return;
@@ -4341,9 +5654,11 @@ namespace tux {
 <<tux gnu copyright>>
 #ifndef _TUXPROBTXBOUNDARIES_H_
 #define _TUXPROBTXBOUNDARIES_H_
+#include <vector>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "tuxProbability.h"
+using namespace std;
 namespace tux {
 class ProbTxBoundaries: public Probability {
 public:
@@ -4359,23 +5674,6 @@ public:
     c_unique() {current=0;}
     unsigned int operator()() {return ++current;}
   } mUniqueNumber;
-
-//  struct c_multiply {
-//    double mL;
-//    unsigned int operator()(double i) {
-//      return static_cast<unsigned int>(i*mL + 0.5L);
-//    }
-//  } mMultiply;
-
-//  struct c_uniform {
-//    double a;
-//    double b;
-//    c_uniform () {a=0;b=1;}
-//    double operator()() {
-//      return gsl_ran_flat (gGslRng,a,b);
-//    }
-//  } mUniform;
-
 };
 }
 #endif // _TUXPROBTXBOUNDARIES_H_
@@ -4437,7 +5735,6 @@ public:
   vector<double> mTheta;
 public:
   ProbTxExpression (const unsigned int k, const double a = 1.L);
-  ~ProbTxExpression ();
   double d ();
   RandomVariable* r (); 
   void theta (vector<double>& t) {mTheta = t;}
@@ -4474,10 +5771,6 @@ ProbTxExpression::ProbTxExpression (const unsigned int k, const double a)
 {
   mAlpha.resize(k,a);
 }
-ProbTxExpression::~ProbTxExpression ()
-{
-}
-
 double
 ProbTxExpression::d ()
 {
@@ -5030,7 +6323,7 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
   else
     lkLeft.push_back(mTxBoundaries->mC.at(left - 1));
   lkLeft.insert(lkLeft.end(),lk.begin(),lk.end()-1);
-  transform(lk.begin(),lk.end(),lkLeft.begin(),lk.begin(),minus<double>());
+  transform(lk.begin(),lk.end(),lkLeft.begin(),lk.begin(),minus<unsigned int>());
   
   // Propose new boundaries
   unsigned int sumLk = accumulate(lk.begin(),lk.end(),0);
@@ -5044,31 +6337,32 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
   vector<double> bAlpha(lk.size());
   transform(b.begin(), b.end(), bAlpha.begin(), 
             bind2nd(multiplies<double>(),mFixed->mAlphaQBoundaries));
+  // Get a and aAlpha using bAlpha.
   // FIXME: check for the numerical stability?
   status = fGslRanDirichletCheck (b,bAlpha,a,aAlpha,mFixed->mAlphaQBoundaries);
-  //fGslRanDirichlet (bAlpha,a,1.0/double(sumLk));
-  //transform(a.begin(), a.end(), aAlpha.begin(), 
-            //bind2nd(multiplies<double>(),mFixed->mAlphaQBoundaries));
   if (status != GSL_SUCCESS)
     {
       mTry++;
       return 0;
     }
 
-  // Compute the new set of boundaries using the new lambda, or a.
+  // Compute the new set, ckA, of boundaries using the new lambda, or a.
   vector<double> aPartialSum(a.size());
   partial_sum(a.begin(),a.end(),aPartialSum.begin());
   vector<double> ckADouble(a.size());
   transform(aPartialSum.begin(), aPartialSum.end(), ckADouble.begin(), 
             bind2nd(multiplies<double>(),static_cast<double>(sumLkStar)));
   transform (ckADouble.begin(),ckADouble.end(),ckA.begin(),mRound);
-  // Now, we have ending positions. We will use the first kappa-1 elements.
   ckA.back() = sumLkStar;
+  // Now, we have ending positions. We will use the first kappa-1 elements.
   vector<unsigned int> s1(a.size());
   uniqueNumber.current = lkLeft.front() + 1;
   generate(s1.begin(),s1.end(),uniqueNumber);                  
   transform(ckA.begin(),ckA.end(),s1.begin(),ckA.begin(),plus<unsigned int>());
+
+  // Now, we have ckA.
   assert(ckA.back()==ck.back());
+
   // Compute lkA
   vector<unsigned int> lkA(ckA);
   vector<unsigned int> lkALeft;
@@ -5077,7 +6371,8 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
   else
     lkALeft.push_back(mTxBoundaries->mC.at(left - 1));
   lkALeft.insert(lkALeft.end(),lkA.begin(),lkA.end()-1);
-  transform(lkA.begin(),lkA.end(),lkALeft.begin(),lkA.begin(),minus<double>());
+  transform(lkA.begin(),lkA.end(),lkALeft.begin(),lkA.begin(),
+            minus<unsigned int>());
 
 #ifdef _DEBUG
   EZDBGONLYLOGGERVLSTREAM(axter::log_very_rarely) 
@@ -5145,6 +6440,7 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
               posA += *i;
               cA.push_back(sumCk);
            }
+
           cB.clear();
           unsigned int posB = lkLeft.front();
           for (vector<unsigned int>::iterator i = lk.begin(); 
@@ -5196,10 +6492,6 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
         {
           mTxBoundaries->mC.at(i + left) = ckA.at(i);
         }
-      // FIXME: Movers checks something about acceptance frequency.
-      // Do we need another class? We would have to use this class.
-      // In MC3 we need to use the output file to compute acceptance frequency
-      // because it would be complicated to access this from class.
     }
 #ifdef _DEBUG
   ss.str(string()); ss << "TxB Acceptance: " <<  acceptanceRatio () << endl;
@@ -5259,6 +6551,7 @@ public:
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include "ezlogger_headers.hpp"
 #include "tuxTxBoundaries.h"
 #include "tuxTxExpression.h"
 #include "tuxGsl.h"
@@ -5324,6 +6617,8 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
   assert(right + 1 <= mTxBoundaries->mC.size());
   vector<unsigned int> ck(mTxBoundaries->mC.begin() + left,
                           mTxBoundaries->mC.begin() + right + 1);
+ 
+  // Compute the lengths.
   vector<unsigned int> lk(ck);
   vector<unsigned int> lkLeft;
   if (left == 0)
@@ -5331,7 +6626,8 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
   else
     lkLeft.push_back(mTxBoundaries->mC.at(left - 1));
   lkLeft.insert(lkLeft.end(),lk.begin(),lk.end()-1);
-  transform(lk.begin(),lk.end(),lkLeft.begin(),lk.begin(), minus<double>());
+  transform(lk.begin(),lk.end(),lkLeft.begin(),lk.begin(),minus<unsigned int>());
+
   // Propose a new set of expression. 
   vector<double> dk(mTxExpression->mDelta.begin() + left,
                     mTxExpression->mDelta.begin() + right + 1);
@@ -5343,20 +6639,17 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
   vector<double> b(kappa);
   vector<double> aAlpha(kappa);
   vector<double> bAlpha(kappa);
-  double sumDk = accumulate(dk.begin(),dk.end(),.0L);
+  double sumDk = accumulate(dk.begin(),dk.end(),.0);
   transform(dk.begin(),dk.end(),b.begin(), 
             bind2nd(divides<double>(),sumDk));
   transform(b.begin(),b.end(),bAlpha.begin(), 
-            bind2nd(multiplies<double>(),mFixed->mAlpha));
-  status = fGslRanDirichletCheck (b,bAlpha,a,aAlpha,mFixed->mAlpha);
+            bind2nd(multiplies<double>(),mFixed->mAlphaQExpression));
+  status = fGslRanDirichletCheck (b,bAlpha,a,aAlpha,mFixed->mAlphaQExpression);
   if (status != GSL_SUCCESS)
     {
       mTry++;
       return 0;
     }
-//  fGslRanDirichlet (bAlpha,a,1.0/mAverageTotalCount);
-//  transform(a.begin(), a.end(), aAlpha.begin(), 
-//            bind2nd(multiplies<double>(),mFixed->mAlpha));
   transform(a.begin(), a.end(), dkA.begin(), 
             bind2nd(multiplies<double>(),sumDk));
 
@@ -5444,7 +6737,7 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
             {
               unsigned int sumCk = accumulate(d->mCount.begin() + pos,
                                               d->mCount.begin() + pos + *i,
-                                              0U);
+                                              0);
               pos += *i;
               c.push_back(sumCk);
            }
@@ -5490,10 +6783,6 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
         {
           mTxExpression->mDelta.at(i + left) = dkA.at(i);
         }
-      // FIXME: Movers checks something about acceptance frequency.
-      // Do we need another class? We would have to use this class.
-      // In MC3 we need to use the output file to compute acceptance frequency
-      // because it would be complicated to access this from class.
     }
 #ifdef _DEBUG
   ss.str(string()); ss << "TxE Acceptance: " <<  acceptanceRatio () << endl;
@@ -5544,32 +6833,58 @@ Sample::full ()
 #define _TUXSUMMARIZER_H_
 #include <iostream>
 #include <vector>
+#include <gsl/gsl_siman.h>
 using namespace std;
 namespace tux {
 class Fixed;
 class Reads;
 class Summarizer {
 public:
-  Fixed* mTxFixed;
+  Fixed* mFixed;
   vector<Reads*> mTxReads;
+  gsl_siman_params_t params; //  = {N_TRIES, ITERS_FIXED_T, STEP_SIZE,
+                             //  K, T_INITIAL, MU_T, T_MIN};
+  vector<vector<unsigned int> > mTxbs;
+
+  vector<unsigned int> mTxb;
+  vector<unsigned int> mBestTxb;
+  unsigned int mLeftInterval; 
+  unsigned int mRightInterval; 
+  unsigned int mStepsize;    // Preset this.
+  unsigned int mCk;          // the boundary site we propose a new value for
+  unsigned int mNewX;        // a new value for the proposed boundary site
+  unsigned int mX;           // the old value for the proposed boundary site 
+  //double mNewE;
+  //double mOldE;
+  //double mE;
 public:
-  Summarizer(const char * filename);
+  Summarizer();
+  Summarizer (Fixed* m, const vector<Reads*>& shortRead);
   ~Summarizer();
   void execute ();
   void findMeanBoundaries ();
   void computeFrequencyBoundaries ();
   friend ostream& operator<< (ostream &out, const Summarizer &t);
+  double EfInitialize();
+  double Ef(double);
+  void takeStep();
+  double boltzmann(double E, double new_E, double T);
 };
 }
 #endif // _TUXSUMMARIZER_H_
+
 
 <<tuxSummarizer.cpp>>=
 <<tux gnu copyright>>
 #include <fstream>
 #include <iterator>
+#include <gsl/gsl_math.h>
 #include "yaml-cpp/yaml.h"
+#include "ezlogger_headers.hpp"
 #include "tuxFixed.h"
 #include "tuxReads.h"
+#include "tuxGsl.h"
+#include "tuxGslRng.h"
 #include "tuxSummarizer.h"
 using namespace std;
 namespace tux {
@@ -5578,29 +6893,16 @@ void delete_pointed_to (T* p)
 {
   delete p;
 }
-Summarizer::Summarizer(const char * filename)
+Summarizer::Summarizer ()
 {
-  std::ifstream fin(filename);
-  YAML::Parser parser(fin);
-  YAML::Node doc;
-  mTxFixed = new Fixed;
-  parser.GetNextDocument(doc); doc["Fixed"] >> *mTxFixed;
-  parser.GetNextDocument(doc);
-  const YAML::Node& node = doc["Reads"];
-  vector<Reads*> shortRead;
-  Reads* r;
-  for (unsigned int i = 0; i < node.size(); i++)
-    {
-      r = new Reads(i);
-      doc["Reads"] >> *r;
-      mTxReads.push_back(r);
-    }
-  fin.close();
+}
+Summarizer::Summarizer (Fixed* m, const vector<Reads*>& shortRead)
+  : mFixed(m), mTxReads(shortRead)
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_very_rarely);
 }
 Summarizer::~Summarizer ()
 {
-  delete mTxFixed;
-  for_each(mTxReads.begin(),mTxReads.end(),delete_pointed_to<Reads>);
 }
 void
 Summarizer::execute ()
@@ -5610,66 +6912,180 @@ Summarizer::execute ()
   computeFrequencyBoundaries ();
   return;
 }
+double
+Summarizer::boltzmann(double E, double new_E, double T)
+{
+  double x = -(new_E - E) / (params.k * T);
+  /* avoid underflow errors for large uphill steps */
+  return (x < GSL_LOG_DBL_MIN) ? 0.0 : exp(x);
+}
 void 
 Summarizer::findMeanBoundaries ()
 {
-  vector<vector<unsigned int> > txb;
-  txb.resize(10);
-  // Read in boundaries from p files 
-  fstream f;
-  for (unsigned int i = 1; i <= mTxFixed->mNumberChain; i++)
+  // gsl_siman_solve is used and modified.
+  double E, new_E, best_E;
+  int i;
+  double T, T_factor;
+  int n_evals = 1, n_iter = 0, n_accepts, n_rejects, n_eless;
+
+  // Sets the mTxb and mBestTxb, and computes E.
+  E = EfInitialize();
+  best_E = E;
+
+  T = params.t_initial;
+  T_factor = 1.0 / params.mu_t;
+
+  while (1) 
     {
-      string fn(mTxFixed->mOutfile);
-      fn += ".";
-      // See http://www.cplusplus.com/articles/D9j2Nwbp
-      string sChainid = 
-        static_cast<ostringstream*>(&(ostringstream() << i))->str();
-      fn += sChainid;
-      fn += ".p";
+      n_accepts = 0;
+      n_rejects = 0;
+      n_eless = 0;
 
-      cout << fn << endl;
-
-      std::ifstream fin(fn.c_str());
-      YAML::Parser parser(fin);
-      YAML::Node doc;
-      parser.GetNextDocument(doc); 
-      parser.GetNextDocument(doc); 
-
-      // Read in vectors of vectors.
-      for (YAML::Iterator it = doc.begin(); it != doc.end(); it++) 
+      for (i = 0; i < params.iters_fixed_T; ++i) 
         {
-          vector<unsigned int> tb;
-          vector<double> te;
-          vector<unsigned int> tInteger;
-          vector<double> tReal;
+          takeStep ();   // Sets mCk, mX and mNewX.
+          new_E = Ef (E); // Computes a new energy based on E, mX and mNewX.
 
-          const YAML::Node& node = *it;
-          node[0] >> tInteger; // chainid, mStep
-          node[1] >> tReal;    // mBeta, mLoglikelihood
-          node[2] >> tb;
-          node[3] >> te;
-          if (tReal.at(0) == 1.L)
-            txb.at(tInteger.at(1)) = tb;
+          if (new_E <= best_E) 
+            {
+              mBestTxb.at(mCk) = mNewX;
+              best_E = new_E;
+            }
 
-//          cout << "TXB: ";
-//          copy(txb.begin(), txb.end()-1,
-//               ostream_iterator<unsigned int>(cout, ", ") );
-//          cout << txb.back() << endl;
-//          cout << "TXE: ";
-//          copy(txe.begin(), txe.end()-1,
-//               ostream_iterator<double>(cout, ", ") );
-//          cout << txe.back() << endl;
+          ++n_evals;     /* keep track of Ef() evaluations */
+          /* now take the crucial step: see if the new point is accepted
+             or not, as determined by the boltzmann probability */
+          if (new_E < E) 
+            {
+              if (new_E < best_E) 
+                {
+                  mBestTxb.at(mCk) = mNewX;
+                  best_E = new_E;
+                }
+              /* yay! take a step */
+              mTxb.at(mCk) = mNewX;
+              E = new_E;
+              ++n_eless;
+            } 
+          else if (gsl_rng_uniform(gGslRng) < boltzmann(E, new_E, T)) 
+            {
+              /* yay! take a step */
+	            //copy_state(new_x, x, element_size, copyfunc);
+              mTxb.at(mCk) = mNewX;
+              E = new_E;
+              ++n_accepts;
+            } 
+          else 
+            {
+              ++n_rejects;
+            }
         }
-      fin.close();
+
+//      if (print_position) 
+//        {
+          /* see if we need to print stuff as we go */
+          /*       printf("%5d %12g %5d %3d %3d %3d", n_iter, T, n_evals, */
+          /*           100*n_eless/n_steps, 100*n_accepts/n_steps, */
+          /*           100*n_rejects/n_steps); */
+          //printf ("%5d   %7d  %12g", n_iter, n_evals, T);
+          //print_position (x);
+          //printf ("  %12g  %12g\n", E, best_E);
+//        }
+
+      /* apply the cooling schedule to the temperature */
+      /* FIXME: I should also introduce a cooling schedule for the iters */
+      T *= T_factor;
+      ++n_iter;
+      if (T < params.t_min) break;
     }
 
-  for (unsigned int i = 0; i < txb.size(); i++)
+  /* at the end, copy the result onto the initial point, so we pass it
+     back to the caller */
+  mTxb = mBestTxb;
+
+  return;
+}
+double
+Summarizer::EfInitialize ()
+{
+  // Choose a TxB in TxBs.
+  unsigned long int s = static_cast<unsigned long int>(mTxbs.size());
+  s = gsl_rng_uniform_int (gGslRng,s);
+  mTxb = mTxbs.at(s);
+  mBestTxb = mTxb;
+
+  // Compute the total distance between TxB and each of TxBs.
+  double v = .0;
+  for (unsigned int i = 0; i < mTxbs.size(); i++)
     {
-      for (unsigned int j = 0; j < txb[i].size(); j++)
+      unsigned int d = fGslDistance (mTxb, mTxbs.at(i));
+      v += static_cast<double>(d);
+    }
+  return v;
+}
+double
+Summarizer::Ef (double E)
+{
+  vector<unsigned int>::iterator u;
+  unsigned int leftDistance;
+  unsigned int rightDistance;
+  for (unsigned int i = 0; i < mTxbs.size(); i++)
+    {
+      vector<unsigned int>& b = mTxbs.at(i);
+      u = upper_bound(b.begin(),b.end(),mNewX);
+      assert (u != b.end());
+      if (u == b.begin())
         {
-          cout << txb[i][j] << " ";
+          leftDistance = mNewX;
+          rightDistance = *u - mNewX;
         }
-      cout << endl;
+      else
+        {
+          leftDistance = mNewX - *(u-1);
+          rightDistance = *u - mNewX;
+        }
+      unsigned int d = GSL_MIN(leftDistance,rightDistance);
+      E += static_cast<double>(d);
+
+      assert (u != b.end());
+      u = upper_bound(b.begin(),b.end(),mX);
+      if (u == b.begin())
+        {
+          leftDistance = mNewX - 1;
+          rightDistance = *u - mNewX;
+        }
+      else
+        {
+          leftDistance = mNewX - *(u-1);
+          rightDistance = *u - mNewX;
+        }
+      d = GSL_MIN(leftDistance,rightDistance);
+      E -= static_cast<double>(d);
+    }
+  return E;
+}
+void 
+Summarizer::takeStep ()
+{
+  // Choose one boundary. 
+  // Find its two neighboring boundaries.
+  unsigned long int s = static_cast<unsigned long int>(mTxb.size());
+  mX = mTxb.at(s);
+  s = gsl_rng_uniform_int (gGslRng,s - 1);
+  mCk = s;
+  if (s == 0)
+    {
+      mLeftInterval = mX - 0 - 1U;
+    }
+  else
+    {
+      mLeftInterval = mX - mTxb.at(s-1) - 1U;
+    }
+  mRightInterval = mTxb.at(s+1) - mX - 1U;
+  mNewX = fGslRanMirror (mLeftInterval,mRightInterval,mStepsize);
+  if (s > 0)
+    {
+      mNewX += mTxb.at(s-1);
     }
   return;
 }
@@ -5693,10 +7109,12 @@ operator<< (ostream &out, const Summarizer &t)
 <<tux gnu copyright>>
 #ifndef _TUXSUMMARY_H_
 #define _TUXSUMMARY_H_
+#include "tuxRandomVariable.h"
 namespace tux {
-class Summary {
+class Summary: public RandomVariable {
 public:
-  void full ();
+  Summary ();
+  ~Summary ();
 };
 }
 #endif // _TUXSUMMARY_H_
@@ -5707,10 +7125,11 @@ public:
 #include "tuxSummary.h"
 using namespace std;
 namespace tux {
-void 
-Summary::full ()
+Summary::Summary ()
 {
-  return;
+}
+Summary::~Summary ()
+{
 }
 }
 @
@@ -5747,19 +7166,26 @@ System::full ()
 <<tux gnu copyright>>
 #ifndef _TUXGSL_H_
 #define _TUXGSL_H_
+#include <vector>
+using namespace std;
 namespace tux {
 double                                                                          
 gsl_ran_negative_binomial_lnpdf (const unsigned int k, 
                                  const double p, 
                                  const double n);
+unsigned int 
+fGslDistance (const vector<unsigned int>& a, const vector<unsigned int>& b);
 }
 #endif // _TUXGSL_H_
 
 <<tuxGsl.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <iterator>
 #include <cmath>
+#include <cassert>
 #include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "tuxGsl.h"
@@ -5776,6 +7202,108 @@ gsl_ran_negative_binomial_lnpdf (const unsigned int k,
 
   double P = (f-a-b) + n * log(p) + static_cast<double>(k) * log(1 - p); 
   return P;
+}
+unsigned int 
+fGslDistance (const vector<unsigned int>& a, const vector<unsigned int>& b)
+{
+  unsigned int v = 0;
+  vector<unsigned int>::const_iterator u;
+  unsigned int leftDistance;
+  unsigned int rightDistance;
+  for (vector<unsigned int>::const_iterator i = a.begin(); i != a.end(); i++)
+    {
+      u = upper_bound(b.begin(),b.end(),*i);
+      if (u == b.begin())
+        {
+          leftDistance = *i - 1;
+          rightDistance = *u - *i;
+        }
+      else if (u == b.end())
+        {
+          leftDistance = 0;
+          rightDistance = 0;
+        }
+      else
+        {
+          leftDistance = *i - *(u-1);
+          rightDistance = *u - *i;
+        }
+      unsigned int d = GSL_MIN(leftDistance,rightDistance);
+      v += d;
+    }
+  return v;
+}
+}
+@
+
+\subsection{Error codes}
+<<tuxError.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXERROR_H_
+#define _TUXERROR_H_
+namespace tux {
+enum { 
+  ERR_OK,
+  ERR_FILE,
+  ERR_RT_OUT_OF_MEMORY
+};
+char* err2msg(int code);
+}
+#endif // _TUXERROR_H_
+
+<<tuxError.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxError.h"
+using namespace std;
+namespace tux {
+struct Error {
+  int value;
+  char* name;
+} error_codes[] = {
+  { ERR_OK, "ERR_OK" },
+  { ERR_FILE, "File not found" },
+  { ERR_RT_OUT_OF_MEMORY, "ERR_RT_OUT_OF_MEMORY" },
+  { 0, 0 }
+};
+char* err2msg(int code)
+{
+  for (int i = 0; error_codes[i].name; ++i)
+    if (error_codes[i].value == code)
+      return error_codes[i].name;
+  return "unknown";
+}
+}
+@
+
+
+\subsection{Signal}
+
+\begin{Verbatim}[frame=lines,framesep=5mm]
+#include <signal.h>
+\end{Verbatim}
+
+<<register signal>>=
+signal(SIGUSR1, sig_handler);
+<<tuxSignal.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSIGNAL_H_
+#define _TUXSIGNAL_H_
+namespace tux {
+void sig_handler(int signum);
+}
+#endif // _TUXSIGNAL_H_
+
+<<tuxSignal.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <signal.h>
+#include "tuxSignal.h"
+using namespace std;
+namespace tux {
+void sig_handler(int signum)
+{
+  cout << "Received signal " << signum << endl;
 }
 }
 @
@@ -5808,6 +7336,18 @@ Xyz::full ()
 @
 
 \subsection{GNU Readline Library}
+<<xmalloc decl>>=
+#include <cstdlib>
+void * xmalloc (size_t size);
+<<xmalloc defn>>=
+void *
+xmalloc (size_t size)
+{
+   register void *value = (void*)malloc(size);
+   if (value == 0)
+      fprintf(stderr, "virtual memory exhausted");
+   return value;
+}
 <<config.h.in>>=
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
@@ -5843,7 +7383,7 @@ Xyz::full ()
 #include <config.h>
 #endif 
 
-#include "rlstdc.h"
+// #include "rlstdc.h"
 
 #include <sys/types.h>
 #ifdef HAVE_SYS_FILE_H
@@ -5871,11 +7411,13 @@ Xyz::full ()
 
 #include <time.h>
 
-#include "xmalloc.h"
+// #include "xmalloc.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
 
+<<xmalloc decl>>
+<<xmalloc defn>>
 
 // extern char *xmalloc PARAMS((size_t));
 
@@ -6717,6 +8259,7 @@ main (int argc, char *argv[])
 
 \subsection{STL}
 <<stl-transform.cpp>>=
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <algorithm>  // transform, copy
@@ -6761,7 +8304,32 @@ main ()
   for_each(vc.begin(),vc.end(),myobject);
   cout << endl;
 
-  //    We would need to
+  // unsigned int / double
+  cout << std::scientific;
+  cout << std::setprecision(std::numeric_limits<double>::digits);
+  unsigned int ui = 25;
+  static const unsigned int scui[] = {1,2,3,4,5};
+  vector<unsigned int> scuiA (scui, scui + sizeof(scui) / sizeof(scui[0]) );
+  vector<double> scuiB (scuiA.size());
+  transform(scuiA.begin(), scuiA.end(), scuiB.begin(), 
+            bind2nd(divides<double>(),static_cast<double>(ui)));
+  for_each(scuiB.begin(),scuiB.end(),myobject);
+  cout << endl;
+
+  double d = 10.0;
+  static const double scd[] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  cout << scd[0] << endl;
+  cout << scd[4] << endl;
+  cout << d << endl;
+  double dv = scd[0]/d;
+  cout << "1/10 = " << dv << endl;
+  vector<unsigned int> scdA (scd, scd + sizeof(scd) / sizeof(scd[0]) );
+  vector<double> scdB (scdA.size());
+  transform(scdA.begin(), scdA.end(), scdB.begin(), 
+            bind2nd(divides<double>(),static_cast<double>(d)));
+  for_each(scdB.begin(),scdB.end(),myobject);
+  cout << endl;
+
   return 0;
 }
 @
@@ -6797,9 +8365,7 @@ void ShowUsage() {
 using namespace tux;
 <<extern tuxGslRng>>
 <<simpleopt>>
-namespace tux {
-  std::ofstream lf; // log file
-}
+<<main tuxlf>>
 int 
 main (int argc, char *argv[])
 {
@@ -6983,9 +8549,7 @@ main (int argc, char *argv[])
 #include "tuxFixed.h"
 using namespace tux;
 <<simpleopt>>
-namespace tux {
-  std::ofstream lf; // log file
-}
+<<main tuxlf>>
 int 
 main (int argc, char *argv[])
 {
@@ -7341,6 +8905,10 @@ main (int argc, char *argv[])
 namespace tux {
 extern std::ofstream lf; // log file
 }
+<<main tuxlf>>=
+namespace tux {
+  std::ofstream lf; // log file
+}
 <<tux-chain.cpp>>=
 #include <cstdlib>
 #include <iomanip>
@@ -7366,9 +8934,7 @@ extern std::ofstream lf; // log file
 #include "tuxChain.h"
 using namespace tux;
 <<simpleopt>>
-namespace tux {
-  std::ofstream lf; // log file
-}
+<<main tuxlf>>
 int 
 main (int argc, char *argv[])
 {
@@ -7502,11 +9068,16 @@ main (int argc, char *argv[])
 @
 
 <<tux-cm.cpp>>=
+#include <cstdlib>
 #include <iomanip>
 #include <fstream>
+#include <stdexcept>
 #include <gsl/gsl_rng.h>
 #include "config.h"
 #include "tuxGslRng.h"
+#include "SimpleOpt.h"
+#include "SimpleGlob.h"
+#include "ezlogger_headers.hpp"
 #include "tuxProbTxBoundaries.h"
 #include "tuxProbTxExpression.h"
 #include "tuxLikelihood.h"
@@ -7521,46 +9092,749 @@ main (int argc, char *argv[])
 #include "tuxChain.h"
 #include "tuxChainManager.h"
 using namespace tux;
+<<simpleopt>>
+<<main tuxlf>>
 int 
 main (int argc, char *argv[])
 {
-  if (argc < 2)
-    {
+  //////////////////////////////////////////////////////////////////////////////
+  // Read two file names; the first is a .yaml file, and the second is the
+  // output file name of the current tux-fixed program.
+  //////////////////////////////////////////////////////////////////////////////
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) {
+    if (args.LastError() == SO_SUCCESS) {
+      if (args.OptionId() == OPT_HELP) {
+          ShowUsage();
+          return 0;
+      }
+      printf("Option, ID: %d, Text: '%s', Argument: '%s'\n",
+          args.OptionId(), args.OptionText(),
+          args.OptionArg() ? args.OptionArg() : "");
+    }
+    else {
+      std::cout << "Invalid argument: " << args.OptionText() << std::endl;
       return 1;
     }
+  }
+  CSimpleGlob glob(SG_GLOB_NODOT|SG_GLOB_NOCHECK);
+  if (SG_SUCCESS != glob.Add(args.FileCount(), args.Files())) {
+    std::cout << "Error while globbing files" << std::endl;
+    return 1;
+  }
 
+  if (glob.FileCount() != 3) {
+    ShowUsage();
+    return 1;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Log level
+  //////////////////////////////////////////////////////////////////////////////
+  // log_very_rarely
+  // log_rarely
+  axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_rarely);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Create GSL RNG and open an output file.
+  //////////////////////////////////////////////////////////////////////////////
   fGslRngAlloc ();
-  std::fstream f;
-  f.open (argv[1], std::fstream::out);
-  f << std::scientific;// << std::fixed;
-  f << std::setprecision(std::numeric_limits<double>::digits);
-  //f << std::setprecision(std::numeric_limits<int>::max());
-  YAML::Emitter out;
+  lf.open(glob.File(2),std::fstream::out);
+  std::fstream of;
+  of.open(glob.File(1),std::fstream::out);
+  of << std::scientific;// << std::fixed;
+  of << std::setprecision(std::numeric_limits<double>::digits);
 
-  // Create a chain manager.
-  ChainManager mChainManager ("fixed.yaml");
-  mChainManager.createChain (3);
-  mChainManager.setChainid (1,3);
-  unsigned int s = 0;
-  while (s < 10) 
+  // Add your source codes.
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in a YAML file as a Fixed object m.
+  //////////////////////////////////////////////////////////////////////////////
+  Fixed m;
+  std::ifstream fin(glob.File(0));
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  doc["Fixed"] >> m;
+  EZLOGGERSTREAM2(lf) << "Fixed is read" << std::endl;
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in data as a vector of Reads objects.
+  //////////////////////////////////////////////////////////////////////////////
+  vector<Reads*> shortRead;
+  string input;
+  Reads* r;
+  EZLOGGERSTREAM2(lf) << "mDatafile is " << m.mDatafile << std::endl;
+  fin.open(m.mDatafile.c_str());
+  if (!fin) {
+    std::cerr << "Unable to open file " << m.mDatafile << std::endl;
+    EZLOGGERSTREAM2(lf) << "Fatal: unable to open file "
+                        << m.mDatafile << std::endl;
+    return 1;
+  }
+  unsigned int i = 0;
+  while (!fin.eof())
     {
-      mChainManager.step (1);
-      s += 1;
-      if (2 < s)
+      r = new Reads(i++);
+      fin >> *r;
+      if (r->mN == 0)
         {
-          mChainManager.sample ();
+          EZLOGGERSTREAM2(lf) << "Fatal: unable to read in file "
+                              << m.mDatafile << std::endl;
+        }
+      else 
+        {
+          shortRead.push_back(r);
         }
     }
+  fin.close();
 
-  // END of TEST
-  f << out.c_str();
-  f << std::endl;
-  f.close();
+  //////////////////////////////////////////////////////////////////////////////
+  // Create a chain manager.
+  //////////////////////////////////////////////////////////////////////////////
+  ChainManager mChainManager (&m, shortRead);
+  mChainManager.createChain (m.mNumberChain);
+  mChainManager.setChainid (0,m.mNumberChain-1);
+  unsigned int s = 0;
+  while (s < m.mMcmcLength) 
+    {
+      mChainManager.step (m.mMcmcThin);
+      std::cerr << "Step: " << s << "\r";
+      s += m.mMcmcThin;
+      if (m.mMcmcBurnin < s)
+        {
+          of << mChainManager;
+        }
+    }
+  mChainManager.report (of);
 
+  //////////////////////////////////////////////////////////////////////////////
+  // Delelet data.
+  //////////////////////////////////////////////////////////////////////////////
+  for (vector<Reads*>::iterator it = shortRead.begin(); 
+       it != shortRead.end(); 
+       it++)
+    {
+      of << **it;
+      delete *it;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Close the  output file, and delete GSL RNG.
+  //////////////////////////////////////////////////////////////////////////////
+  of.close();
+  lf.close();
   fGslRngFree ();
+
   return 0;
 }
 @
+
+\subsection{MCMC and MPI}
+<<tux-mcmc.cpp>>=
+#include <cassert>
+#include <cstdlib>
+#include <iomanip>
+#include <fstream>
+#include <stdexcept>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <mpi.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "SimpleOpt.h"
+#include "SimpleGlob.h"
+#include "ezlogger_headers.hpp"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
+#include "tuxLikelihood.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxMoverManager.h"
+#include "tuxMover.h"
+#include "tuxMoverTxBoundaries.h"
+#include "tuxMoverTxExpression.h"
+#include "tuxChain.h"
+#include "tuxChainManager.h"
+#include "tuxMcmcMpi.h"
+using namespace tux;
+<<simpleopt>>
+<<main tuxlf>>
+<<main gslrngrandomnumber>>
+int 
+main (int argc, char *argv[])
+{
+  //////////////////////////////////////////////////////////////////////////////
+  // Read two file names; the first is a .yaml file, and the second is the
+  // output file name of the current tux-fixed program.
+  //////////////////////////////////////////////////////////////////////////////
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) {
+    if (args.LastError() == SO_SUCCESS) {
+      if (args.OptionId() == OPT_HELP) {
+          ShowUsage();
+          return 0;
+      }
+      printf("Option, ID: %d, Text: '%s', Argument: '%s'\n",
+          args.OptionId(), args.OptionText(),
+          args.OptionArg() ? args.OptionArg() : "");
+    }
+    else {
+      std::cout << "Invalid argument: " << args.OptionText() << std::endl;
+      return 1;
+    }
+  }
+  CSimpleGlob glob(SG_GLOB_NODOT|SG_GLOB_NOCHECK);
+  if (SG_SUCCESS != glob.Add(args.FileCount(), args.Files())) {
+    std::cout << "Error while globbing files" << std::endl;
+    return 1;
+  }
+
+  if (glob.FileCount() != 3) {
+    ShowUsage();
+    return 1;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Log level
+  //////////////////////////////////////////////////////////////////////////////
+  // log_very_rarely
+  // log_rarely
+  axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_rarely);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Create GSL RNG and open an output file.
+  //////////////////////////////////////////////////////////////////////////////
+  fGslRngAlloc ();
+  lf.open(glob.File(2),std::fstream::out);
+  std::fstream of;
+  of.open(glob.File(1),std::fstream::out);
+  of << std::scientific;// << std::fixed;
+  of << std::setprecision(std::numeric_limits<double>::digits);
+
+  // Add your source codes.
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in a YAML file as a Fixed object m.
+  //////////////////////////////////////////////////////////////////////////////
+  Fixed m;
+  std::ifstream fin(glob.File(0));
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  doc["Fixed"] >> m;
+  EZLOGGERSTREAM2(lf) << "Fixed is read" << std::endl;
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in data as a vector of Reads objects.
+  //////////////////////////////////////////////////////////////////////////////
+  vector<Reads*> shortRead;
+  string input;
+  Reads* r;
+  EZLOGGERSTREAM2(lf) << "mDatafile is " << m.mDatafile << std::endl;
+  fin.open(m.mDatafile.c_str());
+  if (!fin) {
+    std::cerr << "Unable to open file " << m.mDatafile << std::endl;
+    EZLOGGERSTREAM2(lf) << "Fatal: unable to open file "
+                        << m.mDatafile << std::endl;
+    return 1;
+  }
+  unsigned int i = 0;
+  while (!fin.eof())
+    {
+      r = new Reads(i++);
+      fin >> *r;
+      if (r->mN == 0)
+        {
+          EZLOGGERSTREAM2(lf) << "Fatal: unable to read in file "
+                              << m.mDatafile << std::endl;
+        }
+      else 
+        {
+          shortRead.push_back(r);
+        }
+    }
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // MPI Init
+  //////////////////////////////////////////////////////////////////////////////
+  gsl_rng_set(gGslRng,m.mSeed);
+  vector<unsigned long int> mProcessSeed;
+  mProcessSeed.resize(m.mNumberProcess); 
+  generate (mProcessSeed.begin(),mProcessSeed.begin(),gslrngRandomNumber);
+
+  int size,rank;
+  int length;
+  char name[80];
+
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+  MPI_Comm_size(MPI_COMM_WORLD,&size);
+  MPI_Get_processor_name(name,&length);
+
+  // Now we are in one of the processes.
+  // Reset the gGslRng.
+  gsl_rng_set(gGslRng,mProcessSeed.at(rank));
+  
+  //////////////////////////////////////////////////////////////////////////////
+  // Create an MCMC.
+  //////////////////////////////////////////////////////////////////////////////
+  assert (m.mNumberSwap < m.mMcmcThin);
+  McmcMpi mMcmc (&m, shortRead, rank);
+  unsigned int s = 0;
+  unsigned int sThin = 0;
+  while (s < m.mMcmcLength) 
+    {
+      std::cerr << "Step: " << s << "\r";
+      mMcmc.step (m.mNumberSwap);
+      s += m.mNumberSwap; sThin += m.mNumberSwap;
+      mMcmc.swap ();
+      if (m.mMcmcBurnin < s)
+        {
+          if (m.mMcmcThin < sThin)
+            {
+              sThin -= m.mMcmcThin;
+              of << mMcmc;
+            }
+        }
+    }
+  mMcmc.report (of);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // MPI Final
+  //////////////////////////////////////////////////////////////////////////////
+  MPI_Finalize(); 
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Delelet data.
+  //////////////////////////////////////////////////////////////////////////////
+  for (vector<Reads*>::iterator it = shortRead.begin(); 
+       it != shortRead.end(); 
+       it++)
+    {
+      of << **it;
+      delete *it;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Close the  output file, and delete GSL RNG.
+  //////////////////////////////////////////////////////////////////////////////
+  of.close();
+  lf.close();
+  fGslRngFree ();
+
+  return 0;
+}
+
+<<tux-single.cpp>>=
+#include <cassert>
+#include <cstdlib>
+#include <iomanip>
+#include <fstream>
+#include <stdexcept>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "config.h"
+#include "tuxGslRng.h"
+#include "SimpleOpt.h"
+#include "SimpleGlob.h"
+#include "ezlogger_headers.hpp"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
+#include "tuxLikelihood.h"
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxMoverManager.h"
+#include "tuxMover.h"
+#include "tuxMoverTxBoundaries.h"
+#include "tuxMoverTxExpression.h"
+#include "tuxChain.h"
+#include "tuxChainManager.h"
+#include "tuxMcmcSingle.h"
+using namespace tux;
+<<simpleopt>>
+<<main tuxlf>>
+<<main gslrngrandomnumber>>
+int 
+main (int argc, char *argv[])
+{
+  //////////////////////////////////////////////////////////////////////////////
+  // Read two file names; the first is a .yaml file, and the second is the
+  // output file name of the current tux-fixed program.
+  //////////////////////////////////////////////////////////////////////////////
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) {
+    if (args.LastError() == SO_SUCCESS) {
+      if (args.OptionId() == OPT_HELP) {
+          ShowUsage();
+          return 0;
+      }
+      printf("Option, ID: %d, Text: '%s', Argument: '%s'\n",
+          args.OptionId(), args.OptionText(),
+          args.OptionArg() ? args.OptionArg() : "");
+    }
+    else {
+      std::cout << "Invalid argument: " << args.OptionText() << std::endl;
+      return 1;
+    }
+  }
+  CSimpleGlob glob(SG_GLOB_NODOT|SG_GLOB_NOCHECK);
+  if (SG_SUCCESS != glob.Add(args.FileCount(), args.Files())) {
+    std::cout << "Error while globbing files" << std::endl;
+    return 1;
+  }
+
+  if (glob.FileCount() != 3) {
+    ShowUsage();
+    return 1;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Log level
+  //////////////////////////////////////////////////////////////////////////////
+  // log_very_rarely
+  // log_rarely
+  axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_rarely);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Create GSL RNG and open an output file.
+  //////////////////////////////////////////////////////////////////////////////
+  fGslRngAlloc ();
+  lf.open(glob.File(2),std::fstream::out);
+  std::fstream of;
+  of.open(glob.File(1),std::fstream::out);
+  of << std::scientific;// << std::fixed;
+  of << std::setprecision(std::numeric_limits<double>::digits);
+
+  // Add your source codes.
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in a YAML file as a Fixed object m.
+  //////////////////////////////////////////////////////////////////////////////
+  Fixed m;
+  std::ifstream fin(glob.File(0));
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  doc["Fixed"] >> m;
+  EZLOGGERSTREAM2(lf) << "Fixed is read" << std::endl;
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in data as a vector of Reads objects.
+  //////////////////////////////////////////////////////////////////////////////
+  vector<Reads*> shortRead;
+  string input;
+  Reads* r;
+  EZLOGGERSTREAM2(lf) << "mDatafile is " << m.mDatafile << std::endl;
+  fin.open(m.mDatafile.c_str());
+  if (!fin) {
+    std::cerr << "Unable to open file " << m.mDatafile << std::endl;
+    EZLOGGERSTREAM2(lf) << "Fatal: unable to open file "
+                        << m.mDatafile << std::endl;
+    return 1;
+  }
+  unsigned int i = 0;
+  while (!fin.eof())
+    {
+      r = new Reads(i++);
+      fin >> *r;
+      if (r->mN == 0)
+        {
+          EZLOGGERSTREAM2(lf) << "Fatal: unable to read in file "
+                              << m.mDatafile << std::endl;
+        }
+      else 
+        {
+          shortRead.push_back(r);
+        }
+    }
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Set the random Seed.
+  //////////////////////////////////////////////////////////////////////////////
+  gsl_rng_set(gGslRng,m.mSeed);
+  
+  //////////////////////////////////////////////////////////////////////////////
+  // Create an MCMC.
+  //////////////////////////////////////////////////////////////////////////////
+  assert (m.mNumberSwap < m.mMcmcThin);
+  McmcSingle mMcmc (&m, shortRead, 0);
+  unsigned int s = 0;
+  unsigned int sThin = 0;
+  while (s < m.mMcmcLength) 
+    {
+      std::cerr << "Step: " << s << "\r";
+      mMcmc.step (m.mNumberSwap);
+      s += m.mNumberSwap; sThin += m.mNumberSwap;
+      mMcmc.swap ();
+      if (m.mMcmcBurnin < s)
+        {
+          if (m.mMcmcThin < sThin)
+            {
+              sThin -= m.mMcmcThin;
+              of << mMcmc;
+            }
+        }
+    }
+  mMcmc.report (of);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Delelet data.
+  //////////////////////////////////////////////////////////////////////////////
+  for (vector<Reads*>::iterator it = shortRead.begin(); 
+       it != shortRead.end(); 
+       it++)
+    {
+      of << **it;
+      delete *it;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Close the  output file, and delete GSL RNG.
+  //////////////////////////////////////////////////////////////////////////////
+  of.close();
+  lf.close();
+  fGslRngFree ();
+
+  return 0;
+}
+@
+
+\subsection{Summary}
+<<tux-sum.cpp>>=
+#include <limits>
+#include <cstdlib>
+#include <iomanip>
+#include <fstream>
+#include <gsl/gsl_rng.h>
+#include "config.h"
+#include "ezlogger_headers.hpp"
+#include "yaml-cpp/yaml.h"
+#include "SimpleOpt.h"
+#include "SimpleGlob.h"
+#include "tuxGsl.h"
+#include "tuxGslRng.h"
+#include "tuxReads.h"
+#include "tuxFixed.h"
+#include "tuxSummarizer.h"
+using namespace tux;
+<<simpleopt>>
+<<main tuxlf>>
+int 
+main (int argc, char *argv[])
+{
+  //////////////////////////////////////////////////////////////////////////////
+  // Read two file names; the first is a .yaml file, and the second is the
+  // output file name of the current tux-fixed program.
+  //////////////////////////////////////////////////////////////////////////////
+  CSimpleOpt args(argc, argv, g_rgOptions);
+  while (args.Next()) {
+    if (args.LastError() == SO_SUCCESS) {
+      if (args.OptionId() == OPT_HELP) {
+          ShowUsage();
+          return 0;
+      }
+      printf("Option, ID: %d, Text: '%s', Argument: '%s'\n",
+          args.OptionId(), args.OptionText(),
+          args.OptionArg() ? args.OptionArg() : "");
+    }
+    else {
+      std::cout << "Invalid argument: " << args.OptionText() << std::endl;
+      return 1;
+    }
+  }
+  CSimpleGlob glob(SG_GLOB_NODOT|SG_GLOB_NOCHECK);
+  if (SG_SUCCESS != glob.Add(args.FileCount(), args.Files())) {
+    std::cout << "Error while globbing files" << std::endl;
+    return 1;
+  }
+
+  if (glob.FileCount() != 3) {
+    ShowUsage();
+    return 1;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Create GSL RNG and open an output file.
+  //////////////////////////////////////////////////////////////////////////////
+  fGslRngAlloc ();
+  lf.open(glob.File(2),std::fstream::out);
+  std::fstream of;
+  of.open(glob.File(1),std::fstream::out);
+  of << std::scientific;// << std::fixed;
+  of << std::setprecision(std::numeric_limits<double>::digits);
+
+  // Add your source codes.
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in a YAML file as a Fixed object m.
+  //////////////////////////////////////////////////////////////////////////////
+  Fixed m;
+  std::ifstream fin(glob.File(0));
+  YAML::Parser parser(fin);
+  YAML::Node doc;
+  parser.GetNextDocument(doc);
+  doc["Fixed"] >> m;
+  EZLOGGERSTREAM2(lf) << "Fixed is read" << std::endl;
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in data as a vector of Reads objects.
+  //////////////////////////////////////////////////////////////////////////////
+  vector<Reads*> shortRead;
+  string input;
+  Reads* r;
+  EZLOGGERSTREAM2(lf) << "mDatafile is " << m.mDatafile << std::endl;
+  fin.open(m.mDatafile.c_str());
+  if (!fin) {
+    std::cerr << "Unable to open file " << m.mDatafile << std::endl;
+    EZLOGGERSTREAM2(lf) << "Fatal: unable to open file "
+                        << m.mDatafile << std::endl;
+    return 1;
+  }
+  unsigned int i = 0;
+  while (!fin.eof())
+    {
+      r = new Reads(i++);
+      fin >> *r;
+      if (r->mN == 0)
+        {
+          EZLOGGERSTREAM2(lf) << "Fatal: unable to read in file "
+                              << m.mDatafile << std::endl;
+        }
+      else 
+        {
+          shortRead.push_back(r);
+        }
+    }
+  fin.close();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Create a summarizer.
+  //////////////////////////////////////////////////////////////////////////////
+  vector<vector<unsigned int> > txbs;
+  vector<unsigned int> txb;
+
+  cout << std::scientific;// << std::fixed;
+  cout << std::setprecision(std::numeric_limits<double>::digits);
+  fin.open("tux.sum");
+  YAML::Parser parser2(fin);
+  YAML::Node doc2;
+  parser2.GetNextDocument(doc2);
+  for (YAML::Iterator it=doc2.begin();it!=doc2.end();++it) 
+    {
+      // Two integers
+      for (YAML::Iterator jt=(*it)[0].begin();jt!=(*it)[0].end();++jt) 
+        {
+          // unsigned int a; *jt >> a; cout << a << " ";
+        }
+      // Two doubles
+      for (YAML::Iterator jt=(*it)[1].begin();jt!=(*it)[1].end();++jt) 
+        {
+          // string a; *jt >> a; double b = strtod(a.c_str(),NULL);
+          // cout << b << " ";
+        }
+      // Many integers
+      txb.clear();
+      for (YAML::Iterator jt=(*it)[2].begin();jt!=(*it)[2].end();++jt) 
+        {
+          unsigned int a; *jt >> a; 
+          // cout << a << " ";
+          txb.push_back(a);
+        }
+      txbs.push_back(txb);
+      // Many doubles
+      for (YAML::Iterator jt=(*it)[3].begin();jt!=(*it)[3].end();++jt) 
+        {
+          string a; *jt >> a; double b = strtod(a.c_str(),NULL);
+          // cout << b << " ";
+        }
+    }
+  fin.close();
+
+  // A random sample of TxB.
+  txb = fGslRanTxBoundaries (shortRead.front()->size(),m.mK);
+  // Compute this txb and each of txbs.
+  for (unsigned int i = 0; i < txbs.size(); i++)
+    {
+      unsigned int d = fGslDistance (txb, txbs.at(i));
+      cout << d << endl;
+    }
+
+  ////////////////////////////////////////////////////////////////////////////// 
+  // Find a mean boundaries and count boundaries.
+  ////////////////////////////////////////////////////////////////////////////// 
+  // We can start with a random boundaries or one of the boundaries.
+  // How can we step between two sets of boundaries? Randomly choose a finite
+  // number of boundary sites, and increase or decrease the number by
+  // considering its neighboring boundary sites. We need to choose how many
+  // sites we move, and how many sites to increase or decrease. We use a uniform
+  // distribution for the choice.
+  //
+  // Another summary is simpler. We count the number of posterior samples where
+  // a site is a boundary site for each site. I am not clear about boundaries.
+  // What is a boundary?
+  vector<unsigned int> summaryTxB(shortRead.front()->size(),0U);
+  for (unsigned int i = 0; i < txbs.size(); i++)
+    {
+      for (unsigned int j = 0; j < txbs[i].size(); j++)
+        {
+          unsigned int ck = txbs[i][j];
+          summaryTxB.at(ck-1)++;
+        }
+    }
+  vector<double> fractionTxB(shortRead.front()->size(),.0);
+  for (unsigned int i = 0; i < summaryTxB.size(); i++)
+    {
+      fractionTxB.at(i) = static_cast<double>(summaryTxB.at(i)) 
+                          / static_cast<double>(summaryTxB.size());
+    }
+  // Now, print fractionTxB.
+  ////////////////////////////////////////////////////////////////////////////// 
+  // Find a mean set of boundaries.
+  ////////////////////////////////////////////////////////////////////////////// 
+  Summarizer mSummarizer (&m,shortRead);
+  mSummarizer.mTxbs = txbs;
+  mSummarizer.params.n_tries = 0;            // Not used.
+  mSummarizer.params.iters_fixed_T = m.mK;
+  mSummarizer.params.step_size = 10.0;
+  mSummarizer.params.k = 1.0;
+  mSummarizer.params.t_initial = 1e10;
+  mSummarizer.params.mu_t = 1.00001;
+  mSummarizer.params.t_min = 1e-1;
+
+  // Execute the summarizer and print it out.
+  mSummarizer.execute ();
+  of << mSummarizer;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Delelet data.
+  //////////////////////////////////////////////////////////////////////////////
+  for (vector<Reads*>::iterator it = shortRead.begin(); 
+       it != shortRead.end(); 
+       it++)
+    {
+      of << **it;
+      delete *it;
+    }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Close the  output file, and delete GSL RNG.
+  //////////////////////////////////////////////////////////////////////////////
+  of.close();
+  lf.close();
+  fGslRngFree ();
+
+  return 0;
+}
+
+@
+
 
 \subsection{Log}
 
@@ -7662,49 +9936,6 @@ main (int argc, char *argv[])
   return 0;
 }
 @
-
-\subsection{Summary}
-
-<<tux-sum.cpp>>=
-#include <iomanip>
-#include <fstream>
-#include <gsl/gsl_rng.h>
-#include "config.h"
-#include "yaml-cpp/yaml.h"
-#include "tuxGslRng.h"
-#include "tuxSummarizer.h"
-using namespace tux;
-int 
-main (int argc, char *argv[])
-{
-  if (argc < 2)
-    {
-      return 1;
-    }
-
-  fGslRngAlloc ();
-  std::fstream f;
-  f.open (argv[1], std::fstream::out);
-  f << std::scientific;// << std::fixed;
-  f << std::setprecision(std::numeric_limits<double>::digits);
-  //f << std::setprecision(std::numeric_limits<int>::max());
-  YAML::Emitter out;
-
-  // Create a chain manager.
-  Summarizer mSum ("fixed.yaml");
-  mSum.execute ();
-  f << mSum;
-
-  // END of TEST
-  f << out.c_str();
-  f << std::endl;
-  f.close();
-
-  fGslRngFree ();
-  return 0;
-}
-@
-
 \subsection{MPI}
 
 \end{document}

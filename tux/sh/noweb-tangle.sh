@@ -21,25 +21,10 @@
 function noweb-tangle {
 OUTSRC=output/src
 NOWEBFILE=$ROOTDIR/noweb/main.nw
-#CPPFILE=( tux.cpp \
-#          tuxHelp.cpp \
-#          tuxManager.cpp \
-#          tuxModel.cpp \
-#          tuxMcmc.cpp \
-#          tuxXyz.cpp \
-#          gsl.cpp \
-#          fileman.cpp \
-#          yamlEmitter.cpp \
-#          monsters.cpp )
-#HPPFILE=( tuxHelp.h \
-#          tuxManager.h \
-#          tuxModel.h \
-#          tuxMcmc.h \
-#          tuxXyz.h \
-#          config.h.in )
-
 CPPFILE=( tux.cpp \
-#          tux-v1.cpp \
+          tux-v1.cpp \
+          fileman.cpp \
+          tuxmpi.cpp
           monsters.cpp
           yamlEmitter.cpp \
           tux-gsl.cpp \
@@ -49,9 +34,13 @@ CPPFILE=( tux.cpp \
           tux-move.cpp \
           tux-chain.cpp \
           tux-cm.cpp \
+          tux-mcmc.cpp \
+          tux-single.cpp \
           tux-sum.cpp \
           tux-log.cpp \
           stl-transform.cpp \
+          tuxSignal.cpp \
+          tuxError.cpp \
           tuxGsl.cpp \
           tuxGslRng.cpp \
           tuxHelp.cpp \
@@ -76,12 +65,16 @@ CPPFILE=( tux.cpp \
           tuxFixed.cpp \
           ezlogger.cpp \
           tuxMcmc.cpp \
+          tuxMcmcSingle.cpp \
+          tuxMcmcMpi.cpp \
           tuxChainManager.cpp \
+          tuxChain.cpp \
           MathFunctions/MakeTable.cpp \
-          MathFunctions/mysqrt.cpp \
-          tuxChain.cpp )
+          MathFunctions/mysqrt.cpp )
 HPPFILE=( tuxManager.h \
           tuxHelp.h \
+          tuxSignal.h \
+          tuxError.h \
           tuxGsl.h \
           tuxGslRng.h \
           benLogDouble.h \
@@ -104,10 +97,12 @@ HPPFILE=( tuxManager.h \
           tuxReads.h \
           tuxFixed.h \
           tuxMcmc.h \
+          tuxMcmcSingle.h \
+          tuxMcmcMpi.h \
           tuxChainManager.h \
-          config.h.in \
+          tuxChain.h \
           gtypes.h \
-          tuxChain.h )
+          config.h.in )
 notangle -RCMakeLists.txt $NOWEBFILE > $OUTSRC/CMakeLists.txt
 notangle -RMathFunctions/CMakeLists.txt $NOWEBFILE > $OUTSRC/MathFunctions/CMakeLists.txt
 
