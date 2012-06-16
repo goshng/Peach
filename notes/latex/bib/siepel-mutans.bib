@@ -362,6 +362,47 @@
   url = {http://dx.doi.org/10.1073/pnas.172501299}
 }
 
+@ARTICLE{Altekar2004,
+  author = {Altekar, Gautam and Dwarkadas, Sandhya and Huelsenbeck, John P. and
+	Ronquist, Fredrik},
+  title = {Parallel Metropolis coupled Markov chain Monte Carlo for Bayesian
+	phylogenetic inference.},
+  journal = {Bioinformatics},
+  year = {2004},
+  volume = {20},
+  pages = {407--415},
+  number = {3},
+  month = {Feb},
+  __markedentry = {[goshng:6]},
+  abstract = {MOTIVATION: Bayesian estimation of phylogeny is based on the posterior
+	probability distribution of trees. Currently, the only numerical
+	method that can effectively approximate posterior probabilities of
+	trees is Markov chain Monte Carlo (MCMC). Standard implementations
+	of MCMC can be prone to entrapment in local optima. Metropolis coupled
+	MCMC [(MC)(3)], a variant of MCMC, allows multiple peaks in the landscape
+	of trees to be more readily explored, but at the cost of increased
+	execution time. RESULTS: This paper presents a parallel algorithm
+	for (MC)(3). The proposed parallel algorithm retains the ability
+	to explore multiple peaks in the posterior distribution of trees
+	while maintaining a fast execution time. The algorithm has been implemented
+	using two popular parallel programming models: message passing and
+	shared memory. Performance results indicate nearly linear speed improvement
+	in both programming models for small and large data sets.},
+  doi = {10.1093/bioinformatics/btg427},
+  institution = {Department of Computer Science, University of Rochester, USA. galtekar@cs.rochester.edu},
+  keywords = {Algorithms; Bayes Theorem; Computer Communication Networks; Computing
+	Methodologies; Gene Expression Profiling, methods; Markov Chains;
+	Monte Carlo Method; Numerical Analysis, Computer-Assisted; Phylogeny;
+	Sequence Alignment, methods; Sequence Analysis, DNA, methods; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btg427},
+  pmid = {14960467},
+  timestamp = {2012.06.08},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btg427}
+}
+
 @ARTICLE{Altschul1990,
   author = {S. F. Altschul and W. Gish and W. Miller and E. W. Myers and D. J.
 	Lipman},
@@ -516,6 +557,15 @@
   year = {2011},
   owner = {goshng},
   timestamp = {2012.03.23}
+}
+
+@ARTICLE{,
+  author = {YVES F. ATCHAD\'{E} and GARETH O. ROBERTS and JEFFREY S. ROSENTHAL},
+  title = {TOWARDS OPTIMAL SCALING OF METROPOLIS-COUPLED MARKOV CHAIN MONTE
+	CARLO},
+  owner = {goshng},
+  timestamp = {2012.06.12},
+  url = {http://probability.ca/jeff/ftpdir/mcmcmc.pdf}
 }
 
 @ARTICLE{Backofen2010,
@@ -1708,7 +1758,6 @@
   pages = {1122--1124},
   number = {8},
   month = {Apr},
-  __markedentry = {[goshng:]},
   abstract = {SUMMARY: Ergatis is a flexible workflow management system for designing
 	and executing complex bioinformatics pipelines. However, its complexity
 	restricts its usage to only highly skilled bioinformaticians. We
@@ -4535,7 +4584,7 @@
   year = {2012},
   volume = {8},
   pages = {583},
-  __markedentry = {[goshng:6]},
+  __markedentry = {[goshng:]},
   abstract = {Listeria monocytogenes is a human, food-borne pathogen. Genomic comparisons
 	between L. monocytogenes and Listeria innocua, a closely related
 	non-pathogenic species, were pivotal in the identification of protein-coding
@@ -4933,6 +4982,55 @@
   pmid = {21771300},
   timestamp = {2012.04.21},
   url = {http://dx.doi.org/10.1186/1471-2105-12-290}
+}
+
+@ARTICLE{Zhou2011a,
+  author = {Zhou, Jianfu and Liu, Xiaoguang and Stones, Douglas S. and Xie, Qiang
+	and Wang, Gang},
+  title = {MrBayes on a graphics processing unit.},
+  journal = {Bioinformatics},
+  year = {2011},
+  volume = {27},
+  pages = {1255--1261},
+  number = {9},
+  month = {May},
+  __markedentry = {[goshng:6]},
+  abstract = {Bayesian phylogenetic inference can be used to propose a 'tree of
+	life' for a collection of species whose DNA sequences are known.
+	While there are many packages available that implement Bayesian phylogenetic
+	inference, such as the popular MrBayes, running these programs poses
+	significant computational challenges. Parallelized versions of the
+	Metropolis coupled Markov chain Monte Carlo (MC³) algorithm in MrBayes
+	have been presented that can run on various platforms, such as a
+	graphics processing unit (GPU). The GPU has been used as a cost-effective
+	means for computational research in many fields. However, until now,
+	some limitations have prevented the GPU from being used to run MrBayes
+	MC³ effectively.We give an appraisal of the possibility of realistically
+	implementing MrBayes MC³ in parallel on an ordinary four-core desktop
+	computer with a GPU. An earlier proposed algorithm for running MrBayes
+	MC³ in parallel on a GPU has some significant drawbacks (e.g. too
+	much CPU-GPU communication) which we resolve. We implement these
+	improvements on the NVIDIA GeForce GTX 480 as most other GPUs are
+	unsuitable for running MrBayes MC³ due to a range of reasons, such
+	as having insufficient support for double precision floating-point
+	arithmetic. Experiments indicate that run-time can be decreased by
+	a factor of up to 5.4 by adding a single GPU (versus state-of-the-art
+	multicore parallel algorithms). We can also achieve a speedup (versus
+	serial MrBayes MC³) of more than 40 on a sufficiently large dataset
+	using two GPUs.GPU MrBayes (i.e. the proposed implementation of MrBayes
+	MC³ for the GPU) is available from http://mrbayes-gpu.sourceforge.net/.},
+  doi = {10.1093/bioinformatics/btr140},
+  institution = {Nankai-Baidu Joint Laboratory, College of Information Technical Science,
+	Nankai University, Tianjin, China.},
+  keywords = {Algorithms; Base Sequence; Bayes Theorem; Computational Biology, methods;
+	Markov Chains; Monte Carlo Method; Phylogeny; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btr140},
+  pmid = {21414986},
+  timestamp = {2012.06.08},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btr140}
 }
 
 @ARTICLE{Zhou2011,

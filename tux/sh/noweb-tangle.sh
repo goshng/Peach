@@ -24,23 +24,25 @@ NOWEBFILE=$ROOTDIR/noweb/main.nw
 CPPFILE=( tux.cpp \
           tux-v1.cpp \
           fileman.cpp \
-          tuxmpi.cpp
           monsters.cpp
           yamlEmitter.cpp \
           tux-gsl.cpp \
           tux-fixed.cpp \
           tux-tx.cpp \
+          tux-probtx.cpp \
           tux-prob.cpp \
           tux-move.cpp \
           tux-chain.cpp \
           tux-cm.cpp \
           tux-mcmc.cpp \
           tux-single.cpp \
+          tux-likelihood.cpp \
           tux-sum.cpp \
           tux-log.cpp \
           stl-transform.cpp \
           tuxSignal.cpp \
           tuxError.cpp \
+          tuxDefault.cpp \
           tuxGsl.cpp \
           tuxGslRng.cpp \
           tuxHelp.cpp \
@@ -53,14 +55,17 @@ CPPFILE=( tux.cpp \
           tuxProbTxBoundaries.cpp \
           tuxProbTxExpression.cpp \
           tuxLikelihood.cpp \
+          tuxTotalLikelihood.cpp \
           tuxMoverManager.cpp \
           tuxMover.cpp \
           tuxMoverTxBoundaries.cpp \
           tuxMoverTxExpression.cpp \
+          tuxMoverTxBSingle.cpp \
           tuxSummarizer.cpp \
           tuxSummary.cpp \
           tuxTxBoundaries.cpp \
           tuxTxExpression.cpp \
+          tuxTxParameter.cpp \
           tuxReads.cpp \
           tuxFixed.cpp \
           ezlogger.cpp \
@@ -75,6 +80,7 @@ HPPFILE=( tuxManager.h \
           tuxHelp.h \
           tuxSignal.h \
           tuxError.h \
+          tuxDefault.h \
           tuxGsl.h \
           tuxGslRng.h \
           benLogDouble.h \
@@ -86,14 +92,17 @@ HPPFILE=( tuxManager.h \
           tuxProbTxBoundaries.h \
           tuxProbTxExpression.h \
           tuxLikelihood.h \
+          tuxTotalLikelihood.h \
           tuxMoverManager.h \
           tuxMover.h \
           tuxMoverTxBoundaries.h \
           tuxMoverTxExpression.h \
+          tuxMoverTxBSingle.h \
           tuxSummarizer.h \
           tuxSummary.h \
           tuxTxBoundaries.h \
           tuxTxExpression.h \
+          tuxTxParameter.h \
           tuxReads.h \
           tuxFixed.h \
           tuxMcmc.h \
