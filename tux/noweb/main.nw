@@ -4050,7 +4050,7 @@ private:
 public:
   int swapChains ();
   Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
-  ~Mcmc ();
+  virtual ~Mcmc ();
   int step (unsigned int n);
   virtual int swap () = 0;
   int save ();
@@ -6124,6 +6124,7 @@ namespace tux {
 class RandomVariable;
 class Probability {
 public:
+  virtual ~Probability () {}
   virtual double d () = 0;
   virtual RandomVariable* r () = 0;
 };
@@ -6150,6 +6151,7 @@ public:
   unsigned int mK;
 public:
   ProbTxBoundaries (unsigned int, unsigned int);
+  virtual ~ProbTxBoundaries () {}
   double d ();
   RandomVariable* r (); 
 
@@ -6218,6 +6220,7 @@ public:
   vector<double> mDelta;
 public:
   ProbTxExpression (const unsigned int k, const double a = 1.L);
+  virtual ~ProbTxExpression ();
   double d ();
   RandomVariable* r (); 
   void theta (vector<double>& t) {mDelta = t;}
@@ -6303,6 +6306,7 @@ public:
   unsigned int mN;
 public:
   Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te);
+  virtual ~Likelihood () {}
   //Likelihood (unsigned int, unsigned int, double);
   double d ();
   RandomVariable* r (); 
@@ -6500,6 +6504,7 @@ public:
 public:
   TotalLikelihood (Fixed* fixed, vector<Reads*>& reads, 
                    TxBoundaries* txb, TxExpression* txe, TxParameter* txp);
+  virtual ~TotalLikelihood () {}
   double d ();
   RandomVariable* r (); 
 };
@@ -6743,6 +6748,7 @@ public:
   double mWeight;
 public:
   Mover (bool d = true) : mTry(0), mAccepted(0), mIsData(d) {}
+  virtual ~Mover () {}
   virtual int step () = 0;
   double acceptanceRatio () const; 
   friend ostream& operator<< (ostream &out, const Mover &t);

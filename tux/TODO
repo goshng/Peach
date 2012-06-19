@@ -1,3 +1,10 @@
+.Do these for initialization.
+. ./run 3
+. ./run 1
+. ./run 2
+. cd output/src/b
+. 
+
 .Tests
 . Reads in setup (Fixed)
 . Reads in data (Reads)
@@ -44,6 +51,8 @@
 . /home/fs01/sc2265/cmake-2.8.7-Linux-i386/bin/cmake --version 
 . Use the working version.
 . cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/usr
+. You can clone yaml-cpp.
+. hg clone https://code.google.com/p/yaml-cpp/
 
 .simpleopt
 . Command line parser

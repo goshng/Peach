@@ -19,10 +19,10 @@
 ###############################################################################
 
 function initialize {
-OUTSRC=output/src
-mkdir $OUTSRC/b
-cp src/ezlogger/* $OUTSRC
-cp src/simpleopt/* $OUTSRC
-cp downloads/FindGSL.cmake $OUTSRC
-cp src/gpl-3.0.txt $OUTSRC
+  OUTSRC=output/src
+  mkdir $OUTSRC/b
+  cp src/ezlogger/* $OUTSRC
+  cp src/simpleopt/* $OUTSRC
+  cp downloads/FindGSL.cmake $OUTSRC
+  cp src/gpl-3.0.txt $OUTSRC
 }
