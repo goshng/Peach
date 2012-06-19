@@ -47,11 +47,7 @@ CPPFILE=( tux.cpp \
           tuxGslRng.cpp \
           tuxHelp.cpp \
           tuxManager.cpp \
-          tuxRandomVariable.cpp \
-          tuxParameter.cpp \
-          tuxData.cpp \
           tuxSystem.cpp \
-          tuxProbability.cpp \
           tuxProbTxBoundaries.cpp \
           tuxProbTxExpression.cpp \
           tuxLikelihood.cpp \

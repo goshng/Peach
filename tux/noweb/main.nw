@@ -3,6 +3,7 @@
 \usepackage[latin9]{inputenc}                                                   
 \usepackage{mdwlist}           % less spaces between items
 \usepackage{bm}                % bold math letters
+\usepackage{amssymb}
 \usepackage{noweb}
 \usepackage{fancyvrb}
 \usepackage[letterpaper]{geometry}
@@ -44,6 +45,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \newcommand{\Cmember}[1]{member \texttt{#1}}
 \newcommand{\Cmethod}[1]{method \texttt{#1}}
 \newcommand{\Cglobal}[1]{\texttt{#1}}
+\newcommand{\Cvariable}[1]{\texttt{#1}}
 \newcommand{\Cfunction}[1]{function \texttt{#1}}
 \newcommand{\Cpackage}[1]{package \textit{#1}}
 \newcommand{\program}[1]{program \texttt{#1}}
@@ -71,24 +73,27 @@ available, use \Cclass{McmcSingle}.  Read more documentation in the lyx
 \Cfile{Peach/notes/researches/siepel-transcript.lyx}.
 
 \subsection{Tux}
-We describe \Cfile{tux.cpp}. The file is one of the two versions of
-\program{tux} with compiler definition of \texttt{\_MPI}. It uses several
-libraries including \library{readline}, \library{yaml-cpp}, \library{SimpleOpt},
-\library{gsl}, and \library{ezlogger}. The companion of \program{tux} could use
-\library{openmpi} to implement an MPI (Message Passing Interface). There are
-other parallelization schemes available: multiple threads, GPUs using CUDA, etc.
-We focus on the MPI implementation first. We borrow the source code of
-\Cfile{fileman.c} from \library{readline} to implement shell environment in
-\Cfile{tux.cpp}.  We have three main global-scope objects: \Cglobal{gFixed},
-\Cglobal{gShortRead}, and \Cglobal{gManager}.  We log the flow of \program{tux}
-using \library{ezlogger}. In the \Cfunction{main}, we set the verbosity level
-using the following line: 
+The \program{tux} uses libraries including \library{readline}, \library{yaml-cpp}, \library{SimpleOpt}, \library{gsl}, and \library{ezlogger}. A companion of \program{tux} uses
+\library{openmpi} to implement an Message Passing Interface (MPI) version of \program{tux} using compiler definition of \texttt{-D\_MPI}. We have yet to implement parallelization schemes of multiple
+threads, or GPUs using CUDA. We focus on the MPI implementation first. We borrow the source code of \Cfile{fileman.c} from \library{readline} to implement a
+command line environment in the main program source \Cfile{tux.cpp}, in which we have
+three main global-scope objects: \Cglobal{gFixed}, \Cglobal{gShortRead}, and
+\Cglobal{gManager}.  We log the flow of \program{tux} using
+\library{ezlogger}. In the \Cfunction{main}, we set the verbosity level using
+the following line:  
 \begin{Verbatim}[frame=lines,framesep=5mm]
 axter::ezlogger<>::set_verbosity_level_tolerance(axter::log_very_rarely);
 Use one of log_always, log_often, log_regularly, log_rarely, log_very_rarely.
 \end{Verbatim}
-In addition to the three main global variables we use \Cglobal{gGslRng}. In the
-\Cfunction{main} we use once
+Set the log verbosity level using \program{tux} command line option \texttt{--logverbosity} with a number
+argument ranging from 1 to 5. In order to create log files properly we use
+\emph{log\_rarely} or \texttt{--logverbosity 4} for logging the detail of MCMC
+procedure, and \emph{log\_regularly} or \texttt{--logverbosity 3} for MC3
+debugging. We create a log file for the main program, and another kind of log
+files for chain or chain manager process. This allows us to see activities in
+MPI processes. In addition to the three main global variables we use
+\Cglobal{gGslRng}. For the main log file we use \Cglobal{tux::lf}. In the
+\Cfunction{main} we use once  
 \begin{Verbatim}[frame=lines,framesep=5mm]
 fGslRngAlloc ();
 \end{Verbatim}
@@ -96,89 +101,43 @@ at the start, and call the following line before exiting the program.
 \begin{Verbatim}[frame=lines,framesep=5mm]
 fGslRngFree ();
 \end{Verbatim}
-We first enter the interactive mode without options. See the batch mode. The
-\program{tux} can show a manual page, its version, or execute commands including
-\Ccommand{fixed}, \Ccommand{mcmc}, and \Ccommand{summarize}. The main option is
-for an input file name: \Coption{-i}, \Coption{--in}, or \Coption{--infile}. The
-input file describes the overall setup of the \program{tux}. We use
-\library{yaml-cpp} to read in the program setup. If no such file with the input
-file name is found, then the \program{tux} exits. The input file contains
-\Cmember{mDatafile}. We read in the file and save it as \Cglobal{gShortRead}.
-With the two global variables ready we can use \Cglobal{gManager}. 
-When we are finished with the batch mode, we delete the memory to each short
-read in \Cglobal{gShortRead}. We also call \Cfunction{fGslRngFree} before the
-exit. Now, let us see \Cclass{Manager}.
+We enter the interactive mode without options or \program{tux}'s command
+\texttt{interactive}.
+\begin{Verbatim}[frame=lines,framesep=5mm]
+./tux interactive
+\end{Verbatim}
+The \program{tux} can show a manual page, its version, or execute commands
+including \Ccommand{fixed}, \Ccommand{mcmc}, and \Ccommand{summarize}. The main
+option is for an input file name: \Coption{-i}, \Coption{--in}, or
+\Coption{--infile}. The input file describes the overall setup of the
+\program{tux}. We use \library{yaml-cpp} to read in the program setup. If no
+such file with the input file name is found, then the \program{tux} exits with
+an error message. The input file contains \Cmember{mDatafile}. We read in the
+file and save it as \Cglobal{gShortRead}. With the two global variables ready we use \Cglobal{gManager}. When being finished with the batch mode, we delete
+the memory to each short read in \Cglobal{gShortRead}. We also call
+\Cfunction{fGslRngFree} before the exit. Now, let us see \Cclass{Manager}. 
 
 \subsection{Manager}
-
-\begin{lstlisting}
-class Manager {
-public:
-  Fixed* mFixed;
-  vector<Reads*> mTxReads;
-  vector<unsigned long int> mProcessSeed;
-public:
-  Manager ();
-  Manager (Fixed* m, const vector<Reads*>& shortRead);
-  void show();
-  void model();
-  void mcmc(int r = 0);
-  void summarize();
-  void save();
-  void load();
-  void help();
-  string logFilename (unsigned int i);
-  string chainFilename (unsigned int i);
-};
-\end{lstlisting}
-
-Members of \Cclass{Manager} are
-\begin{itemize*}
-\item public: 
-\item   Fixed* mFixed; a mere pointer to the program setup
-\item   vector<Reads*> mTxReads; mere pointers to short reads
-\item   vector<unsigned long int> mProcessSeed; random seeds for separate
-processes
-\item public:
-\item   Manager (); 
-\item   Manager (Fixed* m, const vector<Reads*>\& shortRead);
-\item   void show(); Not Yet Implemented (NYI) - shows the current status in the
-shell
-\item   void model(); NYI - shows the current model
-\item   void mcmc(int r); executes an MCMC with rank $r$
-\item   void summarize(); summarizes the posterior sample
-\item   void save(); NYI - saves the state of the
-currently running MCMC
-\item   void load(); NYI - loads the state of a saved MCMC
-\item   void help(); NYI - shows the manual page
-\item   string logFilename (unsigned int i); uses mLogDirectory and mPrefix to
-create a log file name for the $i$ chain.
-\item   string chainFilename (unsigned int i); uses mChainDirectory and mPrefix
-to create a log file name for the $i$ chain.
-\end{itemize*}
-
-The \Cclass{Manager} is one of the main global objects. This can access
+The \Cclass{Manager} is one of the main global objects. This accesses
 \Cclass{Fixed} and \Cclass{Reads}. In the \Cmethod{mcmc} we use \Cclass{Mcmc} to
-run a number of chains. A chain is a cold chain, and the rest of chains are hot
-chains when \Cmember{mNumberProcess} is greater than 1.  The \Cclass{Mcmc}
+run a number of chains. One of them is ``cold,'' and the others are
+``hot'' when \Cmember{mNumberProcess} is greater than 1.  The \Cclass{Mcmc}
 coordinates multiple simultaneous runs of chains.  Each chain needs to know what
-temperature to use. The \Cclass{Mcmc} owns the temperature member, and
-\Cclass{ChainManager} owns its copy. The \Cclass{ChainManager} specifies the
-temperature for the chains that it manages.
-The \Cclass{Mcmc} contains \Cmember{mTemperature}
-and \Cmember{mChainid} for accessing chains.  The \Cclass {Mcmc} creates a
-list of temperature using \Cclass{c\_hlinear}, or \Cclass{c\_hgeometric} setting
-values of \Cmember{temperature}. It sets \Cmember{mChainid} as a sequence of
-non-negative integers. We need to set up a list of chains before running them.
-The \Cclass{Mcmc} creates a list of chains, and executes each chain one at a time
+temperature to use. The \Cclass{Fixed} owns the temperature member. The
+\Cclass{ChainManager} specifies the temperature for the chains that it
+manages. The \Cclass{Fixed} does contain \Cmember{mTemperature}. \Cclass{ChainManager} owns \Cmember{mChainid} for accessing chains.  The \Cclass {Fixed} creates a list of
+temperature using \Cclass{c\_hlinear}, or \Cclass{c\_hgeometric} setting values
+of \Cmember{mTemperature}. The \Cclass{ChainManager} initializes \Cmember{mChainid} as a sequence of
+non-negative integers. We set up a list of chains before running them. The
+\Cclass{Mcmc} creates a list of chains, and executes each chain one at a time
 using \Cmethod{step}. We have two classes for chains. One is for a chain that
 does the sampling job, and the other is for a chain manager. The \Cclass{Mcmc}'s
 \Cmethod{step} commands all of the chains to move a finite number of steps in
 their own process. The chain manager will be run in a separate process. We use
-Message Passing Interface (MPI), which is an application interface that allows
+Message Passing Interface, which is an application interface that allows
 processes to communicate by sending and receiving messages. In essence, it
 facilitates communication when multiple computers/processors/cores are
-performing distributed computation.
+performing distributed computation. 
 
 Let's see how the communication works.  The \Cclass{Mcmc} sends a message of
 \Cmethod{step} to \Cclass{ChainManager}, which in turn sends a message of
@@ -188,7 +147,20 @@ all of the messages of \Cmethod{step} in the list of \Cclass{Chain}, the
 \Cclass{ChainManager} sends a message to \Cclass{Mcmc} to check whether it can
 continue to move steps of the chains. The \Cclass{Mcmc} would swap chains by
 receciving necessary values from \Cclass{ChainManager}. 
+The \Cmethod{mcmc} creates an instance of \Cclass{McmcSingle} or
+\Cclass{McmcMpi}. We move as many steps as \Cmethod{mNumberSwap}. Then, we swap
+chains. After the swap we save the state of each chain if the thinning count is
+greater than the user specified number, or \Cmember{mMcmcThin}. 
 
+We discuss output files. Each process has a \Cclass{ChainManager} object.
+The process opens an output file and a log file. The output file name consists
+of \Cmember{mChainDirectory}, and \Cmember{mPrefix}. The process rank ID or chain
+manager ID follows the name with addition extension of ``chain.'' The log file
+name is constructed similarly except for the extension of ``log.'' 
+
+FIXME: We still need to code the \Cmethod{summarize} of \Cclass{Manager}.
+
+FIXME: We have yet to implement the following feature to save and load MCMC states.
 We wish to control the \program{tux} using signals by allowing \program{tux}
 to monitor signals. A signal turns off the currently running MCMC, and makes the
 \program{tux} save the states and exit. We use SIGUSR1 or SIGUSR2 to customize
@@ -205,75 +177,41 @@ for saving the state of the \program{tux} MCMC. When the signal caputre is not
 available, we could use a file to let \program{tux} know that it is time to stop
 and save the state of MCMC for later use.
 
-The \Cmethod{mcmc} creates an instance of \Cclass{McmcSingle} or
-\Cclass{McmcMpi}. We move as many steps as \Cmethod{mNumberSwap}. Then, we swap
-chains. After the swap we save the state of each chain if the thinning count is
-greater than the user specified number, or \Cmember{mMcmcThin}. 
+Members of \Cclass{Manager} are
+\begin{itemize*}
+\item public: 
+\item   Fixed* mFixed; a mere pointer to the program setup
+\item   vector<Reads*> mTxReads; mere pointers to short reads
+processes
+\item public:
+\item   Manager (); 
+\item   Manager (Fixed* m, const vector<Reads*>\& shortRead);
+\item   void show(); Not Yet Implemented (NYI) - shows the current status in the
+shell
+\item   void model(); NYI - shows the current model
+\item   void mcmc(int r); executes an MCMC with rank $r$
+\item   void summarize(); summarizes the posterior sample
+\item   void save(); NYI - saves the state of the
+currently running MCMC
+\item   void load(); NYI - loads the state of a saved MCMC
+\item   void help(); NYI - shows the manual page
+\end{itemize*}
 
-We discuss output files. Each process has a \Cclass{ChainManager} object.
-The process opens an output file and a log file. The output file name consists
-of \Cmember{mChainDirectory}, and \Cmember{mPrefix}. The process rank ID or chain
-manager ID follows the name with addition extension of ``chain.'' The log file
-name is constructed similarly except for the extension of ``log.'' 
-
-FIXME: We still need to code the \Cmethod{summarize} of \Cclass{Manager}.
-
-\subsection{Model}
-I do not find a role of \Cclass{Model}, yet. The \Cclass{Fixed} has a similar
-role.
+We now detail \Cclass{Manager}. The \Cmember{mFixed} and \Cmember{mReads} are mere pointers to the two global objects. The two global variables could be encapsulated in \Cclass{Manager}. I will consider this option later. This class should serve the user's request. We provide \Cmethod{mcmc} and \Cmethod{summarize}. Using \Cclass{Fixed} we create several file names, one of which is the chain file. A process of MPI or a thread of multiple threads program owns a chain file. A chain file contains samples from multiple chains. In \Cmethod{mcmc} an instance of \Cclass{Mcmc} is created and executed. We print \Cclass{Mcmc} out in a chain file. A chain file name consists of \Cmember{mChainDirectory}, \Cmember{mPrefix}, chain manager or MPI process ID, and extension of  ``chain.'' The \Cmethod{report} prints out the acceptance ratio of movers or updaters and chain swap ratios in a file name made up of  \Cmember{mOutDirectory}, \Cmember{mPrefix}, process ID, and extension of ``rpt.'' The \Cmethod{repportSitewiseFrequencyBoundaries} of \Cclass{Mcmc} creates a file name consisting of \Cmember{mOutDirectory}, \Cmember{mPrefix}, process ID, and extension of ``sbf.'' The \Cmethod{reportSitewiseExpression} creates a file with ``swe'' extension. We have yet to implement a method of summarizing these process-specific files.  The \Cmethod{summarize} creates an instance of \Cclass{Summarizer}, and calls \Cmethod{execute}. This method could feature more functions.
 
 \subsection{Mcmc}
-Chain swaps are done in \Cclass{Mcmc}.  The \Cclass{Mcmc} might have two things
-in it: process management and Markov chains management.  We employ
-Metropolis-coupled Markov chain Monte Carlo (MC3).  See
-http://probability.ca/jeff/ftpdir/mcmcmc.pdf.
-
-\begin{lstlisting}
-class Mcmc {
-public:
-  unsigned int mRank; 
-  Fixed* mFixed;
-  vector<Reads*> mTxReads;
-  ChainManager mChainManager;
-  vector<unsigned int> mChainid;
-  vector<double> mTemperature;
-  vector<double> mLogLikelihoodPrior;
-  vector<unsigned int> mNumberChainPerProcess;
-  vector<unsigned int> mAccumulateNumberChain;
-  vector<vector<unsigned int> > mSwapCount;
-  vector<vector<unsigned int> > mSwapTryCount;
-private:
-  Mcmc ();
-public:
-  int swapChains ();
-  Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
-  ~Mcmc ();
-  int numberChainPerProcess ();
-  int createChainManager (unsigned int r);
-  int step (unsigned int n);
-  virtual int swap () = 0;
-  int sample ();
-  int save ();
-  int load ();
-  void report (ostream &out);
-  friend ostream& operator< < (ostream &out, const Mcmc &t);
-};
-\end{lstlisting}
+The \Cclass{Mcmc} steps and swaps chains. We distribute chains among multiple processes using the class's process management. While in the previous section the \Cclass{Manager} handles user inputs, the \Cclass{Mcmc} does an actual job of running Markov chains. The \Cclass{Mcmc} might have two things in it: process management and Markov chains management.  We employ Metropolis-coupled Markov chain Monte Carlo (MC3).  See http://probability.ca/jeff/ftpdir/mcmcmc.pdf. 
 
 Members of \Cclass{Mcmc}:
 \begin{itemize*}
 \item public:
 \item   unsigned int mRank; the process ID, 0 for \Cclass{McmcSingle}
 \item   Fixed* mFixed; a mere pointer to the program setup
-\item   vector<Reads*> mTxReads; mere pointers to short reads
+\item   vector<Reads*> mReads; mere pointers to short reads
 \item   ChainManager mChainManager; the chain manager
 \item   vector<unsigned int> mChainid; chain IDs of the processes, e.g.,
 c(1,4,0,5,3,2) is the chain IDs for the six processes
-\item   vector<double> mLogLikelihoodPrior; sums of likelihood and prior of the
-processes
-\item   vector<double> mTemperature; temperature values of the chain IDs
-\item   vector<unsigned int> mNumberChainPerProcess; e.g., c(3,3,2)  
-\item   vector<unsigned int> mAccumulateNumberChain; e.g., c(0,3,6,8)
+\item   vector<double> mLogLikelihoodPrior; sums of likelihood and prior of the processes, which is used for chain swaps
 \item   vector<vector<unsigned int> > mSwapCount; number of successful swap
 tries between chains
 \item   vector<vector<unsigned int> > mSwapTryCount; number of swap tries
@@ -283,17 +221,14 @@ between chains
 temperatures - called by \Cmethod{swap}
 \item   Mcmc (Fixed* m, const vector<Reads*>\& shortRead, unsigned int rank);
 \item   ~Mcmc ();
-\item   int numberChainPerProcess (); sets \Cmember{mNumberChainPerProcess} and
-\Cmember{mAccumulateNumberChain} using the number of processors and compute
-nodes
-\item   int createChainManager (unsigned int r); uses \Cmember{mChainManager} to
-create alloted chains for the current rank process
 \item   int step (unsigned int n);
 \item   virtual int swap () = 0; derived classes implement this method
-\item   int sample ();
-\item   int save ();
-\item   int load ();
-\item   void report (ostream \&out);
+\item   int sample (); 
+\item   int save (); NYI
+\item   int load (); NYI
+\item   void report (ostream \&out); prints MCMC diagnostics.
+\item   void reportSitewiseExpression (ostream\& out); prints site-wise expression level.
+\item   void reportSitewiseFrequencyBoundaries (ostream\& out); prints site-wise frequency of boundaries along the chromosome.
 \item   friend ostream\& operator$\ll$ (ostream \&out, const Mcmc \&t);
 \end{itemize*}
 
@@ -304,34 +239,15 @@ The \Cclass{c\_msg1} is used to send a message to the rank 0 process:
 \item double likelihoodPrior; the sum of likelihood and prior of a chain
 \end{itemize*}
 
-The constructor needs pointers to \Cclass{Fixed} and \Cclass{Reads}. It also
-needs rank ID of the process where the \Cclass{Mcmc} object is created. We
-compute how many chains are needed for each process. Then, we create chains for
-the current process. We also prepare chain IDs, and temperature values. The
-acceptance ratio for chain swaps is prepared in \Cmember{mSwapCount} and
-\Cmember{SwapTryCount}.  The \Cclass{McmcSingle} and \Cclass{McmcMpi} implements
-\Cmethod{swap}.  All of the chains managed by \Cclass{ChainManager} have their
-own chain IDs, which are used to index temperature values. We also need the sums
-of log likelihood and log prior to swap chains. We use \Cmethod{chainid} and
-\Cmethod{likelihoodPrior} to access chain IDs and the sum of log likelihood and
-log prior from the chains managed by \Cclass{ChainManager}.  We swap chain IDs
-and the sums of log likelihood and log prior.  We know neighboring chains in
-temperature values to swap chains nearby.  Let us see \Cmethod{swapChains}.  For
-example, we have the following \Cmember{mChainid} and
-\Cmember{mLogLikelihoodPrior}. We find chain IDs using \Cmember{mChainid} with
-process index or ``Index.'' We also want to know the process index using
-``chainIndex'' with chain IDs. We create ``chainIndex'' using
-\Cmember{mChainid}, and swap values in ``chainIndex'' not in \Cmember{mChainid}.
-After swaps we can recreate \Cmember{mChainid} using ``chainIndex.''
+The \Cclass{Mcmc::c\_unique} is an unary operator for generating a sequence of non-negative integers. The constructor needs pointers to \Cclass{Fixed} and \Cclass{Reads}. It also needs rank ID of the process where the \Cclass{Mcmc} object is created. We compute how many chains are needed for each process using \Cclass{Fixed}. Then, we create chains for the current process. The \Cclass{Fixed} prepares temperature. The \Cclass{Mcmc} prepares chain IDs, and log likelihood/prior for chain swaps. The acceptance ratio for chain swaps is prepared in \Cmember{mSwapCount} and \Cmember{SwapTryCount}.  The \Cclass{McmcSingle} and \Cclass{McmcMpi} implements \Cmethod{swap}.  Subclass \Cclass{Mcmc} to create other swap implementation. While \Cclass{Mcmc} manages different processes and chain swaps, the \Cclass{ChainManager} handles a finite number of chains. Without process manangement feature of \Cclass{Mcmc} we had no reason to separate the two classes. The \Cclass{Mcmc} owns an instance of \Cclass{ChainManager}. All of the chains managed by \Cclass{ChainManager} have their own chain IDs, which are used to index temperature values. We also need the sums of log likelihood and log prior to swap chains. We use \Cmethod{chainid} and \Cmethod{likelihoodPrior} to access chain IDs and the sum of log likelihood and log prior from the chains managed by \Cclass{ChainManager}.  We swap chain IDs and the sums of log likelihood and log prior.  We know neighboring chains in temperature values to swap chains nearby.  Let us see \Cmethod{swapChains}.  For example, we have the following \Cmember{mChainid} and \Cmember{mLogLikelihoodPrior}. We find chain IDs using \Cmember{mChainid} with process index or ``Index.'' We also want to know the process index using ``chainIndex'' with chain IDs. We create ``chainIndex'' using \Cmember{mChainid}, and swap values in ``chainIndex'' not in \Cmember{mChainid}. After swaps we can recreate \Cmember{mChainid} using ``chainIndex.''
+
 \begin{Verbatim}[frame=lines,framesep=5mm]
 Index               0  1  2  3  4  5
 mChainid            3  2  0  5  1  4   <- Keep these
 mLogLikelihoodPrior v3 v2 v0 v5 v1 v4  <-   and these values.
 chainIndex          2  4  1  0  5  3   <- We swap indices.
 \end{Verbatim}
-In order to swap chains we choose two chains nearby. See
-\Cfunction{fGslRanMirror}. We give distance of either side and jump distance,
-and get 1-based value from the left-hand side position. 
+In order to swap chains we choose two chains nearby. See \Cfunction{fGslRanMirror}. We give distance of either side and jump distance, and get 1-based value from the left-hand side position. 
 
 The \Cmethod{swap} for the rank 0 process waits for the rest of processes to
 finish their \Cmethod{step}. Positively ranked processes send the rank 0 process
@@ -370,107 +286,73 @@ those to the rank 0 process, and wait and receive messages from the rank 0
 process. After getting all of the chain IDs we use \Cclass{ChainManager} to call
 \Cmethod{setChainid}.
 
+The constructor of \Cclass{Mcmc} initializes the rank of the class or the process, \Cmember{mFixed}, \Cmember{mReads}, and \Cmember{mChainManager}. We also initialize the two members of \Cmember{mLogLikelihoodPrior} and \Cmember{mChainid} for chain swaps. Additionally, we prepare chain swap acceptance ratios or \Cmember{mSwapCount} and \Cmember{mSwapTryCount}. Then, the constructor of \Cclass{ChainManager} creates an alloted number of chains for the process, and \Cmethod{setChainid} of the chain manager class sets the chain IDs and temperatures. See \Cmethod{setChainid} of the chain manager class. Now, turn to the most important method of \Cclass{Mcmc}, \Cmethod{swapChains}. The virtual \Cmethod{swap} of the class calls \Cmethod{swapChains} after collecting chain IDs and log likelihood/prior values from all of the chain managers and before distributing new chain IDs. See above for example of a chain index created from a vector of chain IDs. The chain index is the order vector of the indices of the vector of chain IDs. We refer to the log likelihood/prior using the value of a chain index. We need such a chain index vector because we wish to swap chains nearby. 
+\begin{Verbatim}[frame=lines,framesep=5mm]
+Index               0  1  2  3  4  5  6  7
+mChainid            7  2  1  3  0  6  4  5
+mLogLikelihoodPrior v7 v2 v1 v3 v0 v6 v4 v5
+chainIndex          4  2  1  3  6  7  5  0
+First move: c1 <> c4
+chainIndex          4  6  1  3  2  7  5  0
+Second move: c4 <> c6
+chainIndex          4  6  1  3  5  7  2  0
+Now, we find
+mChainid            7  2  6  3  0  4  1  5
+Results are:
+c1 (> c4) > c6; c6 > c4; c4 > c1
+Note that log likelihood/prior does not change in their indices.
+\end{Verbatim}
+We first construct \Cvariable{chainIndex} using \Cmember{mChainid}. We sample two nearby chain IDs. We find the two chain indices of the two chain IDs, respectively. We find log likelihood/prior values of the indices, and temperature values of the chain IDs. Upon accept of the swap of the two chain IDs we swap the chain indices. During the \Cmember{mNumberSwapTry}-many tries of chain swaps we keep trying to change \Cvariable{chainIndex}. Then, we convert the \Cvariable{chainIndex} to \Cmember{mChainid}.
+
+We just delegate \Cmethod{reportSitewiseFrequencyBoundaries} and \Cmethod{reportSitewiseExpression} of \Cclass{ChainManager} when calling the methods of the same name of \Cclass{Mcmc}. The \Cmethod{report} prints out MCMC diagnostics including chain swap rates. We also delegate output stream operator using \Cclass{ChainManager}'s output stream operator.
+
+Now, we turn to subclasses, \Cclass{McmcMpi} and \Cclass{McmcSingle} of \Cclass{Mcmc}. The \Cclass{McmcSingle} implements the virtual \Cmethod{swap}. Let us see how the method works. First, the \Cclass{McmcSingle} sends \Cmethod{chainid} and \Cmethod{likelihoodPrior} to the \Cclass{ChainManager} to query chain IDs and log likelihood/prior values. The chain manager asks its managed chains for chain IDs, and replies to the query of \Cclass{McmcSingle}. The chain manager also does similarly for log likelihood/prior values. We make \Cmember{mChainid} and \Cmember{mLogLikelihoodPrior} using the values retrieved from chains. Then, the \Cclass{McmcSingle} calls \Cmethod{swapChains} to swap chain IDs of \Cmember{mChainid}. The \Cclass{McmcSingle} sends \Cclass{ChainManager} \Cmethod{setChainid} with the \Cmember{mChainid}.
+
+The \Cclass{McmcMpi} implements \Cmethod{swap} similarly but more complication. The \Cmethod{swap} starts just as that of \Cclass{McmcSingle}. Note that multiple MPI processes enter the method. Each MPI process sends \Cclass{ChainManager} the messages of \Cmethod{chainid} and \Cmethod{likelihoodPrior} in order to retrieve chain IDs and log likelihood/prior values. The zero rank MPI process waits for MPI messages from non-zero rank MPI processes. The zero rank MPI process call \Cmethod{swapChains} when it is finished with receiving messages from all of the processes including itself. After chain swaps we pack messages with new chain IDs to send them back to non-zero rank MPI processes. The non-zero rank MPI processes receive those chains IDs, and calls \Cmethod{setChainid} of \Cclass{ChainManager}. Note that \Cmember{processid} is the chain index of total chains when collecting chain IDs, and it is the chain index among the subset of chains managed by the chain manager when distributing chain IDs.
 
 \subsection{ChainManager}
-The \Cclass{Mcmc} owns an object of \Cclass{ChainManager}, which connects
-\Cclass{Mcmc} and \Cclass{Chain}. The role of \Cclass{ChainManager} is simpler
-than those of others. It manages a list of chains that runs on a single
-processor or a thread.  The \Cclass{ChainManager} does not own objects of
-\Cmember{mFixed}, and \Cmember{mTxReads}. It accesses the two classes using mere
-pointers to the objects of them.  The \Cclass{Mcmc} would not own them either.
-The \Cclass{ChainManager} owns \Cclass{Chain} objects in a vector. After the
-call of the constructor with \Cmember{mFixed} and \Cmember{mTxReads} we call
-\Cmethod{createChain} with specified number of chains to create chains in
-\Cmember{mChain}. We have two version of \Cmethod{setChainid}. We use the
-two-integer argument version when creating chains, and the vector argument one
-when swapping chains.  We send chain IDs and sums of log likelihood and log
-prior to \Cclass{Mcmc}, which uses \Cmethod{chainid} and
-\Cmethod{likelihoodPrior} to get those values.  The chain of writing sample in a
-file is as follows.
+The \Cclass{Mcmc} owns an object of \Cclass{ChainManager}, which connects \Cclass{Mcmc} and \Cclass{Chain}. It manages a list of chains that runs on a single processor or thread.  The \Cclass{ChainManager} does not own objects of \Cmember{mFixed}, and \Cmember{mReads} just like \Cclass{Mcmc}. It accesses the two classes using the mere pointers to the objects of them.  The \Cclass{Mcmc} would not own them either. The \Cclass{ChainManager} owns \Cclass{Chain} objects in a vector, or \Cmember{mChain}. The call of the constructor with \Cmember{mFixed} and \Cmember{mReads} also creates chains in \Cmember{mChain}. The \Cclass{Chain} contains parameters of the model. Some of parameters are summarized by compiling posterior sample output files from each process or thread managed by \Cclass{Mcmc}, and \Cclass{ChainManager}. Other aspects of the parameters need on-line sampling because posterior output files can be too large to be stored in storage medias. The \Cmember{mSitewiseFrequencyBoundaries} and \Cmember{mSitewiseExpression} contains on-line samples of boundaries and expression levels. 
+
+The \Cclass{ChainMananger} owns Markov chains, each of which is sent a message of chain IDs by the chain manager. When a chain manager informs chains of their chain IDs, the chains change their temperature before moving on next steps. The \Cclass{Mcmc} sends \Cclass{ChainManager} messages of \Cmethod{setChainid} to set chain IDs in the chains managed by the chain manager. We have two version of \Cmethod{setChainid}. We use the two-integer argument version when creating chains, and the vector argument one when swapping chains.  We send chain IDs and sums of log likelihood and log prior to \Cclass{Mcmc}, which uses \Cmethod{chainid} and \Cmethod{likelihoodPrior} to get those values.  The chain of writing sample in a file is as follows.
 \begin{Verbatim}[frame=lines,framesep=5mm]
 Manager::mcmc > operator Mcmc > operator ChainManager > operator Chain
 \end{Verbatim}
-We call \Cmethod{report} starting at \Cmethod{mcmc}.
+We call \Cmethod{report} at the end of \Cmethod{mcmc}.
 \begin{Verbatim}[frame=lines,framesep=5mm]
 Manager::mcmc > Mcmc.report > ChainManager.report > Chain.report
 \end{Verbatim}
-The \Cmethod{report} is different from writing samples in a file. It reports
-some summary of each chains activity including chain ID changes, temperature
-changes, likelihood changes, etc. The \Cmethod{report} is called at the end of
-the \Cmethod{mcmc}.
-
-\begin{lstlisting}
-class ChainManager {
-private:
-  ChainManager ();
-public:
-  Fixed* mFixed;
-  vector<Reads*> mTxReads;
-  vector<Chain*> mChain;
-  vector<double> mTemperature;
-public:
-  ChainManager (Fixed* m, const vector<Reads*>& shortRead);
-  void createChain (unsigned int);
-  ~ChainManager ();
-  void step (unsigned int);
-  void setChainid (unsigned int, unsigned int);
-  void setChainid (vector<unsigned int>& v);
-  void chainid (vector<unsigned int>&);
-  void likelihoodPrior (vector<double>&);
-  void report (ostream &out);
-  friend ostream& operator< < (ostream &out, const ChainManager &t);
-};
-\end{lstlisting}
+The \Cmethod{report} is different from writing samples in a file. It reports some summary of each chains activity including chain ID changes, temperature changes, likelihood changes, etc. The \Cmethod{report} is called at the end of the \Cmethod{mcmc}. The \Cclass{Mcmc} sends the \Cclass{ChainManager} message of other reports such as \Cmethod{reportSitewiseExpression} and \Cmethod{reportSitewiseFrequencyBoundaries}. The \Cclass{ChainManager} collects sitewise frequency of boundaries and sitewise expression level from \Cclass{Chain}. The sitewise frequency of boundaries is stored in \Cmember{mSitewiseFrequencyBoundaries}, and the sitewise expression level in \Cmember{mSitewiseExpression}.
 
 Members of \Cclass{ChainManager}:
 \begin{itemize*}
 \item private:
 \item   ChainManager (); We do not allow a default constructor.
 \item public:
-\item   Fixed* mFixed;
-\item   vector<Reads*> mTxReads;
-\item   vector<Chain*> mChain;
-\item   vector<double> mTemperature; This is a copy from \Cclass{Mcmc}.
+\item   Fixed* mFixed; is a mere pointer to the program setup.
+\item   vector<Reads*> mTxReads; is a list of short reads data.
+\item   vector<Chain*> mChain; are chains. The class owns the memory of the chains.
+\item   vector<unsigned int> mSitewiseFrequencyBoundaries; is a posterior sample of boundary frequency along the chromosome.
+\item   vector<double> mSitewiseExpression; is another posterior sample of expression levels along the chromosome.
 \item public:
-\item   ChainManager (Fixed* m, const vector<Reads*>\& shortRead);
-\item   void createChain (unsigned int); This must be called only once because
-it creates a vector of \Cclass{Chain}, connects \Cclass{Fixed} and
-\Cclass{Reads}, and calls \Cclass{createParameter} of \Cclass{Chain}. 
-\item   ~ChainManager ();
-\item   void step (unsigned int);
-\item   void setChainid (unsigned int s, unsigned int e); assigns chain IDs from
-$s$ and $e$, inclusively.
-\item   void setChainid (vector<unsigned int>\& v); assigns chain IDs using $v$
-when swapping chains.
-\item   void chainid (vector<unsigned int>\&); returns the chain IDs. This is
-used in chain swaps.
-\item   void likelihoodPrior (vector<double>\&); returns the sums of log
-likelihood and log prior. This is used in chain swaps.
-\item   void report (ostream \&out);
-\item   friend ostream\& operator$\ll$ (ostream \&out, const ChainManager \&t);
+\item   ChainManager (Fixed* m, const vector<Reads*>\& shortRead); constructs with \Cclass{Fixed} and \Cclass{Reads}.
+\item   ~ChainManager (); frees the memory of chains. 
+\item   void step (unsigned int); lets chains move and updates on-line parameter sampler such as \Cmember{mSitewiseExpression}.
+\item   void setChainid (unsigned int s, unsigned int e); assigns chain IDs from $s$ and $e$, inclusively. Each chain changes the temperature using the newly assigned ID.
+\item   void setChainid (vector<unsigned int>\& v); assigns chain IDs using $v$ when swapping chains. In the same manner each chain changes the temperature using the newly assigned ID.
+\item   void chainid (vector<unsigned int>\&); returns the chain IDs. The \Cclass{Mcmc} sends this message to \Cclass{ChainManager} during chain swaps.
+\item   void likelihoodPrior (vector<double>\&); returns the sums of log likelihood and log prior. The \Cclass{Mcmc} sends this message to \Cclass{ChainManager} during chain swaps.
+\item   void reportSitewiseExpression (ostream\& out); reports values in \Cmember{mSitewiseExpression}. 
+\item   void reportSitewiseFrequencyBoundaries (ostream\& out); reports values in \Cmember{mSitewiseFrequencyBoundaries}.
+\item   void report (ostream \&out); reports MCMC diagnostics.
+\item   friend ostream\& operator$\ll$ (ostream \&out, const ChainManager \&t); delegates output streams to chains in \Cmember{mChains}.
 \end{itemize*}
 
-\subsection{Chain}
-The \Cclass{Chain} owns objects from \Cclass{RandomVariable}:
-\Cmember{mTxBoundaries}, and \Cmember{mTxExpression}.  The
-\Cmember{mMoverManager} is auto variable, and the others are pointers, which
-need to be deleted in the destructor.  The \Cclass{Chain} has access to
-\Cmember{mFixed}, and \Cmember{mTxReads}.  The first two \Cclass{Parameter}
-objects change their contents through \Cclass{Mover} objects that are managed by
-\Cclass{MoverManager}.  The \Cmethod{createParameter} would create
-\Cclass{Parameter} objects.  Additionally, \Cclass{Mover} objects are created in
-methods of \Cclass{Chain}. Objects of \Cclass{Mover}'s subclasses such as
-\Cclass{MoverTxBoundaries} are allowed to access \Cclass{Parameter} members in
-\Cclass{Chain}. We do this by giving \Cclass{MoverTxBoundaries} a pointer to the
-object of \Cclass{TxBoundaries}.  Let us check how we could propose a new state
-of \Cclass{TxBoundaries}, and accept or reject it in \Cclass{MoverTxBoundaries}.
-Do this in \Cclass{MoverTxExpression} as well.
+The constructor of \Cclass{ChainManager} allocates memory of chains and summary. The \Cmethod{step} iterates each elment of chains, and sends a message of a single step to \Cclass{Chain}. The \Cclass{ChainManager} updates \Cmember{mSitewiseFrequencyBoundaries} and \Cmember{mSitewiseExpression} by sending \Cclass{Chain} update messages. The \Cclass{ChainManager} sends \Cmethod{chainid} to \Cclass{Chain} when setting chain IDs in the managed chains. It is sent \Cmethod{chainid} of \Cclass{ChainManager} not \Cclass{Chain}, and \Cmethod{likelihoodPrior} of \Cclass{ChainManager} by \Cclass{Mcmc} during chain swaps. See the trivial report methods.
 
-Where do we set the $\beta$ temperature and chain ID? The $\beta$ temperature is
-set at the same time when chain IDs are set in \Cmethod{setChainid} of
-\Cclass{ChainManager}.  Where do we set the likelihood and prior? We have not
-set this value at all. The likelihood and prior values should be specified by
-\Cclass{Mover} such as \Cclass{MoverTxBoundaries}.
+\subsection{Chain}
+The \Cclass{Chain} owns objects from \Cclass{RandomVariable}: \Cmember{mTxBoundaries}, and \Cmember{mTxExpression}.  The \Cmember{mMoverManager} is auto variable, and the others are pointers, which need to be deleted in the destructor.  The \Cclass{Chain} has access to \Cmember{mFixed}, and \Cmember{mReads}.  The first two \Cclass{Parameter} objects change their contents through \Cclass{Mover} objects that are managed by \Cclass{MoverManager}.  A mover manager allows us to call different movers with different proportion of MCMC runs. Additionally, \Cclass{Mover} objects are created in methods of \Cclass{Chain}. Objects of \Cclass{Mover}'s subclasses such as \Cclass{MoverTxBoundaries} are allowed to access \Cclass{Parameter} members in \Cclass{Chain}. We do this by giving \Cclass{MoverTxBoundaries} a pointer to the object of \Cclass{TxBoundaries}.  Let us check how we could propose a new state of \Cclass{TxBoundaries}, and accept or reject it in \Cclass{MoverTxBoundaries}. Do this in \Cclass{MoverTxExpression} as well.
+
+A chain has an ID, \Cmember{mID}, which is used to set the temperature of the chain. The generation step of a chain is recored in \Cmember{mStep}. The \Cclass{Chain} still contains mere pointers to \Cclass{Fixed} and \Cclass{Reads}. The \Cclass{Parameter} subclass objects members include \Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{mTxParameter}. The first two parameters are key to the model of \program{tux}. Additional more simpler parameters are stored in \Cclass{TxParameter}, which contains log likelihood, $\beta$ temperature, and the like. A chain moves through the Markov chain with a $\beta$ temperature value that is between 0 and 1 inclusively. The \Cclass{ChainManager} sends \Cclass{Chain} the message of \Cmethod{chainid} to change the chain ID and the $\beta$ temperature. We call \Cmethod{updateSitewiseFrequencyBoundaries} or \Cmethod{updateSitewiseExpression} to update these on-line parameter. The report and output stream operator prints out acceptance ratios and parameters, respectively.
 
 We print out the state of a chain in the following format in a file at
 \Cmember{mChainDirectory}/\Cmember{mPrefix}.rankID.chain.
@@ -484,138 +366,56 @@ We print out the state of a chain in the following format in a file at
 
 The \Cclass{Summarizer} reads in chain files.
 
-\begin{lstlisting}
-class Chain {
-private:
-  Chain ();
-  void createParameter ();
-public:
-  unsigned int mID;
-  unsigned int mStep;
-  double mLoglikelihood;
-  double mLogLikelihoodPrior;
-  double mBeta;
-  Fixed* mFixed;
-  vector<Reads*> mTxReads;
-  MoverManager mMoverManager;
-  TxBoundaries* mTxBoundaries;
-  TxExpression* mTxExpression;
-public:
-  Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta = 1.L);
-  ~Chain ();
-  void TxFixed (Fixed* m) {mFixed=m;}
-  void TxReads (const vector<Reads*>& shortRead) {mTxReads=shortRead;}
-  void step (unsigned int n);
-  void report (ostream &out);
-  friend ostream& operator< < (ostream &out, const Chain &t);
-};
-\end{lstlisting}
-
 Members of \Cclass{Chain}:
 \begin{itemize*}
 \item private:
-\item   Chain ();
-\item   void createParameter (); creates boundaries and expression parameters
+\item   Chain (); can be not instantiated as default constructor.
 \item public:
-\item   unsigned int mID; the chain ID, which is used to find $\beta$, the
-heating temperature
-\item   unsigned int mStep; the numbers steps
-\item   double mLoglikelihood; the log likelihood
-\item   double mLogLikelihoodPrior; the sum of log likelihood and log prior
-\item   double mBeta; $\beta$ temperature value
-\item   Fixed* mFixed; the program setup
-\item   vector<Reads*> mTxReads; the data
-\item   MoverManager mMoverManager; the mover manager
+\item   unsigned int mID; the chain ID, which is used to find $\beta$, the heating temperature
+\item   unsigned int mStep; the numbers steps.
+\item   Fixed* mFixed; is a mere pointer to the program setup.
+\item   vector<Reads*> mReads; is a list of mere pointers to the data.
+\item   MoverManager mMoverManager; is the mover manager.
 \item   TxBoundaries* mTxBoundaries; the first parameter of boundaries
 \item   TxExpression* mTxExpression; the second parameter of expression
+\item   TxParameter* mTxParameter; is a simpler parameter than the other two. It contains log likelihood/prior, and $\beta$ temperature.
+\item   vector<unsigned int> mTallyChainid; is the number of steps, for which a chain ID stays.
 \item public:
-\item   Chain (Fixed* m, const vector<Reads*>\& shortRead, const double beta);
+\item   Chain (Fixed* m, const vector<Reads*>\& shortRead); creates a chain.
 \item   ~Chain (); deletes the two parameters
-\item   void TxFixed (Fixed* m); sets the program setup
-\item   void TxReads (const vector<Reads*>\& shortRead); sets the data
-\item   void step (unsigned int n); moves $n$ steps
-\item   void report (ostream \&out); writes some summary of the chain activity
-\item   friend ostream\& operator$\ll$ (ostream \&out, const Chain \&t); writes
-the state of the parameters
+\item   void TxFixed (Fixed* m); sets the program setup.
+\item   void TxReads (const vector<Reads*>\& shortRead); sets the data.
+\item   void step (unsigned int n); moves $n$ steps.
+\item   void report (ostream \&out); writes some summary of the chain activity.
+\item   friend ostream\& operator$\ll$ (ostream \&out, const Chain \&t); writes the state of the parameters.
 \end{itemize*}
 
-\subsection{RandomVariables}
+We creates \Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{mTxParameter} in the constructor of \Cclass{Chain}. We also setup \Cclass{Mover} objects using \Cclass{MoverManager}. Before exiting the constructor we set the value of \Cmember{mLoglikelihood} using \Cclass{Likelihood}. The \Cmember{mTallyChainid} is initialized as well. Because \Cclass{Chain} owns the \Cclass{Parameters} objects, it deletes the memory of the three \Cclass{Parameters} objects. The \Cclass{MoverManager} owns \Cclass{Mover} subclass objects. The \Cclass{ChainManager} sends the message, \Cmethod{chainid}, to \Cclass{Chain} to change the chain ID and the temperature. The \Cclass{ChainManager} queries \Cclass{Chain} for the value of log likelihood and prior. See how \Cmethod{updateSitewiseExpression} and \Cmethod{updateSitewiseFrequencyBoundaries} works. We simply sum values without considering overflow problems. The \Cclass{Chain} sends the message of \Cclass{step} to \Cclass{Mover} subclasses. At the end of \Cmethod{step} of \Cclass{Chain} we increase counts for the chain ID in \Cmember{mTallyChainid}. In the report method we prints out acceptance ratios of movers using \Cclass{MoverManager}, and fractions of residence time of chain IDs in the current chain. 
 
-The \Cclass{TxBoundaries} is created in a method of class \Cclass{Chain}.  The
-\Cclass{MoverTxBoundaries} should be also created in a method of \Cclass{Chain}.
-Then, \Cclass{Chain} can connect its \Cclass{Parameters} and \Cclass{Data} to
-\Cclass{MoverTxBoundaries}.  It passes the connected \Cclass{MoverTxBoundaries}
-to \Cclass{MoverManager}.
-The chain uses \Cclass{Probability} and \Cclass{RandomVariable} to change the
-value of \Cclass{Parameter}. The \Cclass{Data} is a \Cclass{RandomVariable} that
-does not change its value. The \Cclass{Probability} is not a part of the chain. 
-The chain must contain objects of \Cclass{RandomVariable}. The \Cclass{Mover} is
-applied to \Cclass{ChainManager} or \Cclass{Mcmc}. The \Cclass{Chain} may have
-access to \Cclass{Mover}. There are multiple possible movers of parameters. The
-\Cclass{Chain} is manipulated to switch from one mover to another. Each step
-multiple movers are chosen to be applied to \Cclass{Chain}. The \Cclass{Mover}
-may have access to \Cclass{Probability}: it could use some \Cclass{Probability}
-to replace a current state of \Cclass{Parameter} with another. The
-\Cclass{Chain} has an object of \Cclass{MoverManager}, which manages several
-\Cclass{Mover} objects. The \Cclass{MoverManager} is operational in that it
-returns a \Cclass{Mover} among the set of \Cclass{Mover} objects with
-multinomial probability.
+\subsection{RandomVariables}
+The \Cclass{TxBoundaries} is created in a method of class \Cclass{Chain}.  The \Cclass{MoverTxBoundaries} is created in a method of \Cclass{Chain}. Then, \Cclass{Chain} can connect its \Cclass{Parameters} and \Cclass{Data} to \Cclass{MoverTxBoundaries}.  It passes the connected \Cclass{MoverTxBoundaries} to \Cclass{MoverManager}. The chain uses \Cclass{Probability} and \Cclass{RandomVariable} to change the value of \Cclass{Parameter}. The \Cclass{Data} is a \Cclass{RandomVariable} that does not change its value. The \Cclass{Probability} is not a part of the chain. The chain must contain objects of \Cclass{RandomVariable}. The \Cclass{Chain} has access to \Cclass{Mover} via \Cclass{MoverManager}. There are multiple possible movers of parameters. The \Cclass{Chain} is manipulated to switch from one mover to another. Each step multiple movers are chosen to be applied to \Cclass{Chain}. The \Cclass{Mover} has access to \Cclass{Probability}: it could use some \Cclass{Probability} to replace a current state of \Cclass{Parameter} with another. The \Cclass{Chain} has an object of \Cclass{MoverManager}, which manages several \Cclass{Mover} objects. The \Cclass{MoverManager} is operational in that it returns a \Cclass{Mover} among the set of \Cclass{Mover} objects with multinomial probability.
 
 \subsection{Parameter}
-
-This is merely connecting \Cclass{RandomVariable} and other concrete classes
-such as \Cclass{TxBoundaries} or \Cclass{TxExpression}.
+This is merely connecting \Cclass{RandomVariable} and other concrete classes such as \Cclass{TxBoundaries} or \Cclass{TxExpression}.
 
 \subsection{TxBoundaries}
+The \Cclass{TxBoundaries} object is created by \Cclass{ProbTxBoundaries}. The \Cclass{TxBoundaries}'s main features include writing the content to a file, and sampling segments to update. The \Cclass{TxBoundaries} is owned by \Cclass{Chain}, and be accessed by \Cclass{MoverTxBoundaries}. The boundary sites are 1-based positions in a chromosome. A value in \Cmember{mC} is 1-based position at the right-hand side of a segment. The last element of \Cmember{mC} is the size of the chromosome. When moving the state of a boundary site we choose one of $K$ boundary sites and change its position using so called mirror proposal. See \Cclass{MoverTxBSingle} for details. We also consider neighboring boundary sites on either side of a randomly chosen boundary site. See \Cclass{MoverTxBoundaries} for details. The \Cclass{TxBoundaries} can be printed out using \library{yaml-cpp} or the standard ostream. It prints out boundary sites separated by commas and braketed on either side. 
 
 Members of \Cclass{TxBoundaries}:
 \begin{itemize*}
 \item public: 
-\item   vector<unsigned int> mC; 1-based ending positions of segments
-\item   unsigned int mLengthSampleSegmentA; lower bound of length of interval
-\item   unsigned int mLengthSampleSegmentB; upper bound of length of interval
-for choosing random segments
+\item   vector<unsigned int> mC; is 1-based ending positions of segments. The end position of $c_k$ where $k$ runs from 0 to $K$. $c_0$ is 0, and $c_K$ is $L$. \Cmember{mC} runs from 0 to $K-1$. The $0$-th element is $c_1$, and $K-1$-th element is $c_K$. Note that the first element is not 1.
 \item public:
-\item   TxBoundaries ();
-\item   unsigned int size (); the number of segments
-\item   unsigned int L (); the length of the chromosome 
-\item   void seq (unsigned int from, unsigned int to, unsigned int by); 
-\item   void sampleSegment (unsigned int\&, unsigned int\&);
-\item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, 
-                                       const TxBoundaries \&tx);
+\item   TxBoundaries (); a default constructor.
+\item   bool check (); checks if the data members are valid.
+\item   unsigned int size (); is the number of segments.
+\item   unsigned int L (); is the length of the chromosome.
+\item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, const TxBoundaries \&tx); prints \Cmember{mC} in YAML format.
 \item   friend ostream\& operator$\ll$ (ostream \&out, const TxBoundaries \&t);
 \end{itemize*}
 
-This is an older version.
-
-Members of \Cclass{TxBoundaries}
-\begin{itemize*}
-\item Data members:
-\item vector<unsigned int> mC; the end position of $c_k$ where $k$ runs from 0
-to $K$. $c_0$ is 0, and $c_K$ is $L$. \Cmember{mC} runs from 0 to $K-1$. The
-$0$-th element is $c_1$, and $K-1$-th element is $c_K$. Note that the first
-element is not 1.
-\item unsigned int mLengthSampleSegment; 
-\item Methods:
-\item unsigned int length (); returns the number of segments.
-\item unsigned int L (); returns the length of a chromosome. 
-\item operator out (YAML::Emitter \&out, const TxBoundaries \&tx); prints
-\Cmember{mC} in YAML format.
-\item TxBoundaries::sampleSegment (unsigned int\& left, unsigned int\& right); gets
-the end positions of beginning and ending segments. Choose one segment and
-another that are at least one segment apart. Now, we just add 
-\Cmember{mLengthSampleSegment} to the chosen position. We may use a distribution
-to have different values of \Cmember{mLengthSampleSegment} across sampling
-procedure.
-\end{itemize*}
-The \Cclass{TxBoundaries} object is created by \Cclass{ProbTxBoundaries}.
-
-
-The \Cclass{TxBoundaries}'s main features include writing the content to a file,
-and sampling segments to update. The \Cclass{TxBoundaries} is owned by
-\Cclass{Chain}, and be accessed by \Cclass{MoverTxBoundaries}. 
-
 \subsection{TxExpression}
+The \Cclass{TxExpression}'s main features include writing the content to a file, and sampling segments to update. The \Cclass{TxExpression} is owned by \Cclass{Chain}, and be accessed by \Cclass{MoverTxExpression}. The \Cmember{mDelta}'s length is that of a chromosome. The values of \Cmember{mDelta} are written similarly to that of \Cmember{mC} of \Cclass{TxBoundaries}.
 
 Members of \Cclass{TxExpression}:
 \begin{itemize*}
@@ -623,60 +423,63 @@ Members of \Cclass{TxExpression}:
 \item   vector<double> mDelta; 
 \item public:
 \item   TxExpression ();
-\item   void seq (unsigned int); sets the equal-sized delta 
 \item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, 
                                     const TxExpression \&tx);
 \item   friend ostream\& operator$\ll$ (ostream \&out, const TxExpression \&t);
 \end{itemize*}
 
-The \Cclass{TxExpression}'s main features include writing the content to a file,
-and sampling segments to update. The \Cclass{TxExpression} is owned by
-\Cclass{Chain}, and be accessed by \Cclass{MoverTxExpression}. 
-
 \subsection{TxParameter}
-We track other micellaneous parameters. 
+We track other micellaneous parameters. See the data members of \Cclass{TxParameter}.
 
-Members of \Cclass{TxExpression}:
+Members of \Cclass{TxParameter}:
+\begin{itemize*}
+\item public:
+\item  double mLoglikelihood; is the total log likelihood.
+\item  double mLogprior; is the total log prior, which is set to zero.
+\item  double mBeta; is the $\beta$ temperature of the owner of a chain.
+\item public:
+\item  TxParameter ();
+\item  friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, const TxParameter \&tx);
+\item  friend ostream\& operator$\ll$ (ostream \&out, const TxParameter \&t);
+\end{itemize*}
 
 \subsection{Data}
-
-We do not have members yet. This is just a base of fixed parameters.
-We would need to read and write \Cclass{RandomVariable} from and to a file using
-YAML. We have a likelihood that is used to compute the likelihood and to sample
-data given parameters.
+We do not have members yet. This is just a base of fixed parameters. We would need to read and write \Cclass{RandomVariable} from and to a file using YAML. We have a likelihood that is used to compute the likelihood and to sample data given parameters.
 
 \subsection{Reads}
+We create a vector of \Cclass{Reads} to store the data for \program{tux}. We can find the index of the data using \Cmember{mJ}. The \Cmember{mN} is the total number of short reads.
 
 Members of \Cclass{Reads}
 \begin{itemize*}
 \item public: 
-\item   vector<unsigned int> mCount; number of counts of reads at the position.
-We only consider 5' end positions of short reads to count. 
-\item   unsigned int mN; total number of counts derived from \Cmember{mCount}
-\item   unsigned int mJ; j-th short reads
+\item   vector<unsigned int> mCount; is the number of counts of reads at the position. We only consider 5' end positions of short reads to count. 
+\item   unsigned int mN; is the total number of counts derived from \Cmember{mCount}
+\item   unsigned int mJ; is the index of replicates.
 \item public:
-\item   Reads ();
-\item   ~Reads ();
+\item   Reads (unsigned int j); is a constructor setting \Cmember{mJ} to $j$.
 \item   unsigned int size (); the length of a chromosome 
-\item   void sample (unsigned int l, unsigned int ul=10); sets counts for each
-site to random values, the random values are between 0 and ul. The number of
-sites becomes $l$
+\item   void sample (unsigned int l, unsigned int ul=10); sets counts for each site to random values, the random values are between 0 and ul. The number of sites becomes $l$. This initializes the data members.
+\item   void summary (ostream\& out); prints out total counts of reads with the index of replicates.
 \item   friend YAML::Emitter operator (YAML::Emitter out, const Reads tx);
+\item   istream\& operator$\gg$ (istream \&fin, Reads \&t); reads a replicate of short reads counts.
+\item   ostream\& operator$\ll$ (ostream \&out, const Reads \&t); prints out counts separated by a space.
 \end{itemize*}
 
-We create a vector of \Cclass{Reads} to store the data for \program{tux}. We can
-find the index of the data using \Cmember{mJ}. The \Cmember{mN} is the total
-number of short reads.
-
 \subsection{Fixed}
+The \Cclass{Fixed} is for the global program setup variable. The value of \Cmember{mL} is set to the number of sites in a chromosome. We use the short reads data to set the value of it. The options of the \program{tux} are configured using an input file, command line options, or command line options in the interactive mode. If options values are specified by neither the input file nor command line options, we use values in \Cclass{Default}. We illustrate the usage of \program{tux} using those default values. The command line options in the interactive mode override any values in \Cclass{Fixed}. In the batch mode, command line options override any values set by an input file. Some values are derived from values given by users. This includes temperature, random number seeds for MPI processes, and number of chains per process. 
 
 Members of \Cclass{Fixed}
 \begin{itemize*}
 \item public: Data members
+\item   double mMoverTxBSingleWeight; the weight of boundary single move.
+\item   double mMoverTxBWeight; the weight of boundary move.
+\item   double mMoverTxEWeight; the weight of expression move.
+\item   unsigned int mLogVerbosity; the log verbosity level ranging from 1 to 5.
 \item   unsigned long int mSeed; the random number generator seed
 \item   unsigned int mK; the number of segments
 \item   unsigned int mM; the number of segments
 \item   vector<double> mZ; the size factors
+\item   unsigned int mL; the length of a chromosome
 \item   double mA0; the coefficient $a_0$ of the function $\phi$
 \item   double mA1; the coefficient $a_1$ of the function $\phi$
 \item   double mAlphaQExpression; the proposal controller of expression levels
@@ -698,15 +501,30 @@ Dirichlet prior, we would set 0.01 to $\alpha_k$.
 \item   string mChainDirectory; the output chain Directory name
 \item   string mLogDirectory; the log output Directory name
 \item   string mDatafile; the output file name
+\item   vector<unsigned long int> mProcessSeed; random seeds for separate
+\item public:
+\item   vector<double> mTemperature; a list of $\beta$ values.
+\item   vector<unsigned long int> mProcessSeed; a list of random seeds for MPI version of tux.
+\item   vector<unsigned int> mNumberChainPerProcess; e.g., c(3,3,2)  
+\item   vector<unsigned int> mAccumulateNumberChain; e.g., c(0,3,6,8)
 \item public: Methods
 \item   Fixed (); default setup, when the user does not provide tux with values
 in the input yaml file, it uses the initialized values in this constructor.
 \item   \~{}Fixed ();
+\item   int numberChainPerProcess (); sets \Cmember{mNumberChainPerProcess} and \Cmember{mAccumulateNumberChain} using the number of processors and compute nodes
 \item   unsigned int K(); returns the number of segments
 \item   friend YAML::Emitter\& operator$\ll$ (YAML::Emitter \&out, const Fixed \&t);
 \item   friend void operator$\gg$ (const YAML::Node\& node, Fixed\& t);
 \item   friend ostream\& operator$\ll$ (ostream \&out, const Fixed \&t);
+\item   string chainFilename (unsigned int i);                                        
+\item   string outFilename (unsigned int i);                                          
+\item   string logFilename (unsigned int i);                                          
+\item   string pFilename (int i = -1);                                                
+\item   string prefixFilename (int i = -1);                                           
+\item   void temperature ();                                                          
+\item  int numberChainPerProcess ();      
 \end{itemize*}
+
 
 \subsection{Probability}
 
@@ -743,149 +561,93 @@ Let us create a probability of a set of transcript boundaries:
 
 Members of \Cclass{Probability}
 \begin{itemize*}
-\item Data members:
-\item vector<RandomVariable*> mV; a list of random variables
-\item vector<RandomVariable*> mC; a list of conditioning random variables
-\item
 \item virtual double d () = 0; a value of a probability
 \item virtual RandomVariable* r () = 0; a random variate
 \end{itemize*}
 
 \subsection{ProbTxBoundaries}
+Two data members of the class are the length of a chromosome, and the number of sepecified segments. The constructor sets the two values. The probability of a configuration of boundary sites is $1/{(L-1) \choose (K-1)}.$ The \Cclass{ProbTxBoundaries} implements \Cmethod{r} by generating a sequence of positive integers from 1 to $L-1$ and sampling $K-1$ out of the $L-1$ values. We append the vector with $L.$ Then, we allocate the memory of \Cclass{TxBoundaries} using default constructor, and set the vector to the \Cmember{mC} of the \Cclass{TxBoundaries}.
 
 Members of \Cclass{ProbTxBoundaries}
 \begin{itemize*}
-\item Data members:
-\item  unsigned int mL; the length of a chromosome 
-\item  unsigned int mK; the number of segments
-\item Methods:
-\item ProbTxBoundaries (unsigned int l, unsigned int k); sets the length of a
-chromsome to l, and the number of segments to k. 
-\item double d (); a value of a probability of a transcipt boundaries
-\item RandomVariable* r (); a random variate of a transcript boundaries.
+\item public:
+\item   unsigned int mL; the length of a chromosome. 
+\item   unsigned int mK; the number of segments.
+\item public:
+\item   ProbTxBoundaries (unsigned int l, unsigned int k); sets the length of a chromsome to l, and the number of segments to k. 
+\item   double d (); a value of a probability of a transcipt boundaries: logarithmic value of $1/{(L-1) \choose (K-1)}.$
+\item   RandomVariable* r (); a random variate of a transcript boundaries, \Cclass{TxBoundaries}.
 \end{itemize*}
-
-This is an older version.
-
-Members of \Cclass{ProbTxBoundaries}
-\begin{itemize*}
-\item Data members:
-\item unsigned int mL; the length of a genome
-\item unsigned int mK; the number of segments
-\item Method
-\item double d (); logarithmic value of $1/{(L-1) \choose (K-1)}$
-\item RandomVariable* r (); a random variate of \Cclass{TxBoundaries} object
-\end{itemize*}
-
-\Cmethod{ProbTxBoundaries::r} - 
-Consider numerical stability in sampling a random variate of transcript
-boundaries. A segment could be 0 in length. I let a segment be at least 1 in
-length. How can I sample Dirichlet random variates that is at least $1/L$? How
-can I sample from Dirichlet distribution? Let us see function 
-gsl\_ran\_dirichlet. We use gsl\_ran\_choose to choose $k$ sites among $L$
-sites. The value of $L$ can be large. Assuming bacterial genomes we use this
-method. Otherwise, we have to use containt Dirichlet distribution.
-We choose $K-1$ sites between 1 and $L-1$ inclusive.
 
 \subsection{ProbTxExpression}
+The \Cmember{mDelta} is the main variable for expression level parameter. The other \Cmember{mAlpha} is a concentration parameter, which we assume usually be 1. The class implements the \Cmethod{r}, where we construct a vector of real values by sampling from Dirichlet distribution, and set the vector to \Cmember{mDelta} of a newly created \Cclass{TxExpression}.
 
 Members of \Cclass{ProbTxExpression}
 \begin{itemize*}
 \item Data members:
 \item vector<double> mAlpha; a concentration parameter
-\item vector<double> mTheta; a random variate of Dirichlet
+\item vector<double> mDelta; a random variate of Dirichlet
 \item Methods:
 \item  ProbTxExpression (const unsigned int k, const double a = 1.L); sets the
 concentration parameter of Dirichlet distribution. The size is $k$, and
 $\alpha_k$ is 1.
-\item  ~ProbTxExpression ();
 \item double d (); a value of a probability of transcipt expressions 
 \item RandomVariable* r (); a random variate of transcript expressions
 \end{itemize*}
 
 \subsection{Likelihood}
-The \Cclass{Likelihood} is used to compute the likelihood of data given the
-model parameters. It is useful in generating data given model parameters. The
-parameters would be generated by \Cclass{ProbTxBoundaries} and
-\Cclass{ProbTxExpression}. The length $L$ of a chromosome and the number $K$ of
-segments is the parameter to create the two parameters of boundaries ${c_k}$ and
-expression ${\delta_k}$. We need the average number $M$ of short reads, and/or
-the size factor, $Z$, of $J$ samples. We would be given $a_0$ and $a_1$ of
-negative binomial dispersion to sample short reads counts using the expression
-intensity $\mu$, which is equal to $z_j M \delta_k.$  
+The \Cclass{Likelihood} is used to compute the likelihood of data given the model parameters. It is useful in generating data given model parameters. The parameters would be generated by \Cclass{ProbTxBoundaries} and \Cclass{ProbTxExpression}. The length $L$ of a chromosome and the number $K$ of segments is the parameter to create the two parameters of boundaries ${c_k}$ and expression ${\delta_k}$. We need the average number $M$ of short reads, and/or the size factor, $Z$, of $J$ samples. We would be given $a_0$ and $a_1$ of negative binomial dispersion to sample short reads counts using the expression intensity $\mu$, which is equal to $z_j M \delta_k.$ The \Cclass{Fixed} is created from a YAML file. Two probability classes create \Cclass{TxBoundaries} and \Cclass{TxExpression}. The \Cclass{Likelihood} needs the three \Cclass{RandomVariable} objects to create \Cclass{Data} object. It does not own none of \Cclass{RandomVariable} objects.
 
-\begin{lstlisting}
-class Likelihood: public Probability {
-public:
-  Fixed* mFixed;
-  TxBoundaries* mTxBoundaries;
-  TxExpression* mTxExpression;
-  unsigned int mJ;
+Let us discuss this class in generating data under the model and computing the probability of data under the same model. The class implements \Cmethod{r} to generate data. We create a integer vector of size being equal to the number of sites of a chromosome. Then, we instantiate \Cclass{Reads} and set \Cmember{mCount} to the created integer vector. A number of fixed parameters are necessary for creating an integer vector. We need two parameters, \Cmember{mA0} and \Cmember{mA1}, for a dispersion function. We need total sequencing depth, \Cmember{mM}. Replicates of short reads can vary in their depth, which is specified by a size factor. Finally, we need expression level parameter, \Cmember{mDelta}, which is given by an object of \Cclass{TxExpression}. Given all of these parameters we sample number of reads mapped on the segments. We now compute the lengths of segments, and randomly position short reads on the segments. 
 
-  // Data members are set by the above RandomVariable objects
-  double mA0; // given a_0
-  double mA1; // given a_1
-  unsigned int mL; // a given chromosome length
-  unsigned int mK; // a given segments length
-  double mM;       // a given average total counts
-  double mSizeFactor; // a given size factor
-  vector<double> mDelta;   // sample from a uniform Dirichlet distribution
-  vector<unsigned int> mC; // sample from a uniform Dirichlet distribution
-  vector<unsigned int> mCount;
-public:
-  Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te);
-  Likelihood (unsigned int, unsigned int, double);
-  double d ();
-  RandomVariable* r (); 
-  void J (unsigned int j);
-  double sizeFactor () const {return mSizeFactor;}
-  void sizeFactor (const double s) {mSizeFactor=s;}
-  void alpha (const double a0, const double a1) {mA0=a0; mA1=a1;}
-};
-\end{lstlisting}
+Let us turn to the implementation of \Cmethod{d} for computing the total likelihood. We assume dispersion function parameters, \Cmember{mA0} and \Cmember{mA1}. We need neither \Cmember{mM} nor a size factor. We first compute the lengths of all of the segments, and count short reads mapped on segments. We compute the probabilities of count data given expression level, \Cmember{mDelta}, and dispersion function parameter, and expression level under the negative binomial model. Then, we sum all of the log likelihood across all of the segments.
 
 Members of \Cclass{Likelihood}
 \begin{itemize*}
-\item Data members:
-\item unsigned int mL; the length of a chromosome
-\item unsigned int mK; the number of segments
-\item double mM; the level of total expression 
-\item vector<double> mSizeFactor; a set of size factors
-\item vector<double> mDelta; a set of delta given by TxExpression
-\item vector<unsigned int> mC; a set of segments given by TxBoundaries
-\item vector<unsigned int> mCount; a set of numbers along a chromosome
-\item Methods:
-\item  Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te); creates a
-likelihood object using the three random variables objects
-\item Likelihood (unsigned int l, unsigned int k, double m); 
-$l$ sites along a chromosome, $k$ segments, and $m$ total expression level.
-\item RandomVariable* Likelihood::r (); creates a data set.
+\item public:
+\item   Fixed* mFixed; is a mere pointer to the \program{tux} setup.
+\item   unsigned int mJ; is the replicate index.
+\item   double mA0; is the first parameter of a dispersion function.
+\item   double mA1; is the second parameter of a dispersion function.
+\item   unsigned int mL; the length of a chromosome
+\item   unsigned int mK; the number of segments
+\item   double mM; the level of total expression 
+\item   double mSizeFactor; a size factors
+\item   vector<double> mDelta; a set of delta given by TxExpression
+\item   vector<unsigned int> mC; a set of segments given by TxBoundaries
+\item   vector<unsigned int> mCount; a set of reads counts along a chromosome
+\item   unsigned int mN; the total number of reads
+\item public:
+\item   Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te); creates a likelihood object using the three random variables objects
+\item   RandomVariable* r (); creates a data set.
+\item   double d (); computes the likelihood.
+\item   void J (unsigned int j); sets the replicate index.
+\item   double sizeFactor (); returns the size factor.
+\item   void sizeFactor (const double s); sets the size factor.
+\item   void alpha (const double a0, const double a1); sets the dispersion function parameters.
 \end{itemize*}
 
-The \Cclass{Fixed} is created from a YAML file. Two probability classes create
-\Cclass{TxBoundaries} and \Cclass{TxExpression}. The \Cclass{Likelihood} needs
-the three \Cclass{RandomVariable} objects to create \Cclass{Data} object. It
-does not own none of \Cclass{RandomVariable} objects.
+\subsection{TotalLikelihood}
+The \Cclass{TotalLikelihood} is a convenient class for computing the likelihood of all of the replicates using all of the \Cclass{Parameter}, and \Cclass{Data}. This is used in setting up the starting likelihood.
 
 \subsection{MoverManager}
+The Markov chain Monte Carlo features mostly movers of the state of parameters. We often employ multiple movers. Calling multiple movers can be tuned so that bolder movers are more frequently tried. The \Cclass{MoverManager} registers multiple movers with weights. 
+
+mId and mWeight could be owned by \Cclass{Mover}.
 
 Members of \Cclass{MoverManager}:
 \begin{itemize*}
-\item Data Member:
-\item vector<Mover*> mMover; a set of \Cclass{Mover} objects.
-The \Cclass{MoverManager} owns the \Cclass{Mover} object elements in
-\Cmember{mMover}. The \Cmethod{add} allocates the memory of a \Cclass{Mover}
-object. The \Cclass{MoverManager}'s destructor must deallocate the memory.
-\item vector<unsigned int> mId; why do we need this?
-\item vector<double> mWeight; why do we need this?
-\item gsl\_ran\_discrete\_t* mGslRanDiscrete; a lookup tabl for the discrete
-random number generator
-\item Method:
-\item MoverManager (); 
-\item ~MoverManager ();
-\item void add (Mover*, const unsigned int, const double); adds a mover object
-with an ID and weight.
-\item Mover* choose ();
+\item public:
+\item   vector<Mover*> mMover; a set of \Cclass{Mover} objects. The \Cclass{MoverManager} owns the \Cclass{Mover} object elements in \Cmember{mMover}. The \Cmethod{add} allocates the memory of a \Cclass{Mover} object. The \Cclass{MoverManager}'s destructor must deallocate the memory.
+\item   vector<unsigned int> mId; is the Mover ID of the movers.
+\item   vector<double> mWeight; is the weight of the movers.
+\item   gsl\_ran\_discrete\_t* mGslRanDiscrete; is a lookup tabl for the discrete random number generator.
+\item public:
+\item   MoverManager (); 
+\item   ~MoverManager (); frees mover objects, and \Cmember{mGslRanDiscrete}.
+\item   void add (Mover*, const unsigned int, const double); adds a mover object with an ID and weight.
+\item   Mover* choose (); chooses a mover.
+\item   ostream\& operator$\ll$ (ostream \&out, const MoverManager \&t); prints out acceptance ratios.
 \end{itemize*}
 
 \subsection{Mover}
@@ -898,6 +660,9 @@ Members of \Cclass{Mover}:
 \item  public:
 \item    unsigned int mTry; the number of the move try
 \item    unsigned int mAccepted; the number of the accepted ones
+\item    bool mIsData; the flag of sampling from posterior (true) or from prior (false)
+\item    unsigned int mID; is the ID of the mover.
+\item    double mWeight; is the weight of the mover.
 \item  public:
 \item    Mover () : mTry(0), mAccepted(0) {}
 \item    virtual int step () = 0;
@@ -905,111 +670,96 @@ Members of \Cclass{Mover}:
 \end{itemize*}
 
 \subsection{MoverTxBoundaries}
+The \Cclass{MoverTxBoundaries} is one of the movers for transcript boundaries. We have most of \Cclass{RandomVariable} objects. The \Cmethod{step} chooses one of the bounary sites. We also choose neighboring boundary sites on either side. We then update the subset of boundary sites. We need to see details of \Cmethod{step} with two integer arguments.
 
-FIXME: we need to compute the total likelihood in somewhere.
+We shuffle $c_k$ first, then choose $k$ many boundaries on either side, resulting in an odd number of boundaries except either end of the chromosome. Then, we will apply MoverTxBoundaries update. This is the same as MoverTxBoundaries update except the way we choose boundaries. Let us change the MoverTxBoundaries. We use \Cmember{mLengthSampleSegmentA} for the count of the either side boundary sites.
 
-In one iteration of boundaries move we choose a series of segment chunks and
-apply a move to each of the chunks. Because moves on different chunks can be
-handled independently, we consider one chunk only.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Find \texttt{left} and \texttt{right} of a sampled segment $\kappa$.
+The size of $\kappa$ is \texttt{kappa}. We retrieve $\left\{ \delta_{k}\right\} _{k\in\kappa}$
+in \texttt{deltaK}. We get $\left\{ c_{k}\right\} _{k\in\kappa}$
+using \texttt{ck}. Compute the lengths, \texttt{lk}, of the segments.
+The $\sum_{k\in\kappa}l_{k}$ is \texttt{sumLk}. We compute $\left\{ l_{k}\right\} _{k\in\kappa}$
+using $\left\{ c_{k}\right\} _{k\in\kappa}.$ We find \texttt{bAlpha}
+\[
+\left\{ \frac{l_{k}}{\sum_{k'\in\kappa}l_{k'}}\alpha_{\mathrm{b}}\right\} 
+\]
+where $\alpha_{\mathrm{b}}$ is \texttt{mAlphaQBoundaries}, and $\sum_{k'\in\kappa}l_{k'}$
+is \texttt{sumLk}. We sample 
+\[
+\left\{ \frac{l_{k}^{*}}{\sum_{k'\in\kappa}l_{k'}}\right\} 
+\]
+from Dirichlet distribution of concentration parameters just above,
+stored in \texttt{a}. Because we let the length of a segment be greater
+than or equal to 1, the proposal of boundaries is a little more complicated
+than just described. Let us see the proposal of a new set of boundaries.
+We compute \texttt{sumLkStar} as $\sum_{k'\in\kappa}l_{k'}-\left|\kappa\right|.$
+The fraction $l_{k}/\sum_{k'\in\kappa}l_{k'}$ is \texttt{b}. We find
+\texttt{bAlpha} 
+\[
+\left\{ \frac{l_{k}}{\sum_{k'\in\kappa}l_{k'}}\alpha_{\mathrm{b}}\right\} 
+\]
+where $\alpha_{\mathrm{b}}$ is \texttt{mAlphaQBoundaries}, and $\sum_{k'\in\kappa}l_{k'}$
+is \texttt{sumLk}. Now, we use \texttt{bAlpha} to sample \texttt{a}.
+We have to check if the sample \texttt{a} does not produce nemerical
+errors when computing the proposal. In that case, we have to resample
+\texttt{a} until the proposal ratio is well defined. We compute \texttt{aAlpha}
+as 
+\[
+\left\{ \lambda_{k}^{*}\alpha_{\mathrm{b}}\right\} .
+\]
+We have not yet find the actual proposed boundaries. We compute the
+partial sum, \texttt{aPartialSum}, $\left\{ \sum_{i=\mathrm{begin}(\kappa)}^{\mathrm{end}\left(\kappa\right)}\lambda_{i}^{*}=\overline{\lambda_{k}}\right\} _{k\in\kappa}$
+where $\mathrm{begin}(\kappa)$ and $\mathrm{end}\left(\kappa\right)$
+are the first and last elements of the set $\kappa,$ respectively.
+We compute $\left\{ L_{\kappa}^{*}\overline{\lambda_{k}}=l_{k}^{*}\right\} _{k\in\kappa}$
+where $L_{\kappa}^{*}=L_{\kappa}-\left|\kappa\right|,$ and convert
+them to integers, stored in \texttt{ckA}. We let the last value be
+$l_{\mathrm{end}\left(\kappa\right)}=L_{\kappa}^{*}.$ We set $\left\{ l_{k}^{*}\right\} _{k\in\kappa}$
+to $\left\{ c_{\mathrm{begin}\left(\kappa\right)-1}+k\right\} _{k=1}^{\left|\kappa\right|},$
+and store it in \texttt{s1}. Now, we add \texttt{s1} to \texttt{ckA}. 
+
+This \texttt{ckA} is a new boundaries set for $k\in\kappa.$ We compute
+the lengths of the new boundaries set stored in \texttt{lkA}. We use
+them as ending positions of the first $\left|\kappa\right|-1$ segments.
+The ending position of the last segment remains unchanged. Now, we
+need to count reads in the new set of boundaries. The count vector
+is of 0-based position. The number of reads at the first site of the
+first segment of the set $\left|\kappa\right|$ is found at $c_{\mathrm{begin}\left(\kappa\right)-1},$
+which is the right terminal 1-based position of the first segment.
+We store the counts of reads of the set $\kappa^{*}$ in \texttt{cA}.
+Similarly, we compute the counts of reads of the old set $\kappa$
+in \texttt{cB}. We find $\mu_{k}=M\delta_{k},$ $n_{k}=1/\left(a_{0}+a_{1}/\mu_{k}\right),$
+and $p_{k}=n_{k}/\left(n_{k}+\mu_{k}\right),$ stored in \texttt{muB},
+\texttt{nB}, and \texttt{pB}, respectively. We use the three values
+to compute the probability of observing the number of count \texttt{xkB}
+under negative binomial distribution. We compute the probability for
+the new set $\kappa^{*},$ similarly. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-1. We choose a subset of the K segments.
-1.1 We choose a site of the L sites.
-1.2 We choose a length from a distribution or fixed value.
-1.3 Group segments in the chosen region.
-2. Find the lengths of the subset of the segments.
-2.1 Sum the lengths.
-2.2 Compute the fractions of the legnths with respect to the sum of the
-length.
-2.3 Multiply the factions by a pseudo-concentration parameter.
-3. Use the multiplied factions as a set of concentration parameters to
-sample a new set of random variates from the Dirichlet distribution.
-3.1 Multiply the sum of the lengths of the subset to recover a new set of
-segments. 
-3.2 Adjust legnths of the segments so that legnths fit the remaining
-segments.
-4. Compute acceptance probability by using likelihood, priors, and
-Metropolis-Hastings ratio.
-4.1 The priors are p(mu|s)p(s)=p(mu)p(s). This value does not change
-before and after the proposal.
-4.2 Count reads on the subset and compute p(x|theta*)/p(x|theta).
-Optimization of the likelihood ratio can be done by using forms of the
-negative binomial probability functions.
-4.3 Compute the Metropolis-Hastings ratio using the proposal.
-
-\Cclass{MoverTxBoundaries} \Cmethod{step}
-\begin{Verbatim}[frame=lines,framesep=5mm]
-  // 1. We choose a subset of the K segments.
-  // 1.1 We choose a site of the L sites.
-  // 1.2 We choose a length from a distribution or fixed value.
-  // 1.3 Group segments in the chosen region.
-  // 2. Find the lengths of the subset of the segments.
-  // 2.1 Sum the lengths.
-  // 2.2 Compute the fractions of the legnths with respect to the sum of the
-  // length.
-  // 2.3 Multiply the factions by a pseudo-concentration parameter.
-  // 3. Use the multiplied factions as a set of concentration parameters to
-  // sample a new set of random variates from the Dirichlet distribution.
-  // 3.1 Multiply the sum of the lengths of the subset to recover a new set of
-  // segments. 
-  // 3.2 Adjust legnths of the segments so that legnths fit the remaining
-  // segments.
-  // 4. Compute acceptance probability by using likelihood, priors, and
-  // Metropolis-Hastings ratio.
-  // 4.1 The priors are p(mu|s)p(s)=p(mu)p(s). This value does not change
-  // before and after the proposal.
-  // 4.2 Count reads on the subset and compute p(x|theta*)/p(x|theta).
-  // Optimization of the likelihood ratio can be done by using forms of the
-  // negative binomial probability functions.
-  // 4.3 Compute the Metropolis-Hastings ratio using the proposal.
-\end{Verbatim}
 
 \subsection{MoverTxBSingle}
-We shuffle $c_k$ first, then move one at a time. This is a second try of move of
-boundaries. We give the ID 3 for this move.
-Given a boundary site we find the left-hand side distance and the right-hand
-side one. We sample a new boundary site given the two distances.
-
-\subsection{MoverTxBOdd}
-We shuffle $c_k$ first, then choose $k$ many boundaries on either side,
-resulting in an odd number of boundaries except either end of the chromosome.
-Then, we will apply MoverTxBoundaries update. This is the same as
-MoverTxBoundaries update except the way we choose boundaries. Let us change the
-MoverTxBoundaries.
-We use \Cmember{mLengthSampleSegmentA} for the count of the either side boundary
-sites.
+We shuffle $c_k$ first, then move one at a time. This is a second try of move of boundaries. We give the ID 3 for this move. Given a boundary site we find the left-hand side distance and the right-hand side one. We sample a new boundary site given the two distances.
 
 \subsection{MoverTxExpression}
 
 \begin{itemize*}
 \item public: 
-\item  TxBoundaries* mTxBoundaries; a pointer to TxBoundaries
-\item  TxExpression* mTxExpression; a pointer to TxExpression
-\item  Reads* mReads; a pointer to Reads
-\item  double mAlpha; a concentration parameter of Dirichlet
-\item  bool mIsData; a true/false as to whether we compute the likelihood
-\item  double mAverageTotalCount; the average of total reads counts
+\item   Fixed* mFixed; is the \program{tux} setup.
+\item   vector<Reads*> mReads; are pointers to Reads.
+\item   TxBoundaries* mTxBoundaries; is a pointer to TxBoundaries.
+\item   TxExpression* mTxExpression; is a pointer to TxExpression.
+\item   TxParameter* mTxParameter; is a pointer to TxParameter.
+\item   double mAverageTotalCount; the average of total reads counts
 \item public:
-\item  MoverTxExpression ();
-\item  MoverTxExpression (Fixed* f, vector<Reads*>\& r, 
+\item   MoverTxExpression ();
+\item   MoverTxExpression (Fixed* f, vector<Reads*>\& r, 
                           TxBoundaries* txb, TxExpression* txe); sets program
                           setup, data, boundaries, and expression.
-\item  int step (); 
+\item  int step ();
+\item  int step (unsigned int left, unsigned int right); 
 \end{itemize*}
-
-1. Use MoverTxBoundaries::step to choose a subset of the K segments.
-2. Find delta's for the subset.
-3. Sample a new delta's using the current delta's.
-Take the sum of the a, and multiply a by mAlpha/sum.
-mAlpha is 1. If it is smaller, then the variance of a would be
-larger. Because GSL Dirichlet function needs a memory for a return
-value. a is the new delta of the old delta b.
-4. Compute likelihood, prior, and MH ratio.
-Find the start and end so that we can use parts of delta's in mDelta.
-The random variable class's method can return a random stuff. For example,
-TxBoundaries can return a random subset of boundaries. This seems sensible
-because we use a member of TxBoundaries to get something of the member.
-Let's make a method in TxBoundaries to sample a subset of boundaries.
 
 Use the different theta to compute the likeilhood ratio.
 Compute the prior ratio because we give a diffuse Dirichlet prior.
@@ -1030,20 +780,87 @@ mu is (Nj * mDelta)
 p is n/(n+mu)
 n is 1/(a0+a1/mu).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We sample \texttt{left} and \texttt{right} end positions of a segment
+using \texttt{sampleSegment}. The \texttt{left} is uniformly chosen
+among all of the sites in a chromosome. We use a value \texttt{mLengthSampleSegment}
+to find \texttt{right}. We use \texttt{Fixed} class member \texttt{mLengthSampleSegment}.
+In this \texttt{step} function we try to change $\left\{ \delta_{k}\right\} _{k\in\kappa}$
+where $\kappa=\left\{ k:k\in[\mathrm{left},\mathrm{right}],k\in\mathbb{N}_{0}\right\} $
+and $\mathbb{N}_{0}$ is a set of non-negative integers. Note that
+here $k=0$ is for the first segment among the chosen segments in
+$\kappa.$ The class \texttt{TxBoundaries} method \texttt{sampleSegment}
+returns \texttt{left} and \texttt{right}. We grab $\left\{ \delta_{k}\right\} _{k\in\kappa}$
+in a vector \texttt{dk} and \texttt{dkA}. Note that $k\in[\mathrm{left},\mathrm{right}]$
+not $k\in[\mathrm{left},\mathrm{right})$ when we create \texttt{dk}
+variable. We sum \texttt{dk} to find \texttt{sumDk}, or $\sum_{k'\in\kappa}\delta_{k'}.$
+We compute 
+\[
+\left\{ \frac{\delta_{k}}{\sum_{k'\in\kappa}\delta_{k'}}\right\} _{k\in\kappa}
+\]
+as \texttt{b}.\texttt{ }We multiply \texttt{b }by $\alpha_{\mathrm{e}}$
+to find\texttt{ bAlpha} where $\alpha_{\mathrm{e}}$ is \texttt{mAlpha}
+of class \texttt{Fixed. }Now, we sample \texttt{a} from Dirichlet
+distribution with concentration parameter \texttt{bAlpha}. Then, we
+multiply \texttt{a} by \texttt{mAlpha} or $\alpha_{\mathrm{e}}$ to
+have a new value of \texttt{aAlpha}. We also multiply \texttt{a} by
+the sum \texttt{sumDk} to find \texttt{dkA}. Now that we sampled a
+new $\left\{ \delta_{k}^{*}\right\} _{k\in\kappa}$ in \texttt{dkA},
+we need to compute the acceptance probability for the expression level
+move. An acceptance probability consists of likelihood ratio, prior
+ratio, and MH ratio. 
 
-\subsection{Sample}
-Each chain produces an output file. The output file contains running setup
-(\Cclass{Fixed}), data (\Cclass{Reads}), and samples (\Cclass{Sample}). 
-There are other files such as mc3 file, GSL RNG files. One of the multiple
-chains in MC3 would creates mc3 file as well as chain file. 
+We assume a diffused Dirichlet prior on the expression level parameter
+$\left\{ \delta_{k}\right\} $ by having $\alpha_{k}=1.$ When we
+move expression levels of a part of segment, we would need to compute
+the prior ratio
+\[
+\frac{p\left(\bm{x}^{*};\bm{\alpha}\right)}{p\left(\bm{x};\bm{\alpha}\right)}=\prod_{k\in\kappa}\left(\frac{x_{k}^{*}}{x_{k}}\right)^{\alpha_{k}-1}
+\]
+where $\kappa$ is the index set of the part of segment. The logarithm
+of the value is
+\[
+\sum_{k\in\kappa}\left(\alpha_{k}-1\right)\left(\log x_{k}^{*}-\log x_{k}\right)
+\]
+where $\alpha_{k}=1.$ In \texttt{MoverTxExpression::step} logA is
+$\log x_{k}^{*},$ and \texttt{logB} is $\log x_{k}.$ We store the
+prior ratio of expression in \texttt{prExpression}. The prior ratio
+for transcript boundaries is 1 because of no changes to the boudaries
+parameter. 
+
+The Metropolis-Hastings ratio is
+\[
+\frac{q\left(\left\{ \delta_{k}^{*}\right\} _{k\in\kappa}\rightarrow\left\{ \delta_{k}\right\} _{k\in\kappa}\right)}{q\left(\left\{ \delta_{k}\right\} _{k\in\kappa}\rightarrow\left\{ \delta_{k}^{*}\right\} _{k\in\kappa}\right)}=\frac{\mathrm{Dirichlet}\left(\left\{ \delta_{k}\right\} _{k\in\kappa};\left\{ \frac{\alpha_{\mathrm{e}}\delta_{k}^{*}}{\sum_{k'\in\kappa}\delta_{k'}^{*}}\right\} _{k\in\kappa}\right)}{\mathrm{Dirichlet}\left(\left\{ \delta_{k}^{*}\right\} _{k\in\kappa};\left\{ \frac{\alpha_{\mathrm{e}}\delta_{k}}{\sum_{k'\in\kappa}\delta_{k'}}\right\} _{k\in\kappa}\right)}
+\]
+
+
+Computing likelihood ratio involves counting reads. First find $\left\{ c_{k}\right\} _{k\in\kappa}$
+using \texttt{ck}. We compute $\left\{ l_{k}\right\} _{k\in\kappa}$
+or \texttt{lK} where $l_{k}=c_{k}-c_{k-1}$ where $c_{-1}=0.$ 
+
+Note that we still need to make Reads a vector.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Summarizer}
+
+HERE
+
 We reads in posterior sample files from multiple chains to create
 \Cclass{Summary} object.  
 
+I consider a couple of options of summarizing boundaries. The first is
+the sitewise boundary site frequency. Using a 100 or 1,000 of
+boundaries posterior sample leads to too sparse values. So, we keep a vector of
+size being equal to the number of total sites. For each iteration we increase
+the number of counts for the boundary sites in the vector. We might consider a
+range of possible $K$ or the number of segments. After all I am interested in
+whether a site is a boundary site or not. 
+As a second summarization option we compute sitewise expression levels using 
+$\delta_k M / l_k$ where $M$ is the geometric mean of the total read counts. We
+also have a vector of double for the logarithm of the sitewise value. We use the
+log scale because some can be too large. 
 
-
-The \Cmemthod{fillStepIndex} finds the steps and associate them with indices, so
+The \Cmethod{fillStepIndex} finds the steps and associate them with indices, so
 that we can use the index of a step when collecting values from chain files.
 
 The \Cmethod{listLoglikelihood} creates a .p file using one or more chain files.
@@ -1066,11 +883,89 @@ levels. Use \Cclass{Summary} and \Cclass{Summarizer}. Multiple files should be
 handled by \Cclass{Summarizer} because MPI processors create their own output
 files. 
 
+I could not find a good example for \Cclass{Summary} till the summary of
+sitewise frequency of boundaries. I wish to count boundary sites, which is a
+vector of size being equal to the number of sites of a chromosome. The
+\Cclass{Mover} subclass objects need to access the vector. After more thoughts I
+think that \Cclass{ChainManager} should access \Cclass{Chain}'s member or the
+boundaries, and get boundary sites.
+
 
 \subsection{System}
 The \Cclass{System} inspects the local computer system. What do we need to know?
 We need to know the number of CPUs, the size of memory, the number of computes
 nodes, the speed of CPUs, etc.
+
+\subsection{CAC MPI}
+
+\begin{Verbatim}[frame=lines,framesep=5mm]
+nsub mpi.sh
+\end{Verbatim}
+
+<<mpi2.sh>>=
+CPUPERNODE=`grep processor /proc/cpuinfo|wc -l`
+NODECNT=`wc -l<"$PBS_NODEFILE"`
+PROCESSCNT=$$((CPUPERNODE * NODECNT))
+ 
+mpdboot -n $NODECNT -r /usr/bin/ssh -f "$PBS_NODEFILE"
+mpiexec -n $PROCESSCNT /your/program
+
+<<mpi.sh>>=
+#!/bin/sh
+#PBS -A AcctNumber
+#PBS -l walltime=02:00,nodes=4
+#PBS -N mpiTest
+#PBS -j oe
+#PBS -q v4
+ 
+# Because jobs start in the HOME directory, move to where we submitted.
+cd "$PBS_O_WORKDIR" 
+ 
+#Count the number of nodes
+np=$(wc -l < $PBS_NODEFILE)
+ 
+#boot mpi on the nodes
+mpdboot -n $np --verbose -r /usr/bin/ssh -f $PBS_NODEFILE
+
+# Copy data
+mpiexec -ppn 1 -np $np cp $HOME/somedir/file.dat $TMPDIR/file.dat
+ 
+#now execute one process per node
+mpiexec -np $np $HOME/v4Test/hello.out
+mpdallexit
+
+<<hello.c>>=
+#include <stdio.h>
+#include <mpi.h>
+ 
+int main(int argc, char ** argv)
+{
+  int size,rank;
+  int length;
+  char name[80];
+  MPI_Status status;
+  int workerIdx;
+ 
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+  MPI_Comm_size(MPI_COMM_WORLD,&size);
+  MPI_Get_processor_name(name,&length);
+ 
+  if (rank==0) {
+    printf("Hello MPI from the server process!\n");
+ 
+    for (workerIdx=1; workerIdx<size; workerIdx++) {
+      MPI_Recv(name, 80, MPI_CHAR, workerIdx, 999, MPI_COMM_WORLD, &status);
+      printf("Hello MPI!\n");
+      printf(" message from %d of %d on %s\n", workerIdx, size, name);
+    }
+  } else {
+    MPI_Send(name,80,MPI_CHAR,0,999,MPI_COMM_WORLD);
+  }
+ 
+  MPI_Finalize(); 
+}
+@
 
 \subsection{TUX GSL}
 
@@ -1519,6 +1414,7 @@ set (tux-sum_SRCS
 )
 set (tux_SRCS 
   "tux.cpp"
+  "tuxSummary.cpp"
   "tuxSummarizer.cpp"
   "tuxMcmcSingle.cpp"
   "tuxDefault.cpp"
@@ -2236,6 +2132,7 @@ main (int argc, char* argv[])
             }
         }
     }
+  gFixed.mSeed = fGslRngSeed (gFixed.mSeed);
   if (gFixed.check () == false || args.LastError() != SO_SUCCESS
       || isArgumentProcessedSuccessfully == false )
     {
@@ -2244,8 +2141,7 @@ main (int argc, char* argv[])
       return 1;
     }
   else
-    {
-      gFixed.mSeed = fGslRngSeed (gFixed.mSeed);
+    { 
       ss << gFixed; 
       strLog = ss.str();
       EZLOGGERVLSTREAM2(axter::log_always,lf) << strLog; 
@@ -2298,7 +2194,21 @@ main (int argc, char* argv[])
       fGslRngFree ();
       return 1;
     }
-  if (isReadComplete == false)
+  if (isReadComplete == true)
+    {
+      r = gShortRead.front();
+      gFixed.mL = r->size ();
+      double geometricMean = 0;
+      for (vector<Reads*>::iterator it = gShortRead.begin(); 
+           it != gShortRead.end(); 
+           it++)
+        {
+          geometricMean += log(static_cast<double>((*it)->mN));
+        }
+      geometricMean /= static_cast<double>(gShortRead.size());
+      gFixed.mM = exp(geometricMean);
+    }
+  else
     {
       cerr << "Error: Could not successfully read file ``" 
            << gFixed.mDatafile
@@ -2318,7 +2228,7 @@ main (int argc, char* argv[])
   // Execute the command.
   //////////////////////////////////////////////////////////////////////////////
   gManager.mFixed = &gFixed;
-  gManager.mTxReads= gShortRead;
+  gManager.mReads= gShortRead;
 
   switch (sCommand)
     {
@@ -2337,10 +2247,6 @@ main (int argc, char* argv[])
     case OPT_MCMC:
       cout << "Starting MCMC ..." << endl;
 #ifdef _MPI
-      gManager.mProcessSeed.resize(gFixed.mNumberProcess); 
-      generate (gManager.mProcessSeed.begin(), 
-                gManager.mProcessSeed.begin(), 
-                gslrngRandomNumber);
       int size,rank;
       int length;
       char name[80];
@@ -2349,14 +2255,14 @@ main (int argc, char* argv[])
       MPI_Comm_size(MPI_COMM_WORLD,&size);
       MPI_Get_processor_name(name,&length);
       assert(static_cast<unsigned int>(size)==gFixed.mNumberProcess);
-      fGslRngSeed (gManager.mProcessSeed.at(rank));
+      fGslRngSeed (gFixed.mProcessSeed.at(rank));
       axter::ezlogger_output_policy::mEzloggerOutputFilename 
-        = gManager.logFilename (rank);
+        = gFixed.logFilename (rank);
       gManager.mcmc (rank);
       MPI_Finalize(); 
 #else
       axter::ezlogger_output_policy::mEzloggerOutputFilename 
-        = gManager.logFilename (0);
+        = gFixed.logFilename (0);
       gManager.mcmc (0);
 #endif // _MPI
       break;
@@ -2924,6 +2830,7 @@ com_fixed (char *arg)
         {
           cout << "Check if the file ``" << infilename << "'' exists." << endl;
         }
+      gFixed.check();
     }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -3115,7 +3022,7 @@ com_mcmc (char *arg)
   if (sCommand == OPT_MCMC_RUN)
     {
       gManager.mFixed = &gFixed;
-      gManager.mTxReads= gShortRead;
+      gManager.mReads= gShortRead;
       gManager.mcmc (0);
     }
   else if (sCommand == OPT_MCMC_HELP)
@@ -3191,7 +3098,7 @@ com_sum (char *arg)
   if (sCommand == OPT_SUM_RUN)
     {
       gManager.mFixed = &gFixed;
-      gManager.mTxReads= gShortRead;
+      gManager.mReads= gShortRead;
       gManager.summarize ();
     }
   else if (sCommand == OPT_SUM_HELP)
@@ -3919,16 +3826,13 @@ __END_DECLS
 <<tux gnu copyright>>
 #ifndef _TUXMANAGER_H_
 #define _TUXMANAGER_H_
-#include <iostream>
-#include <cmath>
 #include <vector>
 using namespace std;
 namespace tux {
 class Manager {
 public:
   Fixed* mFixed;
-  vector<Reads*> mTxReads;
-  vector<unsigned long int> mProcessSeed;
+  vector<Reads*> mReads;
 public:
   Manager ();
   Manager (Fixed* m, const vector<Reads*>& shortRead);
@@ -3939,8 +3843,6 @@ public:
   void save();
   void load();
   void help();
-  string logFilename (unsigned int i);
-  string chainFilename (unsigned int i);
 };
 }
 #endif // _TUXMANAGER_H_
@@ -3952,6 +3854,7 @@ public:
 #include <vector>
 #include "ezlogger_headers.hpp"
 #include "tuxFixed.h"
+#include "tuxReads.h"
 #ifdef _MPI
 #  include "tuxMcmcMpi.h"
 #else
@@ -3965,7 +3868,7 @@ Manager::Manager ()
 {
 }
 Manager::Manager (Fixed* m, const vector<Reads*>& shortRead)
-  : mFixed(m), mTxReads(shortRead)
+  : mFixed(m), mReads(shortRead)
 {
 }
 void 
@@ -3982,7 +3885,7 @@ void
 Manager::mcmc(int r)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  string cfn = chainFilename (r);
+  string cfn = mFixed->chainFilename (r);
   ofstream fout(cfn.c_str());
   if (fout.is_open() == false)
     {
@@ -3996,9 +3899,9 @@ Manager::mcmc(int r)
       return;
     }
 #ifdef _MPI
-  McmcMpi mMcmc (mFixed,mTxReads,r);
+  McmcMpi mMcmc (mFixed,mReads,r);
 #else
-  McmcSingle mMcmc (mFixed,mTxReads);
+  McmcSingle mMcmc (mFixed,mReads);
 #endif // _MPI
   unsigned int s = 0;
   unsigned int sThin = 0;
@@ -4020,8 +3923,60 @@ Manager::mcmc(int r)
             }
         }
     }
+
+  fout.close();
+
+  // Reports MCMC diagnostics.
+  cfn = mFixed->prefixFilename (r) + "rpt";
+  fout.open(cfn.c_str());
+  if (fout.is_open() == false)
+    {
+      stringstream ss;
+      string strLog;
+      ss << "Error: Could not open file ``" 
+         << cfn
+         << "'' for MCMC output!" << endl;
+      strLog = ss.str(); 
+      EZLOGGERSTREAM << strLog;
+      return;
+    }
   mMcmc.report (fout);
   fout.close();
+
+  // Prints out site-wise frequency boundaries in file prefix.[rank].sfb
+  cfn = mFixed->prefixFilename (r) + "sfb";
+  fout.open(cfn.c_str());
+  if (fout.is_open() == false)
+    {
+      stringstream ss;
+      string strLog;
+      ss << "Error: Could not open file ``" 
+         << cfn
+         << "'' for MCMC output!" << endl;
+      strLog = ss.str(); 
+      EZLOGGERSTREAM << strLog;
+      return;
+    }
+  mMcmc.reportSitewiseFrequencyBoundaries (fout);
+  fout.close();
+
+  // Prints out site-wise frequency boundaries in file prefix.[rank].swe
+  cfn = mFixed->prefixFilename (r) + "swe";
+  fout.open(cfn.c_str());
+  if (fout.is_open() == false)
+    {
+      stringstream ss;
+      string strLog;
+      ss << "Error: Could not open file ``" 
+         << cfn
+         << "'' for MCMC output!" << endl;
+      strLog = ss.str(); 
+      EZLOGGERSTREAM << strLog;
+      return;
+    }
+  mMcmc.reportSitewiseExpression (fout);
+  fout.close();
+
   return;
 }
 void 
@@ -4029,7 +3984,7 @@ Manager::summarize()
 {
   // Parse using one or more chain files.
   // Compute the mean estimate of the boundaries.
-  Summarizer s (mFixed,mTxReads);
+  Summarizer s (mFixed,mReads);
   s.execute ();
   return;
 }
@@ -4048,56 +4003,6 @@ Manager::help()
 {
   return;
 }
-string 
-Manager::logFilename (unsigned int i)
-{
-  string v(mFixed->mLogDirectory);
-  v += mFixed->mPrefix;
-  v += ".";
-  // See http://www.cplusplus.com/articles/D9j2Nwbp
-  string sID = static_cast<ostringstream*>(&(ostringstream() << i))->str();
-  v += sID;
-  v += ".log";
-  return v;
-}
-string 
-Manager::chainFilename (unsigned int i)
-{
-  string v(mFixed->mChainDirectory);
-  v += mFixed->mPrefix;
-  v += ".";
-  string sID = static_cast<ostringstream*>(&(ostringstream() << i))->str();
-  v += sID;
-  v += ".chain";
-  return v;
-}
-}
-@
-
-\subsection{Model}
-<<tuxModel.h>>=
-<<tux gnu copyright>>
-#ifndef _TUXMODEL_H_
-#define _TUXMODEL_H_
-namespace tux {
-class Model {
-public:
-  void full ();
-};
-}
-#endif // _TUXMODEL_H_
-
-<<tuxModel.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxModel.h"
-using namespace std;
-namespace tux {
-void 
-Model::full ()
-{
-  return;
-}
 }
 @
 
@@ -4106,7 +4011,6 @@ Model::full ()
 <<tux gnu copyright>>
 #ifndef _TUXMCMC_H_
 #define _TUXMCMC_H_
-#include <cmath>
 #include <vector>
 #include "tuxChainManager.h"
 using namespace std;
@@ -4117,13 +4021,10 @@ class Mcmc {
 public:
   unsigned int mRank; 
   Fixed* mFixed;
-  vector<Reads*> mTxReads;
+  vector<Reads*> mReads;
   ChainManager mChainManager;
   vector<unsigned int> mChainid;
-  vector<double> mTemperature;
   vector<double> mLogLikelihoodPrior;
-  vector<unsigned int> mNumberChainPerProcess;
-  vector<unsigned int> mAccumulateNumberChain;
   vector<vector<unsigned int> > mSwapCount;
   vector<vector<unsigned int> > mSwapTryCount;
 
@@ -4132,45 +4033,6 @@ public:
     c_unique() {current=0;}
     unsigned int operator()() {return current++;}
   } uniqueNumber;
-
-  struct c_hlinear {
-    double halpha;
-    unsigned int i;
-    c_hlinear () {i=0; halpha=0.5;}
-    double operator()() {
-      double v = 1.0 / (1.0 + halpha * i);
-      i++; 
-      return v;
-    }
-  } hlinearNumber;
-
-  struct c_hgeometric {
-    unsigned int numChain;
-    double halpha, hbeta;
-    unsigned int i;
-    c_hgeometric () {i=0; numChain = 10; halpha=0.95; hbeta=0.2;}
-    double operator()() {
-      double v = 1 
-                 - (1 - hbeta) * i 
-                 * pow (halpha, (double) (numChain - 1 - i)) 
-                 / (double) (numChain - 1);
-      i++;
-      return v; 
-    }
-  } hgeometricNumber;
-
-  struct c_setNumberChainPerProcess {
-    unsigned int current;
-    unsigned int numberChainPerProcess;
-    unsigned int numberRemainingChain;
-    c_setNumberChainPerProcess () {current=0;}
-    unsigned int operator() () { 
-      if (current++ < numberRemainingChain)
-        return numberChainPerProcess + 1;
-      else
-        return numberChainPerProcess;
-    }
-  } setNumberChainPerProcess;
 
   struct c_msg1 {
     unsigned int processid;
@@ -4187,13 +4049,12 @@ public:
   int swapChains ();
   Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
   ~Mcmc ();
-  int numberChainPerProcess ();
-  int createChainManager (unsigned int r);
   int step (unsigned int n);
   virtual int swap () = 0;
-  int sample ();
   int save ();
   int load ();
+  void reportSitewiseExpression (ostream& out);
+  void reportSitewiseFrequencyBoundaries (ostream& out);
   void report (ostream &out);
   friend ostream& operator<< (ostream &out, const Mcmc &t);
 };
@@ -4223,31 +4084,19 @@ using namespace std;
 <<extern tuxGslRng>>
 namespace tux {
 Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
-  : mRank(rank), mFixed(m), mTxReads(shortRead), mChainManager(m,shortRead)
+  : mRank(rank), mFixed(m), mReads(shortRead), mChainManager(m,shortRead,rank)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  numberChainPerProcess ();
-
   mLogLikelihoodPrior.resize (mFixed->mNumberChain);
   mChainid.resize(mFixed->mNumberChain);
-  mTemperature.resize(mFixed->mNumberChain);
 
   // Each chain has a unique ID.
   uniqueNumber.current = 0;
-  generate (mChainid.begin(),mChainid.end(),uniqueNumber);                  
+  generate (mChainid.begin(),mChainid.end(),uniqueNumber);                 
 
   // Sets the temperature values
-  if (mFixed->mNumberChain == 1)
-    {
-      mTemperature.front() = 1.0;
-    }
-  else
-    {
-      hgeometricNumber.numChain = mFixed->mNumberChain;
-      hgeometricNumber.halpha = mFixed->mHAlpha;
-      hgeometricNumber.hbeta = mFixed->mHBeta;
-      generate (mTemperature.begin(),mTemperature.end(),hgeometricNumber);         
-
+  if (mFixed->mNumberChain > 1)
+    { 
       // Swap counts. 
       mSwapCount.resize(mFixed->mNumberChain);
       mSwapTryCount.resize(mFixed->mNumberChain);
@@ -4260,8 +4109,7 @@ Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
 
   // This needs to be called at the end of the constructor, partly because
   // we need to know temperature values.
-  mChainManager.mTemperature = mTemperature;
-  createChainManager (rank);
+  // This is done in setChainid.
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -4270,17 +4118,17 @@ Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
   stringstream ss;
   string strLog;
   ss << "mNumberChainPerProcess -";
-  for (unsigned int i = 0; i < mNumberChainPerProcess.size(); i++)
+  for (unsigned int i = 0; i < mFixed->mNumberChainPerProcess.size(); i++)
     {
-      ss << " " << mNumberChainPerProcess.at(i);
+      ss << " " << mFixed->mNumberChainPerProcess.at(i);
     }
   ss << endl;
   strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
   ss.str(string());
   ss << "mAccumulateNumberChain -";
-  for (unsigned int i = 0; i < mAccumulateNumberChain.size(); i++)
+  for (unsigned int i = 0; i < mFixed->mAccumulateNumberChain.size(); i++)
     {
-      ss << " " << mAccumulateNumberChain.at(i);
+      ss << " " << mFixed->mAccumulateNumberChain.at(i);
     }
   ss << endl;
   strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
@@ -4292,56 +4140,11 @@ Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
     }
   ss << endl;
   strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
-  ss.str(string());
-  ss << "mTemperature -";
-  for (unsigned int i = 0; i < mTemperature.size(); i++)
-    {
-      ss << " " << mTemperature.at(i);
-    }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
 }
 Mcmc::~Mcmc () {}
-int 
-Mcmc::numberChainPerProcess ()
-{
-  // Allocate chains among processes e.g., (3,3,2).
-  setNumberChainPerProcess.current = 0;
-  setNumberChainPerProcess.numberChainPerProcess 
-    = mFixed->mNumberChain / mFixed->mNumberProcess; 
-  setNumberChainPerProcess.numberRemainingChain
-    = mFixed->mNumberChain % mFixed->mNumberProcess;
-  mNumberChainPerProcess.resize (mFixed->mNumberProcess); 
-  generate (mNumberChainPerProcess.begin(), 
-            mNumberChainPerProcess.end(), 
-            setNumberChainPerProcess);
-  unsigned int n;
-  n = accumulate(mNumberChainPerProcess.begin(),
-                 mNumberChainPerProcess.end(),0U);
-  assert (n == mFixed->mNumberChain);
-
-  // Construct a vector of partial sum. e.g., (0,3,6,8).
-  mAccumulateNumberChain.resize(mNumberChainPerProcess.size());
-  partial_sum(mNumberChainPerProcess.begin(),
-              mNumberChainPerProcess.end(),
-              mAccumulateNumberChain.begin());
-  mAccumulateNumberChain.insert(mAccumulateNumberChain.begin(),0);
-  return 0;
-}
-int 
-Mcmc::createChainManager (unsigned int r)
-{
-  // Create chains for a chain manager.
-  unsigned int n = mNumberChainPerProcess.at(r);
-  mChainManager.createChain (n);
-  // Set chain ID by using a vector of partial sum.
-  mChainManager.setChainid (mAccumulateNumberChain[r],
-                            mAccumulateNumberChain[r+1]-1);
-  return 0;
-}
 int
 Mcmc::step (unsigned int n)
 {
@@ -4352,11 +4155,6 @@ Mcmc::step (unsigned int n)
   EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
 #endif // _DEBUG
   mChainManager.step (n);
-  return 0;
-}
-int
-Mcmc::sample ()
-{
   return 0;
 }
 int
@@ -4433,8 +4231,8 @@ Mcmc::swapChains ()
       unsigned pj = chainIndex.at(cj);
       double sumi = mLogLikelihoodPrior.at(pi);
       double sumj = mLogLikelihoodPrior.at(pj);
-      double ti = mTemperature.at(ci);
-      double tj = mTemperature.at(cj);
+      double ti = mFixed->mTemperature.at(ci);
+      double tj = mFixed->mTemperature.at(cj);
       double logAlpha = (ti - tj) * (sumj - sumi);
 
       double logAlphaUniform = log(gsl_rng_uniform (gGslRng));
@@ -4470,6 +4268,18 @@ Mcmc::swapChains ()
     mChainid.at(chainIndex.at(i)) = i;
 
   return 0;
+}
+void
+Mcmc::reportSitewiseExpression (ostream& out)
+{
+  mChainManager.reportSitewiseExpression (out);
+  return;
+}
+void
+Mcmc::reportSitewiseFrequencyBoundaries (ostream& out)
+{
+  mChainManager.reportSitewiseFrequencyBoundaries (out);
+  return;
 }
 void 
 Mcmc::report (ostream &out)
@@ -4537,180 +4347,12 @@ operator<< (ostream &out, const Mcmc &t)
 }
 }
 
-<<tuxMcmcMpi.h>>=
-<<tux gnu copyright>>
-#ifndef _TUXMCMCMPI_H_
-#define _TUXMCMCMPI_H_
-#include <vector>
-#include "tuxMcmc.h"
-#include "tuxChainManager.h"
-using namespace std;
-namespace tux {
-class Fixed;
-class Reads;
-class McmcMpi: public Mcmc {
-private:
-  McmcMpi ();
-public:
-  McmcMpi (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
-  ~McmcMpi ();
-  int swap ();
-};
-}
-#endif // _TUXMCMCMPI_H_
-
-<<tuxMcmcMpi.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <numeric>    // partial_sum
-#include <functional>
-#include <algorithm>  // swap
-#include <mpi.h>
-#include <cassert>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-#include "ezlogger_headers.hpp"
-#include "tuxChainManager.h"
-#include "tuxFixed.h"
-#include "tuxMcmc.h"
-#include "tuxMcmcMpi.h"
-using namespace std;
-<<extern tuxGslRng>>
-namespace tux {
-McmcMpi::McmcMpi (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
-  : Mcmc(m,shortRead,rank)
-{
-  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-}
-McmcMpi::~McmcMpi ()
-{
-}
-int
-McmcMpi::swap ()
-{
-  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  MPI_Status status;
-
-  // Get chain IDs and likelihood prior sum values from each of ChainManagers.
-  vector<unsigned int> v1;
-  mChainManager.chainid (v1);
-  vector<double> v2;
-  mChainManager.likelihoodPrior (v2);
-
-  if (mRank==0) 
-    {
-      // We are at the main process or rank 0 process.
-      // Receive messages to fill chain IDs and sums of likelihood and prior.
-      for (unsigned int workerIdx = 0; 
-           workerIdx < mFixed->mNumberProcess; 
-           workerIdx++) 
-        {
-          for (unsigned int i = mAccumulateNumberChain.at(workerIdx), j = 0;
-               i < mAccumulateNumberChain.at(workerIdx+1);
-               i++, j++)
-            {
-              if (mRank == workerIdx)
-                {
-                  // Process ID, Chain ID, and likelihood/prior value.
-                  mMessage.set (i, v1.at(j), v2.at(j)); 
-                }
-              else
-                {
-                  MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
-                           workerIdx, 999, MPI_COMM_WORLD, &status);
-                }
-              mChainid.at(mMessage.processid) = mMessage.chainid;
-              mLogLikelihoodPrior.at(mMessage.processid) = mMessage.likelihoodPrior;
-            }
-        }
-     
-//      stringstream result;
-//      copy(mChainid.begin(), mChainid.end(), 
-//           ostream_iterator<unsigned int>(result, " "));
-//      EZLOGGERPRINT("Before Rank 0 chain IDs: %s",result.str().c_str());  
-
-      // Swap chains.
-      swapChains ();
-
-//      copy(mChainid.begin(), mChainid.end(), 
-//           ostream_iterator<unsigned int>(result, " "));
-//      EZLOGGERPRINT("After Rank 0 chain IDs: %s",result.str().c_str());  
-      
-      // Send messages
-      v1.clear();
-      v1.resize(mNumberChainPerProcess.at(mRank));
-      for (unsigned int workerIdx = 0; 
-           workerIdx < mFixed->mNumberProcess; 
-           workerIdx++) 
-        {
-          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
-               i < mAccumulateNumberChain[workerIdx+1];
-               i++, j++)
-            {
-              unsigned int pid = mAccumulateNumberChain[workerIdx] + j;
-              assert (pid == i);
-              mMessage.set (i, mChainid.at(i), .0); 
-              if (mRank == workerIdx)
-                {
-                  //v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
-                    //= mMessage.chainid;
-                  v1.at(j) = mMessage.chainid;
-                }
-              else
-                {
-                  MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
-                           workerIdx, 999, MPI_COMM_WORLD);
-                }
-            }
-        }
-
-      // Check if the message passing.
-      //mChainid.assign (lenChain,9);
-      //copy(mChainid.begin(), mChainid.end(), 
-           //ostream_iterator<unsigned int>(result, " "));
-      //EZLOGGERPRINT("After reset 0 chain IDs: %s",result.str().c_str());  
-    }
-  else 
-    {
-      // Send messages to rank 0 process
-      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
-           i < mAccumulateNumberChain[mRank+1];
-           i++, j++)
-        {
-          mMessage.set (i, v1.at(j), v2.at(j)); 
-          MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
-                   0, 999, MPI_COMM_WORLD);
-        }
-
-      // Wait for the decision of the rank 0 process.
-      v1.clear();
-      v1.resize(mNumberChainPerProcess.at(mRank));
-      for (unsigned int i = mAccumulateNumberChain[mRank], j = 0;
-           i < mAccumulateNumberChain[mRank+1];
-           i++, j++)
-        {
-          MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 0, 999, MPI_COMM_WORLD, &status);
-          assert(mMessage.processid - mAccumulateNumberChain.at(mRank) < v1.size());
-          v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
-            = mMessage.chainid;
-        }
-    }
-  mChainManager.setChainid (v1);
-
-  return 0;
-}
-}
-
 <<tuxMcmcSingle.h>>=
 <<tux gnu copyright>>
 #ifndef _TUXMCMCSINGLE_H_
 #define _TUXMCMCSINGLE_H_
 #include <vector>
 #include "tuxMcmc.h"
-#include "tuxChainManager.h"
 using namespace std;
 namespace tux {
 class Fixed;
@@ -4720,7 +4362,6 @@ private:
   McmcSingle ();
 public:
   McmcSingle (Fixed* m, const vector<Reads*>& shortRead);
-  ~McmcSingle ();
   int swap ();
 };
 }
@@ -4742,6 +4383,7 @@ public:
 #include "ezlogger_headers.hpp"
 #include "tuxChainManager.h"
 #include "tuxFixed.h"
+#include "tuxReads.h"
 #include "tuxMcmc.h"
 #include "tuxMcmcSingle.h"
 using namespace std;
@@ -4752,9 +4394,6 @@ McmcSingle::McmcSingle (Fixed* m, const vector<Reads*>& shortRead)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
   assert (mFixed->mNumberProcess == 1);
-}
-McmcSingle::~McmcSingle ()
-{
 }
 int
 McmcSingle::swap ()
@@ -4782,8 +4421,8 @@ McmcSingle::swap ()
            workerIdx < mFixed->mNumberProcess; 
            workerIdx++) 
         {
-          for (unsigned int i = mAccumulateNumberChain.at(workerIdx), j = 0;
-               i < mAccumulateNumberChain.at(workerIdx+1);
+          for (unsigned int i = mFixed->mAccumulateNumberChain.at(workerIdx), j = 0;
+               i < mFixed->mAccumulateNumberChain.at(workerIdx+1);
                i++, j++)
             {
               if (mRank == workerIdx)
@@ -4834,22 +4473,20 @@ McmcSingle::swap ()
 ////////////////////////////////////////////////////////////////////////////////
 
       v1.clear();
-      v1.resize(mNumberChainPerProcess.at(mRank));
+      v1.resize(mFixed->mNumberChainPerProcess.at(mRank));
       for (unsigned int workerIdx = 0; 
            workerIdx < mFixed->mNumberProcess; 
            workerIdx++) 
         {
-          for (unsigned int i = mAccumulateNumberChain[workerIdx], j = 0;
-               i < mAccumulateNumberChain[workerIdx+1];
+          for (unsigned int i = mFixed->mAccumulateNumberChain[workerIdx], j = 0;
+               i < mFixed->mAccumulateNumberChain[workerIdx+1];
                i++, j++)
             {
-              unsigned int pid = mAccumulateNumberChain[workerIdx] + j;
+              unsigned int pid = mFixed->mAccumulateNumberChain[workerIdx] + j;
               assert (pid == i);
               mMessage.set (i, mChainid.at(i), .0); 
               if (mRank == workerIdx)
                 {
-                  //v1.at(mMessage.processid - mAccumulateNumberChain.at(mRank))
-                    //= mMessage.chainid;
                   v1.at(j) = mMessage.chainid;
                 }
               else
@@ -4862,6 +4499,151 @@ McmcSingle::swap ()
 
   mChainManager.setChainid (v1);
 
+  return 0;
+}
+}
+
+
+<<tuxMcmcMpi.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXMCMCMPI_H_
+#define _TUXMCMCMPI_H_
+#include <vector>
+#include "tuxMcmc.h"
+using namespace std;
+namespace tux {
+class Fixed;
+class Reads;
+class McmcMpi: public Mcmc {
+private:
+  McmcMpi ();
+public:
+  McmcMpi (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
+  int swap ();
+};
+}
+#endif // _TUXMCMCMPI_H_
+
+<<tuxMcmcMpi.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <numeric>    // partial_sum
+#include <functional>
+#include <algorithm>  // swap
+#include <mpi.h>
+#include <cassert>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "ezlogger_headers.hpp"
+#include "tuxChainManager.h"
+#include "tuxFixed.h"
+#include "tuxReads.h"
+#include "tuxMcmc.h"
+#include "tuxMcmcMpi.h"
+using namespace std;
+<<extern tuxGslRng>>
+namespace tux {
+McmcMpi::McmcMpi (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
+  : Mcmc(m,shortRead,rank)
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
+}
+int
+McmcMpi::swap ()
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
+  MPI_Status status;
+
+  // Get chain IDs and likelihood prior sum values from each of ChainManagers.
+  vector<unsigned int> v1;
+  mChainManager.chainid (v1);
+  vector<double> v2;
+  mChainManager.likelihoodPrior (v2);
+
+  if (mRank==0) 
+    {
+      // We are at the main process or rank 0 process.
+      // Receive messages to fill chain IDs and sums of likelihood and prior.
+      for (unsigned int workerIdx = 0; 
+           workerIdx < mFixed->mNumberProcess; 
+           workerIdx++) 
+        {
+          for (unsigned int i = mFixed->mAccumulateNumberChain.at(workerIdx), j = 0;
+               i < mFixed->mAccumulateNumberChain.at(workerIdx+1);
+               i++, j++)
+            {
+              if (mRank == workerIdx)
+                {
+                  // Process ID, Chain ID, and likelihood/prior value.
+                  mMessage.set (i, v1.at(j), v2.at(j)); 
+                }
+              else
+                {
+                  MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                           workerIdx, 999, MPI_COMM_WORLD, &status);
+                }
+              mChainid.at(mMessage.processid) = mMessage.chainid;
+              mLogLikelihoodPrior.at(mMessage.processid) = mMessage.likelihoodPrior;
+            }
+        }
+     
+      swapChains ();
+
+      // Send messages
+      v1.clear();
+      v1.resize(mFixed->mNumberChainPerProcess.at(mRank));
+      for (unsigned int workerIdx = 0; 
+           workerIdx < mFixed->mNumberProcess; 
+           workerIdx++) 
+        {
+          for (unsigned int i = mFixed->mAccumulateNumberChain[workerIdx], j = 0;
+               i < mFixed->mAccumulateNumberChain[workerIdx+1];
+               i++, j++)
+            {
+              unsigned int pid = mFixed->mAccumulateNumberChain[workerIdx] + j;
+              assert (pid == i);
+              mMessage.set (j, mChainid.at(i), .0); 
+              if (mRank == workerIdx)
+                {
+                  v1.at(mMessage.processid) = mMessage.chainid;
+                }
+              else
+                {
+                  MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                           workerIdx, 999, MPI_COMM_WORLD);
+                }
+            }
+        }
+    }
+  else 
+    {
+      // Send messages to rank 0 process
+      for (unsigned int i = mFixed->mAccumulateNumberChain[mRank], j = 0;
+           i < mFixed->mAccumulateNumberChain[mRank+1];
+           i++, j++)
+        {
+          mMessage.set (i, v1.at(j), v2.at(j)); 
+          MPI_Send(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                   0, 999, MPI_COMM_WORLD);
+        }
+
+      // Wait for the decision of the rank 0 process.
+      v1.clear();
+      v1.resize(mFixed->mNumberChainPerProcess.at(mRank));
+      for (unsigned int i = mFixed->mAccumulateNumberChain[mRank], j = 0;
+           i < mFixed->mAccumulateNumberChain[mRank+1];
+           i++, j++)
+        {
+          MPI_Recv(&mMessage, sizeof(struct c_msg1), MPI_BYTE, 
+                   0, 999, MPI_COMM_WORLD, &status);
+          assert(mMessage.processid < v1.size());
+          v1.at(mMessage.processid) = mMessage.chainid;
+        }
+    }
+  mChainManager.setChainid (v1);
   return 0;
 }
 }
@@ -4878,24 +4660,29 @@ using namespace std;
 namespace tux {
 class Fixed;
 class Reads;
+class Summary;
 class Chain;
 class ChainManager {
 private:
   ChainManager ();
 public:
   Fixed* mFixed;
-  vector<Reads*> mTxReads;
+  vector<Reads*> mReads;
   vector<Chain*> mChain;
-  vector<double> mTemperature;
+  Summary* mSummary;
+  vector<unsigned int> mSitewiseFrequencyBoundaries;
+  vector<double> mSitewiseExpression;
 public:
-  ChainManager (Fixed* m, const vector<Reads*>& shortRead);
-  void createChain (unsigned int);
+  ChainManager (Fixed* m, const vector<Reads*>& shortRead,
+                unsigned int r);
   ~ChainManager ();
   void step (unsigned int);
   void setChainid (unsigned int, unsigned int);
   void setChainid (vector<unsigned int>& v);
   void chainid (vector<unsigned int>&);
   void likelihoodPrior (vector<double>&);
+  void reportSitewiseExpression (ostream& out);
+  void reportSitewiseFrequencyBoundaries (ostream& out);
   void report (ostream &out);
   friend ostream& operator<< (ostream &out, const ChainManager &t);
 };
@@ -4917,6 +4704,7 @@ public:
 #include "yaml-cpp/yaml.h"
 #include "tuxFixed.h"
 #include "tuxReads.h"
+#include "tuxSummary.h"
 #include "tuxChain.h"
 #include "tuxChainManager.h"
 using namespace std;
@@ -4926,26 +4714,32 @@ void delete_pointed_to (T* p)
 {
   delete p;
 }
-ChainManager::ChainManager (Fixed* m, const vector<Reads*>& shortRead)
-  : mFixed(m), mTxReads(shortRead)
+ChainManager::ChainManager (Fixed* m,
+                            const vector<Reads*>& shortRead,
+                            unsigned int r)
+  : mFixed(m), mReads(shortRead)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
+  mSitewiseFrequencyBoundaries.resize(mFixed->L(),0);
+  mSitewiseExpression.resize(mFixed->L(),.0);
+  mSummary = new Summary;
+
+  // Create chains for a chain manager.
+  unsigned int n = mFixed->mNumberChainPerProcess.at(r);
+  for (unsigned int i = 0; i < n; i++)
+    {
+      Chain* c = new Chain (mFixed, mReads, mSummary);
+      mChain.push_back(c);
+    }
+  setChainid (mFixed->mAccumulateNumberChain[r],
+              mFixed->mAccumulateNumberChain[r+1]-1);
+
 }
 ChainManager::~ChainManager ()
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
   for_each(mChain.begin(),mChain.end(),delete_pointed_to<Chain>);
-}
-void 
-ChainManager::createChain (unsigned int n)
-{
-  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  for (unsigned int i = 0; i < n; i++)
-    {
-      Chain* c = new Chain (mFixed, mTxReads);
-      mChain.push_back(c);
-    }
-  return;
+  delete mSummary;
 }
 void 
 ChainManager::step (unsigned int n)
@@ -4971,7 +4765,22 @@ ChainManager::step (unsigned int n)
 #endif // _DEBUG
   for (vector<Chain*>::iterator i = mChain.begin(); i != mChain.end(); i++)
     {
-      (*i)->step(n);
+      bool isColdChain = false;
+      if ((*i)->mID == 0) isColdChain = true;
+      for (unsigned int j = 0; j < n; j++)
+        {
+	  (*i)->step ();
+	  if (isColdChain == true)
+	    {
+	      // Gets chain information.
+	      (*i)->updateSitewiseFrequencyBoundaries (
+                mSitewiseFrequencyBoundaries
+              );
+	      (*i)->updateSitewiseExpression (
+	        mSitewiseExpression
+              );
+	    }
+	}
     }
   return;
 }
@@ -4984,8 +4793,7 @@ ChainManager::setChainid (unsigned int s, unsigned int e)
   unsigned int i = 0;
   for (iter1 = mChain.begin(); iter1 != mChain.end(); iter1++)
     {
-      (*iter1)->mID = s + i;
-      (*iter1)->mBeta = mTemperature.at(s + i);
+      (*iter1)->chainid (s + i);
       i++;
     }
 }
@@ -5000,8 +4808,7 @@ ChainManager::setChainid (vector<unsigned int>& v)
        iter1 != mChain.end();
        iter1++, iter2++)
     {
-      (*iter1)->mID = *iter2;
-      (*iter1)->mBeta = mTemperature.at(*iter2);
+      (*iter1)->chainid (*iter2);
     }
 }
 void 
@@ -5030,6 +4837,26 @@ ChainManager::likelihoodPrior (vector<double>& v)
       double w = (*iter1)->likelihoodPrior ();
       v.push_back(w);
     }
+}
+void
+ChainManager::reportSitewiseFrequencyBoundaries (ostream& out)
+{
+  for (unsigned int i = 0; i < mFixed->L(); i++)
+    {
+      unsigned int p = i + 1;
+      out << p << " " << mSitewiseFrequencyBoundaries.at(i);
+    }
+  return;
+}
+void
+ChainManager::reportSitewiseExpression (ostream& out)
+{
+  for (unsigned int i = 0; i < mFixed->L(); i++)
+    {
+      unsigned int p = i + 1;
+      out << p << " " << mSitewiseExpression.at(i);
+    }
+  return;
 }
 void 
 ChainManager::report (ostream &out)
@@ -5064,48 +4891,58 @@ operator<< (ostream &out, const ChainManager &t)
 <<tux gnu copyright>>
 #ifndef _TUXCHAIN_H_
 #define _TUXCHAIN_H_
-#include <iomanip>
 #include <iostream>
 #include <vector>
-#include <string>
 #include "tuxMoverManager.h"
 using namespace std;
 namespace tux {
 class Fixed;
 class Reads;
+class Summary;
 class TxBoundaries;
 class TxExpression;
 class TxParameter;
 class Chain {
 private:
   Chain ();
-  void createParameter ();
 public:
   unsigned int mID;
   unsigned int mStep;
-  double mBeta;
   Fixed* mFixed;
-  vector<Reads*> mTxReads;
+  vector<Reads*> mReads;
+  Summary* mSummary;
   MoverManager mMoverManager;
   TxBoundaries* mTxBoundaries;
   TxExpression* mTxExpression;
   TxParameter* mTxParameter;
   vector<unsigned int> mTallyChainid;
 public:
-  Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta = 1.L);
+  Chain (Fixed* m, const vector<Reads*>& shortRead, Summary* s);
   ~Chain ();
+  void chainid (unsigned int id);
   double likelihoodPrior ();
+  void updateSitewiseFrequencyBoundaries (vector<unsigned int>& b);
+  void updateSitewiseExpression (vector<double>& e);
   void TxFixed (Fixed* m) {mFixed=m;}
-  void TxReads (const vector<Reads*>& shortRead) {mTxReads=shortRead;}
-  void step (unsigned int n);
+  void TxReads (const vector<Reads*>& shortRead) {mReads=shortRead;}
+  void step (unsigned int n = 1);
   void report (ostream &out);
   friend ostream& operator<< (ostream &out, const Chain &t);
+
+  struct c_addv {
+    double v;
+    double operator()(double d) {
+      return d + v;
+    }
+  } mAddV;
 };
 }
 #endif // _TUXCHAIN_H_
 
 <<tuxChain.cpp>>=
 <<tux gnu copyright>>
+#include <iomanip>
+#include <string>
 #include <sstream>
 #include <iostream>
 #include <numeric>          // accumulate
@@ -5120,6 +4957,7 @@ public:
 #include "tuxMoverManager.h"
 #include "tuxReads.h"
 #include "tuxFixed.h"
+#include "tuxSummary.h"
 #include "tuxProbTxBoundaries.h" 
 #include "tuxProbTxExpression.h" 
 #include "tuxLikelihood.h" 
@@ -5128,30 +4966,13 @@ public:
 
 using namespace std;
 namespace tux {
-Chain::Chain (Fixed* m, const vector<Reads*>& shortRead, const double beta)
+Chain::Chain (Fixed* m, const vector<Reads*>& shortRead,
+              Summary* s)
   : mID(0), mStep(0),
-    mBeta(beta), mFixed(m), mTxReads(shortRead)
+    mFixed(m), mReads(shortRead), mSummary(s)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  createParameter ();
-}
-Chain::~Chain ()
-{
-  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  delete mTxBoundaries;
-  delete mTxExpression;
-  delete mTxParameter;
-}
-double 
-Chain::likelihoodPrior ()
-{
-  return mTxParameter->mLoglikelihood + mTxParameter->mLogprior;
-}
-void 
-Chain::createParameter ()
-{
-  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  Reads* r = mTxReads.front();
+  Reads* r = mReads.front();
   ProbTxBoundaries factoryTxBoundaries (r->size(),mFixed->K());
   mTxBoundaries = static_cast<TxBoundaries*>(factoryTxBoundaries.r());
   ProbTxExpression factoryTxExpression (mFixed->K());
@@ -5160,24 +4981,28 @@ Chain::createParameter ()
 
   // Boundaries mover
   MoverTxBoundaries* d1 = new MoverTxBoundaries (mFixed, 
-                                                 mTxReads, 
+                                                 mReads, 
                                                  mTxBoundaries, 
                                                  mTxExpression,
-                                                 mTxParameter);
+                                                 mTxParameter,
+						 mSummary);
   mMoverManager.add (d1, 1U, mFixed->mMoverTxBWeight);
   // Expression mover
   MoverTxExpression* d2 = new MoverTxExpression (mFixed, 
-                                                 mTxReads, 
+                                                 mReads, 
+
                                                  mTxBoundaries, 
                                                  mTxExpression,
-                                                 mTxParameter);
+                                                 mTxParameter,
+						 mSummary);
   mMoverManager.add (d2, 2U, mFixed->mMoverTxEWeight);
   // Boundaries single mover
   MoverTxBSingle* d3 = new MoverTxBSingle (mFixed, 
-                                           mTxReads, 
+                                           mReads, 
                                            mTxBoundaries, 
                                            mTxExpression,
-                                           mTxParameter);
+                                           mTxParameter,
+					   mSummary);
   mMoverManager.add (d3, 3U, mFixed->mMoverTxBSingleWeight);
 
   // Compute the total likelihood.
@@ -5185,8 +5010,8 @@ Chain::createParameter ()
   if (mFixed->mIsData == true)
     {
       Likelihood factoryLikelihood (mFixed, mTxBoundaries, mTxExpression);
-      for (vector<Reads*>::iterator i = mTxReads.begin(); 
-           i != mTxReads.end(); 
+      for (vector<Reads*>::iterator i = mReads.begin(); 
+           i != mReads.end(); 
            i++)
         {
           // We need mCount and mN to compute the total likelihood.
@@ -5196,12 +5021,57 @@ Chain::createParameter ()
         }
     }
   mTallyChainid.resize(mFixed->mNumberChain,0);
+}
+Chain::~Chain ()
+{
+  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
+  delete mTxBoundaries;
+  delete mTxExpression;
+  delete mTxParameter;
+}
+void 
+Chain::chainid (unsigned int id)
+{
+  mID = id;
+  mTxParameter->mBeta = mFixed->mTemperature.at(id);
+}
+double 
+Chain::likelihoodPrior ()
+{
+  return mTxParameter->mLoglikelihood + mTxParameter->mLogprior;
+}
+void 
+Chain::updateSitewiseFrequencyBoundaries (vector<unsigned int>& b)
+{
+  for (vector<unsigned int>::iterator i = mTxBoundaries->mC.begin();
+       i != mTxBoundaries->mC.end();
+       i++)
+    {
+      b.at(*i - 1)++;
+    }
+}
+void
+Chain::updateSitewiseExpression (vector<double>& e)
+{
+  for (unsigned int i = 0; i < mTxBoundaries->mC.size(); i++)
+    {
+      unsigned int right = mTxBoundaries->mC.at(i);
+      unsigned int left;
+      if (i > 0)
+        left = mTxBoundaries->mC.at(i-1);
+      else
+        left = 0;
+      unsigned int l = right - left;
+      double v = mTxExpression->mDelta.at(i) 
+                 * mFixed->mM / static_cast<double>(l);
+      mAddV.v = v;
+      transform(e.begin()+left,e.begin()+right,e.begin()+left,mAddV);
+    }
   return;
 }
 void 
 Chain::step (unsigned int n)
 {
-//  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
   for (unsigned int i = 0; i < n; i++, mStep++)
     {
       EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) 
@@ -5239,7 +5109,7 @@ operator<< (ostream &out, const Chain &t)
 {
   out << "-" << endl
       << "  - [" << t.mID << ", " << t.mStep << "]" << endl
-      << "  - [" << t.mBeta << ", " << t.mTxParameter->mLoglikelihood 
+      << "  - [" << t.mTxParameter->mBeta << ", " << t.mTxParameter->mLoglikelihood 
       << "]" << endl
       << *(t.mTxBoundaries)
       << *(t.mTxExpression);
@@ -5260,14 +5130,6 @@ public:
 };
 }
 #endif // _TUXRANDOMVARIABLE_H_
-
-<<tuxRandomVariable.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxRandomVariable.h"
-using namespace std;
-namespace tux {
-}
 @
 
 \subsection{Parameter}
@@ -5281,14 +5143,6 @@ class Parameter: public RandomVariable {
 };
 }
 #endif // _TUXPARAMETER_H_
-
-<<tuxParameter.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxParameter.h"
-using namespace std;
-namespace tux {
-}
 @
 
 \subsection{TxBoundaries}
@@ -5305,25 +5159,11 @@ namespace tux {
 class TxBoundaries: public Parameter {
 public:
   vector<unsigned int> mC;
-  unsigned int mLengthSampleSegmentA;
-  unsigned int mLengthSampleSegmentB;
 public:
-  TxBoundaries (const vector<unsigned int>& c);
   TxBoundaries ();
   bool check ();
   unsigned int size () {return mC.size();}
   unsigned int L () {return mC.back();}
-  void seq (unsigned int from, unsigned int to, unsigned int by);
-  void sampleSegment (unsigned int&, unsigned int&);
-  void sampleSegment (vector<unsigned int>& right);
-  struct c_seq {
-    unsigned int from,by,c;
-    c_seq () {from=0;by=1;c=from-by;}
-    void reset (unsigned int ifrom, unsigned int iby) {
-      from=ifrom;by=iby;c=from-by;
-    }
-    unsigned int operator()() {c+=by;return c;}
-  } mSeq;
   friend YAML::Emitter& operator<< (YAML::Emitter &out, 
                                     const TxBoundaries &tx);
   friend ostream& operator<< (ostream &out, const TxBoundaries &t);
@@ -5341,19 +5181,11 @@ public:
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "yaml-cpp/yaml.h"
-#include "tuxGslRng.h"
 #include "tuxTxBoundaries.h"
-<<extern tuxGslRng>>
 using namespace std;
 namespace tux {
-TxBoundaries::TxBoundaries (const vector<unsigned int>& c)
-  : mC(c)
-{
-}
 TxBoundaries::TxBoundaries () 
 {
-  mLengthSampleSegmentA = 0;
-  mLengthSampleSegmentB = 0;
 }
 bool 
 TxBoundaries::check ()
@@ -5373,14 +5205,6 @@ TxBoundaries::check ()
     }
   return v;
 }
-void 
-TxBoundaries::seq (unsigned int from, unsigned int to, unsigned int by)
-{
-  mSeq.reset (from, by);
-  unsigned int a = (to - from) / by + 1;
-  mC.resize(a);
-  generate(mC.begin(),mC.end(),mSeq);
-}
 YAML::Emitter& 
 operator<< (YAML::Emitter &out, const TxBoundaries &tx)
 {
@@ -5398,55 +5222,6 @@ operator<< (ostream &out, const TxBoundaries &t)
        ostream_iterator<unsigned int>(out, ", ") );
   out << t.mC.back() << "]" << endl;
   return out;
-}
-void
-TxBoundaries::sampleSegment (unsigned int& left, unsigned int& right)
-{
-  unsigned long int l = static_cast<unsigned long int>(mC.back());
-  unsigned int s, e, d;
-  vector<unsigned int>::iterator upLeft = mC.end();
-  vector<unsigned int>::iterator upRight = mC.end();
-  while (upLeft == mC.end() || upRight == mC.end() || d < 1)
-    {
-      s = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
-      e = s + mLengthSampleSegmentA;
-      upLeft = upper_bound(mC.begin(),mC.end(),s);
-      upRight = upper_bound(mC.begin(),mC.end(),e);
-      d = static_cast<unsigned int>(distance(upLeft,upRight));
-    }
-  left = static_cast<unsigned int>(upLeft - mC.begin());
-  right = static_cast<unsigned int>(upRight - mC.begin());
-  return;
-}
-void
-TxBoundaries::sampleSegment (vector<unsigned int>& right)
-{
-  right.clear();
-  unsigned int lengthOfChromosome = mC.back();
-  double A = static_cast<double>(mLengthSampleSegmentA);
-  double B = static_cast<double>(mLengthSampleSegmentB);
-  unsigned int pos = 0;
-  unsigned int r; 
-  while (pos < lengthOfChromosome)
-    {
-      double l = gsl_ran_flat (gGslRng, A, B);
-      unsigned int interval = static_cast<unsigned int>(l + 0.5L);
-      pos += interval;
-      //cerr << "Pos: " << pos << endl;
-      if (pos < lengthOfChromosome)
-        {
-          vector<unsigned int>::iterator upRight;
-          upRight = upper_bound(mC.begin(),mC.end(),pos);
-          r = static_cast<unsigned int>(upRight - mC.begin());
-        }
-      else
-        {
-          r = mC.size() - 1;
-        }
-      right.push_back(r);
-      pos = mC.at(r);
-    } 
-  return;
 }
 }
 @
@@ -5466,20 +5241,10 @@ class TxExpression: public Parameter {
 public:
   vector<double> mDelta;
 public:
-  TxExpression (const vector<double>& d);
   TxExpression ();
-  void seq (unsigned int);
   friend YAML::Emitter& operator<< (YAML::Emitter &out, 
                                     const TxExpression &tx);
   friend ostream& operator<< (ostream &out, const TxExpression &t);
-  struct c_seq {
-    double by,c;
-    c_seq () {by=.1L;c=.0L;}
-    void reset (double iby) {
-      by=iby;c=.0L;
-    }
-    double operator()() {c+=by;return c;}
-  } mSeq;
 };
 }
 #endif // _TUXTXEXPRESSION_H_
@@ -5492,21 +5257,9 @@ public:
 #include "tuxTxExpression.h"
 using namespace std;
 namespace tux {
-TxExpression::TxExpression (const vector<double>& d)
-  : mDelta(d)
-{
-}
 TxExpression::TxExpression ()
 {
  
-}
-void 
-TxExpression::seq (unsigned int num)
-{
-  assert (num > 1);
-  double by = 1.0L / static_cast<double>(num); 
-  mDelta.resize(num,by);
-  return;
 }
 YAML::Emitter& 
 operator<< (YAML::Emitter &out, const TxExpression &tx)
@@ -5545,6 +5298,7 @@ class TxParameter: public Parameter {
 public:
   double mLoglikelihood;
   double mLogprior;
+  double mBeta;
 public:
   TxParameter ();
   friend YAML::Emitter& operator<< (YAML::Emitter &out, 
@@ -5563,7 +5317,7 @@ public:
 using namespace std;
 namespace tux {
 TxParameter::TxParameter ()
-  : mLoglikelihood(.0), mLogprior(.0)
+  : mLoglikelihood(.0), mLogprior(.0), mBeta(.0)
 {
 }
 YAML::Emitter& 
@@ -5572,7 +5326,10 @@ operator<< (YAML::Emitter &out, const TxParameter &tx)
   out << YAML::BeginMap;
   out << YAML::Key << "TxParameter";
   out << YAML::Value << YAML::BeginSeq;
-  out << YAML::Flow << tx.mLoglikelihood << tx.mLogprior << YAML::EndSeq;
+  out << YAML::Flow << tx.mLoglikelihood
+                    << tx.mLogprior
+		    << tx.mBeta
+		    << YAML::EndSeq;
   out << YAML::EndMap;
   return out;
 }
@@ -5582,7 +5339,9 @@ operator<< (ostream &out, const TxParameter &t)
   out << "  - ["
       << t.mLoglikelihood
       << ", "
-      << t.mLogprior;
+      << t.mLogprior
+      << ", "
+      << t.mBeta;
   out << "]" << endl;
   return out;
 }
@@ -5600,14 +5359,6 @@ class Data: public RandomVariable {
 };
 }
 #endif // _TUXDATA_H_
-
-<<tuxData.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxData.h"
-using namespace std;
-namespace tux {
-}
 @
 
 \subsection{Reads}
@@ -5634,8 +5385,8 @@ public:
   Reads (unsigned int j = 0);
   unsigned int size () {return mCount.size();}
   void sample (unsigned int l, unsigned int ul = 10);
-  friend YAML::Emitter& operator<< (YAML::Emitter &out, const Reads &tx);
-  friend void operator>> (const YAML::Node& node, Reads& t);
+//  friend YAML::Emitter& operator<< (YAML::Emitter &out, const Reads &tx);
+//  friend void operator>> (const YAML::Node& node, Reads& t);
   friend ostream& operator<< (ostream &out, const Reads &t);
   friend istream& operator>> (istream &in, Reads &t);
   void summary (ostream &out);
@@ -5683,12 +5434,6 @@ Reads::sample (unsigned int l, unsigned int ul)
 ostream& 
 operator<< (ostream &out, const Reads &t)
 {
-//  assert (t.mCount.size() > 0);
-//  out << "Reads:" << endl
-//      << "  - [";
-//  copy(t.mCount.begin(), t.mCount.end() - 1, 
-//       ostream_iterator<unsigned int>(out, ", ") );
-//  out << t.mCount.back() << "]" << endl;
   copy(t.mCount.begin(), t.mCount.end() - 1, 
        ostream_iterator<unsigned int>(out, " ") );
   out << t.mCount.back();
@@ -5776,22 +5521,22 @@ istream& operator>> (istream &fin, Reads &t)
   EZLOGGERSTREAM2(lf) << strLog; 
   return fin;
 }
-YAML::Emitter& 
-operator<< (YAML::Emitter &out, const Reads &t)
-{
-  out << YAML::BeginMap 
-      << YAML::Key << "Reads" 
-      << YAML::Value << YAML::BeginSeq << YAML::Flow << t.mCount << YAML::EndSeq
-      << YAML::EndMap;
-  return out;
-}
-void 
-operator>> (const YAML::Node& node, Reads& t)
-{
-  node[t.mJ] >> t.mCount;
-  t.mN = accumulate(t.mCount.begin(),t.mCount.end(),0);
-  return;
-}
+//YAML::Emitter& 
+//operator<< (YAML::Emitter &out, const Reads &t)
+//{
+//  out << YAML::BeginMap 
+//      << YAML::Key << "Reads" 
+//      << YAML::Value << YAML::BeginSeq << YAML::Flow << t.mCount << YAML::EndSeq
+//      << YAML::EndMap;
+//  return out;
+//}
+//void 
+//operator>> (const YAML::Node& node, Reads& t)
+//{
+//  node[t.mJ] >> t.mCount;
+//  t.mN = accumulate(t.mCount.begin(),t.mCount.end(),0);
+//  return;
+//}
 void 
 Reads::summary (ostream &out)
 {
@@ -5808,13 +5553,16 @@ and the command line options in the \program{tux}.
 <<tux gnu copyright>>
 #ifndef _TUXFIXED_H_
 #define _TUXFIXED_H_
+#include <cmath>
 #include <string>
 #include <vector>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "yaml-cpp/yaml.h"
 #include "tuxData.h"
+#include "tuxGslRng.h"
 using namespace std;
+<<extern tuxGslRng>>
 namespace tux {
 class Fixed: public Data {
 public:
@@ -5852,6 +5600,11 @@ public:
   string mDatafile;
   bool mIsData;
 public:
+  vector<double> mTemperature;
+  vector<unsigned long int> mProcessSeed;
+  vector<unsigned int> mNumberChainPerProcess;
+  vector<unsigned int> mAccumulateNumberChain;
+public:
   Fixed ();
   ~Fixed ();
   void init ();
@@ -5863,8 +5616,56 @@ public:
   friend ostream& operator<< (ostream &out, const Fixed& t);
   string chainFilename (unsigned int i);
   string outFilename (unsigned int i);
+  string logFilename (unsigned int i);
   string pFilename (int i = -1);
   string prefixFilename (int i = -1);
+  void temperature ();
+  int numberChainPerProcess ();
+
+  struct c_hgeometric {
+    unsigned int numChain;
+    double halpha, hbeta;
+    unsigned int i;
+    c_hgeometric () {i=0; numChain = 10; halpha=0.95; hbeta=0.2;}
+    double operator()() {
+      double v = 1 
+                 - (1 - hbeta) * i 
+                 * pow (halpha, (double) (numChain - 1 - i)) 
+                 / (double) (numChain - 1);
+      i++;
+      return v; 
+    }
+  } hgeometricNumber;
+
+  struct c_hlinear {
+    double halpha;
+    unsigned int i;
+    c_hlinear () {i=0; halpha=0.5;}
+    double operator()() {
+      double v = 1.0 / (1.0 + halpha * i);
+      i++; 
+      return v;
+    }
+  } hlinearNumber;
+
+  struct c_setNumberChainPerProcess {
+    unsigned int current;
+    unsigned int numberChainPerProcess;
+    unsigned int numberRemainingChain;
+    c_setNumberChainPerProcess () {current=0;}
+    unsigned int operator() () { 
+      if (current++ < numberRemainingChain)
+        return numberChainPerProcess + 1;
+      else
+        return numberChainPerProcess;
+    }
+  } setNumberChainPerProcess;
+
+  struct c_gslrnginteger {
+    unsigned long int operator()() {
+      return gsl_rng_get (gGslRng);
+    }
+  } mGslRngInteger;
 };
 }
 #endif // _TUXFIXED_H_
@@ -5872,8 +5673,11 @@ public:
 
 <<tuxFixed.cpp>>=
 <<tux gnu copyright>>
+#include <cassert>
 #include <sstream>
 #include <iostream>
+#include <numeric>         // partial_sum
+#include <algorithm>       // generate
 #include "yaml-cpp/yaml.h"
 #include "ezlogger_headers.hpp"
 #include "tuxDefault.h"
@@ -5950,7 +5754,42 @@ Fixed::check ()
     {
       mLogVerbosity = Default::mLogVerbosity;
     }
-  return v; 
+  if (mNumberProcess > 1)
+    {
+      mProcessSeed.resize(mNumberProcess);
+      generate (mProcessSeed.begin(), 
+                mProcessSeed.end(), 
+                mGslRngInteger);
+    }
+  temperature ();
+  numberChainPerProcess ();
+  return v;
+}
+int 
+Fixed::numberChainPerProcess ()
+{
+  // Allocate chains among processes e.g., (3,3,2).
+  setNumberChainPerProcess.current = 0;
+  setNumberChainPerProcess.numberChainPerProcess 
+    = mNumberChain / mNumberProcess; 
+  setNumberChainPerProcess.numberRemainingChain
+    = mNumberChain % mNumberProcess;
+  mNumberChainPerProcess.resize (mNumberProcess); 
+  generate (mNumberChainPerProcess.begin(), 
+            mNumberChainPerProcess.end(), 
+            setNumberChainPerProcess);
+  unsigned int n;
+  n = accumulate(mNumberChainPerProcess.begin(),
+                 mNumberChainPerProcess.end(),0);
+  assert (n == mNumberChain);
+
+  // Construct a vector of partial sum. e.g., (0,3,6,8).
+  mAccumulateNumberChain.resize(mNumberChainPerProcess.size());
+  partial_sum(mNumberChainPerProcess.begin(),
+              mNumberChainPerProcess.end(),
+              mAccumulateNumberChain.begin());
+  mAccumulateNumberChain.insert(mAccumulateNumberChain.begin(),0);
+  return 0;
 }
 ostream&
 operator<< (ostream &out, const Fixed &t)
@@ -6228,7 +6067,17 @@ Fixed::pFilename (int i)
   v += "p";
   return v;
 }
-
+string 
+Fixed::logFilename (unsigned int i)
+{
+  string v(mLogDirectory);
+  v += mPrefix;
+  v += ".";
+  string sID = static_cast<ostringstream*>(&(ostringstream() << i))->str();
+  v += sID;
+  v += ".log";
+  return v;
+}
 string 
 Fixed::prefixFilename (int i)
 {
@@ -6244,6 +6093,21 @@ Fixed::prefixFilename (int i)
     }
   return v;
 }
+void
+Fixed::temperature ()
+{
+  // Sets the temperature values
+  mTemperature.resize(mNumberChain,1.0);
+  if (mNumberChain > 1)
+    {
+      hgeometricNumber.numChain = mNumberChain;
+      hgeometricNumber.halpha = mHAlpha;
+      hgeometricNumber.hbeta = mHBeta;
+      generate (mTemperature.begin(),mTemperature.end(),hgeometricNumber);        
+    }
+  return;
+}
+
 }
 @
 
@@ -6263,14 +6127,6 @@ public:
 };
 }
 #endif // _TUXPROBABILITY_H_
-
-<<tuxProbability.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxProbability.h"
-using namespace std;
-namespace tux {
-}
 @
 
 \subsection{ProbTxBoundaries}
@@ -6285,6 +6141,8 @@ namespace tux {
 using namespace std;
 namespace tux {
 class ProbTxBoundaries: public Probability {
+private:
+  ProbTxBoundaries ();
 public:
   unsigned int mL;
   unsigned int mK;
@@ -6316,9 +6174,8 @@ public:
 using namespace std;
 namespace tux {
 ProbTxBoundaries::ProbTxBoundaries (unsigned int l, unsigned int k)
+  : mL(l), mK(k)
 {
-  mL = l;
-  mK = k;
 }
 double
 ProbTxBoundaries::d ()
@@ -6356,25 +6213,13 @@ namespace tux {
 class ProbTxExpression: public Probability {
 public:
   vector<double> mAlpha;
-  vector<double> mTheta;
+  vector<double> mDelta;
 public:
   ProbTxExpression (const unsigned int k, const double a = 1.L);
   double d ();
   RandomVariable* r (); 
-  void theta (vector<double>& t) {mTheta = t;}
-  vector<double>& theta () {return mTheta;}
-
-  unsigned int op_cast_unsigned_int (double i) { return static_cast<unsigned int>(i+0.5); }
-
-  struct c_uniform {
-    double a;
-    double b;
-    c_uniform () {a=0;b=1;}
-    double operator()() {
-      return gsl_ran_flat (gGslRng,a,b);
-    }
-  } gslrngUniform;
-
+  void theta (vector<double>& t) {mDelta = t;}
+  vector<double>& theta () {return mDelta;}
 };
 }
 #endif // _TUXPROBTXEXPRESSION_H_
@@ -6399,17 +6244,17 @@ double
 ProbTxExpression::d ()
 {
   size_t k = static_cast<size_t>(mAlpha.size());
-  return gsl_ran_dirichlet_lnpdf(k,&mAlpha[0],&mTheta[0]);
+  return gsl_ran_dirichlet_lnpdf(k,&mAlpha[0],&mDelta[0]);
 }
 RandomVariable* 
 ProbTxExpression::r ()
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
   size_t k = static_cast<size_t>(mAlpha.size());
-  mTheta.resize(k); 
-  gsl_ran_dirichlet(gGslRng,k,&mAlpha[0],&mTheta[0]);
+  mDelta.resize(k); 
+  gsl_ran_dirichlet(gGslRng,k,&mAlpha[0],&mDelta[0]);
   TxExpression* v = new TxExpression;
-  v->mDelta = mTheta;
+  v->mDelta = mDelta;
   return v;
 }
 }
@@ -6456,23 +6301,13 @@ public:
   unsigned int mN;
 public:
   Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te);
-  Likelihood (unsigned int, unsigned int, double);
+  //Likelihood (unsigned int, unsigned int, double);
   double d ();
   RandomVariable* r (); 
   void J (unsigned int j);
   double sizeFactor () const {return mSizeFactor;}
   void sizeFactor (const double s) {mSizeFactor=s;}
   void alpha (const double a0, const double a1) {mA0=a0; mA1=a1;}
-
-  // FIXME: in a separte file under tux namespace.
-  struct c_uniform {
-    double a;
-    double b;
-    c_uniform () {a=0;b=1;}
-    double operator()() {
-      return gsl_ran_flat (gGslRng,a,b);
-    }
-  } gslrngUniform;
 
   struct c_nb {
     double a0;
@@ -6487,20 +6322,6 @@ public:
       return k; 
     }
   } gslrngNb;
-
-  struct c_countRead {
-    vector<unsigned int>::iterator mIter;
-    vector<unsigned int> mRead;
-    c_countRead () {mIter = mRead.begin();}
-    void resize() {mIter = mRead.begin();}
-    unsigned int operator()(unsigned int l) {
-      vector<unsigned int>::iterator mEnd = mIter + l;
-      unsigned int sumCk = accumulate(mIter,mEnd,0);
-      mIter = mEnd; 
-      return sumCk;
-    }
-  } countRead;
-
 };
 }
 #endif // _TUXLIKELIHOOD_H_
@@ -6528,8 +6349,6 @@ Likelihood::Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te)
 {
   // Check the three variables are valid. 
   mFixed = f;
-  mTxBoundaries = tb;
-  mTxExpression = te;
   mL = tb->L();
   mK = f->mK;
   mM = f->mM;
@@ -6539,28 +6358,28 @@ Likelihood::Likelihood (Fixed* f, TxBoundaries* tb, TxExpression* te)
   mC = tb->mC;
   mDelta = te->mDelta;
 }
-
-Likelihood::Likelihood (unsigned int l, unsigned int k, double m)
-{
-  mL = l;
-  mK = k;
-  mM = m;
-  // TxBoundaries is created. Likelihood owns it.
-  ProbTxBoundaries priorTxBoundaries (mL, mK);
-  priorTxBoundaries.mL = mL;
-  priorTxBoundaries.mK = mK;
-  TxBoundaries* vTxBoundaries = 
-    static_cast<TxBoundaries*>(priorTxBoundaries.r());
-  mC = vTxBoundaries->mC;
-  delete vTxBoundaries;
-
-  // TxExpression is created. Likelihood owns it.
-  ProbTxExpression priorTxExpression (mK,1.L);
-  TxExpression* vTxExpression = 
-    static_cast<TxExpression*>(priorTxExpression.r());
-  mDelta = vTxExpression->mDelta;
-  delete vTxExpression;
-}
+//
+//Likelihood::Likelihood (unsigned int l, unsigned int k, double m)
+//{
+//  mL = l;
+//  mK = k;
+//  mM = m;
+//  // TxBoundaries is created. Likelihood owns it.
+//  ProbTxBoundaries priorTxBoundaries (mL, mK);
+//  priorTxBoundaries.mL = mL;
+//  priorTxBoundaries.mK = mK;
+//  TxBoundaries* vTxBoundaries = 
+//    static_cast<TxBoundaries*>(priorTxBoundaries.r());
+//  mC = vTxBoundaries->mC;
+//  delete vTxBoundaries;
+//
+//  // TxExpression is created. Likelihood owns it.
+//  ProbTxExpression priorTxExpression (mK,1.L);
+//  TxExpression* vTxExpression = 
+//    static_cast<TxExpression*>(priorTxExpression.r());
+//  mDelta = vTxExpression->mDelta;
+//  delete vTxExpression;
+//}
 void 
 Likelihood::J (unsigned int j) 
 {
@@ -6612,10 +6431,6 @@ Likelihood::d ()
 #endif // _DEBUG
 
   return vTotal;
-//  countRead.mRead = mCount;
-//  transform(mLk.begin(),mLk.end(),ck.begin(),countRead);
-//  vector<double> logProbNb(mDelta);
-//  transform(logProbNb.begin(),logProbNb.end(),ck.begin(),logProbNb.begin(),probNb);
 }
 RandomVariable*
 Likelihood::r ()
@@ -6882,8 +6697,11 @@ MoverManager::add (Mover* m, const unsigned int id, const double weight)
 Mover*
 MoverManager::choose()
 {
-  assert (mMover.size() > 1);
-  size_t k = gsl_ran_discrete(gGslRng,mGslRanDiscrete);
+  size_t k;
+  if (mMover.size() > 1)
+    k = gsl_ran_discrete(gGslRng,mGslRanDiscrete);
+  else
+    k = 0;
 #ifdef _DEBUG
   stringstream ss;
   ss << "MoverManager::choose " << k << endl;
@@ -6919,6 +6737,8 @@ public:
   unsigned int mTry;
   unsigned int mAccepted;
   bool mIsData;
+  unsigned int mID;
+  double mWeight;
 public:
   Mover (bool d = true) : mTry(0), mAccepted(0), mIsData(d) {}
   virtual int step () = 0;
@@ -6939,13 +6759,9 @@ Mover::acceptanceRatio () const
 {
   double v;
   if (mTry > 0)
-    {
-      v = double(mAccepted)/double(mTry)*100.0;
-    }
+    v = double(mAccepted)/double(mTry)*100.0;
   else
-    {
-      v = .0;
-    }
+    v = .0;
   return v;
 }
 ostream& 
@@ -6978,6 +6794,7 @@ class TxExpression;
 class TxParameter;
 class Reads;
 class Fixed;
+class Summary;
 class MoverTxBoundaries: public Mover {
 public:
   Fixed* mFixed;
@@ -6985,11 +6802,13 @@ public:
   TxBoundaries* mTxBoundaries;
   TxExpression* mTxExpression;
   TxParameter* mTxParameter;
+  Summary* mSummary;
   vector<unsigned int> mK;
 public:
   MoverTxBoundaries ();
   MoverTxBoundaries (Fixed* f, vector<Reads*>& r, 
-                     TxBoundaries* txb, TxExpression* txe, TxParameter* txp);
+                     TxBoundaries* txb, TxExpression* txe, TxParameter* txp,
+		     Summary* s);
   int step ();
   int step (unsigned int left, unsigned int right);
 
@@ -6998,19 +6817,6 @@ public:
     c_unique() {current=0;}
     unsigned int operator()() {return current++;}
   } uniqueNumber;
-
-  struct c_countRead {
-    vector<unsigned int>::iterator mIter;
-    vector<unsigned int> mRead;
-    c_countRead () {mIter = mRead.begin();}
-    void resize() {mIter = mRead.begin();}
-    unsigned int operator()(unsigned int l) {
-      vector<unsigned int>::iterator mEnd = mIter + l;
-      unsigned int sumCk = accumulate(mIter,mEnd,0);
-      mIter = mEnd; 
-      return sumCk;
-    }
-  } countRead;
 
   // Duplicate
   struct c_probNb {
@@ -7055,6 +6861,7 @@ public:
 #include "tuxTotalLikelihood.h"
 #include "tuxReads.h"
 #include "tuxFixed.h"
+#include "tuxSummary.h"
 #include "tuxGsl.h"
 #include "tuxGslRng.h"
 #include "tuxMoverTxBoundaries.h"
@@ -7067,18 +6874,17 @@ MoverTxBoundaries::MoverTxBoundaries ()
 MoverTxBoundaries::MoverTxBoundaries (Fixed* f, vector<Reads*>& r, 
                                       TxBoundaries* txb, 
                                       TxExpression* txe,
-                                      TxParameter* txp)
+                                      TxParameter* txp,
+                                      Summary* s)
   : Mover(f->mIsData), mFixed(f), mReads(r), 
-    mTxBoundaries(txb), mTxExpression(txe), mTxParameter(txp)
+    mTxBoundaries(txb), mTxExpression(txe), mTxParameter(txp),
+    mSummary(s)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  mTxBoundaries->mLengthSampleSegmentA = mFixed->mLengthSampleSegmentA;
-  mTxBoundaries->mLengthSampleSegmentB = mFixed->mLengthSampleSegmentB;
-
   // Create a sequence of non-negative integers from 0 to K-1.
   gUniqueNumberFromZero.current = 0;
   mK.resize(mFixed->mK-1);
-  generate(mK.begin(),mK.end(),gUniqueNumberFromZero);                  
+  generate(mK.begin(),mK.end(),gUniqueNumberFromZero);                 
 }
 int 
 MoverTxBoundaries::step ()
@@ -7107,21 +6913,6 @@ MoverTxBoundaries::step ()
       assert(left < right);
       step (left, right);
     }
-//  vector<unsigned int> segmentKappa;
-//  mTxBoundaries->sampleSegment (segmentKappa);
-//  unsigned int left = 0;
-//  unsigned int right = 0;
-//  for (vector<unsigned int>::iterator i = segmentKappa.begin();
-//       i != segmentKappa.end();
-//       i++)
-//    {
-//      right = *i;
-//      if (left < right)
-//        {
-//          step (left, right);
-//        }
-//      left = right + 1;
-//    }
   return 0;
 }
 int 
@@ -7265,10 +7056,11 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
     }
   else
     {
-      likelihoodExpression = 0;
+      likelihoodExpression = .0;
     }
-  double logAlpha = likelihoodExpression + prExpression + mhExpression;
-  double logAlphaUniform = log(gsl_rng_uniform (gGslRng));
+  double logAlpha = mTxParameter->mBeta * (likelihoodExpression + prExpression)
+                    + mhExpression;
+  double logAlphaUniform = log(gsl_rng_uniform(gGslRng));
   mTry++;
   bool isAccepted = true;
   if (logAlpha < logAlphaUniform)
@@ -7421,6 +7213,7 @@ class TxExpression;
 class TxParameter;
 class Reads;
 class Fixed;
+class Summary;
 class MoverTxBSingle: public Mover {
 public:
   Fixed* mFixed;
@@ -7428,11 +7221,13 @@ public:
   TxBoundaries* mTxBoundaries;
   TxExpression* mTxExpression;
   TxParameter* mTxParameter;
+  Summary* mSummary;
   vector<unsigned int> mK;
 public:
   MoverTxBSingle ();
   MoverTxBSingle (Fixed* f, vector<Reads*>& r, 
-                  TxBoundaries* txb, TxExpression* txe, TxParameter* txp);
+                  TxBoundaries* txb, TxExpression* txe, TxParameter* txp,
+		  Summary* s);
   int step ();
   int step (unsigned int pos);
 };
@@ -7459,6 +7254,7 @@ public:
 #include "tuxTotalLikelihood.h"
 #include "tuxReads.h"
 #include "tuxFixed.h"
+#include "tuxSummary.h"
 #include "tuxGsl.h"
 #include "tuxGslRng.h"
 #include "tuxMoverTxBSingle.h"
@@ -7471,16 +7267,18 @@ MoverTxBSingle::MoverTxBSingle ()
 MoverTxBSingle::MoverTxBSingle (Fixed* f, vector<Reads*>& r, 
                                 TxBoundaries* txb, 
                                 TxExpression* txe,
-                                TxParameter* txp)
+                                TxParameter* txp,
+				Summary* s)
   : Mover(f->mIsData), mFixed(f), mReads(r), 
-    mTxBoundaries(txb), mTxExpression(txe), mTxParameter(txp)
+    mTxBoundaries(txb), mTxExpression(txe), mTxParameter(txp),
+    mSummary(s)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
 
   // Create a sequence of non-negative integers from 0 to K-1.
   gUniqueNumberFromZero.current = 0;
   mK.resize(mFixed->mK-1);
-  generate(mK.begin(),mK.end(),gUniqueNumberFromZero);                  
+  generate(mK.begin(),mK.end(),gUniqueNumberFromZero);                 
 }
 int 
 MoverTxBSingle::step ()
@@ -7631,10 +7429,11 @@ MoverTxBSingle::step (unsigned int pos)
     }
   else
     {
-      likelihoodExpression = 0;
+      likelihoodExpression = .0;
     }
-  double logAlpha = likelihoodExpression + prExpression + mhExpression;
-  double logAlphaUniform = log(gsl_rng_uniform (gGslRng));
+  double logAlpha = mTxParameter->mBeta * (likelihoodExpression + prExpression)
+                    + mhExpression;
+  double logAlphaUniform = log(gsl_rng_uniform(gGslRng));
   mTry++;
   bool isAccepted = true;
   if (logAlpha < logAlphaUniform)
@@ -7759,6 +7558,7 @@ class TxExpression;
 class TxParameter;
 class Reads;
 class Fixed;
+class Summary;
 class MoverTxExpression: public Mover {
 public:
   Fixed* mFixed;
@@ -7766,11 +7566,14 @@ public:
   TxBoundaries* mTxBoundaries;
   TxExpression* mTxExpression;
   TxParameter* mTxParameter;
+  Summary* mSummary;
   double mAverageTotalCount;
+  vector<unsigned int> mK;
 public:
   MoverTxExpression ();
   MoverTxExpression (Fixed* f, vector<Reads*>& r, 
-                     TxBoundaries* txb, TxExpression* txe, TxParameter* txp);
+                     TxBoundaries* txb, TxExpression* txe, TxParameter* txp,
+		     Summary* s);
   int step ();
   int step (unsigned int left, unsigned int right);
 
@@ -7798,6 +7601,7 @@ public:
 #include "tuxTxBoundaries.h"
 #include "tuxTxExpression.h"
 #include "tuxTxParameter.h"
+#include "tuxSummary.h"
 #include "tuxTotalLikelihood.h"
 #include "tuxGsl.h"
 #include "tuxGslRng.h"
@@ -7817,9 +7621,11 @@ MoverTxExpression::MoverTxExpression () : Mover()
 }
 MoverTxExpression::MoverTxExpression (Fixed* f, vector<Reads*>& r, 
                                       TxBoundaries* txb, TxExpression* txe,
-                                      TxParameter* txp)
+                                      TxParameter* txp,
+                                      Summary* s)
   : Mover(f->mIsData), mFixed(f), mReads(r), 
-    mTxBoundaries(txb), mTxExpression(txe), mTxParameter(txp)
+    mTxBoundaries(txb), mTxExpression(txe), mTxParameter(txp),
+    mSummary(s)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
   mAverageTotalCount = .0; 
@@ -7833,27 +7639,38 @@ MoverTxExpression::MoverTxExpression (Fixed* f, vector<Reads*>& r,
     << "The average of the total number of reads is "
     << mAverageTotalCount << endl;
 
-  mTxBoundaries->mLengthSampleSegmentA = mFixed->mLengthSampleSegmentA;
-  mTxBoundaries->mLengthSampleSegmentB = mFixed->mLengthSampleSegmentB;
+  // Create a sequence of non-negative integers from 0 to K-1.
+  gUniqueNumberFromZero.current = 0;
+  mK.resize(mFixed->mK-1);
+  generate(mK.begin(),mK.end(),gUniqueNumberFromZero);
 }
+// This is the same copy of MoverTxBoundaries::step ().
 int 
 MoverTxExpression::step ()
 {
-//  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  vector<unsigned int> segmentKappa;
-  mTxBoundaries->sampleSegment (segmentKappa);
   unsigned int left = 0;
   unsigned int right = 0;
-  for (vector<unsigned int>::iterator i = segmentKappa.begin();
-       i != segmentKappa.end();
-       i++)
+  gsl_ran_shuffle (gGslRng,&mK[0],mK.size(),sizeof(unsigned int)); 
+  for (vector<unsigned int>::iterator i = mK.begin(); i != mK.end(); i++)
     {
-      right = *i;
-      if (left < right)
+      if (mFixed->mLengthSampleSegmentA < *i)
         {
-          step (left, right);
+          left = *i - mFixed->mLengthSampleSegmentA;
         }
-      left = right + 1;
+      else
+        {
+          left = 0;
+        }
+      if (mFixed->mLengthSampleSegmentA < mK.size() - 1 - *i)
+        {
+          right = *i + mFixed->mLengthSampleSegmentA;
+        }
+      else
+        {
+          right = mK.size() - 1;
+        }
+      assert(left < right);
+      step (left, right);
     }
   return 0;
 }
@@ -7910,25 +7727,7 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
   transform(a.begin(), a.end(), dkA.begin(), 
             bind2nd(multiplies<double>(),sumDk));
 
-
-/*******************************************************************************
-  THE PRIOR RATIO SEEMS TO BE 1. THE FOLLOWING CODE IS UNNECESSARY.
-
-  double priorExpressionAlpha = mFixed->mAlphaPriorExpression - 1.L;
-  vector<double> logA(a);
-  vector<double> logB(b);
-  vector<double> logAminusB(a.size());
-  vector<double> logAminusBtimesAlphaMinusOne(a.size());
-  transform(logA.begin(),logA.end(),logA.begin(),mUnaryLog);
-  transform(logB.begin(),logB.end(),logB.begin(),mUnaryLog);
-  transform(logA.begin(),logA.end(),logB.begin(),logAminusB.begin(),
-            minus<double>());
-  transform(logAminusB.begin(), logAminusB.end(), 
-            logAminusBtimesAlphaMinusOne.begin(), 
-            bind2nd(multiplies<double>(),priorExpressionAlpha));
-  double prExpression = accumulate(logAminusBtimesAlphaMinusOne.begin(),
-                                   logAminusBtimesAlphaMinusOne.end(),.0L);
-*******************************************************************************/
+  // Prior ratio.
   double prExpression = .0L;
 
   // MH ratio.
@@ -7981,8 +7780,8 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
     {
       likelihoodExpression = .0;
     }
-
-  double logAlpha = likelihoodExpression + prExpression + mhExpression;
+  double logAlpha = mTxParameter->mBeta * (likelihoodExpression + prExpression)
+                    + mhExpression;
   double logAlphaUniform = log(gsl_rng_uniform(gGslRng));
   mTry++;
   bool isAccepted = true;
@@ -8160,7 +7959,7 @@ private:
   int fillTxbs ();
 public:
   Fixed* mFixed;
-  vector<Reads*> mTxReads;
+  vector<Reads*> mReads;
 
   map<unsigned int,unsigned int> mStepIndex;
   vector<vector<unsigned int> > mTxbs;
@@ -8179,7 +7978,7 @@ public:
   Summarizer (Fixed* m, const vector<Reads*>& shortRead);
   void execute ();
   void findMeanBoundaries ();
-  void listLoglikelihood (unsigned int chainid = 0);
+  void listLoglikelihood ();
   void computeFrequencyBoundaries ();
   friend ostream& operator<< (ostream &out, const Summarizer &t);
 };
@@ -8210,7 +8009,7 @@ void delete_pointed_to (T* p)
   delete p;
 }
 Summarizer::Summarizer (Fixed* m, const vector<Reads*>& shortRead)
-  : mFixed(m), mTxReads(shortRead)
+  : mFixed(m), mReads(shortRead)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
   fillStepIndex ();
@@ -8220,13 +8019,13 @@ void
 Summarizer::execute ()
 {
   // Find the mean boundaries.
-  listLoglikelihood (0);
+  listLoglikelihood ();
 //  computeFrequencyBoundaries ();
 //  findMeanBoundaries ();
   return;
 }
 void 
-Summarizer::listLoglikelihood (unsigned int chainid)
+Summarizer::listLoglikelihood ()
 {
   // Now, we have stepIndex ready.
   unsigned int numberSample = mStepIndex.size();
@@ -8366,7 +8165,7 @@ Summarizer::fillTxbs ()
 void 
 Summarizer::computeFrequencyBoundaries ()
 {
-  vector<unsigned int> summaryTxB(mTxReads.front()->size(),0U);
+  vector<unsigned int> summaryTxB(mReads.front()->size(),0U);
   for (unsigned int i = 0; i < mTxbs.size(); i++)
     {
       for (unsigned int j = 0; j < mTxbs[i].size(); j++)
@@ -8375,7 +8174,7 @@ Summarizer::computeFrequencyBoundaries ()
           summaryTxB.at(ck-1)++;
         }
     }
-  vector<double> fractionTxB(mTxReads.front()->size(),.0);
+  vector<double> fractionTxB(mReads.front()->size(),.0);
   for (unsigned int i = 0; i < summaryTxB.size(); i++)
     {
       fractionTxB.at(i) = static_cast<double>(summaryTxB.at(i)) 
@@ -8427,7 +8226,7 @@ Summarizer::findMeanBoundaries ()
   params.t_min = 10;
   //        The parameters of the Boltzmann distribution and cooling
   //        schedule.
-  // HERE
+  //
   //return;
 
   T = params.t_initial;
@@ -8597,7 +8396,7 @@ Summarizer::takeStep ()
 ostream& 
 operator<< (ostream &out, const Summarizer &t)
 {
-  
+  out << t.mFixed->mK;
   return out;
 }
 }
@@ -8609,8 +8408,12 @@ operator<< (ostream &out, const Summarizer &t)
 #ifndef _TUXSUMMARY_H_
 #define _TUXSUMMARY_H_
 #include "tuxRandomVariable.h"
+#include <vector>
+using namespace std;
 namespace tux {
 class Summary: public RandomVariable {
+public:
+  vector<unsigned int> mBoundary;
 public:
   Summary ();
   ~Summary ();
@@ -10461,6 +10264,7 @@ main (int argc, char *argv[])
 
 \subsection{TxBoundaries, TxExpression, and Reads}
 <<tux-tx.cpp>>=
+#include <cassert>
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -10580,10 +10384,11 @@ main (int argc, char *argv[])
   static const unsigned int s[] = {10,40,80,120,150,500,1500};
   vector<unsigned int> sv(s, s + sizeof(s)/sizeof(s[0]));
   txb.mC = sv;
-  txb.mLengthSampleSegmentA = 30;
-  txb.mLengthSampleSegmentB = 60;
+//  txb.mLengthSampleSegmentA = 30;
+//  txb.mLengthSampleSegmentB = 60;
   vector<unsigned int> segmentKappa;
-  txb.sampleSegment (segmentKappa);
+  assert (0); // Implement sampling of segments. We do not use sampleSegment.
+//  txb.sampleSegment (segmentKappa);
   stringstream result;
   copy(segmentKappa.begin(), segmentKappa.end(), 
        ostream_iterator<unsigned int>(result, " "));
@@ -11270,8 +11075,8 @@ main (int argc, char *argv[])
   //////////////////////////////////////////////////////////////////////////////
   // Create a chain manager.
   //////////////////////////////////////////////////////////////////////////////
-  ChainManager mChainManager (&m, shortRead);
-  mChainManager.createChain (m.mNumberChain);
+  ChainManager mChainManager (&m, shortRead, 0);
+//  mChainManager.createChain (m.mNumberChain);
   mChainManager.setChainid (0,m.mNumberChain-1);
   unsigned int s = 0;
   while (s < m.mMcmcLength) 
@@ -11442,7 +11247,7 @@ main (int argc, char *argv[])
   fGslRngSeed (m.mSeed);
   vector<unsigned long int> mProcessSeed;
   mProcessSeed.resize(m.mNumberProcess); 
-  generate (mProcessSeed.begin(),mProcessSeed.begin(),gslrngRandomNumber);
+  generate (mProcessSeed.begin(),mProcessSeed.end(),gslrngRandomNumber);
 
   int size,rank;
   int length;
