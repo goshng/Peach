@@ -10,13 +10,40 @@
 
 .Packages
 
+.noweb
+. Follow the instruction below when noweb is not or cannot be installed.
+. Download ftp://www.eecs.harvard.edu/pub/nr/noweb-2.11b.tgz
+. Unzip the downloaded file, and change to src directory.
+. Run "awkname gawk"
+. We assume $HOME/usr directory for local installation.
+. Edit Makefile
+  .. HOME=/home/fs01/sc2265
+  .. BIN=$(HOME)/usr/bin
+  .. LIB=$(HOME)/usr/lib
+  .. MAN=$(HOME)/usr/man
+  .. TEXINPUTS=$(HOME)/usr/share/texmf/tex/latex
+. Create a directory $HOME/usr/share/texmf/tex/latex
+. Add 
+. export TEXINPUTS="$HOME/usr/share/texmf/tex/latex:"
+. to $HOME/.profile
+
 .CMake
 . Version 2.8.8
 . http://cmake.org/cmake/resources/software.html
 
+.GNU Scientific Library (gnu-gsl)
+. Find the installed directory of gsl.
+. Add the path, e.g., /cac/contrib/gsl-1.15 $PATH
+
 .yaml
 . Data serializaton
 . http://code.google.com/p/yaml-cpp/
+. Download the file at http://yaml-cpp.googlecode.com/files/yaml-cpp-0.3.0.tar.gz
+. mkdir b; cd b
+. Check if cmake works.
+. /home/fs01/sc2265/cmake-2.8.7-Linux-i386/bin/cmake --version 
+. Use the working version.
+. cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/usr
 
 .simpleopt
 . Command line parser

@@ -25,6 +25,7 @@ ROOTDIR=`pwd`
 #####################################################################
 source sh/noweb-weave.sh
 source sh/noweb-tangle.sh
+source sh/initialize.sh
 
 #####################################################################
 # Read configuration file
@@ -41,6 +42,7 @@ source sh/noweb-tangle.sh
 #####################################################################
 CHOICES=( noweb-weave
           noweb-tangle \
+          initialize \
           warranty \
           copyright \
           quit )
@@ -58,6 +60,7 @@ select CHOICE in ${CHOICES[@]}; do
     continue
   elif [ "$CHOICE" == "noweb-weave" ]; then $CHOICE; break
   elif [ "$CHOICE" == "noweb-tangle" ]; then $CHOICE; break
+  elif [ "$CHOICE" == "initialize" ]; then $CHOICE; break
   elif [ "$CHOICE" == "warranty" ]; then $CHOICE; break
   elif [ "$CHOICE" == "copyright" ]; then $CHOICE; break
   elif [ "$CHOICE" == "quit" ]; then break
