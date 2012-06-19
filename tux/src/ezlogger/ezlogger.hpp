@@ -61,6 +61,7 @@ inserted into the logging.
 #include <sstream>
 #include <string>
 #include <stdio.h>
+#include <cstdlib> // Used in Ubuntu not MacOSX
 #include <cstdarg> // Used in Ubuntu not MacOSX
 
 #include "ezlogger_misc.hpp"
