@@ -4050,7 +4050,7 @@ private:
 public:
   int swapChains ();
   Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
-  virtual ~Mcmc ();
+  virtual ~Mcmc () {}
   int step (unsigned int n);
   virtual int swap () = 0;
   int save ();
@@ -4146,7 +4146,6 @@ Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
 }
-Mcmc::~Mcmc () {}
 int
 Mcmc::step (unsigned int n)
 {
@@ -6220,7 +6219,7 @@ public:
   vector<double> mDelta;
 public:
   ProbTxExpression (const unsigned int k, const double a = 1.L);
-  virtual ~ProbTxExpression ();
+  virtual ~ProbTxExpression () {}
   double d ();
   RandomVariable* r (); 
   void theta (vector<double>& t) {mDelta = t;}
@@ -6454,7 +6453,7 @@ Likelihood::r ()
   vector<unsigned int> lk(mC);
   lk.pop_back();
   lk.insert(lk.begin(),0);
-  transform(mC.begin(),mC.end(),lk.begin(),lk.begin(),minus<double>());
+  transform(mC.begin(),mC.end(),lk.begin(),lk.begin(),minus<double>()); // FIXME
 
   // Place counts on mRead of gslrngRead.
   vector<unsigned int> reads(mL,0);
