@@ -3,7 +3,6 @@
 . ./run 1
 . ./run 2
 . cd output/src/b
-. 
 
 .Tests
 . Reads in setup (Fixed)
@@ -14,6 +13,10 @@
 . Combine the summary files from different machines
 . Summarize the output
 . Create a wiggle file for uncertainty in transcript boundaries
+
+.git
+. To create an archive.
+. git archive --format=tar --prefix=tux/ HEAD | gzip > tux-head.tar.gz
 
 .Packages
 

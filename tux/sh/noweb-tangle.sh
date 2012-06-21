@@ -108,6 +108,11 @@ HPPFILE=( tuxManager.h \
           tuxChain.h \
           gtypes.h \
           config.h.in )
+notangle -Rruntux $NOWEBFILE > $OUTSRC/b/runtux; chmod +x $OUTSRC/b/runtux
+notangle -Rtuxbatch.sh $NOWEBFILE > $OUTSRC/b/tuxbatch.sh
+notangle -RplotTemperature.sh $NOWEBFILE > $OUTSRC/b/plotTemperature.sh
+notangle -RplotTemperature.R $NOWEBFILE > $OUTSRC/b/plotTemperature.R
+
 notangle -RCMakeLists.txt $NOWEBFILE > $OUTSRC/CMakeLists.txt
 notangle -RMathFunctions/CMakeLists.txt $NOWEBFILE > $OUTSRC/MathFunctions/CMakeLists.txt
 

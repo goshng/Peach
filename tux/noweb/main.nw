@@ -197,7 +197,7 @@ currently running MCMC
 \item   void help(); NYI - shows the manual page
 \end{itemize*}
 
-We now detail \Cclass{Manager}. The \Cmember{mFixed} and \Cmember{mReads} are mere pointers to the two global objects. The two global variables could be encapsulated in \Cclass{Manager}. I will consider this option later. This class should serve the user's request. We provide \Cmethod{mcmc} and \Cmethod{summarize}. Using \Cclass{Fixed} we create several file names, one of which is the chain file. A process of MPI or a thread of multiple threads program owns a chain file. A chain file contains samples from multiple chains. In \Cmethod{mcmc} an instance of \Cclass{Mcmc} is created and executed. We print \Cclass{Mcmc} out in a chain file. A chain file name consists of \Cmember{mChainDirectory}, \Cmember{mPrefix}, chain manager or MPI process ID, and extension of  ``chain.'' The \Cmethod{report} prints out the acceptance ratio of movers or updaters and chain swap ratios in a file name made up of  \Cmember{mOutDirectory}, \Cmember{mPrefix}, process ID, and extension of ``rpt.'' The \Cmethod{repportSitewiseFrequencyBoundaries} of \Cclass{Mcmc} creates a file name consisting of \Cmember{mOutDirectory}, \Cmember{mPrefix}, process ID, and extension of ``sbf.'' The \Cmethod{reportSitewiseExpression} creates a file with ``swe'' extension. We have yet to implement a method of summarizing these process-specific files.  The \Cmethod{summarize} creates an instance of \Cclass{Summarizer}, and calls \Cmethod{execute}. This method could feature more functions.
+We now detail \Cclass{Manager}. The \Cmember{mFixed} and \Cmember{mReads} are mere pointers to the two global objects. The two global variables could be encapsulated in \Cclass{Manager}. I will consider this option later. This class should serve the user's request. We provide \Cmethod{mcmc} and \Cmethod{summarize}. Using \Cclass{Fixed} we create several file names, one of which is the chain file. A process of MPI or a thread of multiple threads program owns a chain file. A chain file contains samples from multiple chains. In \Cmethod{mcmc} an instance of \Cclass{Mcmc} is created and executed. We print \Cclass{Mcmc} out in a chain file. A chain file name consists of \Cmember{mChainDirectory}, \Cmember{mPrefix}, chain manager or MPI process ID, and extension of  ``chain.'' The \Cmethod{report} prints out the acceptance ratio of movers or updaters and chain swap ratios in a file name made up of  \Cmember{mOutDirectory}, \Cmember{mPrefix}, process ID, and extension of ``rpt.'' The \Cmethod{repportSitewiseFrequencyBoundaries} of \Cclass{Mcmc} creates a file name consisting of \Cmember{mOutDirectory}, \Cmember{mPrefix}, process ID, and extension of ``sfb.'' The \Cmethod{reportSitewiseExpression} creates a file with ``swe'' extension. We have yet to implement a method of summarizing these process-specific files.  The \Cmethod{summarize} creates an instance of \Cclass{Summarizer}, and calls \Cmethod{execute}. This method could feature more functions.  Note The input file variables, mOutDirectory, mChainDirectory, and mLogDirectory must end with a slash denoting a directory.  The \Cmethod{reportMC3} writes swap chain ratios in a file of \Cmember{mOutDirectory}, \Cmember{mPrefix}, and extension of ``mc3.''
 
 \subsection{Mcmc}
 The \Cclass{Mcmc} steps and swaps chains. We distribute chains among multiple processes using the class's process management. While in the previous section the \Cclass{Manager} handles user inputs, the \Cclass{Mcmc} does an actual job of running Markov chains. The \Cclass{Mcmc} might have two things in it: process management and Markov chains management.  We employ Metropolis-coupled Markov chain Monte Carlo (MC3).  See http://probability.ca/jeff/ftpdir/mcmcmc.pdf. 
@@ -843,6 +843,8 @@ Note that we still need to make Reads a vector.
 
 \subsection{Summarizer}
 
+We combine all of .sfb files to a single .sbf file. Similarly, we combine values from .swe files.  The \Cmethod{listLoglikelihood} creates a .p file using one or more chain files.  Use Tracer to view the trajectory of log likelihoods of all of the chains.
+
 HERE
 
 We reads in posterior sample files from multiple chains to create
@@ -863,8 +865,6 @@ log scale because some can be too large.
 The \Cmethod{fillStepIndex} finds the steps and associate them with indices, so
 that we can use the index of a step when collecting values from chain files.
 
-The \Cmethod{listLoglikelihood} creates a .p file using one or more chain files.
-Use Tracer to view the trajectory of log likelihoods of all of the chains.
 
 The \Cmethod{computeFrequencyBoundaries} creates a .wig file using one or more
 chain files. Upload the wig file to the genome browser.
@@ -1139,8 +1139,8 @@ $ cd output/src
 $ mkdir debug
 $ cd debug
 $ cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
-$ CC=openmpicc CXX=openmpic++ cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
-$ openmpirun -n 2 tux mcmc
+$ CC=mpicc CXX=mpicxx cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
+$ mpirun -n 2 tux mcmc
 $ make
 $ make VERBOSE=1
 $ cd ..;rm -rf b;mkdir b;cd b;cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
@@ -1444,6 +1444,8 @@ set (tux_SRCS
 )
 set (tuxmpi_SRCS 
   "tux.cpp"
+  "tuxSummary.cpp"
+  "tuxSummarizer.cpp"
   "tuxMcmcMpi.cpp"
   "tuxDefault.cpp"
   "tuxError.cpp"
@@ -1456,11 +1458,14 @@ set (tuxmpi_SRCS
   "tuxGslRng.cpp"
   "tuxTxBoundaries.cpp"
   "tuxTxExpression.cpp"
+  "tuxTxParameter.cpp"
   "tuxMoverManager.cpp"
   "tuxMover.cpp"
   "tuxMoverTxBoundaries.cpp"
   "tuxMoverTxExpression.cpp"
+  "tuxMoverTxBSingle.cpp"
   "tuxLikelihood.cpp"
+  "tuxTotalLikelihood.cpp"
   "tuxReads.cpp"
   "tuxFixed.cpp"
   "tuxProbTxBoundaries.cpp"
@@ -1471,29 +1476,29 @@ SET (fileman_SRCS
   "fileman.cpp"
 )
 
+set (CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -g3 -ggdb -O0")
+set (CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -g3 -ggdb -O0")
+
 ################################################################################
 # This is for tux without MPI version.
 # Comment the following two lines when compiling with MPI
 ################################################################################
-set (CMAKE_C_FLAGS_DEBUG "-D_DEBUG -Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -fpermissive -g3 -ggdb -O0")
-set (CMAKE_CXX_FLAGS_DEBUG "-D_DEBUG -Wall -Wextra -W -Wshadow -Wcast-qual -Wno-write-strings -g3 -ggdb -O0")
-
 ################################################################################
-# To compile using openmpi compilers
+# Uncomment two of the following lines to compile using openmpi compilers
 # Comment the following four lines when compiling without MPI
+# Add -D_MPI definition for MPI verstion.
 ################################################################################
 # Under Ubuntu with Package installation
-#set (CMAKE_C_COMPILER mpicc)
-#set (CMAKE_CXX_COMPILER mpic++)
+set (CMAKE_C_COMPILER mpicc)
+set (CMAKE_CXX_COMPILER mpicxx)
 # Under MacOSX with MacPort installation
 #set (CMAKE_C_COMPILER openmpicc)
-#set (CMAKE_CXX_COMPILER openmpic++)
-
+#set (CMAKE_CXX_COMPILER openmpicxx)
 ################################################################################
 # Definitions
 ################################################################################
-add_definitions (-D_DEBUG)
-# add_definitions (-D_MPI -D_DEBUG)
+#add_definitions (-D_DEBUG)
+add_definitions (-D_MPI -D_DEBUG)
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set (tux_VERSION_MAJOR 0)
@@ -1618,11 +1623,13 @@ endif(${YAMLCPP} MATCHES NOTFOUND)
 # 1.
 #add_executable (tux tux-v1.cpp)
 # 2.
-add_executable (tux ${tux_SRCS})
-target_link_libraries(tux ${tux_LIBS} readline termcap)
+#set (tux_LIBS ${tux-tx_LIBS})
+#add_executable (tux ${tux_SRCS})
+#target_link_libraries(tux ${tux_LIBS} readline termcap)
 # 3.
-#add_executable (tux ${tuxmpi_SRCS})
-#target_link_libraries(tux ${tux_LIBS} mpi readline termcap)
+set (tux_LIBS ${tux-tx_LIBS})
+add_executable (tux ${tuxmpi_SRCS})
+target_link_libraries(tux ${tux_LIBS} mpi readline termcap)
 
 #target_link_libraries (tux ${EXTRA_LIBS})
 
@@ -1892,6 +1899,9 @@ namespace tux {
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif 
+#ifdef _MPI
+#include <mpi.h>
+#endif // _MPI
 #include <cstdlib>               // strtoul
 #include <string>
 #include <sstream>
@@ -1901,9 +1911,6 @@ namespace tux {
 #include <gsl/gsl_rng.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#ifdef _MPI
-#include <mpi.h>
-#endif // _MPI
 #include "yaml-cpp/yaml.h"
 #include "SimpleOpt.h"
 #include "SimpleGlob.h"
@@ -2247,7 +2254,7 @@ main (int argc, char* argv[])
         }
       break;
     case OPT_MCMC:
-      cout << "Starting MCMC ..." << endl;
+      // cout << "Starting MCMC ..." << endl;
 #ifdef _MPI
       int size,rank;
       int length;
@@ -3314,6 +3321,8 @@ Help::full ()
 "         Summarizes a posterior sample of transcript boundaries.\n"
 "      tux mcmc -i INFILE --without-data --with-data\n"
 "         The latter option --with-data overrides the former option.\n"
+"      mpirun -n 2 tux mcmc -i INFILE\n"
+"         Runs two MPI processes.\n"
 "\n"
 "AUTHOR\n"
 "   Written by Sang Chul Choi\n"
@@ -3829,12 +3838,16 @@ __END_DECLS
 #ifndef _TUXMANAGER_H_
 #define _TUXMANAGER_H_
 #include <vector>
+#include <ctime>
 using namespace std;
 namespace tux {
 class Manager {
+private:
+  void printRemainingTime (unsigned int, unsigned int, unsigned int);
 public:
   Fixed* mFixed;
   vector<Reads*> mReads;
+  time_t mPrevTime;
 public:
   Manager ();
   Manager (Fixed* m, const vector<Reads*>& shortRead);
@@ -3851,9 +3864,11 @@ public:
 
 <<tuxManager.cpp>>=
 <<tux gnu copyright>>
+#include <iomanip>
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <ctime>
 #include "ezlogger_headers.hpp"
 #include "tuxFixed.h"
 #include "tuxReads.h"
@@ -3907,10 +3922,14 @@ Manager::mcmc(int r)
 #endif // _MPI
   unsigned int s = 0;
   unsigned int sThin = 0;
+  time(&mPrevTime);
   while (s < mFixed->mMcmcLength) 
     {
-      cerr << "Step: " << s << "\r";
-      mMcmc.step (mFixed->mNumberSwap);
+      // Total steps, Current steps, Steps taken, Times taken
+      cerr << "Step: " << setw(10) << s << " - ";
+      printRemainingTime (mFixed->mMcmcLength, s, mFixed->mNumberSwap);
+
+      mMcmc.step (mFixed->mNumberSwap, s);
       s += mFixed->mNumberSwap; sThin += mFixed->mNumberSwap;
       if (mFixed->mNumberChain > 1)
         {
@@ -3925,8 +3944,28 @@ Manager::mcmc(int r)
             }
         }
     }
-
   fout.close();
+
+  // Reports chain swap ratios.
+  if (r == 0)
+    {
+      cfn = mFixed->prefixFilename () + "mc3";
+      fout.open(cfn.c_str());
+      if (fout.is_open() == false)
+        {
+          stringstream ss;
+          string strLog;
+          ss << "Error: Could not open file ``" 
+             << cfn
+             << "'' for MCMC output!" << endl;
+          strLog = ss.str(); 
+          EZLOGGERSTREAM << strLog;
+          return;
+        }
+      mFixed->reportTemperature (fout);
+      mMcmc.reportMC3 (fout);
+      fout.close();
+    }
 
   // Reports MCMC diagnostics.
   cfn = mFixed->prefixFilename (r) + "rpt";
@@ -3980,6 +4019,23 @@ Manager::mcmc(int r)
   fout.close();
 
   return;
+}
+void 
+Manager::printRemainingTime (unsigned int total, 
+                             unsigned int step, 
+                             unsigned int taken)
+{
+  unsigned int remainingStep = (total - step) / taken;
+  time_t c;
+  time(&c);
+  double d = difftime(c,mPrevTime) * static_cast<double>(remainingStep);
+
+  char prev = cout.fill('-'); 
+  cerr << static_cast<int>(floor(d/3600.0)) << ":" 
+       << setw(2) << static_cast<int>(floor(fmod(d,3600.0)/60.0)) << ":"
+       << setw(2) << static_cast<int>(fmod(d,60.0)) << "\r";
+  cout.fill(prev);
+  mPrevTime = c;
 }
 void 
 Manager::summarize()
@@ -4051,12 +4107,13 @@ public:
   int swapChains ();
   Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank);
   virtual ~Mcmc () {}
-  int step (unsigned int n);
+  int step (unsigned int n, unsigned int s);
   virtual int swap () = 0;
   int save ();
   int load ();
   void reportSitewiseExpression (ostream& out);
   void reportSitewiseFrequencyBoundaries (ostream& out);
+  void reportMC3 (ostream &out);
   void report (ostream &out);
   friend ostream& operator<< (ostream &out, const Mcmc &t);
 };
@@ -4147,7 +4204,7 @@ Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
 ////////////////////////////////////////////////////////////////////////////////
 }
 int
-Mcmc::step (unsigned int n)
+Mcmc::step (unsigned int n, unsigned int s)
 {
 #ifdef _DEBUG
   stringstream ss;
@@ -4155,7 +4212,7 @@ Mcmc::step (unsigned int n)
   string strLog(ss.str());
   EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
 #endif // _DEBUG
-  mChainManager.step (n);
+  mChainManager.step (n, s);
   return 0;
 }
 int
@@ -4283,11 +4340,10 @@ Mcmc::reportSitewiseFrequencyBoundaries (ostream& out)
   return;
 }
 void 
-Mcmc::report (ostream &out)
+Mcmc::reportMC3 (ostream &out)
 {
   stringstream ss;
   string strLog;
-  mChainManager.report (out);
 
   // Fold the swap matrix diagonally.
   char prev = out.fill('-');
@@ -4311,6 +4367,9 @@ Mcmc::report (ostream &out)
       for (unsigned int i = 1; i < n; i++)
         {
           ss.str(string());
+
+          out << std::fixed
+              << setw(6) << setprecision(3) << mFixed->mTemperature.at(i);
           ss << "c" << i;
           strLog = ss.str();
           out << setw(5) << strLog;
@@ -4338,6 +4397,12 @@ Mcmc::report (ostream &out)
         }
       out << endl;
     }
+  return;
+}
+void 
+Mcmc::report (ostream &out)
+{
+  mChainManager.report (out);
   return;
 }
 ostream& 
@@ -4527,13 +4592,13 @@ public:
 
 <<tuxMcmcMpi.cpp>>=
 <<tux gnu copyright>>
+#include <mpi.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <numeric>    // partial_sum
 #include <functional>
 #include <algorithm>  // swap
-#include <mpi.h>
 #include <cassert>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
@@ -4677,7 +4742,7 @@ public:
   ChainManager (Fixed* m, const vector<Reads*>& shortRead,
                 unsigned int r);
   ~ChainManager ();
-  void step (unsigned int);
+  void step (unsigned int, unsigned int s);
   void setChainid (unsigned int, unsigned int);
   void setChainid (vector<unsigned int>& v);
   void chainid (vector<unsigned int>&);
@@ -4743,21 +4808,8 @@ ChainManager::~ChainManager ()
   delete mSummary;
 }
 void 
-ChainManager::step (unsigned int n)
+ChainManager::step (unsigned int n, unsigned int s)
 {
-//  EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-//  I used to do this two lines:
-//  stepChain.n = n;
-//  for_each (mChain.begin(), mChain.end(), stepChain);
-//  And, I was wondering if there are ways of doing this using without having
-//    struct c_step {
-//      unsigned int n;
-//      void operator() (Chain *i) { i->step (n);}
-//    } stepChain;
-//  but like this
-//  for_each(mChain.begin(),mChain.end(),bind1st(mem_fun(&Chain::step),this));
-//  I was not happy with either of them. 
-//  Try to think about mem_fun1_t.
 #ifdef _DEBUG
   stringstream ss;
   ss << "ChainManager::step " << n << endl;
@@ -4770,18 +4822,18 @@ ChainManager::step (unsigned int n)
       if ((*i)->mID == 0) isColdChain = true;
       for (unsigned int j = 0; j < n; j++)
         {
-	  (*i)->step ();
-	  if (isColdChain == true)
-	    {
-	      // Gets chain information.
-	      (*i)->updateSitewiseFrequencyBoundaries (
-                mSitewiseFrequencyBoundaries
-              );
-	      (*i)->updateSitewiseExpression (
-	        mSitewiseExpression
-              );
-	    }
-	}
+          (*i)->step ();
+          if (isColdChain == true && mFixed->mMcmcBurnin < s)
+            {
+              // Gets chain information.
+              (*i)->updateSitewiseFrequencyBoundaries (
+                  mSitewiseFrequencyBoundaries
+                );
+              (*i)->updateSitewiseExpression (
+                  mSitewiseExpression
+                );
+            }
+        }
     }
   return;
 }
@@ -4842,21 +4894,24 @@ ChainManager::likelihoodPrior (vector<double>& v)
 void
 ChainManager::reportSitewiseFrequencyBoundaries (ostream& out)
 {
+  out << mSitewiseFrequencyBoundaries.front();
   for (unsigned int i = 0; i < mFixed->L(); i++)
     {
-      unsigned int p = i + 1;
-      out << p << " " << mSitewiseFrequencyBoundaries.at(i);
+      out << " " << mSitewiseFrequencyBoundaries.at(i);
     }
+  out << endl;
   return;
 }
 void
 ChainManager::reportSitewiseExpression (ostream& out)
 {
+  out << setprecision(7);
+  out << mSitewiseExpression.front();
   for (unsigned int i = 0; i < mFixed->L(); i++)
     {
-      unsigned int p = i + 1;
-      out << p << " " << mSitewiseExpression.at(i);
+      out << " " << mSitewiseExpression.at(i);
     }
+  out << endl;
   return;
 }
 void 
@@ -5100,7 +5155,7 @@ Chain::report (ostream &out)
       ss.str(string());
       ss << "c" << i;
       strLog = ss.str();
-      out << setw(3) << strLog << setw(5) << v << " ";
+      out << setw(5) << strLog << setw(7) << v << " ";
     }
   out << endl;
   return;
@@ -5554,6 +5609,7 @@ and the command line options in the \program{tux}.
 <<tux gnu copyright>>
 #ifndef _TUXFIXED_H_
 #define _TUXFIXED_H_
+#include <iostream>
 #include <cmath>
 #include <string>
 #include <vector>
@@ -5612,6 +5668,8 @@ public:
   bool check ();
   unsigned int K () {return mK;}
   unsigned int L () {return mL;}
+  unsigned int numberProcess () {return mNumberProcess;}
+  unsigned int mcmcLength () {return mMcmcLength;}
   friend YAML::Emitter& operator<< (YAML::Emitter &out, const Fixed &t);
   friend void operator>> (const YAML::Node& node, Fixed& t);
   friend ostream& operator<< (ostream &out, const Fixed& t);
@@ -5622,6 +5680,7 @@ public:
   string prefixFilename (int i = -1);
   void temperature ();
   int numberChainPerProcess ();
+  void reportTemperature (ostream& out);
 
   struct c_hgeometric {
     unsigned int numChain;
@@ -5674,6 +5733,7 @@ public:
 
 <<tuxFixed.cpp>>=
 <<tux gnu copyright>>
+#include <iomanip>
 #include <cassert>
 #include <sstream>
 #include <iostream>
@@ -6108,7 +6168,18 @@ Fixed::temperature ()
     }
   return;
 }
-
+void
+Fixed::reportTemperature (ostream& out)
+{
+  for (vector<double>::iterator i = mTemperature.begin();
+       i != mTemperature.end();
+       i++)
+    {
+      out << setprecision(3) << setw(6) << *i;
+    } 
+  out << endl;
+  return;
+}
 }
 @
 
@@ -6453,7 +6524,7 @@ Likelihood::r ()
   vector<unsigned int> lk(mC);
   lk.pop_back();
   lk.insert(lk.begin(),0);
-  transform(mC.begin(),mC.end(),lk.begin(),lk.begin(),minus<double>()); // FIXME
+  transform(mC.begin(),mC.end(),lk.begin(),lk.begin(),minus<unsigned int>());
 
   // Place counts on mRead of gslrngRead.
   vector<unsigned int> reads(mL,0);
@@ -7956,14 +8027,15 @@ class Summarizer {
 private:
   vector<unsigned int> mTxb;
   vector<unsigned int> mBestTxb;
+  bool mIsSuccess;
 private:
   Summarizer();
   double EfInitialize();
   double boltzmann(double E, double new_E, double T);
   double Ef(double);
   void takeStep();
-  int fillStepIndex ();
-  int fillTxbs ();
+  bool fillStepIndex ();
+  bool fillTxbs ();
 public:
   Fixed* mFixed;
   vector<Reads*> mReads;
@@ -7986,6 +8058,8 @@ public:
   void execute ();
   void findMeanBoundaries ();
   void listLoglikelihood ();
+  void reportSitewiseFrequencyBoundaries ();
+  void reportSitewiseExpression ();
   void computeFrequencyBoundaries ();
   friend ostream& operator<< (ostream &out, const Summarizer &t);
 };
@@ -8019,16 +8093,136 @@ Summarizer::Summarizer (Fixed* m, const vector<Reads*>& shortRead)
   : mFixed(m), mReads(shortRead)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
-  fillStepIndex ();
-  fillTxbs ();
+  mIsSuccess = fillStepIndex ();
+  mIsSuccess = fillTxbs ();
 }
 void
 Summarizer::execute ()
 {
-  // Find the mean boundaries.
-  listLoglikelihood ();
-//  computeFrequencyBoundaries ();
-//  findMeanBoundaries ();
+  if (mIsSuccess == true)
+    {
+      // Find the mean boundaries.
+      // listLoglikelihood ();
+      reportSitewiseFrequencyBoundaries ();
+      reportSitewiseExpression ();
+      // computeFrequencyBoundaries ();
+      // findMeanBoundaries ();
+    }
+  return;
+}
+void
+Summarizer::reportSitewiseFrequencyBoundaries ()
+{ 
+  string cfn;
+  vector<unsigned int> v(mFixed->L(),0);
+  for (unsigned int i = 0; i < mFixed->numberProcess (); i++)
+    {
+      unsigned int c;
+      cfn = mFixed->prefixFilename (i) + "sfb";
+      ifstream fin(cfn.c_str());
+      if (fin.is_open() == false)
+        {
+          cerr << "Error: Could not open file ``" 
+               << cfn
+               << "'' for summary!" << endl;
+          return;
+        }
+      for (vector<unsigned int>::iterator j = v.begin(); j != v.end(); j++) 
+        {
+          fin >> c;
+          if (fin.good())
+            {
+              *j += c;
+            }
+          else
+            {
+              cerr << "Error: Could not read " << mFixed->L()
+                   << "numbers from ``" << cfn << ".''" << endl;
+              fin.close();
+              return; 
+            }
+        }
+      fin.close();
+    }
+
+  // Prints out the summed values. 
+  cfn = mFixed->prefixFilename () + "sfb";
+  ofstream fout(cfn.c_str());
+  if (fout.is_open() == false)
+    {
+      cerr << "Error: Could not open file ``" 
+           << cfn
+           << "'' for summary!" << endl;
+      return;
+    }
+  double d;
+  unsigned int l = mFixed->mcmcLength ();
+  fout << setprecision(5);
+  fout << "fixedStep chrom=chr1 start=1 step=1" << endl;
+  for (vector<unsigned int>::iterator j = v.begin(); j != v.end(); j++) 
+    {
+      d = static_cast<double>(*j)/static_cast<double>(l);
+      fout << d << endl; 
+    }
+  fout.close();
+  return;
+}
+
+void
+Summarizer::reportSitewiseExpression ()
+{ 
+  string cfn;
+  vector<double> v(mFixed->L(),.0);
+  for (unsigned int i = 0; i < mFixed->numberProcess (); i++)
+    {
+      double c;
+      cfn = mFixed->prefixFilename (i) + "swe";
+      ifstream fin(cfn.c_str());
+      if (fin.is_open() == false)
+        {
+          cerr << "Error: Could not open file ``" 
+               << cfn
+               << "'' for summary!" << endl;
+          return;
+        }
+      for (vector<double>::iterator j = v.begin(); j != v.end(); j++) 
+        {
+          fin >> c;
+          if (fin.good())
+            {
+              *j += c;
+            }
+          else
+            {
+              cerr << "Error: Could not read " << mFixed->L()
+                   << "numbers from ``" << cfn << ".''" << endl;
+              fin.close();
+              return; 
+            }
+        }
+      fin.close();
+    }
+
+  // Prints out the summed values. 
+  cfn = mFixed->prefixFilename () + "swe";
+  ofstream fout(cfn.c_str());
+  if (fout.is_open() == false)
+    {
+      cerr << "Error: Could not open file ``" 
+           << cfn
+           << "'' for summary!" << endl;
+      return;
+    }
+  double d;
+  unsigned int l = mFixed->mcmcLength ();
+  fout << setprecision(5);
+  fout << "fixedStep chrom=chr1 start=1 step=1" << endl;
+  for (vector<double>::iterator j = v.begin(); j != v.end(); j++) 
+    {
+      d = *j / static_cast<double>(l);
+      fout << d << endl; 
+    }
+  fout.close();
   return;
 }
 void 
@@ -8089,7 +8283,7 @@ Summarizer::listLoglikelihood ()
   fout.close();
   return; 
 }
-int
+bool
 Summarizer::fillStepIndex ()
 {
   mStepIndex.clear();
@@ -8113,7 +8307,9 @@ Summarizer::fillStepIndex ()
     }
   else
     {
-      return 1;
+      cerr << "Error: Check if the file ``" << cfn 
+           << "'' exists." << endl;
+      return false;
     }
 
   unsigned int k = 0;
@@ -8123,12 +8319,13 @@ Summarizer::fillStepIndex ()
     {
       it->second = k++;
     }
-  return 0;
+  return true;
 }
 
-int
+bool
 Summarizer::fillTxbs ()
 {
+  if (mIsSuccess == false) return false;
   // Now, we have stepIndex ready.
   unsigned int numberSample = mStepIndex.size();
   mTxbs.resize(numberSample);
@@ -8167,7 +8364,7 @@ Summarizer::fillTxbs ()
         }
       fin.close();
     }
-  return 0;
+  return true;
 }
 void 
 Summarizer::computeFrequencyBoundaries ()
@@ -12051,6 +12248,48 @@ main (int argc, char *argv[])
   return 0;
 }
 @
+
 \subsection{MPI}
+
+\begin{Verbatim}[frame=lines,framesep=5mm]
+bash plotTemperature.sh s1.out.mc3; open 1.pdf
+\end{Verbatim}
+
+<<runtux>>=
+#!/bin/bash
+nsub tuxbatch.sh
+<<tuxbatch.sh>>=
+#!/bin/sh
+#PBS -A acs4_0001
+#PBS -l walltime=15:00,nodes=2
+#PBS -N tux
+#PBS -j oe
+#PBS -q v4
+
+# Change to the working directory.
+cd $PBS_O_WORKDIR
+# Count the number of processes.
+CPUPERNODE=`grep processor /proc/cpuinfo|wc -l`
+NODECNT=$(wc -l < $PBS_NODEFILE)
+PROCESSCNT=$((CPUPERNODE * NODECNT))
+# Boot mpi on the nodes
+PATH=/usr/bin:/bin:/opt/intel/impi/3.1/bin64/ mpdboot -n $NODECNT --verbose -r /usr/bin/ssh -f $PBS_NODEFILE
+# Now execute PROCESSCNT process on the nodes.
+mpiexec -ppn $CPUPERNODE -np $PROCESSCNT $PBS_O_WORKDIR/tux \
+  mcmc -i in.tux
+# Exit the MPI.
+mpdallexit
+<<plotTemperature.sh>>=
+#!/bin/bash
+echo bash plotTemperature.sh [prefix.mc3]
+head -n 1 $1 > 1
+Rscript plotTemperature.R
+<<plotTemperature.R>>=
+x <- scan("1")
+pdf("1.pdf")
+plot(seq(length(x)),x)
+dev.off()
+@
+
 
 \end{document}
