@@ -463,10 +463,14 @@ Members of \Cclass{Reads}
 \item   friend YAML::Emitter operator (YAML::Emitter out, const Reads tx);
 \item   istream\& operator$\gg$ (istream \&fin, Reads \&t); reads a replicate of short reads counts.
 \item   ostream\& operator$\ll$ (ostream \&out, const Reads \&t); prints out counts separated by a space.
+\item   void cut (const unsigned int b, const unsigned int e); deletes regions outside of the specified regions between $b$ and $e$.
 \end{itemize*}
 
 \subsection{Fixed}
 The \Cclass{Fixed} is for the global program setup variable. The value of \Cmember{mL} is set to the number of sites in a chromosome. We use the short reads data to set the value of it. The options of the \program{tux} are configured using an input file, command line options, or command line options in the interactive mode. If options values are specified by neither the input file nor command line options, we use values in \Cclass{Default}. We illustrate the usage of \program{tux} using those default values. The command line options in the interactive mode override any values in \Cclass{Fixed}. In the batch mode, command line options override any values set by an input file. Some values are derived from values given by users. This includes temperature, random number seeds for MPI processes, and number of chains per process. 
+
+The user can specify the start and end positions of a chromosome using \Cmember{mPosition}. The default of the variable is from 1 to the end of the chromosome. In the source code, we set the default of the start to 0. The first set of the variable happens when reading the tux input file. This value can be overrided by command line options.
+
 
 Members of \Cclass{Fixed}
 \begin{itemize*}
@@ -507,6 +511,7 @@ Dirichlet prior, we would set 0.01 to $\alpha_k$.
 \item   vector<unsigned long int> mProcessSeed; a list of random seeds for MPI version of tux.
 \item   vector<unsigned int> mNumberChainPerProcess; e.g., c(3,3,2)  
 \item   vector<unsigned int> mAccumulateNumberChain; e.g., c(0,3,6,8)
+\item   pair<unsigned int,unsigned int> mPosition; the start and end positions of the chromosome to analyaze.
 \item public: Methods
 \item   Fixed (); default setup, when the user does not provide tux with values
 in the input yaml file, it uses the initialized values in this constructor.
@@ -1414,6 +1419,7 @@ set (tux-sum_SRCS
 )
 set (tux_SRCS 
   "tux.cpp"
+  "tuxProgress.cpp"
   "tuxSummary.cpp"
   "tuxSummarizer.cpp"
   "tuxMcmcSingle.cpp"
@@ -1444,6 +1450,7 @@ set (tux_SRCS
 )
 set (tuxmpi_SRCS 
   "tux.cpp"
+  "tuxProgress.cpp"
   "tuxSummary.cpp"
   "tuxSummarizer.cpp"
   "tuxMcmcMpi.cpp"
@@ -1903,6 +1910,7 @@ namespace tux {
 #include <mpi.h>
 #endif // _MPI
 #include <cstdlib>               // strtoul
+#include <utility>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -1922,6 +1930,7 @@ namespace tux {
 #include "tuxDefault.h"
 #include "tuxError.h"
 #include "tuxSignal.h"
+#include "tuxString.h"
 #include "tuxManager.h"
 <<xmalloc decl>>
 <<xmalloc defn>>
@@ -2012,7 +2021,6 @@ main (int argc, char* argv[])
   //////////////////////////////////////////////////////////////////////////////
   // Interactive Mode
   //////////////////////////////////////////////////////////////////////////////
-                
   if (argc == 1 || sCommand == OPT_INTERACTIVE)
     {
       char *line, *s;
@@ -2089,11 +2097,41 @@ main (int argc, char* argv[])
   bool isArgumentProcessedSuccessfully = true;
   while (args.Next()) 
     {
+      string strArg;
       if (args.LastError() == SO_SUCCESS) 
         {
-          if (args.OptionId() == OPT_WITHOUT_DATA) 
+          if (args.OptionId() == OPT_POSITION) 
+            {
+              strArg = args.OptionArg();
+              vector <string> fields;
+              split (fields, strArg, "-" );
+              if (fields.size() == 2)
+                {
+                  gFixed.mPosition.first = strtoul(fields.front().c_str(),NULL,0);
+                  gFixed.mPosition.second = strtoul(fields.back().c_str(),NULL,0);
+                }
+              else
+                {
+                  isArgumentProcessedSuccessfully = false;
+                }
+              if (!(gFixed.mPosition.first < gFixed.mPosition.second))
+                isArgumentProcessedSuccessfully = false;
+            }
+          else if (args.OptionId() == OPT_WITH_SITEWISEEXPRESSION) 
+            gFixed.mSitewiseExpression = true;
+          else if (args.OptionId() == OPT_WITH_SITEWISEBOUNDARIES) 
+            gFixed.mSitewiseBoundaries = true;
+          else if (args.OptionId() == OPT_WITH_LISTLIKELIHOOD) 
+            gFixed.mListlikelihood = true;
+          else if (args.OptionId() == OPT_WITHOUT_SITEWISEEXPRESSION) 
+            gFixed.mSitewiseExpression = false;
+          else if (args.OptionId() == OPT_WITHOUT_SITEWISEBOUNDARIES) 
+            gFixed.mSitewiseBoundaries = false;
+          else if (args.OptionId() == OPT_WITHOUT_LISTLIKELIHOOD) 
+            gFixed.mListlikelihood = false;
+          else if (args.OptionId() == OPT_WITHOUT_DATA) 
             gFixed.mIsData = false;
-          if (args.OptionId() == OPT_WITH_DATA) 
+          else if (args.OptionId() == OPT_WITH_DATA) 
             gFixed.mIsData = true;
           else if (args.OptionId() == OPT_DATAFILE) 
             gFixed.mDatafile = args.OptionArg();
@@ -2139,6 +2177,8 @@ main (int argc, char* argv[])
             {
               gFixed.mLengthSampleSegmentB = strtoul(args.OptionArg(),NULL,0);
             }
+          else if (args.OptionId() == OPT_NUMBER_BOUNDARIES) 
+            gFixed.mK = strtoul(args.OptionArg(),NULL,0);
         }
     }
   gFixed.mSeed = fGslRngSeed (gFixed.mSeed);
@@ -2153,7 +2193,7 @@ main (int argc, char* argv[])
     { 
       ss << gFixed; 
       strLog = ss.str();
-      EZLOGGERVLSTREAM2(axter::log_always,lf) << strLog; 
+      EZLOGGERVLSTREAM2(axter::log_always,lf) << strLog << endl; 
     }
   axter::ezlogger<>::set_verbosity_level_tolerance(
     static_cast<axter::verbosity>(gFixed.mLogVerbosity)
@@ -2182,6 +2222,7 @@ main (int argc, char* argv[])
               gShortRead.push_back(r);
             }
         }
+
       fin.close();
       unsigned int numberSite = r->size ();
       for (vector<Reads*>::iterator it = gShortRead.begin(); 
@@ -2216,6 +2257,19 @@ main (int argc, char* argv[])
         }
       geometricMean /= static_cast<double>(gShortRead.size());
       gFixed.mM = exp(geometricMean);
+
+      // Change the size of the data.
+      if (gFixed.mPosition.first == 0)
+        {
+          gFixed.mPosition.first = 1;
+          gFixed.mPosition.second = gFixed.mL;
+        }
+      for (vector<Reads*>::iterator it = gShortRead.begin(); 
+           it != gShortRead.end(); 
+           it++)
+        {
+          (*it)->cut (gFixed.mPosition.first,gFixed.mPosition.second);
+        }
     }
   else
     {
@@ -2363,6 +2417,14 @@ enum {
     OPT_SIZEFACTOR,
     OPT_LENGTHSAMPLESEGMENTA,
     OPT_LENGTHSAMPLESEGMENTB,
+    OPT_WITH_SITEWISEEXPRESSION,
+    OPT_WITH_SITEWISEBOUNDARIES,
+    OPT_WITH_LISTLIKELIHOOD,
+    OPT_WITHOUT_SITEWISEEXPRESSION,
+    OPT_WITHOUT_SITEWISEBOUNDARIES,
+    OPT_WITHOUT_LISTLIKELIHOOD,
+    OPT_POSITION,
+    OPT_NUMBER_BOUNDARIES,
 
     OPT_CHAIN,
     OPT_LIKELIHOOD,
@@ -2413,6 +2475,14 @@ CSimpleOpt::SOption g_rgOptions[] = {
     { OPT_SIZEFACTOR,"--sizefactor", SO_MULTI },
     { OPT_LENGTHSAMPLESEGMENTA,"--lengthsamplesegmenta", SO_REQ_SEP },
     { OPT_LENGTHSAMPLESEGMENTB,"--lengthsamplesegmentb", SO_REQ_SEP },
+    { OPT_WITH_SITEWISEEXPRESSION, "--without-sitewiseexpression", SO_NONE },
+    { OPT_WITH_SITEWISEBOUNDARIES, "--without-sitewiseboundaries", SO_NONE },
+    { OPT_WITH_LISTLIKELIHOOD, "--without-listlikelihood", SO_NONE },
+    { OPT_WITHOUT_SITEWISEEXPRESSION, "--with-sitewiseexpression", SO_NONE },
+    { OPT_WITHOUT_SITEWISEBOUNDARIES, "--with-sitewiseboundaries", SO_NONE },
+    { OPT_WITHOUT_LISTLIKELIHOOD, "--with-listlikelihood", SO_NONE },
+    { OPT_POSITION, "--position", SO_REQ_SEP },
+    { OPT_NUMBER_BOUNDARIES, "--number-boundaries", SO_REQ_SEP },
 
     // Other used commands
     { OPT_CHAIN, "chain", SO_NONE },
@@ -3176,6 +3246,46 @@ valid_argument (char *caller, char *arg)
 
 @
 
+\subsection{String}
+See the web site at http://www.cplusplus.com/faq/sequences/strings/split.
+<<tuxString.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXSTRING_H_
+#define _TUXSTRING_H_
+#include <cstddef>
+namespace tux {
+enum empties_t { empties_ok, no_empties };
+template <typename Container>
+Container& split(
+  Container&                            result,
+  const typename Container::value_type& s,
+  const typename Container::value_type& delimiters,
+  empties_t                      empties = empties_ok )
+{
+  result.clear();
+  size_t current;
+  size_t next = -1;
+  do
+  {
+    if (empties == no_empties)
+    {
+      next = s.find_first_not_of( delimiters, next + 1 );
+      if (next == Container::value_type::npos) break;
+      next -= 1;
+    }
+    current = next + 1;
+    next = s.find_first_of( delimiters, current );
+    result.push_back( s.substr( current, next - current ) );
+  }
+  while (next != Container::value_type::npos);
+  return result;
+}
+}
+#endif // _TUXSTRING_H_
+<<tuxString.cpp>>=
+<<tux gnu copyright>>
+@
+
 \subsection{Help}
 <<tuxHelp.h>>=
 <<tux gnu copyright>>
@@ -3253,6 +3363,9 @@ Help::full ()
 << Default::mSeed << ").\n" << 
 "      --sizefactor [K] [N_1] [N_2] ... [N_K]\n"
 "         Sets the size factors. Put this option at the end of the command line.\n"
+"      --number-boundaries [NUMBER]\n"
+"         Sets the number of boundaries ("
+<< Default::mK << ").\n" <<
 "      --lengthsamplesegmenta [NUMBER]\n"
 "         Sets the number of boundaries on either side. (Recommended value is <10)\n"
 "         Sets the start of the range of sampling segments ("
@@ -3287,10 +3400,26 @@ Help::full ()
 "      --hbeta [NUMBER]\n"
 "         Sets the beta for Metropolis-Coupled MCMC ("
 << Default::mHBeta << ").\n" <<
+"      --position [NUMBER-NUMBER]\n"
+"         Sets the two positions (1-END)\n" 
 "      --logverbosity [NUMBER]\n"
 "         Sets the verbosity level from 1 (lowest) to 5 (highest) (" 
 << Default::mLogVerbosity << ")\n"
 <<
+"\n"
+"   Summarize options:\n"
+"      --without-sitewiseexpression\n"
+"         Do not summarize sitewise expression.\n"
+"      --with-sitewiseexpression\n"
+"         Summarizes sitewise expression [Default].\n"
+"      --without-sitewiseboundaries\n"
+"         Do not summarize sitewise boundaries.\n"
+"      --with-sitewiseboundaries\n"
+"         Summarizes sitewise boundaries [Default].\n"
+"      --without-listlikelihood\n"
+"         Do not list likelihoods.\n"
+"      --with-listlikelihood\n"
+"         List likelihoods [Default].\n"
 "\n"
 "   Commands:\n"
 "      interactive\n"
@@ -3837,13 +3966,15 @@ __END_DECLS
 <<tux gnu copyright>>
 #ifndef _TUXMANAGER_H_
 #define _TUXMANAGER_H_
+#include <sstream>
 #include <vector>
 #include <ctime>
 using namespace std;
 namespace tux {
 class Manager {
 private:
-  void printRemainingTime (unsigned int, unsigned int, unsigned int);
+  void printRemainingTime (stringstream& ss, 
+                           unsigned int, unsigned int, unsigned int);
 public:
   Fixed* mFixed;
   vector<Reads*> mReads;
@@ -3864,6 +3995,8 @@ public:
 
 <<tuxManager.cpp>>=
 <<tux gnu copyright>>
+#include <sstream>
+#include <string>
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
@@ -3902,17 +4035,18 @@ void
 Manager::mcmc(int r)
 {
   EZDBGONLYLOGGERVLFUNCTRACKER(axter::log_rarely);
+  stringstream ss;
+  string strLog;
+
   string cfn = mFixed->chainFilename (r);
   ofstream fout(cfn.c_str());
   if (fout.is_open() == false)
     {
-      stringstream ss;
-      string strLog;
       ss << "Error: Could not open file ``" 
          << cfn
-         << "'' for MCMC output!" << endl;
+         << "'' for MCMC output!";
       strLog = ss.str(); 
-      EZLOGGERSTREAM << strLog;
+      EZLOGGERSTREAM << strLog << endl;
       return;
     }
 #ifdef _MPI
@@ -3921,28 +4055,48 @@ Manager::mcmc(int r)
   McmcSingle mMcmc (mFixed,mReads);
 #endif // _MPI
   unsigned int s = 0;
-  unsigned int sThin = 0;
+  unsigned int sThin = mFixed->mMcmcThin;
+  unsigned int sSwap = 0;
+  unsigned int sTime = 0;
   time(&mPrevTime);
-  while (s < mFixed->mMcmcLength) 
+  while (s <= mFixed->mMcmcLength) 
     {
       // Total steps, Current steps, Steps taken, Times taken
-      cerr << "Step: " << setw(10) << s << " - ";
-      printRemainingTime (mFixed->mMcmcLength, s, mFixed->mNumberSwap);
+      if (r == 0)
+        {
+          if (!(sTime < mFixed->mMcmcThin))
+            {
+              ss.str(string());
+              ss << "Step: " << setw(10) << s << " - ";
+              printRemainingTime (ss, mFixed->mMcmcLength, 
+                                  s, mFixed->mMcmcThin);
+              strLog = ss.str(); 
+              EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
+              sTime = 0;
+            }
+          sTime++;
+        }
 
-      mMcmc.step (mFixed->mNumberSwap, s);
-      s += mFixed->mNumberSwap; sThin += mFixed->mNumberSwap;
       if (mFixed->mNumberChain > 1)
         {
-          mMcmc.swap ();
-        }
-      if (mFixed->mMcmcBurnin < s)
-        {
-          if (mFixed->mMcmcThin < sThin)
+          if (!(sSwap < mFixed->mNumberSwap))
             {
-              sThin -= mFixed->mMcmcThin;
-              fout << mMcmc;
+              mMcmc.swap ();
+              sSwap = 0;
             }
+          sSwap++;
         }
+      if (mFixed->mMcmcBurnin <= s)
+        {
+          if (!(sThin < mFixed->mMcmcThin))
+            {
+              fout << mMcmc;
+              sThin = 0;
+            }
+          sThin++;
+        }
+      mMcmc.step (1U, s);
+      s++;
     }
   fout.close();
 
@@ -3953,13 +4107,11 @@ Manager::mcmc(int r)
       fout.open(cfn.c_str());
       if (fout.is_open() == false)
         {
-          stringstream ss;
-          string strLog;
           ss << "Error: Could not open file ``" 
              << cfn
-             << "'' for MCMC output!" << endl;
+             << "'' for MCMC output!";
           strLog = ss.str(); 
-          EZLOGGERSTREAM << strLog;
+          EZLOGGERSTREAM << strLog << endl;
           return;
         }
       mFixed->reportTemperature (fout);
@@ -3972,13 +4124,11 @@ Manager::mcmc(int r)
   fout.open(cfn.c_str());
   if (fout.is_open() == false)
     {
-      stringstream ss;
-      string strLog;
       ss << "Error: Could not open file ``" 
          << cfn
-         << "'' for MCMC output!" << endl;
+         << "'' for MCMC output!"; 
       strLog = ss.str(); 
-      EZLOGGERSTREAM << strLog;
+      EZLOGGERSTREAM << strLog << endl;
       return;
     }
   mMcmc.report (fout);
@@ -3989,13 +4139,11 @@ Manager::mcmc(int r)
   fout.open(cfn.c_str());
   if (fout.is_open() == false)
     {
-      stringstream ss;
-      string strLog;
       ss << "Error: Could not open file ``" 
          << cfn
-         << "'' for MCMC output!" << endl;
+         << "'' for MCMC output!"; 
       strLog = ss.str(); 
-      EZLOGGERSTREAM << strLog;
+      EZLOGGERSTREAM << strLog << endl;
       return;
     }
   mMcmc.reportSitewiseFrequencyBoundaries (fout);
@@ -4006,13 +4154,11 @@ Manager::mcmc(int r)
   fout.open(cfn.c_str());
   if (fout.is_open() == false)
     {
-      stringstream ss;
-      string strLog;
       ss << "Error: Could not open file ``" 
          << cfn
-         << "'' for MCMC output!" << endl;
+         << "'' for MCMC output!"; 
       strLog = ss.str(); 
-      EZLOGGERSTREAM << strLog;
+      EZLOGGERSTREAM << strLog << endl;
       return;
     }
   mMcmc.reportSitewiseExpression (fout);
@@ -4021,7 +4167,8 @@ Manager::mcmc(int r)
   return;
 }
 void 
-Manager::printRemainingTime (unsigned int total, 
+Manager::printRemainingTime (stringstream& ss,
+                             unsigned int total, 
                              unsigned int step, 
                              unsigned int taken)
 {
@@ -4031,9 +4178,9 @@ Manager::printRemainingTime (unsigned int total,
   double d = difftime(c,mPrevTime) * static_cast<double>(remainingStep);
 
   char prev = cout.fill('-'); 
-  cerr << static_cast<int>(floor(d/3600.0)) << ":" 
-       << setw(2) << static_cast<int>(floor(fmod(d,3600.0)/60.0)) << ":"
-       << setw(2) << static_cast<int>(fmod(d,60.0)) << "\r";
+  ss << static_cast<int>(floor(d/3600.0)) << ":" 
+     << setw(2) << static_cast<int>(floor(fmod(d,3600.0)/60.0)) << ":"
+     << setw(2) << static_cast<int>(fmod(d,60.0));
   cout.fill(prev);
   mPrevTime = c;
 }
@@ -4181,24 +4328,24 @@ Mcmc::Mcmc (Fixed* m, const vector<Reads*>& shortRead, unsigned int rank)
     {
       ss << " " << mFixed->mNumberChainPerProcess.at(i);
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog << endl;
   ss.str(string());
   ss << "mAccumulateNumberChain -";
   for (unsigned int i = 0; i < mFixed->mAccumulateNumberChain.size(); i++)
     {
       ss << " " << mFixed->mAccumulateNumberChain.at(i);
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog << endl;
   ss.str(string());
   ss << "mChainid -";
   for (unsigned int i = 0; i < mChainid.size(); i++)
     {
       ss << " " << mChainid.at(i);
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -4208,9 +4355,9 @@ Mcmc::step (unsigned int n, unsigned int s)
 {
 #ifdef _DEBUG
   stringstream ss;
-  ss << "Mover::step " << n << endl;
+  ss << "Mover::step " << n;
   string strLog(ss.str());
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 #endif // _DEBUG
   mChainManager.step (n, s);
   return 0;
@@ -4249,8 +4396,8 @@ Mcmc::swapChains ()
     {
       ss << " " << chainIndex.at(i);
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -4316,8 +4463,8 @@ Mcmc::swapChains ()
     {
       ss << " " << chainIndex.at(i);
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_regularly) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -4382,12 +4529,12 @@ Mcmc::reportMC3 (ostream &out)
                       / static_cast<double>(mSwapTryCount[i][j])
                       * 100.0;
                 }
-              out << setw(5) << v;
+              out << setw(5) << setprecision(1) << v;
             }
           out << endl;
         }
 
-      out << setw(5) << "";
+      out << setw(6) << "";
       for (unsigned int i = 0; i < n - 1; i++)
         {
           ss.str(string());
@@ -4812,9 +4959,9 @@ ChainManager::step (unsigned int n, unsigned int s)
 {
 #ifdef _DEBUG
   stringstream ss;
-  ss << "ChainManager::step " << n << endl;
+  ss << "ChainManager::step " << n; 
   string strLog(ss.str());
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 #endif // _DEBUG
   for (vector<Chain*>::iterator i = mChain.begin(); i != mChain.end(); i++)
     {
@@ -4895,7 +5042,7 @@ void
 ChainManager::reportSitewiseFrequencyBoundaries (ostream& out)
 {
   out << mSitewiseFrequencyBoundaries.front();
-  for (unsigned int i = 0; i < mFixed->L(); i++)
+  for (unsigned int i = 1; i < mFixed->L(); i++)
     {
       out << " " << mSitewiseFrequencyBoundaries.at(i);
     }
@@ -4907,7 +5054,7 @@ ChainManager::reportSitewiseExpression (ostream& out)
 {
   out << setprecision(7);
   out << mSitewiseExpression.front();
-  for (unsigned int i = 0; i < mFixed->L(); i++)
+  for (unsigned int i = 1; i < mFixed->L(); i++)
     {
       out << " " << mSitewiseExpression.at(i);
     }
@@ -5446,6 +5593,7 @@ public:
   friend ostream& operator<< (ostream &out, const Reads &t);
   friend istream& operator>> (istream &in, Reads &t);
   void summary (ostream &out);
+  void cut (const unsigned int b, const unsigned int e);
 
   struct c_uniformInt {
     unsigned int l;
@@ -5572,11 +5720,25 @@ istream& operator>> (istream &fin, Reads &t)
 
   stringstream ss; 
   ss << "Total number of reads is " << t.mN 
-     << " from " << t.mCount.size() << " sites." << endl;
+     << " from " << t.mCount.size() << " sites.";
   string strLog(ss.str());
-  EZLOGGERSTREAM2(lf) << strLog; 
+  EZLOGGERSTREAM2(lf) << strLog << endl; 
   return fin;
 }
+void 
+Reads::cut (const unsigned int b, const unsigned int e)
+{
+  assert (b < e);
+  if (e - b + 1 < mCount.size())
+    {
+      vector<unsigned int> c(mCount.begin() + b - 1,mCount.begin() + e);
+      mCount = c;
+      assert(mCount.size() == e - b + 1);
+      mN = accumulate(mCount.begin(),mCount.end(),0);
+    }
+  return;
+}
+
 //YAML::Emitter& 
 //operator<< (YAML::Emitter &out, const Reads &t)
 //{
@@ -5605,11 +5767,16 @@ Reads::summary (ostream &out)
 \subsection{Fixed}
 We use the following order of option setup: \Cclass{Default}, \Cclass{Fixed},
 and the command line options in the \program{tux}.
+
+f1 <- function(i,n,x,y) { 1 - (1-y)*i*(x^(n-1-i))/(n-1) }
+v <- c(); for (i in 1:n) { v <- c(v,f1(i,n,0.95,0.3)) }; plot(1:n,v)
+
 <<tuxFixed.h>>=
 <<tux gnu copyright>>
 #ifndef _TUXFIXED_H_
 #define _TUXFIXED_H_
 #include <iostream>
+#include <utility>
 #include <cmath>
 #include <string>
 #include <vector>
@@ -5656,6 +5823,10 @@ public:
   string mLogfile;
   string mDatafile;
   bool mIsData;
+  bool mSitewiseExpression;
+  bool mSitewiseBoundaries; 
+  bool mListlikelihood;
+  pair<unsigned int,unsigned int> mPosition;
 public:
   vector<double> mTemperature;
   vector<unsigned long int> mProcessSeed;
@@ -5667,7 +5838,7 @@ public:
   void init ();
   bool check ();
   unsigned int K () {return mK;}
-  unsigned int L () {return mL;}
+  unsigned int L () {return (mPosition.second - mPosition.first + 1);}
   unsigned int numberProcess () {return mNumberProcess;}
   unsigned int mcmcLength () {return mMcmcLength;}
   friend YAML::Emitter& operator<< (YAML::Emitter &out, const Fixed &t);
@@ -5733,6 +5904,7 @@ public:
 
 <<tuxFixed.cpp>>=
 <<tux gnu copyright>>
+#include <cstdlib>
 #include <iomanip>
 #include <cassert>
 #include <sstream>
@@ -5741,6 +5913,7 @@ public:
 #include <algorithm>       // generate
 #include "yaml-cpp/yaml.h"
 #include "ezlogger_headers.hpp"
+#include "tuxString.h"
 #include "tuxDefault.h"
 #include "tuxFixed.h"
 <<extern tuxlf>>
@@ -5805,6 +5978,11 @@ Fixed::init ()
   //mLogfile              = Default::mLogfile;
   mDatafile             = Default::mDatafile;
   mIsData               = Default::mIsData;
+  mSitewiseExpression   = Default::mSitewiseExpression;
+  mSitewiseBoundaries   = Default::mSitewiseBoundaries;
+  mListlikelihood       = Default::mListlikelihood;
+  mPosition.first       = Default::mPosition;
+  mPosition.second      = Default::mL;
   return;
 }
 bool 
@@ -5921,17 +6099,35 @@ operator<< (ostream &out, const Fixed &t)
       << "  " << "mLogDirectory"
       << ": " << t.mLogDirectory << endl
       << "  " << "mDatafile"
-      << ": " << t.mDatafile << endl;
+      << ": " << t.mDatafile << endl
+      << "  " << "mPosition"
+      << ": " << t.mPosition.first << "-" << t.mPosition.second << endl;
   if (t.mIsData == true) 
     out << "  mIsData: true" << endl;
   else
     out << "  mIsData: false" << endl;
+  if (t.mSitewiseExpression == true) 
+    out << "  mSitewiseExpression: true" << endl;
+  else
+    out << "  mSitewiseExpression: false" << endl;
+  if (t.mSitewiseBoundaries == true) 
+    out << "  mSitewiseBoundaries: true" << endl;
+  else
+    out << "  mSitewiseBoundaries: false" << endl;
+  if (t.mListlikelihood == true) 
+    out << "  mListlikelihood: true" << endl;
+  else
+    out << "  mListlikelihood: false" << endl;
   out << "---" << endl;
   return out;
 }
 YAML::Emitter& 
 operator<< (YAML::Emitter &out, const Fixed &t)
 {
+  stringstream ss;
+  ss << t.mPosition.first << "-" << t.mPosition.second;
+  string strPosition(ss.str());
+  
   out << YAML::BeginMap << YAML::Key << "Fixed" << YAML::Value;
   out << YAML::BeginMap
       << YAML::Key << "mMoverTxBSingleWeight"
@@ -5998,6 +6194,14 @@ operator<< (YAML::Emitter &out, const Fixed &t)
       << YAML::Value << t.mDatafile
       << YAML::Key << "mIsData"
       << YAML::Value << t.mIsData
+      << YAML::Key << "mSitewiseExpression"
+      << YAML::Value << t.mSitewiseExpression
+      << YAML::Key << "mSitewiseBoundaries"
+      << YAML::Value << t.mSitewiseBoundaries
+      << YAML::Key << "mListlikelihood"
+      << YAML::Value << t.mListlikelihood
+      << YAML::Key << "mPosition"
+      << YAML::Value << strPosition
       << YAML::EndMap;
   out << YAML::EndMap;
   return out;
@@ -6005,6 +6209,7 @@ operator<< (YAML::Emitter &out, const Fixed &t)
 void 
 operator>> (const YAML::Node& node, Fixed& t) 
 {
+  string strPosition;
   // See yaml-cpp/include/yaml-cpp/exceptions.h
   // for exception handlers
   try 
@@ -6055,7 +6260,15 @@ operator>> (const YAML::Node& node, Fixed& t)
     {
       t.mL = Default::mL;
     }
-  node["mK"] >> t.mK;
+  try 
+    {
+      node["mK"] >> t.mK;
+    } 
+  catch(YAML::KeyNotFound& e) 
+    {
+      t.mK = Default::mK;
+    }
+
   node["mM"] >> t.mM;
   node["mZ"] >> t.mZ;
   node["mA0"] >> t.mA0;
@@ -6087,6 +6300,51 @@ operator>> (const YAML::Node& node, Fixed& t)
   catch(YAML::KeyNotFound& e) 
     {
       t.mIsData = Default::mIsData;
+    }
+  try 
+    {
+      node["mSitewiseExpression"] >> t.mSitewiseExpression;
+    }
+  catch(YAML::KeyNotFound& e) 
+    {
+      t.mSitewiseExpression = Default::mSitewiseExpression;
+    }
+  try 
+    {
+      node["mSitewiseBoundaries"] >> t.mSitewiseBoundaries;
+    }
+  catch(YAML::KeyNotFound& e) 
+    {
+      t.mSitewiseBoundaries = Default::mSitewiseBoundaries;
+    }
+  try 
+    {
+      node["mListlikelihood"] >> t.mListlikelihood;
+    }
+  catch(YAML::KeyNotFound& e) 
+    {
+      t.mListlikelihood = Default::mListlikelihood;
+    }
+  try 
+    {
+      node["mPosition"] >> strPosition;
+      vector <string> fields;
+      split (fields, strPosition, "-" );
+      if (fields.size() == 2)
+        {
+          t.mPosition.first = strtoul(fields.front().c_str(),NULL,0);
+          t.mPosition.second = strtoul(fields.back().c_str(),NULL,0);
+        }
+      else
+        {
+          t.mPosition.first = Default::mPosition;
+          t.mPosition.second = t.mL;
+        }
+    }
+  catch(YAML::KeyNotFound& e) 
+    {
+      t.mPosition.first = Default::mPosition;
+      t.mPosition.second = t.mL;
     }
   return;
 }
@@ -6501,9 +6759,9 @@ Likelihood::d ()
 
 #ifdef _DEBUG
   stringstream ss;
-  ss << "Likelihood::d returns " << vTotal << endl;
+  ss << "Likelihood::d returns " << vTotal;
   string strLog(ss.str());
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 #endif // _DEBUG
 
   return vTotal;
@@ -6664,9 +6922,9 @@ TotalLikelihood::d ()
               ss.str(string()); 
               ss << "j k v mu xk p n " 
                  << j << " " << k << " " << v << " " << mu << " " 
-                 << xk << " " << p << " " << n << endl;
+                 << xk << " " << p << " " << n;
               strLog = ss.str(); 
-              EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+              EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -6781,9 +7039,9 @@ MoverManager::choose()
     k = 0;
 #ifdef _DEBUG
   stringstream ss;
-  ss << "MoverManager::choose " << k << endl;
+  ss << "MoverManager::choose " << k;
   string strLog(ss.str());
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 #endif // _DEBUG
   return mMover.at(k);
 }
@@ -7170,6 +7428,13 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
                            likelihoodExpression, 1e-6);
       if (diffV != 0)
         {
+          ss.str(string()); 
+          ss << "Error: currLoglikelihood " << currLoglikelihood
+             << " - "
+             << "prevLoglikelihood " << prevLoglikelihood
+             << " = likelihoodExpression " << likelihoodExpression;
+          strLog = ss.str(); 
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
           assert(0);
         }
 #endif // _DEBUG
@@ -7188,9 +7453,8 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
               unsigned int k = left + i;
               ss << " " << k << " (" << lk.at(i) << " - " << ck.at(i) << ")";
             }
-          ss << endl;
           strLog = ss.str(); 
-          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog;
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
           ss.str(string());
           ss << "    ";
           ss << "TxB(new) start at " << lkLeft.front() << " k (lk-ck)";
@@ -7199,9 +7463,8 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
               unsigned int k = left + i;
               ss << " " << k << " (" << lkA.at(i) << " - " << ckA.at(i) << ")";
             }
-          ss << endl;
           strLog = ss.str(); 
-          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog;
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
           assert (0);
         }
 ////////////////////////////////////////////////////////////////////////////////
@@ -7223,9 +7486,9 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
   else
     ss << " > ";
   ss << "Alpha: " << logAlpha << " = "
-     << likelihoodExpression << " + " << prExpression << " + " << mhExpression
-     << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+     << likelihoodExpression << " + " << prExpression << " + " << mhExpression;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string()); 
   ss << "    ";
@@ -7235,9 +7498,8 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
       unsigned int k = left + i;
       ss << " " << k << " (" << lk.at(i) << " - " << ck.at(i) << ")";
     }
-  ss << endl;
   strLog = ss.str(); 
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
   ss.str(string());
   ss << "    ";
   ss << "TxB(new) start at " << lkLeft.front() << " k (lk-ck)";
@@ -7246,29 +7508,29 @@ MoverTxBoundaries::step (unsigned int left, unsigned int right)
       unsigned int k = left + i;
       ss << " " << k << " (" << lkA.at(i) << " - " << ckA.at(i) << ")";
     }
-  ss << endl;
   strLog = ss.str(); 
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string());
   ss << "    ";
   ss << "TxB(b) ";
   for (unsigned int i = 0; i < a.size(); i++) ss << " " << b.at(i); 
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string());
   ss << "    ";
   ss << "TxB(a) ";
   for (unsigned int i = 0; i < a.size(); i++) ss << " " << a.at(i); 
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string()); 
   ss << "    ";
   ss << "TxB Acceptance: " << mAccepted << " / " << mTry << " = " 
-     <<  acceptanceRatio () << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+     <<  acceptanceRatio (); 
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -7375,9 +7637,9 @@ MoverTxBSingle::step (unsigned int pos)
   stringstream ss;
   string strLog;
   ss.str(string()); 
-  ss << "MoverTxBSingle::step (" << pos << ")" << endl;
+  ss << "MoverTxBSingle::step (" << pos << ")";
   strLog = ss.str(); 
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -7475,9 +7737,9 @@ MoverTxBSingle::step (unsigned int pos)
               ss.str(string()); 
               ss << "j k vA muA xkA pA nA " 
                  << j << " " << k << " " << vA << " " << muA << " " 
-                 << xkA << " " << pA << " " << nA << endl;
+                 << xkA << " " << pA << " " << nA;
               strLog = ss.str(); 
-              EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+              EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -7495,9 +7757,9 @@ MoverTxBSingle::step (unsigned int pos)
               ss.str(string()); 
               ss << "j k vB muB xkB pB nB " 
                  << j << " " << k << " " << vB << " " << muB << " " 
-                 << xkB << " " << pB << " " << nB << endl;
+                 << xkB << " " << pB << " " << nB; 
               strLog = ss.str(); 
-              EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+              EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -7541,13 +7803,13 @@ MoverTxBSingle::step (unsigned int pos)
       if (diffV != 0)
         {
           ss.str(string()); 
-          ss << "diffV currLoglikelihood - prevLoglikelihood likelihoodExpression," 
-             << diffV << " "
-             << currLoglikelihood << " - " 
-             << prevLoglikelihood << " " << likelihoodExpression << endl;
+          ss << "Error: currLoglikelihood " << currLoglikelihood
+             << " - "
+             << "prevLoglikelihood " << prevLoglikelihood
+             << " = likelihoodExpression " << likelihoodExpression;
           strLog = ss.str(); 
-          EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
-          //assert(0);
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
+          assert(0);
         }
 #endif // _DEBUG
 
@@ -7560,15 +7822,13 @@ MoverTxBSingle::step (unsigned int pos)
           ss.str(string()); 
           ss << "    ";
           ss << "TxB3(old) " << ck;
-          ss << endl;
           strLog = ss.str(); 
-          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog;
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
           ss.str(string());
           ss << "    ";
           ss << "TxB3(new) " << ckA; 
-          ss << endl;
           strLog = ss.str(); 
-          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog;
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
           assert (0);
         }
 ////////////////////////////////////////////////////////////////////////////////
@@ -7590,28 +7850,27 @@ MoverTxBSingle::step (unsigned int pos)
   else
     ss << " > ";
   ss << "Alpha: " << logAlpha << " = "
-     << likelihoodExpression << " + " << prExpression << " + " << mhExpression
-     << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+     << likelihoodExpression << " + " << prExpression << " + " << mhExpression;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string()); 
   ss << "    ";
   ss << "TxB3(old) " << ck;
-  ss << endl;
   strLog = ss.str(); 
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
   ss.str(string());
   ss << "    ";
   ss << "TxB3(new) " << ckA; 
-  ss << endl;
   strLog = ss.str(); 
-  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string()); 
   ss << "    ";
   ss << "TxB3 Acceptance: " << mAccepted << " / " << mTry << " = " 
-     <<  acceptanceRatio () << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+     <<  acceptanceRatio (); 
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -7895,6 +8154,13 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
                            likelihoodExpression, 1e-6);
       if (diffV != 0)
         {
+          ss.str(string()); 
+          ss << "Error: currLoglikelihood " << currLoglikelihood
+             << " - "
+             << "prevLoglikelihood " << prevLoglikelihood
+             << " = likelihoodExpression " << likelihoodExpression;
+          strLog = ss.str(); 
+          EZDBGONLYLOGGERVLSTREAM(axter::log_always) << strLog << endl;
           assert(0);
         }
 #endif // _DEBUG
@@ -7916,9 +8182,9 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
   else
     ss << " > ";
   ss << "Alpha: " << logAlpha << " = "
-     << likelihoodExpression << " + " << prExpression << " + " << mhExpression
-     << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+     << likelihoodExpression << " + " << prExpression << " + " << mhExpression;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string()); 
   ss << "    ";
@@ -7928,8 +8194,8 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
       unsigned int k = left + i;
       ss << " " << k << " (" << lk.at(i) << " - " << ck.at(i) << ")";
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
   ss.str(string()); 
   ss << "    ";
   ss << "TxE(old): k (dk)";
@@ -7938,8 +8204,8 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
       unsigned int k = left + i;
       ss << " " << k << " (" << dk.at(i) << ")";
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
   ss.str(string()); 
   ss << "    ";
   ss << "TxE(new): k (dk)";
@@ -7948,28 +8214,29 @@ MoverTxExpression::step (unsigned int left, unsigned int right)
       unsigned int k = left + i;
       ss << " " << k << " (" << dkA.at(i) << ")";
     }
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string());
   ss << "    ";
   ss << "TxE(b) ";
   for (unsigned int i = 0; i < a.size(); i++) ss << " " << b.at(i); 
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string());
   ss << "    ";
   ss << "TxE(a) ";
   for (unsigned int i = 0; i < a.size(); i++) ss << " " << a.at(i); 
-  ss << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 
   ss.str(string()); 
   ss << "    ";
   ss << "TxE Acceptance: " << mAccepted << " / " << mTry << " = " 
-     <<  acceptanceRatio () << endl;
-  strLog = ss.str(); EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog;
+     <<  acceptanceRatio (); 
+  strLog = ss.str(); 
+  EZDBGONLYLOGGERVLSTREAM(axter::log_rarely) << strLog << endl;
 ////////////////////////////////////////////////////////////////////////////////
 #endif // _DEBUG
 ////////////////////////////////////////////////////////////////////////////////
@@ -8081,6 +8348,7 @@ public:
 #include "tuxReads.h"
 #include "tuxGsl.h"
 #include "tuxGslRng.h"
+#include "tuxProgress.h"
 #include "tuxSummarizer.h"
 using namespace std;
 namespace tux {
@@ -8101,10 +8369,12 @@ Summarizer::execute ()
 {
   if (mIsSuccess == true)
     {
-      // Find the mean boundaries.
-      // listLoglikelihood ();
-      reportSitewiseFrequencyBoundaries ();
-      reportSitewiseExpression ();
+      if (mFixed->mListlikelihood == true)
+        listLoglikelihood ();
+      if (mFixed->mSitewiseExpression == true)
+        reportSitewiseExpression ();
+      if (mFixed->mSitewiseBoundaries == true)
+        reportSitewiseFrequencyBoundaries ();
       // computeFrequencyBoundaries ();
       // findMeanBoundaries ();
     }
@@ -8137,7 +8407,7 @@ Summarizer::reportSitewiseFrequencyBoundaries ()
           else
             {
               cerr << "Error: Could not read " << mFixed->L()
-                   << "numbers from ``" << cfn << ".''" << endl;
+                   << " numbers from ``" << cfn << ".''" << endl;
               fin.close();
               return; 
             }
@@ -8158,7 +8428,7 @@ Summarizer::reportSitewiseFrequencyBoundaries ()
   double d;
   unsigned int l = mFixed->mcmcLength ();
   fout << setprecision(5);
-  fout << "fixedStep chrom=chr1 start=1 step=1" << endl;
+  // fout << "fixedStep chrom=chr1 start=1 step=1" << endl;
   for (vector<unsigned int>::iterator j = v.begin(); j != v.end(); j++) 
     {
       d = static_cast<double>(*j)/static_cast<double>(l);
@@ -8195,7 +8465,7 @@ Summarizer::reportSitewiseExpression ()
           else
             {
               cerr << "Error: Could not read " << mFixed->L()
-                   << "numbers from ``" << cfn << ".''" << endl;
+                   << " numbers from ``" << cfn << ".''" << endl;
               fin.close();
               return; 
             }
@@ -8216,7 +8486,7 @@ Summarizer::reportSitewiseExpression ()
   double d;
   unsigned int l = mFixed->mcmcLength ();
   fout << setprecision(5);
-  fout << "fixedStep chrom=chr1 start=1 step=1" << endl;
+  // fout << "fixedStep chrom=chr1 start=1 step=1" << endl;
   for (vector<double>::iterator j = v.begin(); j != v.end(); j++) 
     {
       d = *j / static_cast<double>(l);
@@ -8238,6 +8508,8 @@ Summarizer::listLoglikelihood ()
     }
 
   // Now, we have pMatrix ready.
+  Progress p;
+  p.start ("List Likelihood", mFixed->mNumberProcess, cout);
   for (unsigned int i = 0; i < mFixed->mNumberProcess; i++)
     {
       string cfn = mFixed->chainFilename (i);
@@ -8259,8 +8531,10 @@ Summarizer::listLoglikelihood ()
           pMatrix.at(rowIndex).at(0) = s;
         }
       fin.close();
-      // cout << "Number: " << doc2.size() << endl;
+      p.move (i, cout);
     }
+  p.complete (cout);
+  // Print the status.
 
   // Print the values in a .p file.
   string ofn = mFixed->pFilename ();
@@ -8296,14 +8570,19 @@ Summarizer::fillStepIndex ()
       YAML::Parser parser2(fin);
       YAML::Node doc2;
       parser2.GetNextDocument(doc2);
+      Progress p;
+      p.start ("Index", doc2.size(), cout);
+      unsigned int i = 0;
       for (YAML::Iterator it=doc2.begin();it!=doc2.end();++it) 
         {
           unsigned int id, s;
           (*it)[0][0] >> id;
           (*it)[0][1] >> s;
           mStepIndex[s] = 0;
+          p.move (i++, cout);
         }
       fin.close();
+      p.complete (cout);
     }
   else
     {
@@ -8332,6 +8611,8 @@ Summarizer::fillTxbs ()
   vector<unsigned int> txb;
 
   // Now, we txbs ready.
+  Progress p;
+  p.start ("TxB", mFixed->mNumberProcess, cout);
   for (unsigned int i = 0; i < mFixed->mNumberProcess; i++)
     {
       string cfn = mFixed->chainFilename (i);
@@ -8363,7 +8644,9 @@ Summarizer::fillTxbs ()
             }
         }
       fin.close();
+      p.move (i, cout);
     }
+  p.complete (cout);
   return true;
 }
 void 
@@ -9180,6 +9463,10 @@ public:
   static string mLogDirectory;
   static string mDatafile;
   static bool mIsData;
+  static bool mSitewiseExpression;
+  static bool mSitewiseBoundaries;
+  static bool mListlikelihood;
+  static unsigned int mPosition;
 };
 }
 #endif // _TUXDEFAULT_H_
@@ -9226,6 +9513,75 @@ string Default::mChainDirectory("./");
 string Default::mLogDirectory("./");
 string Default::mDatafile("in.dat");
 bool Default::mIsData(true);
+bool Default::mSitewiseExpression(true);
+bool Default::mSitewiseBoundaries(true);
+bool Default::mListlikelihood(true);
+unsigned int Default::mPosition(0);
+}
+@
+
+\subsection{Progress}
+<<tuxProgress.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXPROGRESS_H_
+#define _TUXPROGRESS_H_
+#include <ctime>
+#include <string>
+using namespace std;
+namespace tux {
+class Progress {
+private:
+  string mName; 
+  unsigned int mTotal;
+  time_t mPrevTime;
+public:
+  Progress () {}
+  Progress (char* n, unsigned int);
+  void start (char* n, unsigned int, ostream& out);
+  void move (unsigned int, ostream& out);
+  void complete (ostream& out);
+};
+}
+#endif // _TUXPROGRESS_H_
+
+<<tuxProgress.cpp>>=
+<<tux gnu copyright>>
+#include <iomanip>
+#include <iostream>
+#include <ctime>
+#include <string>
+#include "tuxProgress.h"
+using namespace std;
+namespace tux {
+Progress::Progress (char* n, unsigned int t)
+  : mName(n), mTotal(t)
+{
+}
+void
+Progress::start (char* n, unsigned int l, ostream& out)
+{
+  mName = n;
+  mTotal = l;
+  out << mName << ": 0% ("
+      << "0/" << mTotal << ")\r" << flush;
+  return;
+}
+void
+Progress::move (unsigned int s, ostream& out)
+{
+  double p = static_cast<double>(s) / static_cast<double>(mTotal) * 100.0;
+  out << mName << ": " << setprecision(1) << fixed << p << "% ("
+      << s << "/" << mTotal << ")\r" << flush;
+  return;
+}
+void
+Progress::complete (ostream& out)
+{
+  out << mName << ": 100% ("
+      << mTotal << "/" << mTotal << "), done\n";
+  return;
+}
+
 }
 @
 
@@ -12265,6 +12621,8 @@ nsub tuxbatch.sh
 #PBS -N tux
 #PBS -j oe
 #PBS -q v4
+#PBS -m e
+##PBS -M goshng@gmail.com
 
 # Change to the working directory.
 cd $PBS_O_WORKDIR

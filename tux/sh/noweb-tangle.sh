@@ -40,6 +40,8 @@ CPPFILE=( tux.cpp \
           tux-sum.cpp \
           tux-log.cpp \
           stl-transform.cpp \
+          tuxProgress.cpp \
+          tuxString.cpp \
           tuxSignal.cpp \
           tuxError.cpp \
           tuxDefault.cpp \
@@ -74,6 +76,8 @@ CPPFILE=( tux.cpp \
           MathFunctions/mysqrt.cpp )
 HPPFILE=( tuxManager.h \
           tuxHelp.h \
+          tuxProgress.h \
+          tuxString.h \
           tuxSignal.h \
           tuxError.h \
           tuxDefault.h \
