@@ -303,7 +303,7 @@
 							<real>185</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>540 121 1340 937 0 0 1920 1058 </string>
+						<string>498 121 1340 937 0 0 1920 1058 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -331,7 +331,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D0A0EB1014ED5AE900E4C185</string>
+										<string>D0774E4A1598A72E00033D08</string>
 										<key>history</key>
 										<array>
 											<string>D0A82B7F14B26B3700021F5C</string>
@@ -341,7 +341,7 @@
 											<string>D0A82B8314B26B3700021F5C</string>
 											<string>D0A82B8414B26B3700021F5C</string>
 											<string>D0A82B8514B26B3700021F5C</string>
-											<string>D0A82B8714B26B3700021F5C</string>
+											<string>D0A0EB1014ED5AE900E4C185</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -357,7 +357,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {1133, 891}}</string>
 								<key>RubberWindowFrame</key>
-								<string>540 121 1340 937 0 0 1920 1058 </string>
+								<string>498 121 1340 937 0 0 1920 1058 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -382,7 +382,7 @@
 										<key>Frame</key>
 										<string>{{10, 27}, {1133, -27}}</string>
 										<key>RubberWindowFrame</key>
-										<string>540 121 1340 937 0 0 1920 1058 </string>
+										<string>498 121 1340 937 0 0 1920 1058 </string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -464,11 +464,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>D0A0EB1114ED5AE900E4C185</string>
+				<string>D0774E4B1598A72E00033D08</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>D0A0EB1214ED5AE900E4C185</string>
+				<string>D0774E4C1598A72E00033D08</string>
 				<string>D0A82AE414B2245E00021F5C</string>
-				<string>D0A0EB1314ED5AE900E4C185</string>
+				<string>D0774E4D1598A72E00033D08</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
@@ -661,7 +661,7 @@
 		<string>/Users/goshng/Documents/Projects/Peach/dernaseq/dernaseq.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>540 121 1340 937 0 0 1920 1058 </string>
+	<string>498 121 1340 937 0 0 1920 1058 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
