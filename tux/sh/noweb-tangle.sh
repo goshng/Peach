@@ -46,6 +46,7 @@ CPPFILE=( tux.cpp \
           tuxSystem.cpp \
           tuxProbability.cpp \
           tuxProbTxBoundaries.cpp \
+          tuxProbTxExpression.cpp \
           tuxLikelihood.cpp \
           tuxMoverManager.cpp \
           tuxMover.cpp \
@@ -67,6 +68,7 @@ HPPFILE=( tuxManager.h \
           tuxSystem.h \
           tuxProbability.h \
           tuxProbTxBoundaries.h \
+          tuxProbTxExpression.h \
           tuxLikelihood.h \
           tuxMoverManager.h \
           tuxMover.h \

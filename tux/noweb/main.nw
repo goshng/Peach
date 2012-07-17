@@ -186,6 +186,52 @@ Members of \Cclass{Chain}:
 \item Data* mTxData; a set of short reads alignment data
 \end{enumerate*}
 
+The \Cclass{Chain} owns objects from \Cclass{RandomVariable}:
+\Cmember{mTxBoundaries}, \Cmember{mTxExpression}, and \Cmember{mTxData}. The
+first two \Cclass{Parameter} objects change their contents through
+\Cclass{Mover} objects that are managed by \Cclass{MoverManager}. Methods of
+\Cclass{Chain} would create \Cclass{Parameter} objects. Additionally,
+\Cclass{Mover} objects are created in methods of \Cclass{Chain}. Objects of
+\Cclass{Mover}'s subclasses such as \Cclass{MoverTxBoundaries} are allowed to
+access \Cclass{Parameter} members in \Cclass{Chain}. We do this by giving
+\Cclass{MoverTxBoundaries} a pointer to the object of \Cclass{TxBoundaries}.
+Let us check how we could propose a new state of \Cclass{TxBoundaries}, and
+accept or reject it in \Cclass{MoverTxBoundaries}. Do this 
+in \Cclass{MoverTxExpression} as well.
+
+\Cclass{MoverTxBoundaries} \Cmethod{step}
+\begin{Verbatim}[frame=lines,framesep=5mm]
+  // 1. We choose a subset of the K segments.
+  // 1.1 We choose a site of the L sites.
+  // 1.2 We choose a length from a distribution or fixed value.
+  // 1.3 Group segments in the chosen region.
+  // 2. Find the lengths of the subset of the segments.
+  // 2.1 Sum the lengths.
+  // 2.2 Compute the fractions of the legnths with respect to the sum of the
+  // length.
+  // 2.3 Multiply the factions by a pseudo-concentration parameter.
+  // 3. Use the multiplied factions as a set of concentration parameters to
+  // sample a new set of random variates from the Dirichlet distribution.
+  // 3.1 Multiply the sum of the lengths of the subset to recover a new set of
+  // segments. 
+  // 3.2 Adjust legnths of the segments so that legnths fit the remaining
+  // segments.
+  // 4. Compute acceptance probability by using likelihood, priors, and
+  // Metropolis-Hastings ratio.
+  // 4.1 The priors are p(mu|s)p(s)=p(mu)p(s). This value does not change
+  // before and after the proposal.
+  // 4.2 Count reads on the subset and compute p(x|theta*)/p(x|theta).
+  // Optimization of the likelihood ratio can be done by using forms of the
+  // negative binomial probability functions.
+  // 4.3 Compute the Metropolis-Hastings ratio using the proposal.
+\end{Verbatim}
+
+
+TxBoundaries is created in a method of class Chain.
+MoverTxBoundaries should be also created in a method of class Chain.
+Then, Chain can connect its Parameters and Data to MoverTxBoundaries.
+It passes the connected MoverTxBoundaries to MoverManager.
+
 The chain uses \Cclass{Probability} and \Cclass{RandomVariable} to change the
 value of \Cclass{Parameter}. The \Cclass{Data} is a \Cclass{RandomVariable} that
 does not change its value. The \Cclass{Probability} is not a part of the chain. 
@@ -298,6 +344,26 @@ Members of \Cclass{ProbTxBoundaries}
 \item RandomVariable* r (); a random variate of \Cclass{TxBoundaries} object
 \end{enumerate*}
 
+Members of \Cclass{Data}
+\begin{enumerate*}
+\item vector<unsigned int> mCount; number of counts of reads at the position. We
+only consider 5' end positions of short reads to count. 
+\end{enumerate*}
+
+We would need to read and write \Cclass{RandomVariable} from and to a file using
+YAML. We have a likelihood that is used to compute the likelihood and to sample
+data given parameters.
+
+Members of \Cclass{Data}
+\begin{enumerate*}
+\item  unsigned int mL; the length of the genome
+\item  unsigned int mK; the number of segments
+\item  double mM; a sequencing depth
+\item  vector<double> mSizeFactor; size factors of all of J samples
+\item  vector<double> mDelta; fractions of short reads on mK segments
+\item  vector<double> mSigma; fractions of mK segment boundaries
+\end{enumerate*}
+
 Global variables
 \begin{enumerate*}
 \item const gsl\_rng *gGslRng; the main function calls MPI\_Init function to create
@@ -311,6 +377,17 @@ Main function
 \begin{enumerate*}
 \item OPT\_MCMC: creates multiple random seeds using a single seed.
 \end{enumerate*}
+
+We have a number of boundaries. We can compute the average number of times a
+boundary exists to the right of a site. We compute average expression level for
+each site. We do this using the posterior samples of boundaries and expression
+levels. Use \Cclass{Summary} and \Cclass{Summarizer}. Multiple files should be
+handled by \Cclass{Summarizer} because MPI processors create their own output
+files. 
+
+The \Cclass{System} inspects the local computer system. What do we need to know?
+We need to know the number of CPUs, the size of memory, the number of computes
+nodes, the speed of CPUs, etc.
 
 \section{Compilation}
 Build a debug version using CMake.
@@ -470,6 +547,7 @@ SET (tux_SRCS
   "tuxSystem.cpp"
   "tuxProbability.cpp"
   "tuxProbTxBoundaries.cpp"
+  "tuxProbTxExpression.cpp"
   "tuxLikelihood.cpp"
   "tuxMoverManager.cpp"
   "tuxMover.cpp"
@@ -2345,7 +2423,8 @@ public:
 <<tux gnu copyright>>
 #include <iostream>
 #include <cassert>
-#include "tuxMover.h"
+#include "tuxMoverTxExpression.h"
+#include "tuxMoverTxBoundaries.h"
 #include "tuxMoverManager.h"
 #include "tuxChain.h"
 using namespace std;
@@ -2355,6 +2434,35 @@ Chain::Chain ()
   mBeta = 1; 
   mStep = 0;
   likelihoodPrior = 0;
+
+  // Create TxBoundaries
+  ProbTxBoundaries factoryTxBoundaries;
+  factoryTxBoundaries.mL = 10;
+  factoryTxBoundaries.mK = 2;
+  mTxBoundaries = factoryTxBoundaries.d (); 
+  // Create TxExpression
+  vector<double> a(factoryTxBoundaries.mK,10.0L);
+  ProbTxExpression factoryTxExpression (a);
+  mTxExpression = factoryTxExpression.d ();
+
+  Mover* m;
+  MoverTxBoundaries* d1;
+  MoverTxExpression* d2;
+
+  // Boundaries Mover
+  m = new MoverTxBoundaries;
+  d1 = dynamic_cast<MoverTxBoundaries*>(m);
+  d1->mTxBoundaries = mTxBoundaries;
+  d1->mTxExpression = mTxExpression;
+  mMoverManager.add (m, 1, 1);
+
+  // Expression Mover
+  m = new MoverTxExpression;
+  d2 = dynamic_cast<MoverTxBoundaries*>(m);
+  d2->mTxBoundaries = mTxBoundaries;
+  d2->mTxExpression = mTxExpression;
+  mMoverManager.add (m, 2, 1);
+
 }
 Chain::~Chain ()
 {
@@ -2498,10 +2606,12 @@ TxExpression::~TxExpression ()
 <<tux gnu copyright>>
 #ifndef _TUXDATA_H_
 #define _TUXDATA_H_
+#include "tuxRandomVariable.h"
 namespace tux {
-class Data {
+class Data: RandomVariable {
+// FIXME:
 public:
-  void full ();
+  
 };
 }
 #endif // _TUXDATA_H_
@@ -2512,13 +2622,44 @@ public:
 #include "tuxData.h"
 using namespace std;
 namespace tux {
-void 
-Data::full ()
+}
+@
+
+\subsection{Reads}
+<<tuxReads.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXREADS_H_
+#define _TUXREADS_H_
+#include <vector>
+#include "tuxData.h"
+namespace tux {
+class Reads: Data {
+public:
+  vector<unsigned int> mCount;
+public:
+  Reads ();
+  ~Reads ();
+}
+#endif // _TUXREADS_H_
+
+<<tuxReads.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include "tuxReads.h"
+using namespace std;
+namespace tux {
+// FIXME
+Reads::Reads ()
 {
-  return;
+  
+}
+Reads::~Reads ()
+{
+  
 }
 }
 @
+
 
 \subsection{Probability}
 <<tuxProbability.h>>=
@@ -2567,7 +2708,7 @@ public:
   unsigned int mK;
 public:
   double d ();
-  Parameter* r (); 
+  RandomVariable* r (); 
   double op_multiply (double i) { return i*mL; }
   unsigned int op_cast_unsigned_int (double i) { return static_cast<unsigned int>(i+0.5); }
 
@@ -2599,7 +2740,7 @@ ProbTxBoundaries::d ()
 {
   return -gsl_sf_lnchoose(mL-1,mK-1);
 }
-Parameter* 
+RandomVariable* 
 ProbTxBoundaries::r ()
 {
   vector<double> a(mK);
@@ -2612,9 +2753,87 @@ ProbTxBoundaries::r ()
   // I do this just for the sake of learning C++.
   // We could have used gsl_rng_uniform_int.
   // Set the transcript boundaries to the sampled value c.
-  Parameter* v = new TxBoundaries;
+  TxBoundaries* v = new TxBoundaries;
   v->mC = c;
-  return v;
+  return dynamic_cast<RandomVariable*>(v);
+}
+}
+@
+
+\subsection{ProbTxExpression}
+<<tuxProbTxExpression.h>>=
+<<tux gnu copyright>>
+#ifndef _TUXPROBTXEXPRESSION_H_
+#define _TUXPROBTXEXPRESSION_H_
+#include <vector>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "tuxProbability.h"
+
+extern gsl_rng* gGslRng;
+
+namespace tux {
+class ProbTxExpression: public Probability {
+public:
+  vector<double> mAlpha;
+  vector<double> mTheta;
+public:
+  ProbTxExpression (const vector<double>& a);
+  ~ProbTxExpression ();
+
+  double d ();
+  RandomVariable* r (); 
+  unsigned int op_cast_unsigned_int (double i) { return static_cast<unsigned int>(i+0.5); }
+
+  struct c_uniform {
+    double a;
+    double b;
+    c_uniform () {a=0;b=1;}
+    double operator()() {
+      return gsl_ran_flat (gGslRng,a,b);
+    }
+  } gslrngUniform;
+
+};
+}
+#endif // _TUXPROBTXEXPRESSION_H_
+
+<<tuxProbTxExpression.cpp>>=
+<<tux gnu copyright>>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <gsl/gsl_block.h>
+#include <gsl/gsl_randist.h>
+#include "tuxTxExpression.h"
+#include "tuxProbTxExpression.h"
+using namespace std;
+namespace tux {
+ProbTxExpression::ProbTxExpression (const vector<double>& a)
+{
+  mAlpha = a; 
+}
+ProbTxExpression::~ProbTxExpression ()
+{
+}
+double
+ProbTxExpression::d ()
+{
+  size_t k = static_cast<size_t>(mAlpha.size());
+  return gsl_ran_dirichlet_lnpdf(k,&mAlpha[0],&mTheta[0]);
+}
+RandomVariable* 
+ProbTxExpression::r ()
+{
+  size_t k = static_cast<size_t>(mAlpha.size());
+  gsl_block* t = gsl_block_alloc(k);
+  gsl_ran_dirichlet(gGslRng,k,&mAlpha[0],t->data);
+  mTheta.resize(k); std::copy(t->data,t->data + k,mTheta.begin());
+  gsl_block_free(t);
+
+  TxExpression* v = new TxExpression;
+  v->mDelta = mTheta;
+  return dynamic_cast<RandomVariable*>(v);
 }
 }
 @
@@ -2624,10 +2843,99 @@ ProbTxBoundaries::r ()
 <<tux gnu copyright>>
 #ifndef _TUXLIKELIHOOD_H_
 #define _TUXLIKELIHOOD_H_
+#include <vector>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "tuxProbability.h"
+
+extern gsl_rng* gGslRng;
+
 namespace tux {
-class Likelihood {
+class Likelihood: public Probability {
 public:
-  void full ();
+  unsigned int mL; // given
+  unsigned int mK; // given
+  double mM;       // given
+  vector<double> mSizeFactor; // sample from a uniform distribution
+  vector<double> mDelta;      // sample from a uniform Dirichlet distribution
+  vector<unsigned int> mC;    // sample from a uniform Dirichlet distribution
+  vector<unsigned int> mCount;
+public:
+  Likelihood (unsigned int, unsigned int, unsigned int, double);
+  double d ();
+  RandomVariable* r (); 
+
+  // FIXME: in a separte file under tux namespace.
+  struct c_uniform {
+    double a;
+    double b;
+    c_uniform () {a=0;b=1;}
+    double operator()() {
+      return gsl_ran_flat (gGslRng,a,b);
+    }
+  } gslrngUniform;
+
+  struct c_nb {
+    double a0;
+    double a1;
+    double mM;
+    double mSizeFactor;
+    unsigned int operator()(double i) {
+      double mu = i * mM * mSizeFactor; 
+      double n = mu/(a0+a1/mu);
+      double p = n/(n+mu);
+      unsigned int k = gsl_ran_negative_binomial(gGslRng, p, n);
+      return k; 
+    }
+  } gslrngNb;
+
+  struct c_read {
+    unsigned int mPosition;
+    vector<unsigned int> mRead;
+    c_read () {};
+    c_read (size_t n) {mRead.resize(n); mPosition = 0;}
+    void resize(size_t n) {mRead.resize(n,0); mPosition = 0;}
+    unsigned int operator()(unsigned int n,unsigned int l) {
+      unsigned int s; 
+      for (unsigned int i = 0; i < n; i++)
+        {
+          s = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
+          mRead.at(mPosition + s)++;
+        }
+      return n;
+    }
+  } gslrngRead;
+
+  unsigned int op_subtract (unsigned int i, unsigned int j) {
+    return j - i;
+  }
+
+  struct c_countRead {
+    vector<unsigned int>::iterator mIter;
+    vector<unsigned int> mRead;
+    c_countRead () {mIter = mRead.begin();}
+    void resize() {mIter = mRead.begin();}
+    unsigned int operator()(unsigned int l) {
+      vector<unsigned int>::iterator mEnd = mIter + l;
+      unsigned int sumCk = accumulate(mIter,mEnd,0);
+      mIter = mEnd; 
+      return sumCk;
+    }
+  } countRead;
+
+  struct c_probNb {
+    double a0;
+    double a1;
+    double mM;
+    double mSizeFactor;
+    double operator()(double d,unsigned int k) {
+      double mu = d * mM * mSizeFactor; 
+      double n = mu/(a0+a1/mu);
+      double p = n/(n+mu);
+      return log(gsl_ran_negative_binomial_pdf(k,p,n));
+    }
+  } probNb;
+
 };
 }
 #endif // _TUXLIKELIHOOD_H_
@@ -2635,13 +2943,86 @@ public:
 <<tuxLikelihood.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <vector>
+#include "tuxTxBoundaries.h"
+#include "tuxTxExpression.h"
+#include "tuxProbTxBoundaries.h"
+#include "tuxProbTxExpression.h"
 #include "tuxLikelihood.h"
 using namespace std;
 namespace tux {
-void 
-Likelihood::full ()
+Likelihood::Likelihood (unsigned int j, unsigned int l, unsigned int k, double m)
 {
-  return;
+  mL = l;
+  mK = k;
+  mM = m;
+  // TxBoundaries is created. Likelihood owns it.
+  ProbTxBoundaries priorTxBoundaries;
+  priorTxBoundaries.mL = mL;
+  priorTxBoundaries.mK = mK;
+  TxBoundaries* vTxBoundaries 
+    = dynamic_cast<MoverTxBoundaries*>(priorTxBoundaries.r ());
+  mC = vTxBoundaries->mC;
+  delete vTxBoundaries;
+
+  // TxExpression is created. Likelihood owns it.
+  vector<double> a(mK,1.0L);
+  ProbTxExpression priorTxExpression (a);
+  TxExpression* vTxExpression 
+    = dynamic_cast<MoverTxExpression*>(priorTxExpression.r ());
+  mDelta = vTxExpression->mDelta
+  delete vTxExpression;
+  
+  // Sizefactors are created.
+  mSizeFactor.resize(j,1.0L);
+  gslrngUniform.a = 0.5L;
+  gslrngUniform.b = 1.5L;
+  generate(mSizeFactor.begin(),mSizeFactor.end(),gslrngUniform);
+
+}
+double
+Likelihood::d ()
+{
+  // Find lengths.
+  vector<unsigned int> mLk(mC);
+  mLk.pop_back();
+  mLk.insert(mLk.begin(),0);
+  transform(mLk.begin(),mLk.end(),mC.begin(),mLk.begin(),op_subtract);
+
+  // Count reads in ck.
+  vector<unsigned int> ck(mDelta.size());
+  countRead.mRead = mCount;
+  transform(mLk.begin(),mLk.end(),ck.begin(),countRead);
+
+  // 
+  gsl_ran_negative_binomial_pdf(k,p,n); 
+
+  gslrngRead.resize (mL);
+  vector<double> logProbNb(mDelta);
+  transform(logProbNb.begin(),logProbNb.end(),ck.begin(),logProbNb.begin(),probNb);
+  double v = accumulate(logProbNb.begin(),logProbNb.end(),0);
+  return v; 
+}
+RandomVariable*
+Likelihood::r ()
+{
+  // For each i-th segment, sample j.
+  // Use TxBoundaries and TxExpression to generate a set of Data.
+  vector<unsigned int> ck(mDelta.size());
+  transform(mDelta.begin(),mDelta.end(),ck.begin(),gslrngNb);
+  // 
+  vector<unsigned int> mLk(mC);
+  mLk.pop_back();
+  mLk.insert(mLk.begin(),0);
+  transform(mLk.begin(),mLk.end(),mC.begin(),mLk.begin(),op_subtract);
+
+  gslrngRead.resize (mL);
+  transform(ck.begin(),ck.end(),mLk.begin(),ck.begin(),gslrngRead);
+
+  // Data
+  Reads* v = new Reads;
+  v->mCount = gslrngRead.mRead;
+  return dynamic_cast<RandomVariable*>(v);
 }
 }
 @
@@ -2665,6 +3046,7 @@ public:
   MoverManager ();
   ~MoverManager ();
   void add (const unsigned int, const double);
+  void add (Mover*, const unsigned int, const double);
   Mover* choose ();
 
   template <class T> struct c_delete {
@@ -2695,9 +3077,6 @@ MoverManager::~MoverManager ()
   c_delete<Mover*> deleteMover;
   for_each (mMover.begin(), mMover.end(), deleteMover);           
 }
-// FIXME: MoverTxBoundaries should be created in a method of class Chain.
-//        Then, Chain can connect its Parameters and Data to MoverTxBoundaries.
-//        It passes the connected MoverTxBoundaries to MoverManager.
 void
 MoverManager::add (const unsigned int id, const double weight)
 {
@@ -2711,6 +3090,19 @@ MoverManager::add (const unsigned int id, const double weight)
     case 2: m = new MoverTxBoundaries;
     break;
     }
+  mMover.push_back(m);
+  if (mMover.size() > 1)
+    {
+      size_t k = mMover.size();
+      gsl_block* w = gsl_block_alloc(k);
+      mGslRanDiscrete = gsl_ran_discrete_preproc (k,w->data); 
+    }
+}
+void
+MoverManager::add (Mover* m, const unsigned int id, const double weight)
+{
+  mId.push_back(id); 
+  mWeight.push_back(weight);
   mMover.push_back(m);
   if (mMover.size() > 1)
     {
@@ -2758,10 +3150,22 @@ namespace tux {
 #define _TUXMOVERTXBOUNDARIES_H_
 #include "txMover.h"
 namespace tux {
+class TxBoundaries;
+class TxExpression;
 class MoverTxBoundaries: Mover {
+public:
+  TxBoundaries* mTxBoundaries;
+  TxExpression* mTxExpression;
 public:
   MoverTxBoundaries ();
   int step ();
+  unsigned int op_subtract (unsigned int i, unsigned int j) {
+    return j - i;
+  }
+  double op_multiply (double i, unsigned int j) {
+    return i * j;
+  }
+
 };
 }
 #endif // _TUXMOVERTXBOUNDARIES_H_
@@ -2769,12 +3173,104 @@ public:
 <<tuxMoverTxBoundaries.cpp>>=
 <<tux gnu copyright>>
 #include <iostream>
+#include <numeric>
+#include <algorithm>
+#include <vector>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 #include "tuxMoverTxBoundaries.h"
+
+extern gsl_rng* gGslRng;
+
 using namespace std;
 namespace tux {
 void 
 MoverTxBoundaries::MoverTxBoundaries ()
 {
+}
+int 
+MoverTxBoundaries::step ()
+{
+  // 1. We choose a subset of the K segments.
+  // 1.1 We choose a site of the L sites.
+  // 1.2 We choose a length from a distribution or fixed value.
+  // 1.3 Group segments in the chosen region.
+  // 2. Find the lengths of the subset of the segments.
+  // 2.1 Sum the lengths.
+  // 2.2 Compute the fractions of the legnths with respect to the sum of the
+  // length.
+  // 2.3 Multiply the factions by a pseudo-concentration parameter.
+  // 3. Use the multiplied factions as a set of concentration parameters to
+  // sample a new set of random variates from the Dirichlet distribution.
+  // 3.1 Multiply the sum of the lengths of the subset to recover a new set of
+  // segments. 
+  // 3.2 Adjust legnths of the segments so that legnths fit the remaining
+  // segments.
+  // 4. Compute acceptance probability by using likelihood, priors, and
+  // Metropolis-Hastings ratio.
+  // 4.1 The priors are p(mu|s)p(s)=p(mu)p(s). This value does not change
+  // before and after the proposal.
+  // 4.2 Count reads on the subset and compute p(x|theta*)/p(x|theta).
+  // Optimization of the likelihood ratio can be done by using forms of the
+  // negative binomial probability functions.
+  // 4.3 Compute the Metropolis-Hastings ratio using the proposal.
+  unsigned long int l = static_cast<unsigned long int>(mTxBoundaries->mC.back());
+  unsigned int s = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
+  unsigned int e = s + 10000;
+  // Use mTxBoundaries->mC to find the subset.
+  // Find two points that minimally bound either s or e.
+  vector<unsigned int>::iterator upLeft;
+  vector<unsigned int>::iterator upRight;
+  upLeft = upper_bound(mTxBoundaries->mC.begin(),mTxBoundaries->mC.end(),s);
+  upRight = upper_bound(mTxBoundaries->mC.begin(),mTxBoundaries->mC.end(),e);
+  while (upLeft < upRight) 
+    {
+      l = static_cast<unsigned long int>(mTxBoundaries->mC.back());
+      s = static_cast<unsigned int>(gsl_rng_uniform_int(gGslRng,l));
+      e = s + 10000;
+      upLeft = upper_bound(mTxBoundaries->mC.begin(),mTxBoundaries->mC.end(),s);
+      upRight = upper_bound(mTxBoundaries->mC.begin(),mTxBoundaries->mC.end(),e);
+    }
+  vector<unsigned int> lk(upRight-upLeft);
+  vector<unsigned int>::iterator second = lk.begin() + 1;
+  copy(upLeft,upRight-1,second);
+  if (upLeft == mTxBoundaries.begin())
+    {
+      lk.at(0) = 0;
+    }
+  else
+    {
+      lk.at(0) = *(upLeft - 1);
+    }
+  transform(lk.begin(),lk.end(),upLeft,lk.begin(),op_subtract);
+  // sumLk can be computed by subtracting lk.at(0) from *upRight.
+  unsigned int sumLk = accumulate(lk.begin(),lk.end(),0);
+  double concentrationParameter = 10.0L;
+  vector<double> alpha(lk.size(),concentrationParameter/static_cast<double>(sumLk));
+  transform(alpha.begin(),alpha.end(),lk.begin(),alpha.begin(),op_multiply);
+
+  size_t k = static_cast<size_t>(alpha.size());
+  gsl_block* t = gsl_block_alloc(k);
+  gsl_ran_dirichlet(gGslRng,k,&alpha[0],t->data);
+  vector<double> theta(k);
+  copy(t->data,t->data + k,theta.begin());
+  gsl_block_free(t);
+
+  vector<unsigned int> a;
+  if (upLeft == mTxBoundaries.begin())
+    a.push_back(0);
+  else
+    a.push_back(*(upLeft - 1));
+  for (size_t i = 0; i < k-1; i++)
+    {
+      a.push_back(a.back() + theta.at(i) * sumLk);
+    }
+  
+  // a[1] to a[k-1] are the new middle points.
+  // Compute the likelihood.
+  // a[0] to a[k] (,which does not exist) are used to count reads.
+  // FIXME: We do not have data yet. Find Data.
+   
 }
 }
 @
@@ -2784,10 +3280,17 @@ MoverTxBoundaries::MoverTxBoundaries ()
 <<tux gnu copyright>>
 #ifndef _TUXMOVERTXEXPRESSION_H_
 #define _TUXMOVERTXEXPRESSION_H_
+#include "txMover.h"
 namespace tux {
-class MoverTxExpression {
+class TxBoundaries;
+class TxExpression;
+class MoverTxExpression: Mover {
 public:
-  void full ();
+  TxBoundaries* mTxBoundaries;
+  TxExpression* mTxExpression;
+public:
+  MoverTxExpression ();
+  int step ();
 };
 }
 #endif // _TUXMOVERTXEXPRESSION_H_
@@ -2799,9 +3302,12 @@ public:
 using namespace std;
 namespace tux {
 void 
-MoverTxExpression::full ()
+MoverTxExpression::MoverTxExpression ()
 {
-  return;
+}
+int 
+MoverTxExpression::step ()
+{
 }
 }
 @
@@ -2854,34 +3360,6 @@ using namespace std;
 namespace tux {
 void 
 Summary::full ()
-{
-  return;
-}
-}
-@
-
-
-\subsection{Reads}
-<<tuxReads.h>>=
-<<tux gnu copyright>>
-#ifndef _TUXREADS_H_
-#define _TUXREADS_H_
-namespace tux {
-class Reads {
-public:
-  void full ();
-};
-}
-#endif // _TUXREADS_H_
-
-<<tuxReads.cpp>>=
-<<tux gnu copyright>>
-#include <iostream>
-#include "tuxReads.h"
-using namespace std;
-namespace tux {
-void 
-Reads::full ()
 {
   return;
 }
