@@ -1,0 +1,52 @@
+
+GFFFILE=/v4scratch/sc2265/rnaseq/output/tomato/1/data/ITAG2.3_gene_models.gff3.txt.no-negative
+TMPDIR=/tmp/1322891.scheduler.v4linux/
+
+# Move to the temp dir.
+cd $PBS_O_WORKDIR
+cd $TMPDIR
+cp $GFFFILE .
+
+$R215
+library(rtracklayer)
+gene.range3 <- import.gff3("ITAG2.3_gene_models.gff3.txt.no-negative")
+gene.range.mrna<- gene.range3[gene.range3$type=="mRNA",]
+
+# To create a table with position
+tomatoDir <- "/home/fs01/sc2265/tmp/tomato"
+for (i in list.files(tomatoDir,pattern="csv")) 
+{
+  x10.1 <- read.csv(paste(tomatoDir,i,sep="/"))
+  x10.1 <- x10.1[-1,]
+  x10.1.pos <- gene.range.mrna[gene.range.mrna$ID %in% paste("mRNA:",x10.1$Gene,sep=""),]
+  x10.1.2 <- data.frame(Gene=sub("mRNA:","",x10.1.pos$ID),start=start(x10.1.pos))
+  x10.1.3 <- merge(x10.1, x10.1.2, sort = FALSE)
+	write.csv(x10.1.3,file=paste(tomatoDir,"out",i,sep="/"))
+}
+
+# To creaet positions and fold changes
+for (i in list.files(".",pattern="csv"))
+{
+  x <- read.csv(i)
+  x <- x[,c(2,5,12)]
+	x[,2] <- log2(x[,2])
+  write.table(x,file=paste("/Volumes/Elements/Documents/Projects/RNASeq-Analysis/log/033012/tomato/out/out",i,sep="/"),quote=F,sep="\t",row.names=F)
+}
+
+
+#
+# END OF FILE
+#
+x10.1 <- read.csv("/home/fs01/sc2265/tmp/tomato/IL10-1-Table 1.csv")
+x10.1 <- x10.1[-1,]
+paste("gene:",x10.1$Gene,sep="")
+gene.range1$ID %in% paste("gene:",x10.1$Gene,sep="")
+
+
+x10.1.pos <- gene.range.mrna[gene.range.mrna$ID %in% paste("mRNA:",x10.1$Gene,sep=""),]
+start(x10.1.pos)
+
+x10.1.2 <- data.frame(Gene=sub("mRNA:","",x10.1.pos$ID),start=start(x10.1.pos))
+
+x10.1.3 <- merge(x10.1, x10.1.2, sort = FALSE)
+
