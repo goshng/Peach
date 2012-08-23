@@ -3,3 +3,5 @@ input
 downloads
 output
 *.tar
+*.svg
+*.png
