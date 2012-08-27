@@ -3,6 +3,7 @@ outputDir3 <- "output/position3"
 pen <- "output/position/PENeQTL.csv"
 y <- read.csv(pen)
 
+ilpositionDir <- "data/raw/ilposition"
 for (i in list.files(outputDir,pattern="IL")) 
 {
   x <- read.csv(paste(outputDir,i,sep="/"))
@@ -12,9 +13,14 @@ for (i in list.files(outputDir,pattern="IL"))
   chrN <- as.numeric(chrN)
   genename.pattern <- sprintf("Solyc%02d",chrN)
 
+  # TRUE for withinIL. 
+  within.il <- rep(FALSE,nrow(x))
+  x.ilposition <- scan(paste(ilpositionDir,i,sep="/"))
+  within.il[x.ilposition[1] <= x$start & x$start <= x.ilposition[2]] <- TRUE
+
   # TRUE for cis.
-  cis.trans <- rep(FALSE,nrow(x))
-  cis.trans[grep(genename.pattern,x$Gene)] <- TRUE
+  same.chr <- rep(FALSE,nrow(x))
+  same.chr[grep(genename.pattern,x$Gene)] <- TRUE
 
   # TRUE for pen
   ratioPen <- rep(NA,nrow(x))
@@ -27,7 +33,7 @@ for (i in list.files(outputDir,pattern="IL"))
   pen.gre[inpen.gre] <- (log(x2$ratio.x) * log(x2$ratio.y) > 0)
   ratioPen[inpen.gre] <- x2$ratio.y
   
-  x <- data.frame(x,cis=cis.trans,inpen=inpen.gre,ratiopen=ratioPen,pen=pen.gre)
+  x <- data.frame(x,withinil=within.il,samechr=same.chr,inpen=inpen.gre,ratiopen=ratioPen,pen=pen.gre)
   write.table(x,file=paste(outputDir3,i,sep="/"),quote=F,sep="\t",row.names=F)
 }
 

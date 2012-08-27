@@ -27,7 +27,8 @@ source sh/copyright.sh
 # source sh/global-variable.sh
 # source sh/read-species.sh
 # source sh/init-file-system.sh
-source sh/find-position.sh
+source sh/batch.sh
+source sh/make-soft-links.sh
 
 #####################################################################
 # Read configuration file
@@ -43,8 +44,7 @@ source sh/find-position.sh
 # Menus
 #####################################################################
 PS3="Select the menu : "
-CHOICES=( find-position \
-          ---BATCH---\
+CHOICES=( initialize \
           batch \
           warranty \
           copyright \
@@ -54,6 +54,7 @@ select CHOICE in ${CHOICES[@]}; do
     echo -e "You need to enter something\n"
     continue
   elif [ "$CHOICE" == "find-position" ]; then $CHOICE; break
+  elif [ "$CHOICE" == "initialize" ]; then $CHOICE; break
   elif [ "$CHOICE" == "batch" ]; then $CHOICE; break
   elif [ "$CHOICE" == "warranty" ]; then $CHOICE; break
   elif [ "$CHOICE" == "copyright" ]; then $CHOICE; break

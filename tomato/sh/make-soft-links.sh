@@ -1,5 +1,6 @@
 #!/bin/bash
 
+function initialize {
 echo Create symbolic links at the local base directory.
 echo Choose your local and storage base directoires.
 echo Delete the line of exit in the script, and execute this shell script again.
@@ -33,3 +34,4 @@ echo Edit the conf file available at $LOCALBASEDIR/conf/README
 # mkdir $LOCALBASEDIR/routput
 # mkdir $LOCALBASEDIR/conf
 # cp $BASEDIR/conf/README.local $LOCALBASEDIR/conf/README
+}

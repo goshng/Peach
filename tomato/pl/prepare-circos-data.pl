@@ -2,20 +2,20 @@
 ###############################################################################
 # Copyright (C) 2012 Sang Chul Choi
 #
-# This file is part of RNAseq Analysis.
+# This file is part of Tomato Analysis.
 # 
-# RNAseq Analysis is free software: you can redistribute it and/or modify
+# Tomato Analysis is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# RNAseq Analysis is distributed in the hope that it will be useful,
+# Tomato Analysis is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with RNAseq Analysis.  If not, see <http://www.gnu.org/licenses/>.
+# along with Tomato Analysis.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 use strict;
 use warnings;
@@ -127,7 +127,9 @@ elsif ($cmd eq "exppen")
 }
 elsif ($cmd eq "snp")
 {
-  unless (defined $params{chr})
+  unless (defined $params{il}
+          and defined $params{ilpositiondir}
+          and defined $params{chr})
   {
     print STDERR "ERROR: You need options for $cmd command.\n";
     exit(0);
@@ -135,7 +137,9 @@ elsif ($cmd eq "snp")
 }
 elsif ($cmd eq "othersnp")
 {
-  unless (defined $params{chr})
+  unless (defined $params{il}
+          and defined $params{ilpositiondir}
+          and defined $params{chr})
   {
     print STDERR "ERROR: You need options for $cmd command.\n";
     exit(0);
@@ -163,6 +167,8 @@ if ($cmd eq "links")
     or die "cannot open $params{ilpositiondir}/$params{il}.csv";
   my $line = <IL>;
   my @a = split /\s+/, $line;
+  my $ilStartPosition = $a[0];
+  my $ilEndPosition = $a[1];
   $sourceStartPosition = $a[2];
   if ($sourceStartPosition == 0)
   {
@@ -183,8 +189,20 @@ if ($cmd eq "links")
     if ($a[0] =~ /Solyc(\d\d)g/)
     {
       my $chrN = int($1);
+      my $startPosition = $a[2];
       my $endPosition = $a[2] + 10;
-      print $outfile "sl$params{chr} $sourceStartPosition $sourceEndPosition sl$chrN $a[2] $endPosition\n";
+
+      if ($chrN eq $params{chr})
+      {
+        unless ($ilStartPosition <= $startPosition and $startPosition <= $ilEndPosition)
+        {
+          print $outfile "sl$params{chr} $sourceStartPosition $sourceEndPosition sl$chrN $a[2] $endPosition\n";
+        }
+      }
+      else
+      {
+        print $outfile "sl$params{chr} $sourceStartPosition $sourceEndPosition sl$chrN $a[2] $endPosition\n";
+      }
     }
     else
     {
@@ -292,11 +310,20 @@ elsif ($cmd eq "exppen")
 }
 elsif ($cmd eq "snp" or $cmd eq "othersnp")
 {
+  # Find the IL position.
+  open IL, "$params{ilpositiondir}/$params{il}.csv"
+    or die "cannot open $params{ilpositiondir}/$params{il}.csv";
+  my $line = <IL>;
+  my @a = split /\s+/, $line;
+  my $ilStartPosition = $a[0];
+  my $ilEndPosition = $a[1];
+
   # Print the links file.
   my $count = 0;
   my $countM = 0;
   my $countI = 0;
   my $countD = 0;
+  my $countO = 0;
   my $i = 0;
   while (<$infile>)
   {
@@ -309,23 +336,80 @@ elsif ($cmd eq "snp" or $cmd eq "othersnp")
       my $chrN = int($1);
       my $startPosition = $a[3];
       my $endPosition = $a[3] + 10;
-      if (($cmd eq "snp" and $chrN eq $params{chr})
-          or ($cmd eq "othersnp" and $chrN ne $params{chr}))
+      if ($cmd eq "snp")
       {
-        print $outfile "sl$chrN $startPosition $endPosition color=white\n";
-        $count++;
-        if ($a[0] eq 'M')
+        if ($chrN eq $params{chr})
         {
-          $countM++;
-        } 
-        elsif ($a[0] eq 'I')
+          if ($ilStartPosition <= $startPosition and $startPosition <= $ilEndPosition)
+          {
+            print $outfile "sl$chrN $startPosition $endPosition color=white\n";
+            $count++;
+            if ($a[0] eq 'M')
+            {
+              $countM++;
+            } 
+            elsif ($a[0] eq 'I')
+            {
+              $countI++;
+            } 
+            elsif ($a[0] eq 'D')
+            {
+              $countD++;
+            } 
+            else
+            {
+              $countO++;
+            } 
+          }
+        }
+      }
+      else
+      {
+        if ($chrN eq $params{chr})
         {
-          $countI++;
-        } 
-        elsif ($a[0] eq 'D')
+          unless ($ilStartPosition <= $startPosition and $startPosition <= $ilEndPosition)
+          {
+            print $outfile "sl$chrN $startPosition $endPosition color=white\n";
+            $count++;
+            if ($a[0] eq 'M')
+            {
+              $countM++;
+            } 
+            elsif ($a[0] eq 'I')
+            {
+              $countI++;
+            } 
+            elsif ($a[0] eq 'D')
+            {
+              $countD++;
+            } 
+            else
+            {
+              $countO++;
+            } 
+          }
+        }
+        else
         {
-          $countD++;
-        } 
+            print $outfile "sl$chrN $startPosition $endPosition color=white\n";
+            $count++;
+            if ($a[0] eq 'M')
+            {
+              $countM++;
+            } 
+            elsif ($a[0] eq 'I')
+            {
+              $countI++;
+            } 
+            elsif ($a[0] eq 'D')
+            {
+              $countD++;
+            } 
+            else
+            {
+              $countO++;
+            } 
+        }
       }
     }
     else
@@ -334,7 +418,7 @@ elsif ($cmd eq "snp" or $cmd eq "othersnp")
     }
   }
   close($infile);
-  print STDERR "sl$params{chr}\t$params{in}\t$countM\t$countI\t$countD\t$count\n";
+  print STDERR "sl$params{chr}\t$params{in}\t$countM\t$countO\t$countI\t$countD\t$count\n";
 }
 elsif ($cmd eq "pen")
 {
@@ -414,6 +498,15 @@ elsif ($cmd eq "circos")
       }
     }
     close(IN);
+
+my $maxOrder = 0;
+foreach my $key (keys %il)
+{
+  if ($maxOrder < $il{$key}{order})
+  {
+    $maxOrder = $il{$key}{order};
+  }
+}
  
 foreach my $key (keys %il)
 {
@@ -443,6 +536,9 @@ auto_alpha_steps  = 5
 OUT
 ;
 
+my $radiusBase = 0.73;
+my $radiusLink = 0.65 - 0.06 * $maxOrder; 
+
 print OUT "<links>\n";
 
 foreach my $key (keys %il)
@@ -450,9 +546,9 @@ foreach my $key (keys %il)
 print OUT <<OUT
 <link>
 file          = output/links/$key.csv
-radius        = 0.4r
+radius        = ${radiusLink}r
 bezier_radius = 0r
-color         = $il{$key}{color}_a2
+color         = $il{$key}{color}_a3
 thickness     = 2
 
 # <rules>
@@ -473,7 +569,6 @@ print OUT "</links>\n";
 print OUT "<plots>\n";
 
 # PEN SNPs
-my $radiusBase = 0.70;
 print OUT <<OUT
 <plot>                                                                          
 type = tile
@@ -488,7 +583,7 @@ padding     = 8
 
 layers_overflow       = collapse
 stroke_thickness = 1
-stroke_color     = green_a2
+stroke_color     = green_a3
 </plot>
 OUT
 ;
@@ -496,7 +591,10 @@ OUT
 # SNPs
 foreach my $key (keys %il)
 {
-my $radius = $radiusBase - 0.06 * $il{$key}{order};
+my $radius = $radiusBase - 0.07 * $il{$key}{order};
+my $radiusEnd = $radius + 0.1;
+my $radiusText= $radius - 0.01;
+my $radiusTextEnd = $radiusEnd - 0.01;
 print OUT <<OUT
 <plot>
 type = tile
@@ -511,10 +609,23 @@ padding     = 8
 
 layers_overflow       = collapse
 stroke_thickness = 1
-stroke_color     = $il{$key}{color}_a2
+stroke_color     = $il{$key}{color}_a3
 </plot>
+
+<plot>
+type = text
+file = output/ilname/${key}.csv
+color      = black
+label_font = bold
+label_size = 18p
+r0   = ${radiusText}r
+r1   = ${radiusTextEnd}r
+padding    = 15p
+rpadding   = 15p
+</plot>    
 OUT
 ;
+
 
 =cut
 print OUT <<OUT
@@ -531,7 +642,7 @@ padding     = 8
 
 layers_overflow       = collapse
 stroke_thickness = 1
-stroke_color     = $il{$key}{color}_a2
+stroke_color     = $il{$key}{color}_a3
 </plot>
 OUT
 ;
@@ -542,8 +653,8 @@ print OUT <<OUT
 <plot>
 type = scatter
 file             = output/exppen/chr$chrI
-fill_color       = green_a2
-stroke_color     = green_a2
+fill_color       = green_a3
+stroke_color     = green_a3
 glyph            = circle
 glyph_size       = 15
 
@@ -576,8 +687,8 @@ print OUT <<OUT
 <plot>
 type = scatter
 file             = output/exp/${key}.csv
-fill_color       = $il{$key}{color}_a2
-stroke_color     = $il{$key}{color}_a2
+fill_color       = $il{$key}{color}_a3
+stroke_color     = $il{$key}{color}_a3
 glyph            = circle
 glyph_size       = 15
 
@@ -608,8 +719,8 @@ print OUT <<OUT
 <plot>
 type = scatter
 file             = output/inter/${key}.csv
-fill_color       = black_a2
-stroke_color     = black_a2
+fill_color       = black_a3
+stroke_color     = black_a3
 glyph            = circle
 glyph_size       = 15
 
@@ -622,13 +733,15 @@ r0    = 0.77r
 OUT
 ;
 }
+
+
 print OUT "</plots>\n";
 
 
 print OUT <<OUT
-<<include ideogram.conf>>
+<<include data/conf/ideogram.conf>>
 
-<<include ticks.conf>>
+<<include data/conf/ticks.conf>>
 
 <image>
 <<include etc/image.conf>>                
@@ -700,8 +813,6 @@ positions for the SNPs (see command pen above). We create a file that contains
 a line, sl8 552376 552386 color=white. The file is output/snpother:b 1
 /IL9-3_SNP. 
 
-
-
 find-position-il.R: IL6-1_SNP no SNPs in chr06. 
 
 links: links. 
@@ -711,7 +822,6 @@ exp: intra expression
 inter: inter expression
 
 circos: create circos files.
-
 
 =over 8
 
@@ -765,7 +875,7 @@ Sang Chul Choi, C<< <goshng_at_yahoo_dot_co_dot_kr> >>
 
 =head1 BUGS
 
-If you find a bug please post a message rnaseq_analysis project at codaset dot
+If you find a bug please post a message Tomato analysis project at codaset dot
 com repository so that I can make prepare-circos-data.pl better.
 
 =head1 COPYRIGHT
