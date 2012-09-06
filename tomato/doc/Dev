@@ -9,3 +9,7 @@ as.numeric((x)[,4]) + as.numeric((x.o)[,4]) == as.numeric(x.b[,3])
 as.numeric((x)[,5]) + as.numeric((x.o)[,5]) == as.numeric(x.b[,4])
 as.numeric((x)[,6]) + as.numeric((x.o)[,6]) == as.numeric(x.b[,5])
 as.numeric((x)[,7]) + as.numeric((x.o)[,7]) == as.numeric(x.b[,6])
+
+as.numeric((x)[,3]) + as.numeric((x)[,4]) + as.numeric((x)[,5]) + as.numeric((x)[,6]) == as.numeric((x)[,7])
+as.numeric((x.o)[,3]) + as.numeric((x.o)[,4]) + as.numeric((x.o)[,5]) + as.numeric((x.o)[,6]) == as.numeric((x.o)[,7])
+as.numeric((x.b)[,2]) + as.numeric((x.b)[,3]) + as.numeric((x.b)[,4]) + as.numeric((x.b)[,5]) == as.numeric((x.b)[,6])

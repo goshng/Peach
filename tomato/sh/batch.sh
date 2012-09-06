@@ -17,6 +17,7 @@
 # along with Tomato Analysis.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 function batch {
+  date
 #  RAW=smallraw
 #  NUMBERCHROM=2
   RAW=raw
@@ -146,4 +147,6 @@ function batch {
     mkdir output/circosout/$g
     circos -conf output/circos/chr$g.conf -outputdir output/circosout/$g
   done 
+
+  date
 }

@@ -41,6 +41,7 @@ GetOptions( \%params,
             'nchr=i',
             'il=s',
             'ilpositionfile=s',
+            'chril=s',
             'ilpositiondir=s',
             'in=s',
             'infile=s',
@@ -150,6 +151,15 @@ elsif ($cmd eq "pen")
   unless (defined $params{infile}
           and defined $params{nchr}
           and defined $params{outdir})
+  {
+    print STDERR "ERROR: You need options for $cmd command.\n";
+    exit(0);
+  }
+}
+elsif ($cmd eq "ilmap")
+{
+  unless (defined $params{ilpositiondir}
+          and defined $params{chril})
   {
     print STDERR "ERROR: You need options for $cmd command.\n";
     exit(0);
@@ -456,6 +466,112 @@ elsif ($cmd eq "pen")
     close(OUT);
     print $outfile "sl$chrI\t$count\n";  
   }
+}
+elsif ($cmd eq "ilmap")
+{
+  # Lengths of chromosomes.
+  my $maxChrLength = 0;
+  my $sumChrLength = 0;
+  my @chrLength;
+  open KARYOTYPE, "data/karyotype/karyotype.sol.txt";
+  while (<KARYOTYPE>)
+  {
+    my @a = split /\s+/;
+    push @chrLength, $a[5];
+    if ($maxChrLength < $a[5])
+    {
+      $maxChrLength = $a[5];
+    }
+  }
+  close KARYOTYPE;
+
+  for (my $y = 1; $y <= 12; $y++)
+	{
+	  $sumChrLength += $chrLength[$y];
+	}
+  my $interbp = 4000000;
+  $sumChrLength += ($interbp * 11);
+	my $baseLength = 20/$sumChrLength;
+	# print STDERR $sumChrLength, "\n";
+
+	my @endChrbp;
+	push @endChrbp, 0;
+	my $a = 0;
+  for (my $y = 1; $y <= 12; $y++)
+	{
+	  $a += $chrLength[$y];
+		$a += $interbp if $y > 1;
+	  push @endChrbp, $a;
+	}
+
+  for (my $x = 1; $x <= 74; $x++)
+  {
+    for (my $y = 1; $y <= 12; $y++)
+    {
+      my $xpos = $x * 0.27; 
+      my $yheight = $chrLength[$y] * $baseLength;
+			
+			my $ystart = ($sumChrLength - $endChrbp[$y]) * $baseLength;
+      print "\\filldraw[fill=yellow] ($xpos,$ystart) rectangle +(0.15,$yheight);\n";    
+    }
+  }
+
+  for (my $y = 1; $y <= 12; $y++)
+    {
+			my $ystart = ($sumChrLength - $endChrbp[$y] + 10000000) * $baseLength;
+      print "\\draw[font=\\footnotesize] (-0.1,$ystart) node [align=flush right] {$y};\n";
+    }
+
+  open CHRIL, $params{chril} or die "cannot open < $params{chril}"; 
+  my $orderIL = 0;
+  while (<CHRIL>)
+  {
+    $orderIL += 0.27;
+    my $orderILOfLabel = $orderIL + 0.3;
+    my @a = split /,/;
+    $a[0] =~ /IL(\d+)/;
+    my $ilname = $a[0];
+    my $chr = $1;
+		open IL, "$params{ilpositiondir}/$a[0].csv"
+      or die "cannot open $params{ilpositiondir}/$a[0].csv";
+    my $l = <IL>;
+    @a = split /\s+/, $l;
+    my $heightIL = ($a[1] - $a[0]) * $baseLength;
+    my $lowerIL = ($sumChrLength - $endChrbp[$chr] + $chrLength[$chr] - $a[1]) * $baseLength;
+		$lowerIL = 0 if ($lowerIL < 2.632092e-04);
+      
+    # print $chr,"\t",$a[0],"\t",$a[1],"\t",$chrLength[$chr],"\n";
+
+    print "\\filldraw[fill=black] ($orderIL,$lowerIL) rectangle +(0.15,$heightIL);\n";
+    print "\\draw[font=\\tiny] ($orderILOfLabel,20.5) node [align=flush right,rotate=60] {$ilname};\n";
+
+    close (IL);
+  }
+  close CHRIL;
+
+=cut
+  opendir (my $dh, $params{ilpositiondir}) or die "";
+  while(readdir $dh) 
+  {
+    if (/IL(\d+)/)
+    {
+      my $chr = $1;
+		  open IL, "$params{ilpositiondir}/$_"
+			  or die "cannot open $params{ilpositiondir}/$_";
+      my $l = <IL>;
+      my @a = split /\s+/, $l;
+      my $heightIL = ($a[1] - $a[0])/$chrLength[$chr]*0.9;
+      my $lowerIL = (1-$a[1]/$chrLength[$chr])*0.9 + 13 - $chr;
+      
+      # print $chr,"\t",$a[0],"\t",$a[1],"\t",$chrLength[$chr],"\n";
+
+print "\\filldraw[fill=black] ($chr,$lowerIL) rectangle +(0.1,$heightIL);\n";
+
+		  close (IL);
+    }
+  }
+  closedir $dh;
+=cut
 }
 elsif ($cmd eq "circos")
 {
@@ -822,6 +938,12 @@ exp: intra expression
 inter: inter expression
 
 circos: create circos files.
+
+ilmap: create IL maps.
+
+perl pl/prepare-circos-data.pl ilmap -ilpositiondir data/raw/ilposition -chril data/raw/chr-il.txt > ~/1
+
+perl pl/prepare-circos-data.pl ilmap -ilpositiondir data/raw/ilposition -chril data/raw/chr-il.txt > /Users/goshng/Dropbox/Documents/Projects/Peach/pgf/1.tex
 
 =over 8
 

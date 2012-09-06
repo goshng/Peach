@@ -17,7 +17,7 @@ done
 
 BASEDIR=`pwd`
 echo Creating soft links to directories in the source code base directory...
-for i in R doc pl sh src run COPYING; do
+for i in R doc pl sh src run tex COPYING; do
 rm $LOCALBASEDIR/$i 
 ln -s $BASEDIR/$i $LOCALBASEDIR/$i 
 done
