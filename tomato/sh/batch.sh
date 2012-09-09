@@ -18,10 +18,10 @@
 ###############################################################################
 function batch {
   date
-#  RAW=smallraw
-#  NUMBERCHROM=2
-  RAW=raw
-  NUMBERCHROM=12
+  RAW=smallraw
+  NUMBERCHROM=2
+#  RAW=raw
+#  NUMBERCHROM=12
   rm -rf output/count; mkdir output/count
 
   # Number of unique SNPs in IL lines per chromosome. 
@@ -147,6 +147,13 @@ function batch {
     mkdir output/circosout/$g
     circos -conf output/circos/chr$g.conf -outputdir output/circosout/$g
   done 
+
+  perl pl/prepare-circos-data.pl ilmap \
+    -ilpositionfile data/$RAW/ilmap2.txt \
+    -chril data/$RAW/order.csv \
+    > output/ilmap.tex
+
+  pdflatex -output-directory output tex/ilmap.tex
 
   date
 }

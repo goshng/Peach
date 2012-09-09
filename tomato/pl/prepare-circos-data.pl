@@ -21,6 +21,10 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
+
+sub parseILPosition ($);
+sub parseILOrder ($);
+
 $| = 1; # Do not buffer output
 my $VERSION = 'prepare-circos-data.pl 1.0';
 
@@ -158,7 +162,16 @@ elsif ($cmd eq "pen")
 }
 elsif ($cmd eq "ilmap")
 {
-  unless (defined $params{ilpositiondir}
+  unless (defined $params{ilpositionfile}
+          and defined $params{chril})
+  {
+    print STDERR "ERROR: You need options for $cmd command.\n";
+    exit(0);
+  }
+}
+elsif ($cmd eq "parse-ilposition")
+{
+  unless (defined $params{ilpositionfile}
           and defined $params{chril})
   {
     print STDERR "ERROR: You need options for $cmd command.\n";
@@ -169,7 +182,96 @@ elsif ($cmd eq "ilmap")
 ################################################################################
 ## DATA PROCESSING
 ################################################################################
-if ($cmd eq "links")
+if ($cmd eq "parse-ilposition")
+{
+  ##############################################################################
+  # %ilposition and @ilorder
+
+=cut
+  my $ilname;
+  open ILMAP, $params{ilpositionfile} 
+    or die "cannot open $params{ilpositionfile}"; 
+  while (<ILMAP>)
+  {
+    chomp;
+    if (/^(IL\S+)/)
+    {
+      my @array = ("1:0","1:0");
+      $ilname = $1;
+      $ilposition{$ilname} = [ @array ];
+    }
+    elsif (/^SL2.40ch(\d+),/) # SL2.40ch01
+    {
+      my $chrNum = int($1);
+      my @a = split /,/;
+      my $type = "";
+      if (scalar(@a) == 3)
+      {
+        if ($a[2] eq "main")
+        {
+          $type = "main";
+        } 
+        elsif ($a[2] eq "m82")
+        {
+          $type = "m82";
+        }
+        else
+        {
+          $type = "";
+        }
+      }
+      if ($type eq "main")
+      {
+        # $ilposition{$ilname}[0] = sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        $ilposition{$ilname}[0] = sprintf("SL2.40ch%02d,%d,%s,",$chrNum,$a[1],$type);
+        my $line = <ILMAP>;
+        chomp $line;
+        $line =~ /^SL2.40ch(\d+),/;
+        $chrNum = int($1);
+        @a = split /,/, $line;
+        # $ilposition{$ilname}[1] = sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        $ilposition{$ilname}[1] = sprintf("SL2.40ch%02d,%d,,",$chrNum,$a[1]);
+      }
+      else
+      {
+        # push @{ $ilposition{$ilname} }, sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        push @{ $ilposition{$ilname} }, sprintf("SL2.40ch%02d,%d,%s,",$chrNum,$a[1],$type);
+        my $line = <ILMAP>;
+        chomp $line;
+        $line =~ /^SL2.40ch(\d+),/;
+        $chrNum = int($1);
+        @a = split /,/, $line;
+        # push @{ $ilposition{$ilname} }, sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        push @{ $ilposition{$ilname} }, sprintf("SL2.40ch%02d,%d,,",$chrNum,$a[1]);
+      }
+    }
+  }
+  close ILMAP;
+
+  open ORDER, $params{chril} or die "cannot open $params{chril} $!"; 
+  while (<ORDER>)
+  {
+    chomp;
+    push @ilorder, $_;
+  }
+  close ORDER;
+=cut
+
+  my %ilposition = parseILPosition ($params{ilpositionfile});
+  my @ilorder = parseILOrder ($params{chril});
+
+  # Print ilposition in the order of ilorder.
+  foreach my $ilname (@ilorder)
+  {
+    print "$ilname reads,,,\n";
+    foreach my $i ( 0 .. $#{ $ilposition{$ilname} } ) 
+    {
+      print "$ilposition{$ilname}[$i]\n";
+      # print " $i = $ilposition{$ilname}[$i]\n";
+    }
+  }
+}
+elsif ($cmd eq "links")
 {
   # Find the IL position.
   my $sourceStartPosition = 0;
@@ -522,56 +624,48 @@ elsif ($cmd eq "ilmap")
       print "\\draw[font=\\footnotesize] (-0.1,$ystart) node [align=flush right] {$y};\n";
     }
 
-  open CHRIL, $params{chril} or die "cannot open < $params{chril}"; 
+  my %ilposition = parseILPosition ($params{ilpositionfile});
+  my @ilorder = parseILOrder ($params{chril});
   my $orderIL = 0;
-  while (<CHRIL>)
+  foreach my $ilname (@ilorder)
   {
     $orderIL += 0.27;
     my $orderILOfLabel = $orderIL + 0.3;
-    my @a = split /,/;
-    $a[0] =~ /IL(\d+)/;
-    my $ilname = $a[0];
-    my $chr = $1;
-		open IL, "$params{ilpositiondir}/$a[0].csv"
-      or die "cannot open $params{ilpositiondir}/$a[0].csv";
-    my $l = <IL>;
-    @a = split /\s+/, $l;
-    my $heightIL = ($a[1] - $a[0]) * $baseLength;
-    my $lowerIL = ($sumChrLength - $endChrbp[$chr] + $chrLength[$chr] - $a[1]) * $baseLength;
-		$lowerIL = 0 if ($lowerIL < 2.632092e-04);
-      
-    # print $chr,"\t",$a[0],"\t",$a[1],"\t",$chrLength[$chr],"\n";
+    # $ilname =~ /IL(\d+)/;
+    # my $chr = $1;
 
-    print "\\filldraw[fill=black] ($orderIL,$lowerIL) rectangle +(0.15,$heightIL);\n";
-    print "\\draw[font=\\tiny] ($orderILOfLabel,20.5) node [align=flush right,rotate=60] {$ilname};\n";
-
-    close (IL);
-  }
-  close CHRIL;
-
-=cut
-  opendir (my $dh, $params{ilpositiondir}) or die "";
-  while(readdir $dh) 
-  {
-    if (/IL(\d+)/)
+    my $numberIL = scalar(@{ $ilposition{$ilname} }) / 2;
+    foreach my $i (1 .. $numberIL)
     {
-      my $chr = $1;
-		  open IL, "$params{ilpositiondir}/$_"
-			  or die "cannot open $params{ilpositiondir}/$_";
-      my $l = <IL>;
-      my @a = split /\s+/, $l;
-      my $heightIL = ($a[1] - $a[0])/$chrLength[$chr]*0.9;
-      my $lowerIL = (1-$a[1]/$chrLength[$chr])*0.9 + 13 - $chr;
-      
+      $ilposition{$ilname}[$i*2-2] =~ /^SL2.40ch(\d+),(\d+)/;
+      my $chr = int($1);
+      next if $chr == 0;
+      my $chrStart = $2;
+      my @a = split /,/, $ilposition{$ilname}[$i*2-2];
+      die "Not 3 elements scalar(@a)" unless scalar(@a) == 2 or scalar(@a) == 3;
+      my $color = "black";
+      if (scalar(@a) == 3 and $a[2] eq "m82")
+      {
+        $color = "gray";
+      }
+      $ilposition{$ilname}[$i*2-1] =~ /^SL2.40ch(\d+),(\d+)/;
+      my $chrEnd = $2;
+
+      my $heightIL = ($chrEnd - $chrStart) * $baseLength;
+      my $lowerIL = ($sumChrLength - $endChrbp[$chr] + $chrLength[$chr] - $chrEnd) * $baseLength;
+      $lowerIL = 0 if ($lowerIL < 1e-4);
+      if ($heightIL < 1e-4)
+      {
+        $heightIL = 1e-4;
+        print STDERR "Height is too small to display\n";
+      }
+        
       # print $chr,"\t",$a[0],"\t",$a[1],"\t",$chrLength[$chr],"\n";
 
-print "\\filldraw[fill=black] ($chr,$lowerIL) rectangle +(0.1,$heightIL);\n";
-
-		  close (IL);
+      print "\\filldraw[fill=$color,draw=$color] ($orderIL,$lowerIL) rectangle +(0.15,$heightIL);\n";
     }
+    print "\\draw[font=\\tiny] ($orderILOfLabel,20.5) node [align=flush right,rotate=60] {$ilname};\n";
   }
-  closedir $dh;
-=cut
 }
 elsif ($cmd eq "circos")
 {
@@ -883,6 +977,88 @@ if (exists $params{out})
   close $outfile;
 }
 
+################################################################################
+# Local functions
+sub parseILPosition ($)
+{
+  my ($ilpositionfile) = @_;
+  my %ilposition;
+  my $ilname;
+  open ILMAP, $ilpositionfile
+    or die "cannot open $ilpositionfile $!"; 
+  while (<ILMAP>)
+  {
+    chomp;
+    if (/^(IL\S+)/)
+    {
+      my @array = ("1:0","1:0");
+      $ilname = $1;
+      $ilposition{$ilname} = [ @array ];
+    }
+    elsif (/^SL2.40ch(\d+),/) # SL2.40ch01
+    {
+      my $chrNum = int($1);
+      my @a = split /,/;
+      my $type = "";
+      if (scalar(@a) == 3)
+      {
+        if ($a[2] eq "main")
+        {
+          $type = "main";
+        } 
+        elsif ($a[2] eq "m82")
+        {
+          $type = "m82";
+        }
+        else
+        {
+          $type = "";
+        }
+      }
+      if ($type eq "main")
+      {
+        # $ilposition{$ilname}[0] = sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        $ilposition{$ilname}[0] = sprintf("SL2.40ch%02d,%d,%s,",$chrNum,$a[1],$type);
+        my $line = <ILMAP>;
+        chomp $line;
+        $line =~ /^SL2.40ch(\d+),/;
+        $chrNum = int($1);
+        @a = split /,/, $line;
+        # $ilposition{$ilname}[1] = sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        $ilposition{$ilname}[1] = sprintf("SL2.40ch%02d,%d,,",$chrNum,$a[1]);
+      }
+      else
+      {
+        # push @{ $ilposition{$ilname} }, sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        push @{ $ilposition{$ilname} }, sprintf("SL2.40ch%02d,%d,%s,",$chrNum,$a[1],$type);
+        my $line = <ILMAP>;
+        chomp $line;
+        $line =~ /^SL2.40ch(\d+),/;
+        $chrNum = int($1);
+        @a = split /,/, $line;
+        # push @{ $ilposition{$ilname} }, sprintf("%s:%d:%d",$type,$chrNum,$a[1]);
+        push @{ $ilposition{$ilname} }, sprintf("SL2.40ch%02d,%d,,",$chrNum,$a[1]);
+      }
+    }
+  }
+  close ILMAP;
+  return %ilposition;
+}
+
+sub parseILOrder ($)
+{
+  my ($chrilfile) = @_;
+  my @ilorder;
+  open ORDER, $chrilfile or die "cannot open $chrilfile $!"; 
+  while (<ORDER>)
+  {
+    chomp;
+    push @ilorder, $_;
+  }
+  close ORDER;
+  return @ilorder;
+}
+
 __END__
 =head1 NAME
 
@@ -944,6 +1120,10 @@ ilmap: create IL maps.
 perl pl/prepare-circos-data.pl ilmap -ilpositiondir data/raw/ilposition -chril data/raw/chr-il.txt > ~/1
 
 perl pl/prepare-circos-data.pl ilmap -ilpositiondir data/raw/ilposition -chril data/raw/chr-il.txt > /Users/goshng/Dropbox/Documents/Projects/Peach/pgf/1.tex
+
+To check and parse ilmap2.txt and order.csv.
+perl pl/prepare-circos-data.pl parse-ilposition -ilpositionfile data/smallraw/ilmap2-check.txt -chril data/smallraw/order-check.csv > t1
+diff t1 data/smallraw/ilmap2-check.txt 
 
 =over 8
 
