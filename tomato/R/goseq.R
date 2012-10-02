@@ -7,9 +7,9 @@ if (length(args) != 1)
   quit("no")
 }
 raw <- args[1]
-GFFFILE <- paste("data",raw,"ITAG2.3_gene_models.gff3",sep="/")
+GFFFILE <- paste("data",raw,"gff.RData",sep="/")
+load(GFFFILE)
 
-gene.range <- import.gff3(GFFFILE)
 gene.range.mrna <- gene.range[gene.range$type=="mRNA",]
 gene.range.mrna$score <- 0
 colnames(gene.range.mrna)[colnames(gene.range.mrna) == "Name"] <- "name"

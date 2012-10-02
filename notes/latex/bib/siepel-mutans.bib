@@ -2148,6 +2148,54 @@
   url = {http://dx.doi.org/10.1371/journal.pone.0003042}
 }
 
+@ARTICLE{Goeman2007,
+  author = {Goeman, Jelle J. and Bühlmann, Peter},
+  title = {Analyzing gene expression data in terms of gene sets: methodological
+	issues.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {980--987},
+  number = {8},
+  month = {Apr},
+  __markedentry = {[goshng:]},
+  abstract = {MOTIVATION: Many statistical tests have been proposed in recent years
+	for analyzing gene expression data in terms of gene sets, usually
+	from Gene Ontology. These methods are based on widely different methodological
+	assumptions. Some approaches test differential expression of each
+	gene set against differential expression of the rest of the genes,
+	whereas others test each gene set on its own. Also, some methods
+	are based on a model in which the genes are the sampling units, whereas
+	others treat the subjects as the sampling units. This article aims
+	to clarify the assumptions behind different approaches and to indicate
+	a preferential methodology of gene set testing. RESULTS: We identify
+	some crucial assumptions which are needed by the majority of methods.
+	P-values derived from methods that use a model which takes the genes
+	as the sampling unit are easily misinterpreted, as they are based
+	on a statistical model that does not resemble the biological experiment
+	actually performed. Furthermore, because these models are based on
+	a crucial and unrealistic independence assumption between genes,
+	the P-values derived from such methods can be wildly anti-conservative,
+	as a simulation experiment shows. We also argue that methods that
+	competitively test each gene set against the rest of the genes create
+	an unnecessary rift between single gene testing and gene set testing.},
+  doi = {10.1093/bioinformatics/btm051},
+  institution = {Department of Medical Statistics and Bioinformatics, Leiden University
+	Medical Center, Leiden, The Netherlands. j.j.goeman@lumc.nl},
+  keywords = {Algorithms; Artifacts; Data Interpretation, Statistical; Databases,
+	Genetic; Gene Expression Profiling, methods; Information Storage
+	and Retrieval, methods; Reproducibility of Results; Sensitivity and
+	Specificity},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btm051},
+  pmid = {17303618},
+  review = {jemin},
+  timestamp = {2012.09.09},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btm051}
+}
+
 @ARTICLE{Griffiths-Jones2005,
   author = {Griffiths-Jones, Sam},
   title = {Annotating non-coding RNAs with Rfam.},
@@ -2189,7 +2237,6 @@
   year = {2008},
   volume = {9},
   pages = {122},
-  __markedentry = {[goshng:6]},
   abstract = {Evolutionary conservation of RNA secondary structure is a typical
 	feature of many functional non-coding RNAs. Since almost all of the
 	available methods used for prediction and annotation of non-coding
@@ -2431,6 +2478,41 @@
   pmid = {19996181},
   timestamp = {2012.01.25},
   url = {http://dx.doi.org/10.1073/pnas.0909051106}
+}
+
+@ARTICLE{Jacob2012,
+  author = {Jacob, Laurent and Neuvial, Pierre and Dudoit, Sandrine},
+  title = {{More power via graph-structured tests for differential expression
+	of gene networks.}},
+  journal = {Ann. Appl. Stat. },
+  year = {2012},
+  volume = {6},
+  pages = {561-600},
+  number = {2},
+  abstract = {{Summary: We consider multivariate two-sample tests of means, where
+	the location shift between the two populations is expected to be
+	related to a known graph structure. An important application of such
+	tests is the detection of differentially expressed genes between
+	two patient populations, as shifts in expression levels are expected
+	to be coherent with the structure of graphs reflecting gene properties
+	such as biological process, molecular function, regulation or metabolism.
+	For a fixed graph of interest, we demonstrate that accounting for
+	graph structure can yield more powerful tests under the assumption
+	of smooth distribution shift on the graph. We also investigate the
+	identification of nonhomogeneous subgraphs of a given large graph,
+	which poses both computational and multiple hypothesis testing problems.
+	The relevance and benefits of the proposed approach are illustrated
+	on synthetic data and on breast and bladder cancer gene expression
+	data analyzed in the context of KEGG and NCI pathways.}},
+  classmath = {{*62H15 (Multivariate hypothesis testing) 05C90 (Appl. of graph theory)
+	92C42 ( ) 92C40 (Biochemistry, etc.) 62P10 (Appl. of statistics to
+	biology) 65C60 (Computational problems in statistics) }},
+  doi = {10.1214/11-AOAS528},
+  keywords = {{biological networks; pathways; enrichment analysis; two-sample test;
+	Hotelling T2; spectral graph theory; graph Laplacian; dimensionality
+	reduction}},
+  language = {English},
+  review = {jemin}
 }
 
 @ARTICLE{Jenkinson2005,
@@ -3709,6 +3791,48 @@
   url = {http://dx.doi.org/10.1016/j.copbio.2010.10.003}
 }
 
+@ARTICLE{Nacu2007,
+  author = {Nacu, Serban and Critchley-Thorne, Rebecca and Lee, Peter and Holmes,
+	Susan},
+  title = {Gene expression network analysis and applications to immunology.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {850--858},
+  number = {7},
+  month = {Apr},
+  abstract = {We address the problem of using expression data and prior biological
+	knowledge to identify differentially expressed pathways or groups
+	of genes. Following an idea of Ideker et al. (2002), we construct
+	a gene interaction network and search for high-scoring subnetworks.
+	We make several improvements in terms of scoring functions and algorithms,
+	resulting in higher speed and accuracy and easier biological interpretation.
+	We also assign significance levels to our results, adjusted for multiple
+	testing. Our methods are successfully applied to three human microarray
+	data sets, related to cancer and the immune system, retrieving several
+	known and potential pathways. The method, denoted by the acronym
+	GXNA (Gene eXpression Network Analysis) is implemented in software
+	that is publicly available and can be used on virtually any microarray
+	data set. SUPPLEMENTARY INFORMATION: The source code and executable
+	for the software, as well as certain supplemental materials, can
+	be downloaded from http://stat.stanford.edu/~serban/gxna.},
+  doi = {10.1093/bioinformatics/btm019},
+  institution = {Department of Statistics, Stanford University, Stanford, CA 94305,
+	USA. serban@stat.stanford.edu},
+  keywords = {Algorithms; Computer Simulation; Gene Expression Profiling, methods;
+	Gene Expression Regulation, immunology; Immunologic Techniques; Models,
+	Immunological; Oligonucleotide Array Sequence Analysis, methods;
+	Proteome, immunology; Signal Transduction, immunology; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btm019},
+  pmid = {17267429},
+  review = {jemin},
+  timestamp = {2012.09.09},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btm019}
+}
+
 @BOOKLET{health2010,
   title = {{Health, United States, 2009: With Special Feature on Medical Technology.}},
   author = {{National Center for Health Statistics}},
@@ -4357,7 +4481,6 @@
   pages = {841--842},
   number = {6},
   month = {Mar},
-  __markedentry = {[goshng:]},
   abstract = {Testing for correlations between different sets of genomic features
 	is a fundamental task in genomics research. However, searching for
 	overlaps between features with existing web-based methods is complicated
@@ -4749,6 +4872,55 @@
   pii = {S0219720007003028},
   pmid = {17933013},
   timestamp = {2012.07.24}
+}
+
+@ARTICLE{Sales2012,
+  author = {Sales, Gabriele and Calura, Enrica and Cavalieri, Duccio and Romualdi,
+	Chiara},
+  title = {graphite - a Bioconductor package to convert pathway topology to
+	gene network.},
+  journal = {BMC Bioinformatics},
+  year = {2012},
+  volume = {13},
+  pages = {20},
+  __markedentry = {[goshng:6]},
+  abstract = {Gene set analysis is moving towards considering pathway topology as
+	a crucial feature. Pathway elements are complex entities such as
+	protein complexes, gene family members and chemical compounds. The
+	conversion of pathway topology to a gene/protein networks (where
+	nodes are a simple element like a gene/protein) is a critical and
+	challenging task that enables topology-based gene set analyses.Unfortunately,
+	currently available R/Bioconductor packages provide pathway networks
+	only from single databases. They do not propagate signals through
+	chemical compounds and do not differentiate between complexes and
+	gene families.Here we present graphite, a Bioconductor package addressing
+	these issues. Pathway information from four different databases is
+	interpreted following specific biologically-driven rules that allow
+	the reconstruction of gene-gene networks taking into account protein
+	complexes, gene families and sensibly removing chemical compounds
+	from the final graphs. The resulting networks represent a uniform
+	resource for pathway analyses. Indeed, graphite provides easy access
+	to three recently proposed topological methods. The graphite package
+	is available as part of the Bioconductor software suite.graphite
+	is an innovative package able to gather and make easily available
+	the contents of the four major pathway databases. In the field of
+	topological analysis graphite acts as a provider of biological information
+	by reducing the pathway complexity considering the biological meaning
+	of the pathway elements.},
+  doi = {10.1186/1471-2105-13-20},
+  institution = {Department of Biology, University of Padova, via U, Bassi 58/B, Padova,
+	Italy.},
+  keywords = {Gene Regulatory Networks; Humans; Insulin, metabolism; Oligonucleotide
+	Array Sequence Analysis, methods; Receptor, Notch1, metabolism; Signal
+	Transduction; Software},
+  language = {eng},
+  medline-pst = {epublish},
+  owner = {goshng},
+  pii = {1471-2105-13-20},
+  pmid = {22292714},
+  review = {jemin R package qpgraph GeneNetworkBuilder},
+  timestamp = {2012.09.09},
+  url = {http://dx.doi.org/10.1186/1471-2105-13-20}
 }
 
 @ARTICLE{Schmieder2011,

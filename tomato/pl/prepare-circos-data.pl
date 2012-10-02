@@ -41,6 +41,7 @@ GetOptions( \%params,
             'help|h',
             'verbose',
             'version' => sub { print $VERSION."\n"; exit; },
+            'rfriendly',
             'chr=i',
             'nchr=i',
             'il=s',
@@ -178,6 +179,27 @@ elsif ($cmd eq "parse-ilposition")
     exit(0);
   }
 }
+elsif ($cmd eq "circos")
+{
+  unless (defined $params{nchr}
+          and defined $params{outdir}
+          and defined $params{infile})
+  {
+    print STDERR "ERROR: You need options for $cmd command.\n";
+    exit(0);
+  }
+}
+elsif ($cmd eq "circos2")
+{
+  unless (defined $params{ilpositionfile}
+          and defined $params{nchr}
+          and defined $params{chril}
+          and defined $params{outdir})
+  {
+    print STDERR "ERROR: You need options for $cmd command.\n";
+    exit(0);
+  }
+}
 
 ################################################################################
 ## DATA PROCESSING
@@ -260,14 +282,50 @@ if ($cmd eq "parse-ilposition")
   my %ilposition = parseILPosition ($params{ilpositionfile});
   my @ilorder = parseILOrder ($params{chril});
 
-  # Print ilposition in the order of ilorder.
-  foreach my $ilname (@ilorder)
+  if (exists $params{rfriendly})
   {
-    print "$ilname reads,,,\n";
-    foreach my $i ( 0 .. $#{ $ilposition{$ilname} } ) 
+    # Print ilposition in the order of ilorder.
+    print "chr,start,end,il,type\n";
+
+    foreach my $ilname (@ilorder)
     {
-      print "$ilposition{$ilname}[$i]\n";
-      # print " $i = $ilposition{$ilname}[$i]\n";
+      my $numberIL = scalar(@{ $ilposition{$ilname} }) / 2;
+      foreach my $i (1 .. $numberIL)
+      {
+        $ilposition{$ilname}[$i*2-2] =~ /^SL2.40ch(\d+),(\d+)/;
+        my $chr = int($1);
+        my $chrStart = $2;
+        my @a = split /,/, $ilposition{$ilname}[$i*2-2];
+        die "Not 3 elements scalar(@a)" unless scalar(@a) == 2 or scalar(@a) == 3;
+        my $type = "minor";
+        if (scalar(@a) == 3)
+        {
+          if ($a[2] eq "m82" or $a[2] eq "main")
+          {
+            $type = $a[2];
+          }
+          else
+          {
+            die "Type must be either main or m82";
+          }
+        }
+        $ilposition{$ilname}[$i*2-1] =~ /^SL2.40ch(\d+),(\d+)/;
+        my $chrEnd = $2;
+        print "$chr,$chrStart,$chrEnd,$ilname,$type\n";
+      }
+    }
+  }
+  else
+  {
+    # Print ilposition in the order of ilorder.
+    foreach my $ilname (@ilorder)
+    {
+      print "$ilname reads,,,\n";
+      foreach my $i ( 0 .. $#{ $ilposition{$ilname} } ) 
+      {
+        print "$ilposition{$ilname}[$i]\n";
+        # print " $i = $ilposition{$ilname}[$i]\n";
+      }
     }
   }
 }
@@ -709,6 +767,9 @@ elsif ($cmd eq "circos")
     }
     close(IN);
 
+################################################################################
+# INSIDE THE FOREACH
+################################################################################
 my $maxOrder = 0;
 foreach my $key (keys %il)
 {
@@ -755,7 +816,7 @@ foreach my $key (keys %il)
 {
 print OUT <<OUT
 <link>
-file          = output/links/$key.csv
+file          = output/links2/$key
 radius        = ${radiusLink}r
 bezier_radius = 0r
 color         = $il{$key}{color}_a3
@@ -808,7 +869,7 @@ my $radiusTextEnd = $radiusEnd - 0.01;
 print OUT <<OUT
 <plot>
 type = tile
-file = output/snp/${key}_SNP
+file = output/cissnpinsideil/${key}
 r0   = ${radius}r
 r1   = ${radius}r
 
@@ -824,7 +885,7 @@ stroke_color     = $il{$key}{color}_a3
 
 <plot>
 type = text
-file = output/ilname/${key}.csv
+file = output/ilname/${key}
 color      = black
 label_font = bold
 label_size = 18p
@@ -896,7 +957,7 @@ foreach my $key (keys %il)
 print OUT <<OUT
 <plot>
 type = scatter
-file             = output/exp/${key}.csv
+file             = output/cis2/${key}
 fill_color       = $il{$key}{color}_a3
 stroke_color     = $il{$key}{color}_a3
 glyph            = circle
@@ -928,7 +989,7 @@ OUT
 print OUT <<OUT
 <plot>
 type = scatter
-file             = output/inter/${key}.csv
+file             = output/trans2/${key}
 fill_color       = black_a3
 stroke_color     = black_a3
 glyph            = circle
@@ -964,6 +1025,318 @@ OUT
 ;
 
     close(OUT);
+################################################################################
+# END OF THE FOREACH
+################################################################################
+  }
+}
+elsif ($cmd eq "circos2")
+{
+  my @colors = ("black","red","blue","purple","orange","grey","magenta","brown","violet","pink","tomato");
+  my %ilposition = parseILPosition ($params{ilpositionfile});
+  my @ilorder = parseILOrder ($params{chril});
+  my $orderIL = 0;
+  my $colori = 1;
+  foreach my $ilname (@ilorder)
+  {
+    my %il;
+    my $rec = {};
+    $il{$ilname} = $rec;
+    $rec->{order} = 1;
+    $rec->{color} = $colors[$colori];
+    $rec->{transcolor} = $colors[0];
+    $ilname =~ /IL(\d+)/;
+    my $chrI = int($1);
+
+################################################################################
+# INSIDE THE FOREACH
+################################################################################
+my $maxOrder = 1;
+ 
+foreach my $key (keys %il)
+{
+print STDERR "$key,$il{$key}{order},$il{$key}{color}\n";
+}
+
+    open OUT, ">$params{outdir}/$ilname.conf"
+      or die "cannot open $params{outdir}/$ilname.conf"; 
+
+print OUT <<OUT 
+# The chromosome sizes
+karyotype = data/karyotype/karyotype.sol.txt
+chromosomes_units = 1000000
+
+# Enlarge 
+chromosomes_scale = sl$chrI:5
+
+<image>                                                                         
+auto_alpha_colors = yes                                                         
+auto_alpha_steps  = 5
+</image>
+
+<colors>
+<<include etc/colors.conf>>
+<<include etc/colors.unix.txt>> 
+</colors>
+OUT
+;
+
+my $radiusBase = 0.73;
+my $radiusLink = 0.65 - 0.06 * $maxOrder; 
+
+print OUT "<links>\n";
+
+foreach my $key (keys %il)
+{
+print OUT <<OUT
+<link>
+file          = output/links2/$key
+radius        = ${radiusLink}r
+bezier_radius = 0r
+color         = $il{$key}{color}_a3
+thickness     = 2
+
+# <rules>
+# <rule>
+# condition     = var(intrachr)
+# show          = no
+# </rule>
+# </rules>
+
+</link>
+OUT
+;
+}
+
+print OUT "</links>\n";
+
+
+print OUT "<plots>\n";
+
+# PEN SNPs
+print OUT <<OUT
+<plot>                                                                          
+type = tile
+file = output/pen/chr$chrI
+r0   = 1.07r
+r1   = 1.07r
+
+layers = 1
+margin      = 0.02u                                                             
+thickness   = 50
+padding     = 8 
+
+layers_overflow       = collapse
+stroke_thickness = 1
+stroke_color     = green_a3
+</plot>
+OUT
+;
+
+# SNPs
+foreach my $key (keys %il)
+{
+my $radius = $radiusBase - 0.07 * $il{$key}{order};
+my $radiusEnd = $radius + 0.1;
+my $radiusText= $radius - 0.01;
+my $radiusTextEnd = $radiusEnd - 0.01;
+print OUT <<OUT
+<plot>
+type = tile
+file = output/cissnpinsideil/${key}
+r0   = ${radius}r
+r1   = ${radius}r
+
+layers = 1
+margin      = 0.02u
+thickness   = 50
+padding     = 8 
+
+layers_overflow       = collapse
+stroke_thickness = 1
+stroke_color     = $il{$key}{color}_a3
+</plot>
+
+<plot>
+type = tile
+file = output/cissnpoutsideil/${key}
+r0   = ${radius}r
+r1   = ${radius}r
+
+layers = 1
+margin      = 0.02u
+thickness   = 50
+padding     = 8 
+
+layers_overflow       = collapse
+stroke_thickness = 1
+stroke_color     = $il{$key}{color}_a3
+</plot>
+
+<plot>
+type = tile
+file = output/transsnpil/${key}
+r0   = ${radius}r
+r1   = ${radius}r
+
+layers = 1
+margin      = 0.02u
+thickness   = 50
+padding     = 8 
+
+layers_overflow       = collapse
+stroke_thickness = 1
+stroke_color     = $il{$key}{transcolor}_a3
+</plot>
+
+<plot>
+type = text
+file = output/ilname/${key}
+color      = black
+label_font = bold
+label_size = 18p
+r0   = ${radiusText}r
+r1   = ${radiusTextEnd}r
+padding    = 15p
+rpadding   = 15p
+</plot>    
+OUT
+;
+
+
+=cut
+print OUT <<OUT
+<plot>
+type = tile
+file = output/othersnp/${key}_SNP
+r0   = ${radius}r
+r1   = ${radius}r
+
+layers = 1
+margin      = 0.02u
+thickness   = 50
+padding     = 8 
+
+layers_overflow       = collapse
+stroke_thickness = 1
+stroke_color     = $il{$key}{color}_a3
+</plot>
+OUT
+;
+=cut
+}
+
+#for (my $chrJ = 0; $chrJ <= $params{nchr}; $chrJ++)
+#{
+print OUT <<OUT
+<plot>
+type = scatter
+file             = output/exppen/chr$chrI
+fill_color       = green_a3
+stroke_color     = green_a3
+glyph            = circle
+glyph_size       = 15
+
+max   = 15
+min   = -15
+r1    = 1.35r
+r0    = 1.15r
+
+<axes>
+<axis>
+thickness = 2
+position  = 0
+color     = red
+</axis>
+<axis>
+thickness = 1
+color     = lgrey
+spacing   = 5
+</axis>
+</axes>
+
+</plot>
+OUT
+;
+#}
+
+foreach my $key (keys %il)
+{
+# Intra-chromosomal eQTL
+print OUT <<OUT
+<plot>
+type = scatter
+file             = output/cis2/${key}
+fill_color       = $il{$key}{color}_a3
+stroke_color     = $il{$key}{color}_a3
+glyph            = circle
+glyph_size       = 15
+
+max   = 15
+min   = -15
+r1    = 0.97r
+r0    = 0.77r
+
+<axes>
+<axis>
+thickness = 2
+position  = 0
+color     = red
+</axis>
+<axis>
+thickness = 1
+color     = lgrey
+spacing   = 5
+</axis>
+</axes>
+
+</plot>
+OUT
+;
+
+# Inter-chromosomal eQTL
+print OUT <<OUT
+<plot>
+type = scatter
+file             = output/trans2/${key}
+fill_color       = black_a3
+stroke_color     = black_a3
+glyph            = circle
+glyph_size       = 15
+
+max   = 15
+min   = -15
+r1    = 0.97r
+r0    = 0.77r
+
+</plot>
+OUT
+;
+}
+
+
+print OUT "</plots>\n";
+
+
+print OUT <<OUT
+<<include data/conf/ideogram.conf>>
+
+<<include data/conf/ticks.conf>>
+
+<image>
+<<include etc/image.conf>>                
+</image>
+
+<<include etc/colors_fonts_patterns.conf>> 
+
+<<include etc/housekeeping.conf>> 
+OUT
+;
+
+    close(OUT);
+################################################################################
+# END OF THE FOREACH
+################################################################################
   }
 }
 

@@ -6,9 +6,8 @@ if (length(args) != 1)
 	quit("no")
 }
 raw <- args[1]
-GFFFILE <- paste("data",raw,"ITAG2.3_gene_models.gff3",sep="/")
-
-gene.range <- import.gff3(GFFFILE)
+GFFFILE <- paste("data",raw,"gff.RData",sep="/")
+load(GFFFILE)
 gene.range.mrna <- gene.range[gene.range$type=="mRNA",]
 
 # To create a table with position
@@ -20,7 +19,7 @@ for (i in list.files(inputDir,pattern="csv"))
   x10.1 <- x10.1[-1,]
   x10.1 <- x10.1[x10.1[,1]!="",]
   x10.1.pos <- gene.range.mrna[gene.range.mrna$ID %in% paste("mRNA:",x10.1[,1],sep=""),]
-  x10.1.2 <- data.frame(Gene=sub("mRNA:","",x10.1.pos$ID),start=start(x10.1.pos))
+  x10.1.2 <- data.frame(Gene=sub("mRNA:","",x10.1.pos$ID),start=start(x10.1.pos),end=end(x10.1.pos))
   colnames(x10.1) <- c("Gene","meanA","meanB","ratio","padj","b1","b2","z1")
   x10.1.3 <- merge(x10.1, x10.1.2, sort = FALSE)
   if (nrow(x10.1) == nrow(x10.1.2)) {
