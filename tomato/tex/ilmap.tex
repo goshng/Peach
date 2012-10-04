@@ -1,0 +1,28 @@
+\documentclass{article} % say 
+\usepackage{adjustbox}
+\usepackage{tikz} 
+% \usepackage[width=8.5in,height=8.5in]{geometry}
+
+\setlength{\topmargin}{-1in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\footskip}{0in}
+\setlength{\oddsidemargin}{-1in}
+\pagestyle{empty}
+
+\begin{document} 
+\pdfpageheight 8.5in 
+\pdfpagewidth 8.5in 
+
+\begin{tikzpicture}
+
+% 2 is for the 2nd chromosome in X-axis.
+% 10.5 is the end of an IL.
+% 0.1 does not change.
+% 0.3 is the length of the IL.
+% \filldraw[fill=black] (1,12) rectangle +(0.1,0.3);
+
+\input output/ilmap.tex
+
+\end{tikzpicture}
+\end{document}

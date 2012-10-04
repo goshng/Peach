@@ -7,3 +7,4 @@ sudo texhash
 
 I am not sure whether this actually installed pgf, or it had been already
 installed.
+It seems that pgf and TikZ are already installed.

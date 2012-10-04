@@ -1,0 +1,42 @@
+##gff-version 3
+##feature-ontology http://song.cvs.sourceforge.net/*checkout*/song/ontology/sofa.obo?revision=1.93
+##sequence-region SL2.40ch00 1 21805821
+SL2.40ch00	ITAG_eugene	gene	9900000	10100000	.	+	.	Alias=Solyc00g001;ID=gene:Solyc00g001.2;Name=Solyc00g001.2;from_BOGAS=1;length=1753
+SL2.40ch00	ITAG_eugene	mRNA	9900000	10100000	.	+	.	ID=mRNA:Solyc00g001.2.1;Name=Solyc00g001.2.1;Note=Aspartic;Ontology_term=GO:0006508;Parent=gene:Solyc00g001.2;from_BOGAS=1;interpro2go_term=GO:0006508;length=1753;nb_exon=2
+SL2.40ch00	ITAG_eugene	exon	9900000	9950000	.	+	.	ID=exon:Solyc00g001.2.1.1;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+SL2.40ch00	ITAG_eugene	five_prime_UTR	9900000	9930000	.	+	.	ID=five_prime_UTR:Solyc00g001.2.1.0;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+SL2.40ch00	ITAG_eugene	CDS	9930001	9950000	.	+	0	ID=CDS:Solyc00g001.2.1.1;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+SL2.40ch00	ITAG_eugene	intron	9950001	10050000	.	+	.	ID=intron:Solyc00g001.2.1.1;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+SL2.40ch00	ITAG_eugene	exon	10050001	10100000	.	+	0	ID=exon:Solyc00g001.2.1.2;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+SL2.40ch00	ITAG_eugene	CDS	10050001	10070000	.	+	2	ID=CDS:Solyc00g001.2.1.2;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+SL2.40ch00	ITAG_eugene	three_prime_UTR	10070001	10100000	.	+	.	ID=three_prime_UTR:Solyc00g001.2.1.0;Parent=mRNA:Solyc00g001.2.1;from_BOGAS=1
+###
+SL2.40ch01	ITAG_eugene	gene	19900000	20100000	.	+	.	Alias=Solyc01g002;ID=gene:Solyc01g002.2;Name=Solyc01g002.2;from_BOGAS=1;length=1753
+SL2.40ch01	ITAG_eugene	mRNA	19900000	20100000	.	+	.	ID=mRNA:Solyc01g002.2.1;Name=Solyc01g002.2.1;Note=Aspartic;Ontology_term=GO:0006508;Parent=gene:Solyc01g002.2;from_BOGAS=1;interpro2go_term=GO:0006508;length=1753;nb_exon=2
+SL2.40ch01	ITAG_eugene	exon	19900000	19950000	.	+	.	ID=exon:Solyc01g002.2.1.1;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	five_prime_UTR	19900000	19930000	.	+	.	ID=five_prime_UTR:Solyc01g002.2.1.0;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	CDS	19930001	19950000	.	+	0	ID=CDS:Solyc01g002.2.1.1;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	intron	19950001	20050000	.	+	.	ID=intron:Solyc01g002.2.1.1;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	exon	20050001	20100000	.	+	0	ID=exon:Solyc01g002.2.1.2;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	CDS	20050001	20070000	.	+	2	ID=CDS:Solyc01g002.2.1.2;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	three_prime_UTR	20070001	20100000	.	+	.	ID=three_prime_UTR:Solyc01g002.2.1.0;Parent=mRNA:Solyc01g002.2.1;from_BOGAS=1
+###
+SL2.40ch01	ITAG_eugene	gene	69900000	70100000	.	+	.	Alias=Solyc01g003;ID=gene:Solyc01g003.2;Name=Solyc01g003.2;from_BOGAS=1;length=1753
+SL2.40ch01	ITAG_eugene	mRNA	69900000	70100000	.	+	.	ID=mRNA:Solyc01g003.2.1;Name=Solyc01g003.2.1;Note=Aspartic;Ontology_term=GO:0006508;Parent=gene:Solyc01g003.2;from_BOGAS=1;interpro2go_term=GO:0006508;length=1753;nb_exon=2
+SL2.40ch01	ITAG_eugene	exon	69900000	69950000	.	+	.	ID=exon:Solyc01g003.2.1.1;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	five_prime_UTR	69900000	69930000	.	+	.	ID=five_prime_UTR:Solyc01g003.2.1.0;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	CDS	69930001	69950000	.	+	0	ID=CDS:Solyc01g003.2.1.1;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	intron	69950001	70050000	.	+	.	ID=intron:Solyc01g003.2.1.1;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	exon	70050001	70100000	.	+	0	ID=exon:Solyc01g003.2.1.2;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	CDS	70050001	70070000	.	+	2	ID=CDS:Solyc01g003.2.1.2;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+SL2.40ch01	ITAG_eugene	three_prime_UTR	70070001	70100000	.	+	.	ID=three_prime_UTR:Solyc01g003.2.1.0;Parent=mRNA:Solyc01g003.2.1;from_BOGAS=1
+###
+SL2.40ch02	ITAG_eugene	gene	29900000	30100000	.	+	.	Alias=Solyc02g004;ID=gene:Solyc02g004.2;Name=Solyc02g004.2;from_BOGAS=1;length=1753
+SL2.40ch02	ITAG_eugene	mRNA	29900000	30100000	.	+	.	ID=mRNA:Solyc02g004.2.1;Name=Solyc02g004.2.1;Note=Aspartic;Ontology_term=GO:0006508;Parent=gene:Solyc02g004.2;from_BOGAS=1;interpro2go_term=GO:0006508;length=1753;nb_exon=2
+SL2.40ch02	ITAG_eugene	exon	29900000	29950000	.	+	.	ID=exon:Solyc02g004.2.1.1;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1
+SL2.40ch02	ITAG_eugene	five_prime_UTR	29900000	29930000	.	+	.	ID=five_prime_UTR:Solyc02g004.2.1.0;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1
+SL2.40ch02	ITAG_eugene	CDS	29930001	29950000	.	+	0	ID=CDS:Solyc02g004.2.1.1;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1
+SL2.40ch02	ITAG_eugene	intron	29950001	30050000	.	+	.	ID=intron:Solyc02g004.2.1.1;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1
+SL2.40ch02	ITAG_eugene	exon	30050001	30100000	.	+	0	ID=exon:Solyc02g004.2.1.2;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1
+SL2.40ch02	ITAG_eugene	CDS	30050001	30070000	.	+	2	ID=CDS:Solyc02g004.2.1.2;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1
+SL2.40ch02	ITAG_eugene	three_prime_UTR	30070001	30100000	.	+	.	ID=three_prime_UTR:Solyc02g004.2.1.0;Parent=mRNA:Solyc02g004.2.1;from_BOGAS=1

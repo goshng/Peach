@@ -1,0 +1,21 @@
+
+# Replace ^M with a new line
+mkdir t
+cd t
+unzip chr10&pen.zip
+mkdir t2
+for i in `ls *.txt`; do tr '^M' '\n' < $i > t2/$i; done
+
+
+# A karyotype or chromsome sizes.
+
+
+# SNP positions on chr10.
+chr10SNPINDELS.csv
+
+# SNP eQTL.
+IL10-1-1-Table 1.csv
+IL10-1-Table 1.csv
+IL10-2-2-Table 1.csv
+IL10-2-Table 1.csv
+IL10-3-Table 1.csv

@@ -1,0 +1,70 @@
+circosout
+---------
+circos figures per chromosome and per IL
+
+summary
+-------
+summary statistics
+
+bothsnp.csv
+
+cistranspenlike-bychromosome.csv
+Columns: ,chr,cis.pen,cis.notpen,trans.pen,trans.notpen,notunique,total
+eQTLs (genes with differential expression) from different ILs in the same
+chromosome can be cis and trans because the IL regions are different among those
+ILs in the same chromosome. Similarly, eQTLs expression patterns from ILs in the
+same chromosome can be different from PEN's exression patterns. These are
+counted in the column notunique. So,
+cis.pen + cis.notpen + trans.pen + trans.notpen = notunique + total
+for each chromosome.
+
+cistranspenlike.csv
+eqtl-uniq.csv
+
+log - non-unique eQTL
+
+pen-snp-type.csv
+snp-uniq.csv
+
+ven-snp.txt
+~~~~~~~~~~~
+Unique IL SNPs and PEN SNPs, the intersection set of them are counted.
+This is created by R/ven-snp.R.
+
+ven-eqtl.csv
+~~~~~~~~~~~~
+eQTL's occurences in ILs.
+
+metabolite 
+----------
+gene-to-metabolite correlation
+
+metabolite-cor
+--------------
+metabolite-to-metabolite correlation
+
+cor
+---
+gene-to-gene correlation
+
+cor-ab
+------
+gene set A to gene set B correlation
+ab-cor.csv
+ab-pval.csv
+
+gene2gene-pval.csv
+------------------
+all-gene-to-all-gene correlation
+
+Note that n1 is for < 0.1, n2 for < 0.01, n3 for < 0.001, and n4 for < 0.0001
+
+go
+--
+gene ontology analysis
+
+See go-all.csv for a concatenated file of the files in directory go. 
+
+ilmap.pdf
+---------
+IL map figure - use the second page

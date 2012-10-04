@@ -1,0 +1,22 @@
+History of Tomato Analysis
+==========================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+Histories
+---------
+
+Mon Sep 24 15:27:42 EDT 2012
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Consider Jemin's older RNA-seq data files to find SNPs and eQTL using BWA and
+TopHat.
+
+IL_mat_62.txt-cor.csv
+
+Solyc05g012020.2.1
+
+# GFFFILE <- paste("data",raw,"ITAG2.3_gene_models.gff3",sep="/")
+# gene.range <- import.gff3(GFFFILE)
+
+
+data/raw/metabolite/IL_mat_62.txt
+

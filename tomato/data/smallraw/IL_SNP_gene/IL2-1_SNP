@@ -1,0 +1,5 @@
+type	SNP	chromosome	position
+M	T->C	SL2.40ch00	10000000
+I	T->C	SL2.40ch01	20000000
+D	G->C	SL2.40ch02	10000000
+M	A->C	SL2.40ch02	20000000

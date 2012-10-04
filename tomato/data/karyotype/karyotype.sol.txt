@@ -1,0 +1,13 @@
+chr - sl0 0 1 21553897 chr0
+chr - sl1 1 1 90303444 chr1
+chr - sl2 2 1 49917694 chr2
+chr - sl3 3 1 64839514 chr3
+chr - sl4 4 1 64063812 chr4
+chr - sl5 5 1 65021238 chr5
+chr - sl6 6 1 46040936 chr6
+chr - sl7 7 1 65268321 chr7
+chr - sl8 8 1 63031857 chr8
+chr - sl9 9 1 67661191 chr9
+chr - sl10 10 1 64833805 chr10
+chr - sl11 11 1 53385525 chr11
+chr - sl12 12 1 65485353 chr12

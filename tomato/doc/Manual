@@ -1,0 +1,1041 @@
+User Manual of Tomato Analysis
+==============================
+Sang Chul Choi <goshng@yahoo.co.kr>
+v0.0.2, September 2012
+
+output/links2/IL12-3
+
+kimjaeok:/Users/goshng/bin/etc
+
+
+Introduction
+------------
+
+RNA-seq data from Tomato IL lines with M82 background are visualized and summarized. RNA-seq data of M82 and each of 74 IL lines are compared to produce SNP sites. IL regions should contain most of SNP sites, which allows to manually annotate IL regions. An IL line contains a major IL region and multiple minor IL regions. Three types of SNP sites are mutation (M), insertion (I), and deletion (D).  Gene expression in M82 and each of IL lines are compared to determine differentially expressed genes, which we call expression QTLs.  DE genes or eQTLs bounded by a major IL, and DE genes near SNPs (within 50 kbps on either side) are called cis eQTLs, and otherwise called trans eQTLs. We report summary statistics of SNPs such as numbers of unque SNPs on each chromosome using the IL lines in the chromosome, numbers of SNPs on annotated regions, and numbers of eQTLs. We visualize SNPs and eQTLs using the *circos* tool.
+
+Follow along to acheive the goal mentioned above. Warning! Backup your own raw data files before using commands of *Tomato Analysis*. We do not guarantee that *Tomato Analysis* works as you expect (see the license file, +COPYING+ at the base directory of *Tomato Analysis*, or execute menus *warranty* and *copyright*). *Tomato Analysis* could delete important files of yours. Backup yours and use *Tomato Analysis* at your own risk. If you have done so, you can keep reading this manual to do the analyses mentioned above.  Should you change *Tomato Analysis* to suit your need, contact me to help you (see section <<help,Getting Help>>). 
+
+Follow three steps before executing menus provided by *Tomato Analysis*. First, create local and storage directories. See the section <<Files>>. Second, install the software packages specified in the configuration file. See the section <<Installation>> for what software packages are needed. Third, prepare data files that are similar to those in +data/smallraw+ at proper places. Now, you are ready to start to analyze data of RNA-seq using *Tomato Analysis*.
+ 
+.Execute the main menu 
+----
+$ ./run
+----
+
+.Test the procedure with small data set in +data/smallraw+
+----
+./run 2
+----
+
+.Run the procedure with data in +data/raw+
+----
+./run 3
+----
+
+First, call *initialize* to create directories for output files. Then, call *test* menu to test whether *Tomato Analysis* works in your computer. Follow the instruction in the menu *batch* below. Menus might provide scripts in bash shell or R. Execute them at the base directory of *Tomato Analysis*. 
+
+anchor:convention[]
+
+Conventions used in this manual
+-------------------------------
+Menus are in *bold*, and file or software names are in +typewriter+. Shell and R variables, and variables used in configuration and species files are in _italic_. We could have two main root directories, which could refer to the same directory. We refer to the source directory of *Tomato Analysis* as the root base directory of *Tomato Analysis*. We often omit the directory when we refer to a subdirectory of the root base directory. For example, this file that you are reading is called +doc/Manual+ or +doc/Manual.html+.
+
+anchor:help[]
+
+Getting Help
+------------
+Please, post comments or help at
+http://code.google.com/p/tomato-analysis.
+
+Kick Start
+----------
+.Set up local base directoires (see <<Files>>)
+. Edit +sh/make-soft-links.sh+
+. Execute menu *initialize* to create storages and local base directories
+
+.Run the test procedure
+. Execute menu *test*
+
+.Run the batch procedure
+. Create +data/raw+ directory
+. Prepare data files in +data/raw+
+. Execute menu *batch*
+
+Menus
+-----
+*Tomato Analysis* menus provide users with access to commands for analyzing tomato data. We assume that we would create output directories at _ROOTANALYSISDIR_ directory, which can be different from the current source root directory of *Tomato Analysis*.
+
+anchor:initialize[]
+
+initialize
+~~~~~~~~~~
+Follow the instruction of the menu.
+
+anchor:batch[]
+
+batch
+~~~~~
+This menu provides scripts to process data files in +data/raw+.  The source code of *Tomato Analysis* includes +data+ directory, which contains +conf+, +karyotype+, +smallraw+, and +go+ directories. You should create +data/raw+ directory for files that are of the same format as those in +data/smallraw+. Because the procedure with the test data set using +data/smallraw+ would take a few minutes in a laptop, you should be able to easily test whether the procedure works before running it with real data files in +data/raw+, which you need to prepare just like those in +data/smallraw+. You need to install other software such as *circos* and *R* to use *Tomato Analysis*. See the section <<data>> for a how-to of preparation of real data files. Let us see details of this menu.
+
+We use +data/raw/ilmap2.txt+ and +data/raw/order.csv+ to create +output/ilmap2.dat+, which is in an R friendly format of the file of +data/raw/ilmap2.txt+. We create +output/count+ for storing files for summary statistics, which is summarized by +R/summarize-count.R+.  Directory +data/raw/IL_SNP_gene+ contains files for SNPs associated with ILs. The first 4 columns define a unique SNP. The 1st column represents the type of a SNP: mutation (M), insertion (I), and deletion (D). The 2nd column represents change of SNPs such as T->C for the change of T to C. The 3rd column represents chromosome, and the 4th column is the position of the SNP. Using the first 4 columns we can find the number of unique SNPs associated with ILs per chromosome. We store the values in the file +output/count/snp-uniq.txt+. 
+
+Using the gene annotations stored in the gff file, +data/raw/ITAG2.3_gene_models.gff3+ we count SNPs on types of genomic regions including mRNA, CDS, exon, 5' UTR, 3' UTR, gene, and intron; +output/count/pen-snp-type.txt+, which is also summarized as +output/summary/pen-snp-type.csv+, which can be read easily by a spreadsheet program such as *Excel*. Note that we use +data/raw/pen_SNP+. Note that we do not consider uniqueness of SNPs in PEN SNPs.
+
+We use file +data/raw/IL_SNP_gene/pen_SNP+ to create SNPs in each of the chromosomes as a file +output/pen/chr1+ for chromosome 1. We draw these SNPs on the outer circle. We also count the number SNPs in PEN per chromosome in +output/count/pen.txt+. Note that we do not consider uniqueness of SNPs in PEN SNPs.
+
+Directory +data/raw/eqtl+ contains expression of genes for IL lines. The first two lines are ignored although the number of columns separated by commas must be equal for all of the rows. Three types of genes or eQTLs are those within the current IL, those outside the IL but overlapped with SNPs, and those outside the IL but not overlapped with SNPs. We use +R/find-position-mrna.R+ to find the start positions of genes in the genes in the directory +data/raw/eqtl+, creating almost the same files as the input files in the directory +output/position+, and creating the number of genes for each IL in +output/count/mrna-eqtl.txt+. For example, file +output/position/IL1-1-2.csv+ contains one more column of start position in the input file +data/raw/eqtl/IL1-1-2.csv+. 
+
+We then call +R/find-position-mrna2.R+, an R script to create +output/count/mrna-eqtl2.txt+. This script creates +output/position2+ from +output/position+. For example, it extracts gene name, ratio in log2 scale, and start and end positions from +output/position/IL1-1.csv+ to create an R-friendly table.
+
+R script +R/find-position-mrna3.R+ creates files in +output/positions3+ using files in +output/position+. We add two columns: cis or trans, pen-like or not. 
+
+We also add annotations of genes or mRNAs using files in +data/raw/eqtl+.
+
+I have realized that we basically add more columns to files in +data/raw/eqtl+: start and end positions, annotations, cis or trans, and pen-like or not. We could have created a single table for each IL not like different directories such as +output/position+, +output/position2+, +output/position3+, and +output/note+. Let's keep this way for now.
+
+After the run of some R scripts, we use +R/eqtl-cis-trans.R+ script to create data files for circos drawing: +output/cis2+, +output/trans2+, +output/links2+, +output/ilname+, +output/cissnpinsideil+, +output/cissnpoutsideil+, and +output/transsnpil+. We only draw links to trans, which are genes outside IL regions. We also draw expression within IL in +output/exp+, and those outside IL in +output/inter+. We also draw expression of PEN using +output/exppen+. 
+
+R script +R/summarize-count.R+ summarizes counts.
+
+We wish to do the functional category enrichment test of differentially expressed genes for each IL. First we create BLASTDB of +uniref90.fasta+ using +makeblastdb+. BLASTing the whole protein sequences of a fasta file, e.g., +ITAG2.3_proteins.fasta+, could take many days even with the option of expliting multiple CPUs. We split the +ITAG2.3_proteins.fasta+ using +src/fastasplitn.c+, and BLAST each splitted file in a compute node using a coarse-grained parallelization of BLAST. In so doing, we can search the protein sequence database of +uniref90.fasta+ for uniref90 protein sequences similar to protein sequences of tomato in +ITAG2.3_proteins.fasta+ relatively quickly. We then use +pl/geneontology.pl+ to create +gene2go+ and +go2ngene+ files that are necessary for gene ontology analyses. 
+
+The gff file, +ITAG2.3_gene_models.gff3.txt.no-negative+ contains annotations. 
+ 
+Let us draw circos figures. 
+
+We also create SNPs within ILs using command +snp+ of the perl script of +pl/prepare-circos-data.pl+, and store in +output/snp+ directory. Although we do not draw, we use command +othersnp+ to create files in +output/othersnp+.
+
+The subcommand _ilmap_ of the main perl script allows us to create IL map in PDf foramt.
+
+R script, +R/correlation-il.R+, creates correlation coefficients and their p-values for eQTLs of some ILs. This needs more explanations.
+
+
+anchor:Installation[]
+
+Installation
+------------
+Software packages used in *Tomato Analysis* should be installed on the local and/or remote machine. First, create directories called +downloads/build+. If you use your local machine, follow this instruction in your machine. You have to log in your remote machine if you use other machine such as a linux cluster.
+
+----
+$ mkdir -p downloads/build
+----
+
+Create a +bin+ directory to save executable files.
+
+----
+$ mkdir -p $HOME/usr/bin
+----
+
+circos
+~~~~~~
+
+
+
+Dowanload BWA source code available at http://bio-bwa.sourceforge.net. 
+
+----
+$ downloads/bwa-0.6.2.tar.bz2
+----
+
+Extract the file and compile it.
+
+----
+$ cd downloads/build
+$ tar jxf ../bwa-0.6.2.tar.bz2
+$ cd bwa-0.6.2; make; cd ..
+$ mv bwa-0.6.2 $HOME/usr/bin
+----
+
+Edit +conf/README+ if necessary; Add the following line. The base directory is
+$HOME or your home directory. Shell variable $BWA is replaced by
++/home/userid/usr/bin/bwa-0.6.2/bwa+.
+
+----
+BWA:usr/bin/bwa-0.6.2/bwa
+----
+
+Perl
+~~~~
+
+We
+
+Rscript
+~~~~~~~
+Install R version 2.15 and Bioconductor 2.10.
+
+----
+CACRSCRIPT:/path/to/Rscript
+----
+
+In R, run the following line of
+----
+source("http://www.bioconductor.org/biocLite.R")
+----
+
+to install the R packages:
+
+----
+biocLite("rtracklayer")
+biocLite("IRanges")
+biocLite("GenomicRanges")
+install.packages("Hmisc")
+install.packages("corrgram")
+----
+
+BLAST
+~~~~~
+We will use BLAST for functional association of differentially expressed genes.
+We do not provide features of *Tomato Analysis* that uses +BLAST+.
+ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ 
+ncbi-blast-2.2.25+-x64-linux.tar.gz
+is used in the cluster. You could download a dmg for mac installation, which was installed at the following directory:
+
+----
+/usr/local/ncbi/blast/bin
+----
+
+Because we use a relative path for programs, copy executables in the bin directory to +usr/bin+ of your home at the local machine or at the remote one. 
+
+.Add the following lines to +conf/README+ for global configuration
+----
+MAKEBLASTDB:usr/bin/makeblastdb
+BLASTN:usr/bin/blastn
+BLASTP:usr/bin/blastp
+----
+
+Refer to documentation available in http://www.ncbi.nlm.nih.gov/books/NBK1762.
+
++deseq-blast+	       
+
+We use +uniprot90+ for functional association.
+wget ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta
+
+
+anchor:Files[]
+
+Files
+-----
+
+R
+~~
+
++correct-position-il.R+
+^^^^^^^^^^^^^^^^^^^^^^^
+
+R script +count-snp-type.R+ counts SNPs on different types of genomic regions including mRNA, CDS, exon, 5' UTR, 3' UTR, gene, and intron. 
+
++R/count-snp-type.R+
+^^^^^^^^^^^^^^^^^^^^
+
+Two arguments for this R script are the data directory name, or raw or smallraw, and the number of chromosomes. For the real data, we would execute 
+
+----
+Rscript R/count-snp-type.R raw 12 > output/count/pen-snp-type.txt
+----
+
+This R script uses +data/raw/ITAG2.3_gene_models.gff3+ to find regions of different annotated regions such as mRNAs, and counts SNPs from +output/IL_SNP_gene/pen_SNP+ in each of the annotated regions per chromosome. Note that we count how many annotated region, say mRNAs, a given SNP is overlapped. A given SNP can be double or multiply counted if annotated regions are overlapped. If there are no such overlapped annotated regions, the number of SNPs for a kind of annotated regions must be equal to the actual number of SNPs. I could have merged all of the same annotated regions, say mRNAs, and counted SNPs. Or, what we have done here is to count SNPs on each annotated region and sum the occurences of SNPs with any hits. 
+
++find-position-il.R+
+^^^^^^^^^^^^^^^^^^^^
+
+We may not use this in the batch script.
+
++R/correlation-il.R+
+^^^^^^^^^^^^^^^^^^^^
+
+R script, +R/correlation-il.R+, creates correlation coefficients and their p-values for eQTLs of some ILs. This needs more explanations.
+
++R/find-position-mrna.R+
+^^^^^^^^^^^^^^^^^^^^^^
+
+We use +R/find-position-mrna.R+ to find the start positions of genes in the genes in the directory +data/raw/eqtl+, creating almost the same files as the input files in the directory +output/position+, and creating the number of genes for each IL in +output/count/mrna-eqtl.txt+. For example, file +output/position/IL1-1-2.csv+ contains one more column of start position in the input file +data/checkraw/eqtl/IL1-1-2.csv+. 
+
+
++find-position-mrna2.R+
+^^^^^^^^^^^^^^^^^^^^^^^
+
+We then call +R/find-position-mrna2.R+, an R script to create +output/count/mrna-eqtl2.txt+. This script creates +output/position2+ from +output/position+. For example, it extracts gene name, ratio in log2 scale, and start and end positions from +output/position/IL1-1.csv+ to create an R-friendly table.
+
++find-position-mrna3.R+
+^^^^^^^^^^^^^^^^^^^^^^^
+
+R script +R/find-position-mrna3.R+ creates files in +output/positions3+ using files in +output/position+. We add two columns: cis or trans, pen-like or not. 
+
+R script +R/find-position-mrna3.R+ creates +output/count/mrna-eqtl3.txt+ as a byproduct of creating files in +output/position3+. This adds columns to each of files in +output/position+ for denoting cis/trans and penlike/not.
+
+
++summarize-count.R+
+^^^^^^^^^^^^^^^^^^^
+
+R script +R/summarize-count.R+ summarizes counts.
+
++R/eqtl-cis-trans.R+
+^^^^^^^^^^^^^^^^^^^^
+
+We call this R script for each of 74 IL lines. For example, consider an IL line named IL1-1. This R script identifies cis and trans eQTLs in +output/position2/IL1-1+ by comparing locations of the eQTLs in the +position2+ directory with regions of both IL1-1 specified by +output/ilmap2.dat+ and of SNPs in +output/IL_SNP_gene/IL1-1_SNP+. Note that we should consider not only locations but also chrmosomes when compare locations of eQTLs and those of SNPs and IL regions. Files in +output/cis2+ and +output/trans2+ contains cis and trans eQTLs for circos scatter plot. Files in +output/links2+ contains trans eQTLs for circos link plot. Files in +output/ilname+ are used to plot names of ILs. 
+
+SNPs are divided into three catetories. SNPs within IL are called cis. SNPs outside IL but overlapped with eQTLs are also called cis. All of the other SNPs are trans.
+
+anchor:data[]
+
+data
+~~~~
+
+Two directories of +data/conf+ and +data/karyotype+ store data files for *circos*. Test data files are stored in the directory of +data/smallraw+. This subdirectory, called +data/smallraw+, in the +data+ directory contains sample data files. You should prepare data files in +data/raw+ just like those in +data/smallraw+ to execute menus in *Tomato Analysis*. Ignore files not mentioned in this section below.
+
++data/karyotype/karyotype.sol.txt+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We should specify the length of each chromosome in this file.
+
+----
+chr - sl0 0 1 21492721 chr0
+chr - sl1 1 1 90303444 chr1
+chr - sl2 2 1 49917694 chr2
+chr - sl3 3 1 64839514 chr3
+chr - sl4 4 1 64063812 chr4
+chr - sl5 5 1 65021238 chr5
+chr - sl6 6 1 46040936 chr6
+chr - sl7 7 1 65268321 chr7
+chr - sl8 8 1 63031857 chr8
+chr - sl9 9 1 67661191 chr9
+chr - sl10 10 1 64833805 chr10
+chr - sl11 11 1 53385525 chr11
+chr - sl12 12 1 65485353 chr12
+----
+
++data/smallraw/IL_SNP_gene+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Direcotry +IL_SNP_gene+ contains files such as +IL1-1_SNP+ and +pen_SNP+. We have four SNP files and one pen SNP files in this test directory.  See the following subsection for the content of a file in this directory.
+
+----
+     1	IL1-1_SNP
+     2	IL1-2_SNP
+     3	IL2-1_SNP
+     4	IL2-2_SNP
+     5	pen_SNP
+----
+
++data/smallraw/IL_SNP_gene/IL1-1_SNP+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We use only the first four columns of SNP files of IL lines. Three types of SNPs are mutation (M), insertion (I), and deletion (D). The second column details the pattern of a SNP. The chromosome column should read SL2.40chXX, where XX could vary from 00 to 12. Note that if the chromosome name pattern changes, then we have to revise the source code of *Tomato Analysis*.
+
+----
+     1	type	SNP	chromosome	position
+     2	M	T->C	SL2.40ch01	40000
+     3	M	G->C	SL2.40ch01	60000
+     4	M	A->C	SL2.40ch01	70000
+     5	M	G->C	SL2.40ch01	57359
+     6	M	A->C	SL2.40ch01	58350
+     7	M	T->C	SL2.40ch02	90000
+----
+
++data/smallraw/eqtl+
+^^^^^^^^^^^^^^^^^^^^
+
+This input directory contains expression QTL files or differentially expressed genes for IL lines and the background line or PEN.
+
+----
+     1	IL1-1.csv
+     2	IL1-2.csv
+     3	IL2-1.csv
+     4	IL2-2.csv
+     5	PENeQTL.csv
+----
+
++data/smallraw/eqtl/IL1-1.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Gene expression data lines of this file follow the two header lines. Note that we have two header lines. The first two lines are ignored because IL files in +data/smallraw/eqtl+ directory are different in the two header lines. The first column in the data lines is the name of genes or mRNAs. The rest of columns are two expression values of condition A and B, ratio of B over A, p-value, and three unknown columns. 
+
+----
+     1	Gene,,,,,,,
+     2	,mean,mean,ratio,padj,,,
+     3	Solyc01g005050.2.1,7.528,1287.62666666667,2,0.0230839950239443,FALSE,FALSE,0
+     4	Solyc01g007710.2.1,2.13,42.9133333333333,4,0.0385660671204183,FALSE,FALSE,0
+     5	Solyc02g005100.2.1,3.164,30.25,8,0.0306834265208629,FALSE,FALSE,0
+----
+
++data/ITAG2.3_gene_models.gff3+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We use the gff annotation file to find annotations of the tomato reference genome.
+
+----
+##gff-version 3
+##feature-ontology http://song.cvs.sourceforge.net/*checkout*/song/ontology/sofa.obo?revision=1.93
+##sequence-region SL2.40ch00 1 21805821
+SL2.40ch00	ITAG_eugene	gene	16437	18189	.	+	.	Alias=Solyc00g005000;ID=gene:Solyc00g005000.2;Name=Solyc00g005000.2;from_BOGAS=1;length=1753
+SL2.40ch00	ITAG_eugene	mRNA	16437	18189	.	+	.	ID=mRNA:Solyc00g005000.2.1;Name=Solyc00g005000.2.1;Note=Aspartic proteinase nepenthesin I (AHRD V1 **-- A9ZMF9_NEPAL)%3B contains Interpro domain(s)  IPR001461  Peptidase A1 ;Ontology_term=GO:0006508;Parent=gene:Solyc00g005000.2;from_BOGAS=1;interpro2go_term=GO:0006508;length=1753;nb_exon=2
+----
+
++data/smallraw/ilmap2.txt+
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This file contains locations of major and minor ILs.
+
+----
+IL1-1 reads,,,
+SL2.40ch01,303202,main,
+SL2.40ch01,77720421,,
+SL2.40ch01,90217601,,
+SL2.40ch01,90217741,,
+SL2.40ch07,55697423,,
+SL2.40ch07,58468160,,
+SL2.40ch09,63877453,m82,
+SL2.40ch09,67265993,,
+SL2.40ch11,48824040,,
+...
+----
+
++data/smallraw/order.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The 74 IL should be ordered in visualization.
+
+----
+IL1-1-2
+IL1-1-3
+IL1-1
+IL1-2
+IL1-3
+IL1-4
+IL1-4-18
+IL2-1-1
+IL2-1
+IL2-2
+...
+----
+
+doc
+~~~
+You are reading the Manual, which is in the +doc+ directory.
+
+downloads
+~~~~~~~~~
+Download required software at the directory.
+
+email
+~~~~~
+Save email correspondence with collaborators.
+
+log
+~~~
+Save day-to-day scripts.
+
+output
+~~~~~~
+Directory +count+ contains files with counts in tabular format.
+
++output/ilmap2.dat+
+^^^^^^^^^^^^^^^^^^^
+
+The IL map file, +data/raw/ilmap2.txt+, is not in R friendly input format. We convert the IL map file to a R friendly file, a csv file, which can be read easily by R function _read.csv_. Four columns of the file are chromosome ID, start, and end position, IL name, and types of the IL (main, m82, and minor).
+
+----
+chr,start,end,il,type
+1,303202,1123780,IL1-1-2,main
+7,55697423,58393006,IL1-1-2,m82
+9,66829047,67265846,IL1-1-2,m82
+10,58060241,58957259,IL1-1-2,minor
+...
+----
+
++output/count/snp-uniq.txt+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We use the four SNP files in +data/smallraw/IL_SNP_gene+ to count unique SNPs. Note that they are unique not total SNPs. We use the first four columns to identify unique SNPs in each of the SNP files. The following is the content of the file where columns represent chromosome ID (1 and 2), SNP types (M, I, D for mutation, insertion, and deletioin), and counts.
+
+----
+1 M 12
+1 I 0
+1 D 0
+2 M 12
+2 I 0
+2 D 0
+----
+
++output/IL_SNP_gene+
+^^^^^^^^^^^^^^^^^^^^
+
+This directory contains files of the same names as those in +data/raw/IL_SNP_gene+. We extract three columns from each of the SNP files in +data/raw/IL_SNP_gene+.
+
+----
+     1	type	chromosome	position
+     2	M	SL2.40ch01	40000
+     3	M	SL2.40ch01	60000
+     4	M	SL2.40ch01	70000
+     5	M	SL2.40ch01	57359
+     6	M	SL2.40ch01	58350
+     7	M	SL2.40ch02	90000
+----
+
++output/count/pen-snp-type.txt+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An R script, +R/count-snp-type.R+, uses +data/raw/ITAG2.3_gene_models.gff3+ to categorize SNPs in +output/IL_SNP_gene/pen_SNP+. This output file contains basically three columns, chrmosome ID (0 to 2), categories, and counts. A SNP is classified as _annotation_ if there is any annotations that are overlapped with the SNP position. SNPs are called _noannotation_ when there is no annotation in the gff that are overlapped with those SNPs. The number of SNP in a chromosome is next to _all_. The rest of annotations including mRNA, CDS, exon, 5utr, 3utr, gene, and intron are self-explanatory.
+
+----
+     1	Chr 0 annotation 0 
+     2	Chr 0 noannotation 0 
+     3	Chr 0 all 0 
+     4	Chr 0 mRNA 0 
+     5	Chr 0 CDS 0 
+     6	Chr 0 exon 0 
+     7	Chr 0 5utr 0 
+     8	Chr 0 3utr 0 
+     9	Chr 0 gene 0 
+    10	Chr 0 intron 0 
+    11	Chr 1 annotation 4 
+    12	Chr 1 noannotation 8 
+    13	Chr 1 all 12 
+    14	Chr 1 mRNA 4 
+    15	Chr 1 CDS 1 
+    16	Chr 1 exon 4 
+    17	Chr 1 5utr 1 
+    18	Chr 1 3utr 2 
+    19	Chr 1 gene 4 
+    20	Chr 1 intron 0 
+    21	Chr 2 annotation 4 
+    22	Chr 2 noannotation 8 
+    23	Chr 2 all 12 
+    24	Chr 2 mRNA 4 
+    25	Chr 2 CDS 3 
+    26	Chr 2 exon 4 
+    27	Chr 2 5utr 1 
+    28	Chr 2 3utr 0 
+    29	Chr 2 gene 4 
+    30	Chr 2 intron 0 
+----
+
++output/pen+
+^^^^^^^^^^^^
+
+The _pen_ command of the main perl script uses +data/raw/IL_SNP_gene/pen_SNP+ to create circos data files in the output directory, +output/pen+. The file, +output/pen/chr0+, contains nothing. See the next subsection for the content of a file in the output directory.
+
+----
+     1	chr0
+     2	chr1
+     3	chr2
+----
+
++output/pen/chr1+
+^^^^^^^^^^^^^^^^^
+
+The first column is always sl1 because this file is for chromosome 1. The second column is the position of a pen SNP. The third column is an artificial value, 10 bp downstream of the SNP position. The fourth column is always color=white.
+
+----
+     1	sl1 1898954 1898964 color=white
+     2	sl1 2100000 2100010 color=white
+     3	sl1 58350 58360 color=white
+     4	sl1 70000 70010 color=white
+     5	sl1 1898412 1898422 color=white
+     6	sl1 2000000 2000010 color=white
+     7	sl1 57359 57369 color=white
+     8	sl1 60000 60010 color=white
+     9	sl1 1800000 1800010 color=white
+    10	sl1 190000 190010 color=white
+    11	sl1 40000 40010 color=white
+    12	sl1 900 910 color=white
+----
+
++output/count/pen.txt+
+^^^^^^^^^^^^^^^^^^^^^^
+
+The command _pen_ of the main perl script, or +pl/prepare-circos-data.pl+, uses +data/raw/IL_SNP_gene/pen_SNP+ to create this file for the numbers of SNPs in the PEN background line.
+
+----
+sl0	0
+sl1	12
+sl2	12
+----
+
+
++output/position+
+^^^^^^^^^^^^^^^^^
+
+R script +R/find-position-mrna.R+ creates output files at +output/position+ using eQTL files in +data/raw/eqtl+. The eQTL files are not refined, or not in format for reading them using R script. The location of an eQTL gene is appended to the eQTL files, and files of the same file names are created in +output/position+. The script also creates file +output/count/mrna-eqtl.txt+ (see the subsection below). See the csv files in the directories +data/raw/eqtl+ and +output/position+.
+
+----
+     1	IL1-1.csv
+     2	IL1-2.csv
+     3	IL2-1.csv
+     4	IL2-2.csv
+     5	PENeQTL.csv
+----
+
++output/position/IL1-1.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+R script +R/find-position-mrna.R+ creates file +output/count/mrna-eqtl.txt+, which contains the number of genes in the expression QTL per IL. Directory +data/checkraw/eqtl+ contains files, e.g., +IL9-3.csv+, which contains two head lines followed by gene expression. The 
+
+----
+"","Gene","meanA","meanB","ratio","padj","b1","b2","z1","start","end"
+"1","Solyc01g005050.2.1","7.528","1287.62666666667","2","0.0230839950239443",FALSE,FALSE,0,57359,58350
+"2","Solyc01g007710.2.1","2.13","42.9133333333333","4","0.0385660671204183",FALSE,FALSE,0,1898412,1898954
+"3","Solyc02g005100.2.1","3.164","30.25","8","0.0306834265208629",FALSE,FALSE,0,582837,583264
+----
+
++output/count/mrna-eqtl.txt+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+R script +R/find-position-mrna.R+ creates file +output/count/mrna-eqtl.txt+, which contains the number of genes in the expression QTL per IL. Directory +data/checkraw/eqtl+ contains files, e.g., +IL9-3.csv+, which contains two head lines followed by gene expression. 
+
+----
+     1	IL1-1.csv , 3 
+     2	IL1-2.csv , 3 
+     3	IL2-1.csv , 3 
+     4	IL2-2.csv , 3 
+     5	PENeQTL.csv , 4 
+     6	Total number of mRNAs, 5 
+----
+
++output/position2+
+^^^^^^^^^^^^^^^^^^
+
+R script +R/find-position-mrna2.R+ converts files in +output/position+ to simpler ones in +output/position2+.
+
+----
+     1	IL1-1.csv
+     2	IL1-2.csv
+     3	IL2-1.csv
+     4	IL2-2.csv
+     5	PENeQTL.csv
+----
+
++output/position2/IL1-1.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We extract gene (or eQTL) names, ratio of expression in log2 scale, start, and end positions.
+
+----
+     1	Gene	ratio	start	end
+     2	Solyc01g005050.2.1	1	57359	58350
+     3	Solyc01g007710.2.1	2	1898412	1898954
+     4	Solyc02g005100.2.1	3	582837	583264
+----
+
++output/count/mrna-eqtl2.txt+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is almost the same file as +output/count/mrna-eqtl.txt+. The output file shows how many eQTLs are processed by the R script of +R/find-position-mrna2.R+.
+
+----
+     1	IL1-1.csv , 3 
+     2	IL1-2.csv , 3 
+     3	IL2-1.csv , 3 
+     4	IL2-2.csv , 3 
+     5	PENeQTL.csv , 4 
+----
+
++output/position3+
+^^^^^^^^^^^^^^^^^^
+
+This output directory contains 
+
+----
+     1	IL1-1.csv
+     2	IL1-2.csv
+     3	IL2-1.csv
+     4	IL2-2.csv
+----
+
++output/position3/IL1-1.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The R script, +R/find-position-mrna3.R+, adds more columns to the files in +output/position2+. For a given IL, _withinil_ column denotes whether the gene is inside the IL. Column _samechr_ specifies whether the gene is in the same chromosome as IL's. Column _inpen_ means whether the eQTL or gene is also found in PEN eQTL. Column _ratiopen_ is the log value of expression ratio of PEN. Column _pen_ means whether the pattern of expression ratio of IL's and that of PEN's are the same or not.
+
+----
+     1	X	Gene	meanA	meanB	ratio	padj	b1	b2	z1	start	end	withinil	samechr	inpen	ratiopen	pen
+     2	1	Solyc00g001.2.1	1	1	2	0.01	FALSE	FALSE	0	9900000	10100000	FALSE	FALSE	TRUE	0	FALSE
+     3	2	Solyc01g002.2.1	1	1	2	0.01	FALSE	FALSE	0	19900000	20100000	TRUE	TRUE	TRUE	0	FALSE
+     4	3	Solyc01g003.2.1	1	1	2	0.01	FALSE	FALSE	0	69900000	70100000	FALSE	TRUE	TRUE	0	FALSE
+     5	4	Solyc02g004.2.1	1	1	2	0.01	FALSE	FALSE	0	29900000	30100000	FALSE	FALSE	TRUE	0	FALSE
+----
+
++output/note+
+^^^^^^^^^^^^^
+
+The R script, +R/find-note-mrna.R+, converts files in +data/raw/eqtl+ to those with annotations in this output directory of +output/note+.
+
+----
+     1	IL1-1.csv
+     2	IL1-2.csv
+     3	IL2-1.csv
+     4	IL2-2.csv
+     5	PENeQTL.csv
+----
+
++output/note/IL1-1.csv+
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The file contains a column called note.
+
+----
+     1	"","Gene","meanA","meanB","ratio","padj","b1","b2","z1","note"
+     2	"1","Solyc01g005050.2.1","7.528","1287.62666666667","2","0.0230839950239443",FALSE,FALSE,0,"Unknown Protein (AHRD V1)"
+     3	"2","Solyc01g007710.2.1","2.13","42.9133333333333","4","0.0385660671204183",FALSE,FALSE,0,"Unknown Protein (AHRD V1)"
+     4	"3","Solyc02g005100.2.1","3.164","30.25","8","0.0306834265208629",FALSE,FALSE,0,"Unknown Protein (AHRD V1)"
+----
+
++output/go+
+^^^^^^^^^^^
+
+This output directory should contain files of gene ontology terms that might be functionally associated with IL lines. Phenotypes from IL lines should match the gene ontology terms. The test using +data/smallraw+ did not show any gene ontology terms, consequently no files in this output directory.
+
++output/ilname+
+^^^^^^^^^^^^^^^
+
+The R script, +R/eqtl-cis-trans.R+, uses an eQTL file in +output/position2+ and SNPs in +output/IL_SNP_gene+ with +output/ilmap2.dat+ to categorize cis and trans eQTLs. Four output directories are +output/cis2+, +output/trans2+, +output/links2+, and +output/ilname+. These output directories contains the following files.
+
+----
+     1	IL1-1
+     2	IL1-2
+     3	IL2-1
+     4	IL2-2
+----
+
++output/cis2+
+^^^^^^^^^^^^^
+
+The R script, +R/eqtl-cis-trans.R+, uses files in +output/position2+ to create circos data files for cis eQTL.
+
+----
+     1	IL1-1
+     2	IL1-2
+     3	IL2-1
+     4	IL2-2
+----
+
++output/cis2/IL1-1+
+^^^^^^^^^^^^^^^^^^^
+
+This file is used to draw cis eQTL or expression values in log2 scale.
+
+----
+     1	sl1 57359 58350 1
+----
+
++output/trans2+
+^^^^^^^^^^^^^^^
+
+The same R script, +R/eqtl-cis-trans.R+, uses files in +output/position2+ to create circos data files for trans eQTL. The set of file names in this output directory are the same as that of the output directory, +output/cis2+.
+
++output/trans2/IL1-1+
+^^^^^^^^^^^^^^^^^^^^^
+
+This file is used to draw trans eQTL or expression values in log2 scale.
+
+----
+     1	sl1 1898412 1898954 2
+     2	sl2 582837 583264 3
+----
+
++output/links2+
+^^^^^^^^^^^^^^^
+
+The same R script, +R/eqtl-cis-trans.R+, uses files in +output/position2+ to create circos data files for links from a main IL to trans eQTL. The set of file names in this output directory are the same as that of the output directory, +output/cis2+.
+
++output/links2/IL1-1+
+^^^^^^^^^^^^^^^^^^^^^
+
+This file is used to draw links from a main IL to trans eQTL.
+
+----
+sl1 50000 50010 sl1 1898412 1898422
+sl1 50000 50010 sl2 582837 582847
+----
+
++output/exppen+
+^^^^^^^^^^^^^^^
+
+The command, _exppen_, of the main perl script creates expression values for the background PEN line.
+
+----
+     1	chr0
+     2	chr1
+     3	chr2
+----
+
++output/exppen/chr1+
+^^^^^^^^^^^^^^^^^^^^
+
+The four columns are chromosome ID, start position, end position, and the expression value of the SNP in PEN line.
+
+----
+     1	sl1 57359 57369 1
+     2	sl1 1898412 1898422 2
+----
+
+
+
++output/summary+
+^^^^^^^^^^^^^^^^
+
+The summary statistics of the SNP and others are stored in this output directory.
+
+----
+     1	bothsnp.csv
+     2	cistranspenlike.csv
+     3	pen-snp-type.csv
+     4	snp-uniq.csv
+----
+
++output/summary/bothsnp.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+----
+     1	,1,1.1,3,4
+     2	il,IL1-1,IL1-1,IL2-1,IL2-2
+     3	m,6,6,6,6
+     4	md,0,0,0,0
+     5	i,0,0,0,0
+     6	d,0,0,0,0
+     7	t,6,6,6,6
+----
+
++output/summary/cistranspenlike.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+----
+     1	,1,2,3,4
+     2	il,IL1-1,IL1-2,IL2-1,IL2-2
+     3	cis.pen,0,0,0,0
+     4	cis.notpen,1,1,0,1
+     5	trans.pen,0,0,0,0
+     6	trans.notpen,3,3,4,3
+     7	total,4,4,4,4
+----
+
++output/summary/pen-snp-type.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We use +output/count/pen-snp-type.txt+, which is created by +R/count-snp-type.R+, to create a table of numbers of SNPs on different annotated regions.
+
+---- 
+     1	,V1,V2,V3
+     2	chr,0,1,2
+     3	gene,0,4,4
+     4	mrna,0,4,4
+     5	cds,0,1,3
+     6	exon,0,4,4
+     7	utr5,0,1,1
+     8	utr3,0,2,0
+     9	intron,0,0,0
+    10	annotation,0,4,4
+    11	noannotation,0,8,8
+    12	all,0,12,12
+----
+
++output/summary/snp-uniq.csv+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We use +output/count/snp-uniq.txt+ to create a csv file, which can be read by a spreadsheet program such as *Excel*.
+
+----
+     1	,V1,V2
+     2	chr,1,2
+     3	m,12,12
+     4	i,0,0
+     5	d,0,0
+     6	total,12,12
+----
+
++output/circos+
+^^^^^^^^^^^^^^^
+
+This contains circos configuration files for chromosomes and ILs.
+
+Perl script +pl/prepare-circos-data.pl+ with command +pen+ uses +data/raw/IL_SNP_gene/pen_SNP+ to create tile data files for *circos*. This draws the outer circle of tiles for displaying SNPs in PEN line.
+ 
+Perl script +pl/prepare-circos-data.pl+ with command +snp+ uses multiple IL files in +data/raw/IL_SNP_gene+ to create tile data files for *circos*. This draws the inner circles of tiles for displaying SNPs in IL lines. We also use +othersnp+ command for the perl script, which is not used for drawing circos figures. Question? Do I have to use IL position information to draw tiles of SNPs?
+
+Perl script +pl/prepare-circos-data.pl+ with command +links+ uses gene expression to determine trans eQTL. The start position of a link is at the center of the corresponding IL, and the destination is any gene outside the IL. We specified the IL regions manually in files at +output/ilposition+. Question? Is this right?
+
+Perl script +pl/prepare-circos-data.pl+ with command +exp+ uses gene expression to plot expression levels to create _scatter_ circos data sets for the genes within the corresponding IL regions. Use command +inter+ to create a similar data set for genes outside of the IL region. 
+
+Perl script +pl/prepare-circos-data.pl+ with command +exppen+ uses gene expression of PEN to create _scatter_ circos data set, which is drawn at the outer circle.   
+
+
++output/circosout+
+^^^^^^^^^^^^^^^^^^
+
+This contains circos figures.
+
++output/ilmap.tex+
+^^^^^^^^^^^^^^^^^^
+
+This is used with +tex/ilmap.tex+ to create IL maps in genomewide.
+
+pl
+~~
+The perl script +prepare-circos-data.pl+ create data files for circos figures.
+
+Command +pen+ 
+
+run
+~~~
+The main shell script.
+
+sh
+~~
+A few shell scripts.
+
+species
+~~~~~~~
+N/A.
+
+src
+~~~
+C or C++ source code files. Use +fastasplitn.c+ to split a FASTA file into multiple files.
+
+Others Files
+------------
+We would execute menus in a directory. The directory can be the directory you created from the git source repository, or a separate directory. We call the git source directory te Dropbox base directory because I would a directory in a Dropbox for storing source code. It could be called a git source code directory. The Dropbox base directory contains files and directories. We could have a separate directory called a local base directory. The local base directory contains soft links to some of directories in the Dropbox directory. As I mentioned earlier, a separate hard drive can be used to store an +output+ directory. So, we could have a storage base directory. The local base directory would also contains soft links to directories in the sotrage base directory. Three base directories are used for the convenience of development. 
+
+.Dropbox base directory
+----
+/Users/goshng/Dropbox/Documents/Projects/RNASeq-Analysis
+----
+
+.Local base directory
+----
+/Users/goshng/Documents/Projects/RNASeq-Analysis
+----
+
+.Storage base directory
+----
+/Volumes/Elements/Documents/Projects/RNASeq-Analysis
+----
+
+The Dropbox and local base directories can be combined into one. We would clone a git repository via github at th Dropbox +Projects+ directory, or local +Projects+ directory. When cloning a git repository at a Dropbox base directory, you may have to still create a local base directory. In the local base directory, link some directories (+pl+, +sh+, and +src+) and the main script file +run+ using soft links. The storage base directory would contain directories for input and output files such as +data+, +downloads+, +email+, +log+, and +output+ directories. Users can create other files and soft-link them at the local base directory. This soft-links allow us to use the local base directory as the main base directory by merging source code and data. Use +sh/make-soft-links.sh+ to create soft links in the local base directory. Edit +sh/make-soft-links.sh+ to change the value of _LOCALBASEDIR_ and _STORAGEBASEDIR_. 
+
+In the storage base directory, create the directories for storing data.
+----
+mkdir data downloads email log output
+----
+
+Run +sh/make-soft-links.sh+ to create soft links in the local base directory.
+
+.Clone a git repository (read-only and edit)
+----
+git clone git://github.com/goshng/Tomato-Analysis.git
+git clone git@github.com:goshng/Tomato-Analysis.git 
+----
+
+AUTHORS
+~~~~~~~
+Sang Chul Choi uses circos and R to analyze tomato IL lines from RNA-seq data.
+
+COPYING
+~~~~~~~
+The GNU General Public License. 
+
+ChangeLog
+~~~~~~~~~
+This is a little different from a typical ChangeLog. It is more or less of history of my work. You could find some of actual codes or scripts in +log+ directory.
+
+INSTALL
+~~~~~~~
+The instruction of installing Tomato Analysis.
+
+NEWS
+~~~~
+A list of user-visible changes to *Tomato Analysis* worth mentioning. 
+
+R
+~~
+R scripts.
+
+README
+~~~~~~
+A README of the root directory.
+
+THANKS
+~~~~~~
+People help the development of *Tomato Analysis*.
+
+TODO
+~~~~
+New features of *Tomato Analysis*.
+
+bin
+~~~
+Binary or shell script files. 
+
+c
+~~
+A shell script that uses +asciidoc+ to convert +doc/Manual+ to an html file.
+
+conf
+~~~~
+The *Tomato Analysis* is configured using the +README+ in the +conf+ directory.
+
+doc
+~~~
+Users should refer to documentation in +doc+ directory, which also contains +lyx+ files for potential publications from the analysis of bacterial transcriptome.
+
+log
+~~~
+This is placed at the storage base directory, where a number of directories can be placed as you do some analyses. The directory name is MMDDYY, where MM is month, DD is a day, and YY is the year. See the ChangeLog for some working information.
+
+package
+~~~~~~~
+We use R-based analyses to postprocess the results from computationally intensive analyses, which are mostly done in *Tomato Analysis*. Parts of the analyses can be incorporated in a manuscript for publication as a part of the result section.
+
+pl
+~~
+Perl scripts.
+
+run
+~~~
+It shows a menu of commands provided by *Tomato Analysis*.
+
+sh
+~~
+Bash scripts.
+
+----
+     1	batch.sh
+     2	blast-cac.sh
+     3	copyright.sh
+     4	find-position.sh
+     5	goseq.sh
+     6	make-soft-links.sh
+     7	run.sh
+----
+
+src
+~~~
+C, or C++ source codes.
+
+
+Details and Future Development
+------------------------------
+You could read the details of implementation as a source code documentation. They may not make sense from the user perspective. 
+
+Useful Tools
+~~~~~~~~~~~~
+You could annotate bacterial genomes using xbase available at 
+http://www.xbase.ac.uk/annotation.
+You could compare two genomes to find genes unique to one of the two genome using genomeblast available at
+http://bioinfo-srv1.awh.unomaha.edu/genomeblast/tutorial.php. Because genbank files created by +xbase+ were incompatible with the format required by genomeblast, we extract amino acid sequences from genbank file to find genes that are unique to one of the two genomes. A +bioperl+ script, +pl/extractcds.pl+ could be useful to extract protein sequences from a genbank file.
+
+Usefuls R snippets
+~~~~~~~~~~~~~~~~~~
+
+match : finds the index of the second vector for the elements of the first vector.
+
+
+
+
+
+
+
+
+
+
+
