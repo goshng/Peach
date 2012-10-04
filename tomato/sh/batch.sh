@@ -27,6 +27,7 @@ function package {
   cp -r output/summary $d
   cp -r output/metabolite $d 
   cp -r output/metabolite-cor $d 
+  cp -r output/cor-ab $d 
   cp -r output/cor $d 
   cp -r output/go $d 
   cp -r output/ilmap.pdf $d 

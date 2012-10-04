@@ -123,10 +123,12 @@ function summary {
   rm -rf output/cor; mkdir output/cor
   rm -rf output/metabolite; mkdir output/metabolite
   rm -rf output/metabolite-cor; mkdir output/metabolite-cor
+  rm -rf output/cor-ab; mkdir output/cor-ab
   Rscript R/correlation-il.R $RAW
   for i in `ls data/$RAW/metabolite`; do
     Rscript R/correlation-metabolite.R $RAW $i
   done
+  Rscript R/correlation-ab.R $RAW IL-expressionforcorrelation.csv for-apriori-subnetwork-a.csv for-apriori-subnetwork-b.csv ab
 
   for i in `ls output/cor/*-pval.csv`; do Rscript R/postprocess-il.R $i; done 
   

@@ -47,6 +47,12 @@ cor
 ---
 gene-to-gene correlation
 
+cor-ab
+------
+gene set A to gene set B correlation
+ab-cor.csv
+ab-pval.csv
+
 gene2gene-pval.csv
 ------------------
 all-gene-to-all-gene correlation
