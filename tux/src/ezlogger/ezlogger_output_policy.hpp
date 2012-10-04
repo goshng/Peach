@@ -33,21 +33,25 @@ namespace axter
 #ifndef EZLOGGER_OUTPUT_FILENAME
 #define EZLOGGER_OUTPUT_FILENAME GetFileName()
 #endif //EZLOGGER_OUTPUT_FILENAME
+#else
+
 #endif //_WIN32
 
-
 #ifndef EZLOGGER_OUTPUT_FILENAME
-#define EZLOGGER_OUTPUT_FILENAME "ezlogger_output.txt"
+// #define EZLOGGER_OUTPUT_FILENAME "ezlogger_output.txt"
+#define EZLOGGER_OUTPUT_FILENAME 
 #endif
 	
 	public:
+static std::string mEzloggerOutputFilename;
 		inline static std::ostream& get_log_stream()
 		{
-			static const std::string FileName = EZLOGGER_OUTPUT_FILENAME;
-#ifdef EZLOGGER_REPLACE_EXISTING_LOGFILE_
-			static std::ofstream logfile(FileName.c_str(), std::ios_base::out);
-#else
+			//static const std::string FileName = EZLOGGER_OUTPUT_FILENAME;
+			static const std::string FileName = mEzloggerOutputFilename;
+#ifdef EZLOGGER_USE_EXISTING_LOGFILE_
 			static std::ofstream logfile(FileName.c_str(),  std::ios_base::out | std::ios_base::app);
+#else
+			static std::ofstream logfile(FileName.c_str(), std::ios_base::out);
 #endif
 			static bool logfile_is_open = logfile.is_open();
 			if (logfile_is_open) return logfile;

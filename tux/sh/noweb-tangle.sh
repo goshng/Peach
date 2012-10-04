@@ -21,47 +21,69 @@
 function noweb-tangle {
 OUTSRC=output/src
 NOWEBFILE=$ROOTDIR/noweb/main.nw
-#CPPFILE=( tux.cpp \
-#          tuxHelp.cpp \
-#          tuxManager.cpp \
-#          tuxModel.cpp \
-#          tuxMcmc.cpp \
-#          tuxXyz.cpp \
-#          gsl.cpp \
-#          fileman.cpp \
-#          yamlEmitter.cpp \
-#          monsters.cpp )
-#HPPFILE=( tuxHelp.h \
-#          tuxManager.h \
-#          tuxModel.h \
-#          tuxMcmc.h \
-#          tuxXyz.h \
-#          config.h.in )
-
 CPPFILE=( tux.cpp \
+          tux-v1.cpp \
+          fileman.cpp \
+          monsters.cpp
+          yamlEmitter.cpp \
+          tux-gsl.cpp \
+          tux-fixed.cpp \
+          tux-tx.cpp \
+          tux-probtx.cpp \
+          tux-prob.cpp \
+          tux-move.cpp \
+          tux-chain.cpp \
+          tux-cm.cpp \
+          tux-mcmc.cpp \
+          tux-single.cpp \
+          tux-likelihood.cpp \
+          tux-sum.cpp \
+          tux-log.cpp \
+          stl-transform.cpp \
+          tuxProgress.cpp \
+          tuxString.cpp \
+          tuxSignal.cpp \
+          tuxError.cpp \
+          tuxDefault.cpp \
+          tuxGsl.cpp \
+          tuxGslRng.cpp \
+          tuxHelp.cpp \
           tuxManager.cpp \
-          tuxRandomVariable.cpp \
-          tuxParameter.cpp \
-          tuxData.cpp \
           tuxSystem.cpp \
-          tuxProbability.cpp \
           tuxProbTxBoundaries.cpp \
           tuxProbTxExpression.cpp \
           tuxLikelihood.cpp \
+          tuxTotalLikelihood.cpp \
           tuxMoverManager.cpp \
           tuxMover.cpp \
           tuxMoverTxBoundaries.cpp \
           tuxMoverTxExpression.cpp \
+          tuxMoverTxBSingle.cpp \
           tuxSummarizer.cpp \
           tuxSummary.cpp \
           tuxTxBoundaries.cpp \
           tuxTxExpression.cpp \
+          tuxTxParameter.cpp \
           tuxReads.cpp \
+          tuxFixed.cpp \
           ezlogger.cpp \
           tuxMcmc.cpp \
+          tuxMcmcSingle.cpp \
+          tuxMcmcMpi.cpp \
           tuxChainManager.cpp \
-          tuxChain.cpp )
+          tuxChain.cpp \
+          MathFunctions/MakeTable.cpp \
+          MathFunctions/mysqrt.cpp )
 HPPFILE=( tuxManager.h \
+          tuxHelp.h \
+          tuxProgress.h \
+          tuxString.h \
+          tuxSignal.h \
+          tuxError.h \
+          tuxDefault.h \
+          tuxGsl.h \
+          tuxGslRng.h \
+          benLogDouble.h \
           tuxRandomVariable.h \
           tuxParameter.h \
           tuxData.h \
@@ -70,20 +92,33 @@ HPPFILE=( tuxManager.h \
           tuxProbTxBoundaries.h \
           tuxProbTxExpression.h \
           tuxLikelihood.h \
+          tuxTotalLikelihood.h \
           tuxMoverManager.h \
           tuxMover.h \
           tuxMoverTxBoundaries.h \
           tuxMoverTxExpression.h \
+          tuxMoverTxBSingle.h \
           tuxSummarizer.h \
           tuxSummary.h \
           tuxTxBoundaries.h \
           tuxTxExpression.h \
+          tuxTxParameter.h \
           tuxReads.h \
+          tuxFixed.h \
           tuxMcmc.h \
+          tuxMcmcSingle.h \
+          tuxMcmcMpi.h \
           tuxChainManager.h \
+          tuxChain.h \
           gtypes.h \
-          tuxChain.h )
+          config.h.in )
+notangle -Rruntux $NOWEBFILE > $OUTSRC/b/runtux; chmod +x $OUTSRC/b/runtux
+notangle -Rtuxbatch.sh $NOWEBFILE > $OUTSRC/b/tuxbatch.sh
+notangle -RplotTemperature.sh $NOWEBFILE > $OUTSRC/b/plotTemperature.sh
+notangle -RplotTemperature.R $NOWEBFILE > $OUTSRC/b/plotTemperature.R
+
 notangle -RCMakeLists.txt $NOWEBFILE > $OUTSRC/CMakeLists.txt
+notangle -RMathFunctions/CMakeLists.txt $NOWEBFILE > $OUTSRC/MathFunctions/CMakeLists.txt
 
 for f in ${CPPFILE[@]}; do
   notangle -L -R$f $NOWEBFILE > $OUTSRC/$f

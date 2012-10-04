@@ -1,0 +1,7 @@
+./clean
+cd $1
+mkdir b
+cd b
+# cmake -Wno-dev ..
+cmake ..
+make

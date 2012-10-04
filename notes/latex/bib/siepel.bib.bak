@@ -502,6 +502,44 @@
   url = {http://dx.doi.org/10.1101/gr.424203}
 }
 
+@ARTICLE{Altschul1990,
+  author = {S. F. Altschul and W. Gish and W. Miller and E. W. Myers and D. J.
+	Lipman},
+  title = {Basic local alignment search tool.},
+  journal = {J Mol Biol},
+  year = {1990},
+  volume = {215},
+  pages = {403--410},
+  number = {3},
+  month = {Oct},
+  abstract = {A new approach to rapid sequence comparison, basic local alignment
+	search tool (BLAST), directly approximates alignments that optimize
+	a measure of local similarity, the maximal segment pair (MSP) score.
+	Recent mathematical results on the stochastic properties of MSP scores
+	allow an analysis of the performance of this method as well as the
+	statistical significance of alignments it generates. The basic algorithm
+	is simple and robust; it can be implemented in a number of ways and
+	applied in a variety of contexts including straightforward DNA and
+	protein sequence database searches, motif searches, gene identification
+	searches, and in the analysis of multiple regions of similarity in
+	long DNA sequences. In addition to its flexibility and tractability
+	to mathematical analysis, BLAST is an order of magnitude faster than
+	existing sequence comparison tools of comparable sensitivity.},
+  doi = {10.1016/S0022-2836(05)80360-2},
+  institution = {National Center for Biotechnology Information, National Library of
+	Medicine, National Institutes of Health, Bethesda, MD 20894.},
+  keywords = {Algorithms; Amino Acid Sequence; Base Sequence; Databases, Factual;
+	Mutation; Sensitivity and Specificity; Sequence Homology, Nucleic
+	Acid; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S0022-2836(05)80360-2},
+  pmid = {2231712},
+  timestamp = {2012.01.16},
+  url = {http://dx.doi.org/10.1016/S0022-2836(05)80360-2}
+}
+
 @ARTICLE{Andam2010,
   author = {Cheryl P Andam and David Williams and J. Peter Gogarten},
   title = {Biased gene transfer mimics patterns created through shared ancestry.},
@@ -2952,6 +2990,43 @@
   url = {http://dx.doi.org/10.1038/nbt.1637}
 }
 
+@ARTICLE{Chevalet2010,
+  author = {Claude Chevalet and Natacha Nikolic},
+  title = {The distribution of coalescence times and distances between microsatellite
+	alleles with changing effective population size.},
+  journal = {Theor Popul Biol},
+  year = {2010},
+  volume = {77},
+  pages = {152--163},
+  number = {3},
+  month = {May},
+  abstract = {We investigate the effects of past changes of the effective population
+	size on the present allelic diversity at a microsatellite marker
+	locus. We first derive the analytical expression of the generating
+	function of the joint probabilities of the time to the Most Recent
+	Common Ancestor for a pair of alleles and of their distance (the
+	difference in allele size). We give analytical solutions in the case
+	of constant population size and the geometrical mutation model. Otherwise,
+	numerical inversion allows the distributions to be calculated in
+	general cases. The effects of population expansion or decrease and
+	the possibility to detect an ancient bottleneck are discussed. The
+	method is extended to samples of three and four alleles, which allows
+	investigating the covariance structure of the frequencies f(k) of
+	pairs of alleles with a size difference of k motifs, and suggesting
+	some approaches to the estimation of past demography.},
+  doi = {10.1016/j.tpb.2010.01.001},
+  institution = {>},
+  keywords = {Alleles; Microsatellite Repeats, genetics; Models, Genetic; Mutation},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {S0040-5809(10)00002-X},
+  pmid = {20085779},
+  review = {Barton population size changes Lohse},
+  timestamp = {2011.12.09},
+  url = {http://dx.doi.org/10.1016/j.tpb.2010.01.001}
+}
+
 @ARTICLE{Chikkagoudar2007,
   author = {Satish Chikkagoudar and Usman Roshan and Dennis Livesay},
   title = {eProbalign: generation and manipulation of multiple sequence alignments
@@ -3303,6 +3378,58 @@
   pmid = {15059994},
   timestamp = {2010.08.23},
   url = {http://dx.doi.org/10.1101/gr.2034704}
+}
+
+@ARTICLE{Croucher2009,
+  author = {Nicholas J Croucher and Maria C Fookes and Timothy T Perkins and
+	Daniel J Turner and Samuel B Marguerat and Thomas Keane and Michael
+	A Quail and Miao He and Sammey Assefa and Jürg Bähler and Robert
+	A Kingsley and Julian Parkhill and Stephen D Bentley and Gordon Dougan
+	and Nicholas R Thomson},
+  title = {A simple method for directional transcriptome sequencing using Illumina
+	technology.},
+  journal = {Nucleic Acids Res},
+  year = {2009},
+  volume = {37},
+  pages = {e148},
+  number = {22},
+  month = {Dec},
+  __markedentry = {[goshng]},
+  abstract = {High-throughput sequencing of cDNA has been used to study eukaryotic
+	transcription on a genome-wide scale to single base pair resolution.
+	In order to compensate for the high ribonuclease activity in bacterial
+	cells, we have devised an equivalent technique optimized for studying
+	complete prokaryotic transcriptomes that minimizes the manipulation
+	of the RNA sample. This new approach uses Illumina technology to
+	sequence single-stranded (ss) cDNA, generating information on both
+	the direction and level of transcription throughout the genome. The
+	protocol, and associated data analysis programs, are freely available
+	from http://www.sanger.ac.uk/Projects/Pathogens/Transcriptome/. We
+	have successfully applied this method to the bacterial pathogens
+	Salmonella bongori and Streptococcus pneumoniae and the yeast Schizosaccharomyces
+	pombe. This method enables experimental validation of genetic features
+	predicted in silico and allows the easy identification of novel transcripts
+	throughout the genome. We also show that there is a high correlation
+	between the level of gene expression calculated from ss-cDNA and
+	double-stranded-cDNA sequencing, indicting that ss-cDNA sequencing
+	is both robust and appropriate for use in quantitative studies of
+	transcription. Hence, this simple method should prove a useful tool
+	in aiding genome annotation and gene expression studies in both prokaryotes
+	and eukaryotes.},
+  doi = {10.1093/nar/gkp811},
+  institution = {The Wellcome Trust Sanger Institute, Wellcome Trust Genome Campus,
+	Hinxton, Cambridge, Cambridgeshire CB10 1SA, UK.},
+  keywords = {DNA, Complementary, chemistry; DNA, Single-Stranded, chemistry; Gene
+	Expression Profiling, methods; Gene Library; RNA Splicing; Salmonella,
+	genetics; Schizosaccharomyces, genetics; Sequence Analysis, DNA,
+	methods; Streptococcus pneumoniae, genetics; Transcription, Genetic},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {gkp811},
+  pmid = {19815668},
+  timestamp = {2012.01.20},
+  url = {http://dx.doi.org/10.1093/nar/gkp811}
 }
 
 @ARTICLE{Croucher2010,
@@ -7975,6 +8102,58 @@
   url = {http://dx.doi.org/10.1186/1471-2105-7-423}
 }
 
+@ARTICLE{Jaeckisch2011,
+  author = {Nina Jaeckisch and Ines Yang and Sylke Wohlrab and Gernot Glöckner
+	and Juergen Kroymann and Heiko Vogel and Allan Cembella and Uwe John},
+  title = {Comparative Genomic and Transcriptomic Characterization of the Toxigenic
+	Marine Dinoflagellate Alexandrium ostenfeldii.},
+  journal = {PLoS One},
+  year = {2011},
+  volume = {6},
+  pages = {e28012},
+  number = {12},
+  abstract = {Many dinoflagellate species are notorious for the toxins they produce
+	and ecological and human health consequences associated with harmful
+	algal blooms (HABs). Dinoflagellates are particularly refractory
+	to genomic analysis due to the enormous genome size, lack of knowledge
+	about their DNA composition and structure, and peculiarities of gene
+	regulation, such as spliced leader (SL) trans-splicing and mRNA transposition
+	mechanisms. Alexandrium ostenfeldii is known to produce macrocyclic
+	imine toxins, described as spirolides. We characterized the genome
+	of A. ostenfeldii using a combination of transcriptomic data and
+	random genomic clones for comparison with other dinoflagellates,
+	particularly Alexandrium species. Examination of SL sequences revealed
+	similar features as in other dinoflagellates, including Alexandrium
+	species. SL sequences in decay indicate frequent retro-transposition
+	of mRNA species. This probably contributes to overall genome complexity
+	by generating additional gene copies. Sequencing of several thousand
+	fosmid and bacterial artificial chromosome (BAC) ends yielded a wealth
+	of simple repeats and tandemly repeated longer sequence stretches
+	which we estimated to comprise more than half of the whole genome.
+	Surprisingly, the repeats comprise a very limited set of 79-97 bp
+	sequences; in part the genome is thus a relatively uniform sequence
+	space interrupted by coding sequences. Our genomic sequence survey
+	(GSS) represents the largest genomic data set of a dinoflagellate
+	to date. Alexandrium ostenfeldii is a typical dinoflagellate with
+	respect to its transcriptome and mRNA transposition but demonstrates
+	Alexandrium-like stop codon usage. The large portion of repetitive
+	sequences and the organization within the genome is in agreement
+	with several other studies on dinoflagellates using different approaches.
+	It remains to be determined whether this unusual composition is directly
+	correlated to the exceptionally genome organization of dinoflagellates
+	with a low amount of histones and histone-like proteins.},
+  doi = {10.1371/journal.pone.0028012},
+  institution = {Alfred Wegener Institute for Polar and Marine Research, Bremerhaven,
+	Germany.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {PONE-D-11-13369},
+  pmid = {22164224},
+  timestamp = {2012.01.17},
+  url = {http://dx.doi.org/10.1371/journal.pone.0028012}
+}
+
 @ARTICLE{Janga2006,
   author = {Sarath Chandra Janga and Warren F Lamboy and Araceli M Huerta and
 	Gabriel Moreno-Hagelsieb},
@@ -10215,6 +10394,39 @@
   url = {http://dx.doi.org/10.1093/bioinformatics/btp324}
 }
 
+@ARTICLE{Li2009b,
+  author = {Heng Li and Bob Handsaker and Alec Wysoker and Tim Fennell and Jue
+	Ruan and Nils Homer and Gabor Marth and Goncalo Abecasis and Richard
+	Durbin and 1000 Genome Project Data Processing Subgroup},
+  title = {The Sequence Alignment/Map format and SAMtools.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {2078--2079},
+  number = {16},
+  month = {Aug},
+  abstract = {SUMMARY: The Sequence Alignment/Map (SAM) format is a generic alignment
+	format for storing read alignments against reference sequences, supporting
+	short and long reads (up to 128 Mbp) produced by different sequencing
+	platforms. It is flexible in style, compact in size, efficient in
+	random access and is the format in which alignments from the 1000
+	Genomes Project are released. SAMtools implements various utilities
+	for post-processing alignments in the SAM format, such as indexing,
+	variant caller and alignment viewer, and thus provides universal
+	tools for processing read alignments. AVAILABILITY: http://samtools.sourceforge.net.},
+  institution = {Wellcome Trust Sanger Institute, Wellcome Trust Genome Campus, Cambridge,
+	CB10 1SA, UK, Broad Institute of MIT and Harvard, Cambridge, MA 02141,
+	USA.},
+  keywords = {Algorithms; Base Sequence; Computational Biology, methods; Genome;
+	Genomics; Molecular Sequence Data; Sequence Alignment, methods; Sequence
+	Analysis, DNA, methods; Software},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {19505943},
+  timestamp = {2011.12.23}
+}
+
 @ARTICLE{Li2003,
   author = {Li Li and Christian J Stoeckert and David S Roos},
   title = {OrthoMCL: identification of ortholog groups for eukaryotic genomes.},
@@ -10443,6 +10655,51 @@
   review = {Sequence Alignment},
   timestamp = {2010.09.08},
   url = {http://dx.doi.org/10.1093/bioinformatics/btq338}
+}
+
+@ARTICLE{Lohse2011,
+  author = {K. Lohse and R. J. Harrison and N. H. Barton},
+  title = {A general method for calculating likelihoods under the coalescent
+	process.},
+  journal = {Genetics},
+  year = {2011},
+  volume = {189},
+  pages = {977--987},
+  number = {3},
+  month = {Nov},
+  abstract = {Analysis of genomic data requires an efficient way to calculate likelihoods
+	across very large numbers of loci. We describe a general method for
+	finding the distribution of genealogies: we allow migration between
+	demes, splitting of demes [as in the isolation-with-migration (IM)
+	model], and recombination between linked loci. These processes are
+	described by a set of linear recursions for the generating function
+	of branch lengths. Under the infinite-sites model, the probability
+	of any configuration of mutations can be found by differentiating
+	this generating function. Such calculations are feasible for small
+	numbers of sampled genomes: as an example, we show how the generating
+	function can be derived explicitly for three genes under the two-deme
+	IM model. This derivation is done automatically, using Mathematica.
+	Given data from a large number of unlinked and nonrecombining blocks
+	of sequence, these results can be used to find maximum-likelihood
+	estimates of model parameters by tabulating the probabilities of
+	all relevant mutational configurations and then multiplying across
+	loci. The feasibility of the method is demonstrated by applying it
+	to simulated data and to a data set previously analyzed by Wang and
+	Hey (2010) consisting of 26,141 loci sampled from Drosophila simulans
+	and D. melanogaster. Our results suggest that such likelihood calculations
+	are scalable to genomic data as long as the numbers of sampled individuals
+	and mutations per sequence block are small.},
+  doi = {10.1534/genetics.111.129569},
+  institution = {Institute of Evolutionary Biology, University of Edinburgh, Edinburgh
+	EH9 3JT, United Kingdom.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {genetics.111.129569},
+  pmid = {21900266},
+  review = {Yong Wang's method extension.},
+  timestamp = {2011.12.05},
+  url = {http://dx.doi.org/10.1534/genetics.111.129569}
 }
 
 @ARTICLE{Longo2003,
@@ -11286,6 +11543,28 @@
   pmid = {20438648},
   timestamp = {2011.08.15},
   url = {http://dx.doi.org/10.1186/1471-2105-11-S3-S10}
+}
+
+@ARTICLE{Martin2011,
+  author = {Marcel Martin},
+  title = {Cutadapt removes adapter sequences from high-throughput sequencing
+	reads},
+  journal = {EMBnet.journal},
+  year = {2011},
+  volume = {17},
+  number = {1},
+  abstract = {When small RNA is sequenced on current sequencing machines, the resulting
+	reads are usually longer than the RNA and therefore contain parts
+	of the 3' adapter. That adapter must be found and removed error-tolerantly
+	from each read before read mapping. Previous solutions are either
+	hard to use or do not offer required features, in particular support
+	for color space data. As an easy to use alternative, we developed
+	the command-line tool cutadapt, which supports 454, Illumina and
+	SOLiD (color space) data, offers two adapter trimming algorithms,
+	and has other useful features. Cutadapt, including its MIT-licensed
+	source code, is available for download at http://code.google.com/p/cutadapt/},
+  keywords = {next generation sequencing; small RNA; microRNA; adapter removal},
+  url = {http://journal.embnet.org/index.php/embnetjournal/article/view/200}
 }
 
 @ARTICLE{McCue2001,
@@ -12899,6 +13178,55 @@
   url = {http://bioinformatics.oxfordjournals.org/content/18/5/715.abstract}
 }
 
+@ARTICLE{Passalacqua2009,
+  author = {Karla D Passalacqua and Anjana Varadarajan and Brian D Ondov and
+	David T Okou and Michael E Zwick and Nicholas H Bergman},
+  title = {Structure and complexity of a bacterial transcriptome.},
+  journal = {J Bacteriol},
+  year = {2009},
+  volume = {191},
+  pages = {3203--3211},
+  number = {10},
+  month = {May},
+  abstract = {Although gene expression has been studied in bacteria for decades,
+	many aspects of the bacterial transcriptome remain poorly understood.
+	Transcript structure, operon linkages, and information on absolute
+	abundance all provide valuable insights into gene function and regulation,
+	but none has ever been determined on a genome-wide scale for any
+	bacterium. Indeed, these aspects of the prokaryotic transcriptome
+	have been explored on a large scale in only a few instances, and
+	consequently little is known about the absolute composition of the
+	mRNA population within a bacterial cell. Here we report the use of
+	a high-throughput sequencing-based approach in assembling the first
+	comprehensive, single-nucleotide resolution view of a bacterial transcriptome.
+	We sampled the Bacillus anthracis transcriptome under a variety of
+	growth conditions and showed that the data provide an accurate and
+	high-resolution map of transcript start sites and operon structure
+	throughout the genome. Further, the sequence data identified previously
+	nonannotated regions with significant transcriptional activity and
+	enhanced the accuracy of existing genome annotations. Finally, our
+	data provide estimates of absolute transcript abundance and suggest
+	that there is significant transcriptional heterogeneity within a
+	clonal, synchronized bacterial population. Overall, our results offer
+	an unprecedented view of gene expression and regulation in a bacterial
+	cell.},
+  doi = {10.1128/JB.00122-09},
+  institution = {School of Biology, Georgia Institute of Technology, 310 Ferst Dr.,
+	Atlanta, GA 30332-0230, USA.},
+  keywords = {Bacillus anthracis, genetics; Computational Biology; Gene Expression
+	Profiling, methods; Gene Expression Regulation, Bacterial, genetics;
+	Molecular Sequence Data; Operon, genetics; RNA, Messenger, genetics;
+	Reverse Transcriptase Polymerase Chain Reaction; Sequence Analysis,
+	DNA},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {JB.00122-09},
+  pmid = {19304856},
+  timestamp = {2012.01.17},
+  url = {http://dx.doi.org/10.1128/JB.00122-09}
+}
+
 @ARTICLE{Paul2010,
   author = {Joshua S Paul and Yun S Song},
   title = {A principled approach to deriving approximate conditional sampling
@@ -13198,6 +13526,48 @@
 	SDD},
   timestamp = {2010.10.12},
   url = {http://dx.doi.org/10.1128/AAC.01377-09}
+}
+
+@ARTICLE{Polanski1998,
+  author = {A. Polanski and M. Kimmel and R. Chakraborty},
+  title = {Application of a time-dependent coalescence process for inferring
+	the history of population size changes from DNA sequence data.},
+  journal = {Proc Natl Acad Sci U S A},
+  year = {1998},
+  volume = {95},
+  pages = {5456--5461},
+  number = {10},
+  month = {May},
+  abstract = {Distribution of pairwise differences of nucleotides from data on a
+	sample of DNA sequences from a given segment of the genome has been
+	used in the past to draw inferences about the past history of population
+	size changes. However, all earlier methods assume a given model of
+	population size changes (such as sudden expansion), parameters of
+	which (e.g., time and amplitude of expansion) are fitted to the observed
+	distributions of nucleotide differences among pairwise comparisons
+	of all DNA sequences in the sample. Our theory indicates that for
+	any time-dependent population size, N(tau) (in which time tau is
+	counted backward from present), a time-dependent coalescence process
+	yields the distribution, p(tau), of the time of coalescence between
+	two DNA sequences randomly drawn from the population. Prediction
+	of p(tau) and N(tau) requires the use of a reverse Laplace transform
+	known to be unstable. Nevertheless, simulated data obtained from
+	three models of monotone population change (stepwise, exponential,
+	and logistic) indicate that the pattern of a past population size
+	change leaves its signature on the pattern of DNA polymorphism. Application
+	of the theory to the published mtDNA sequences indicates that the
+	current mtDNA sequence variation is not inconsistent with a logistic
+	growth of the human population.},
+  institution = {Human Genetics Center, School of Public Health, University of Texas
+	at Houston, Post Office Box 20334, Houston, TX 77225, USA.},
+  keywords = {Algorithms; DNA, Mitochondrial, chemistry; Humans; Models, Genetic;
+	Population Dynamics; Sequence Analysis, DNA},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {9576903},
+  review = {Lohse Barton method can be extended to changing population sizes.},
+  timestamp = {2011.12.09}
 }
 
 @ARTICLE{Pollard2010,
@@ -14209,50 +14579,6 @@
   pmid = {17728317},
   timestamp = {2011.08.02},
   url = {http://dx.doi.org/10.1093/biostatistics/kxm030}
-}
-
-@ARTICLE{Robinson2007,
-  author = {Mark D Robinson and Gordon K Smyth},
-  title = {Moderated statistical tests for assessing differences in tag abundance.},
-  journal = {Bioinformatics},
-  year = {2007},
-  volume = {23},
-  pages = {2881--2887},
-  number = {21},
-  month = {Nov},
-  __markedentry = {[goshng]},
-  abstract = {Digital gene expression (DGE) technologies measure gene expression
-	by counting sequence tags. They are sensitive technologies for measuring
-	gene expression on a genomic scale, without the need for prior knowledge
-	of the genome sequence. As the cost of sequencing DNA decreases,
-	the number of DGE datasets is expected to grow dramatically. Various
-	tests of differential expression have been proposed for replicated
-	DGE data using binomial, Poisson, negative binomial or pseudo-likelihood
-	(PL) models for the counts, but none of the these are usable when
-	the number of replicates is very small.We develop tests using the
-	negative binomial distribution to model overdispersion relative to
-	the Poisson, and use conditional weighted likelihood to moderate
-	the level of overdispersion across genes. Not only is our strategy
-	applicable even with the smallest number of libraries, but it also
-	proves to be more powerful than previous strategies when more libraries
-	are available. The methodology is equally applicable to other counting
-	technologies, such as proteomic spectral counts.An R package can
-	be accessed from http://bioinf.wehi.edu.au/resources/},
-  doi = {10.1093/bioinformatics/btm453},
-  institution = {Department of Medical Biology, University of Melbourne, Parkville,
-	Victoria, Australia.},
-  keywords = {Algorithms; Computer Simulation; Data Interpretation, Statistical;
-	Expressed Sequence Tags; Gene Expression Profiling, methods; Likelihood
-	Functions; Models, Genetic; Models, Statistical; Poisson Distribution;
-	Sequence Analysis, DNA, methods; Signal Processing, Computer-Assisted},
-  language = {eng},
-  medline-pst = {ppublish},
-  owner = {goshng},
-  pii = {btm453},
-  pmid = {17881408},
-  review = {edgeR},
-  timestamp = {2011.11.22},
-  url = {http://dx.doi.org/10.1093/bioinformatics/btm453}
 }
 
 @ARTICLE{Robinson2003,
@@ -18600,7 +18926,7 @@
   owner = {goshng},
   pii = {gb-2010-11-2-r14},
   pmid = {20132535},
-  timestamp = {2011.11.22},
+  timestamp = {2012.01.06},
   url = {http://dx.doi.org/10.1186/gb-2010-11-2-r14}
 }
 

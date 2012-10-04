@@ -1,0 +1,1 @@
+for i in `find . -name b -type d`; do rm -rf $i; done

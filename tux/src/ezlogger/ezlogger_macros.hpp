@@ -49,6 +49,7 @@ requires this approach.
 #if !defined(__FUNCTION__) && !defined(__GNUC__) //The GNU compiler and VC++ 7.x supports this macro
 #define __FUNCTION__ ""  //If compiler does not support it, then use empty string
 #endif //!defined(__FUNCTION__) && !defined(__GNUC__)
+//#define __FUNCTION__ __PRETTY_FUNCTION__
 // @endcond 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

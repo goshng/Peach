@@ -1,0 +1,9 @@
+Download pgf_2.10.tds.zip
+mkdir pgf; cd pgf
+Unzip it to pgf
+mv pgf to the following directory
+$HOME/Library/texmf/tex/generic/pgf
+sudo texhash
+
+I am not sure whether this actually installed pgf, or it had been already
+installed.

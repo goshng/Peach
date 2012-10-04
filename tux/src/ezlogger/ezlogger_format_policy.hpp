@@ -33,8 +33,10 @@ namespace axter
 				FileNameOnly = FileNameOnly.substr(pos+1);
 			}
 			char FileNameFormat[999] = {0};
-			sprintf(FileNameFormat, "%-32s(%5.5i): , [%-16s], [s_%i] [%s, ", 
-				FileNameOnly.c_str(), LineNo, FunctionName, levels_format_usage_data.m_severity_level, get_current_time_str().c_str());
+			//sprintf(FileNameFormat, "%-32s(%5.5i): , [%-16s], [s_%i] [%s, ", 
+				//FileNameOnly.c_str(), LineNo, FunctionName, levels_format_usage_data.m_severity_level, get_current_time_str().c_str());
+			sprintf(FileNameFormat, "%5.5i: [%-20s] [s_%i] [%s ", 
+				LineNo, FunctionName, levels_format_usage_data.m_severity_level, get_current_time_str().c_str());
 			return FileNameFormat;
 		}
 	private:

@@ -1,12 +1,61 @@
+.Do these for initialization.
+. ./run 3
+. ./run 1
+. ./run 2
+. cd output/src/b
+
+.Tests
+. Reads in setup (Fixed)
+. Reads in data (Reads)
+. MCMC runs
+. Writes TxBoundaries and TxExpression states along with chain information
+. Chain information includes likelihood, chain ID
+. Combine the summary files from different machines
+. Summarize the output
+. Create a wiggle file for uncertainty in transcript boundaries
+
+.git
+. To create an archive.
+. git archive --format=tar --prefix=tux/ HEAD | gzip > tux-head.tar.gz
+
 .Packages
+
+.noweb
+. Follow the instruction below when noweb is not or cannot be installed.
+. Download ftp://www.eecs.harvard.edu/pub/nr/noweb-2.11b.tgz
+. Unzip the downloaded file, and change to src directory.
+. Run "awkname gawk"
+. We assume $HOME/usr directory for local installation.
+. Edit Makefile
+  .. HOME=/home/fs01/sc2265
+  .. BIN=$(HOME)/usr/bin
+  .. LIB=$(HOME)/usr/lib
+  .. MAN=$(HOME)/usr/man
+  .. TEXINPUTS=$(HOME)/usr/share/texmf/tex/latex
+. Create a directory $HOME/usr/share/texmf/tex/latex
+. Add 
+. export TEXINPUTS="$HOME/usr/share/texmf/tex/latex:"
+. to $HOME/.profile
 
 .CMake
 . Version 2.8.8
 . http://cmake.org/cmake/resources/software.html
 
+.GNU Scientific Library (gnu-gsl)
+. Find the installed directory of gsl.
+. Add the path, e.g., /cac/contrib/gsl-1.15 $PATH
+
 .yaml
 . Data serializaton
 . http://code.google.com/p/yaml-cpp/
+. Download the file at http://yaml-cpp.googlecode.com/files/yaml-cpp-0.3.0.tar.gz
+. mkdir b; cd b
+. Check if cmake works.
+. /home/fs01/sc2265/cmake-2.8.7-Linux-i386/bin/cmake --version 
+. Use the working version.
+. cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/usr
+. You can clone yaml-cpp.
+. hg clone https://code.google.com/p/yaml-cpp/
 
 .simpleopt
 . Command line parser
@@ -16,11 +65,12 @@
 . FindGSL.cmake
 
 .DESeq
+. http://www.bioconductor.org/packages/release/bioc/src/contrib/DESeq_1.8.2.tar.gz
 . Genome sequence length: 2032925
 . Short reads positions along the S. mutans genome: FASTQ001.start (1,19,20)
 . Size factors: 0.8700484 1.0158870 1.1285131
 . Number of transcripts: 
-. mean=q*s, size=q*s/d, d=a0+a1/mean
+. mean=(q*s), size=1/d, d=a0+a1/(q*s)
 . a0, a1 = 0.0269 6.2076
 . q is a parameter
 . mean is computed for each transcript
@@ -37,6 +87,7 @@
 .Log
 . http://stackoverflow.com/questions/696321/best-logging-framework-for-native-c
 . http://developer.gnome.org/glib/2.33/glib-Basic-Types.html
+. How about pantheios? This requires stlsoft, b64, xtests, and shwild.
 
 .GNOME glib
 . http://ftp.gnome.org/pub/GNOME/sources/glib/2.33/glib-2.33.1.tar.xz
@@ -49,4 +100,6 @@ program shows a way of parsing a YAML file.
 program illustrates usages of emitting a YAML document. 
 . readline.cpp - 
 
-
+.Other softwares
+. g++
+. noweb

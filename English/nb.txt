@@ -1,0 +1,76 @@
+CHAPTER 1 Introduction 
+
+God made the integers, all the rest is the work of man.
+Kronecker
+
+This book is concerned with models of event counts. An event count refers to the
+number of times an event occurs, for example the number of airline accidents or
+earthquakes. An event count is the realization of a nonnegative integer-valued
+random variable. A univariate statistical model of event counts usually
+specifies a probability distribution of the number of occurrences of the event
+known up to some parameters. Estimation and inference in such models are
+concerned with the unknown parameters, given the probability distribution and
+the count data. Such a specification involves no other variables and the number
+of events is assumed to be independently identically distributed ( iid ). Much
+early theoretical and applied work on event counts was carried out in the
+univariate framework. The main focus of this book, however, is regression
+analysis of event counts. The statistical analysis of counts within the
+framework of discrete paramet- ric distributions for univariate iid random
+variables has a long and rich history (Johnson, Kotz, and Kemp, 1992). The
+Poisson distribution was derived as a limiting case of the binomial by Poisson
+(1837). Early applications include the classic study of Bortkiewicz (1898) of
+the annual number of deaths from being kicked by mules in the Prussian army. A
+standard generalization of the Poisson is the negative binomial distribution. It
+was derived by Greenwood and Yule (1920), as a consequence of apparent contagion
+due to unobserved het- erogeneity, and by Eggenberger and Polya (1923) as a
+result of true contagion. The biostatistics literature of the 1930s and 1940s,
+although predominantly univariate, refined and brought to the forefront seminal
+issues that have since permeated regression analysis of both counts and
+durations. The development of the counting process approach unified the
+treatment of counts and dura- tions. Much of the vast literature on iid counts,
+which addresses issues such as heterogeneity and overdispersion, true versus
+apparent contagion, and iden- tifiability of Poisson mixtures, retains its
+relevance in the context of count
+
+data regressions. This leads to models such as the negative binomial regression
+model. Significant early developments in count models took place in actuarial
+sci- ence, biostatistics, and demography. In recent years these models have also
+been used extensively in economics, political science, and sociology. The spe-
+cial features of data in their respective fields of application have fueled
+deve- lopments that have enlarged the scope of these models. An important mile-
+stone in the development of count data regression models was the emergence of
+the &#8220;generalized linear models,&#8221; of which the Poisson regression is
+a spe- cial case, first described by Nelder and Wedderburn (1972) and detailed
+in McCullagh and Nelder (1989). Building on these contributions, the papers by
+Gourieroux, Monfort, and Trognon (1984a, b), and the work on longitu- dinal or
+panel count data models of Hausman, Hall, and Griliches (1984), have also been
+very influential in stimulating applied work in the econometric literature.
+Regression analysis of counts is motivated by the observation that in many, if
+not most, real-life contexts, the iid assumption is too strong. For example, the
+mean rate of occurrence of an event may vary from case to case and may depend on
+some observable variables. The investigator&#8217;s main interest therefore may
+lie in the role of covariates (regressors) that are thought to affect the
+parameters of the conditional distribution of events, given the covariates. This
+is usually accomplished by a regression model for event count. At the simplest
+level we may think of this in the conventional regression framework in which the
+dependent variable, y , is restricted to be a nonnegative random variable whose
+conditional mean depends on some vector of regressors, x . At a different level
+of abstraction, an event may be thought of as the real- ization of a point
+process governed by some specified rate of occurrence of the event. The number
+of events may be characterized as the total number of such realizations over
+some unit of time. The dual of the event count is the inter- arrival time ,
+defined as the length of the period between events. Count data regression is
+useful in studying the occurrence rate per unit of time conditional on some
+covariates. One could instead study the distribution of interarrival times
+conditional on covariates. This leads to regression models of waiting times or
+durations . The type of data available, cross-sectional, time series, or
+longitudinal, will affect the choice of the statistical framework. An obvious
+first question is whether &#8220;special&#8221; methods are required to handle
+count data or whether the standard Gaussian linear regression may suffice. More
+common regression estimators and models, such as the ordinary least squares in
+the linear regression model, ignore the restricted support for the dependent
+variable. This leads to significant deficiencies unless the mean of the counts
+is high, in which case normal approximation and related regression methods may
+be satisfactory. The Poisson (log-linear) regression is motivated by the usual
+considera- tions for regression analysis but also seeks to preserve and exploit
+as much

@@ -21,7 +21,7 @@
 function noweb-weave {
   noweave -delay noweb/main.nw > output/noweb/main.tex
   pdflatex -output-directory output/noweb output/noweb/main
-  open output/noweb/main.pdf
+#  open output/noweb/main.pdf
 }
 
 #exit
