@@ -2,4 +2,28 @@ PhyML Analysis
 ==============
 Sang Chul Choi <goshng@yahoo.co.kr>
 
+Download executables from:
+Download a PhyML executable at PhyML-Analysis/downloads.
+Download a version of PhyML at http://www.atgc-montpellier.fr/phyml/versions.php
+PhyML-aBayes 
 
+Download data files from:
+
+phy160
+babylon:/lab/wd2/strep.phylo/strep.lactobacillus.47/fnn.redo/phy.lactobacillus.47/phy
+
+phy175
+babylon:/lab/wd2/strep.phylo/strep.staph.staa.47/fnn.I1.8c90/strep.staph.47.I1.8c90.phy/phy
+
+./PhyML-aBayes_macOS_i386 -i $file -m GTR -f e -c 4 -a e
+
+Create a script that run on the cluster.
+/home/fs01/sc2265/Documents/Projects/Peach/PhyML-Analysis
+We need four shell scripts.
+createjobidfile.sh: this should be modified to create a jobidfile.
+run.sh: this may need to be changed. This would prepare some input and output
+directories.
+batch.sh: this script is the main batch shell script that would be run by batch
+system.
+batchjob.sh: this script needs to be modified for the specific executable or
+PhyML.
