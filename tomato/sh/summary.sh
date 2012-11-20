@@ -131,6 +131,13 @@ function summary {
   Rscript R/correlation-ab.R $RAW IL-expressionforcorrelation.csv for-apriori-subnetwork-a.csv for-apriori-subnetwork-b.csv ab
 
   for i in `ls output/cor/*-pval.csv`; do Rscript R/postprocess-il.R $i; done 
+
+  # Count unique genes 
+  rm -f output/summary/number-gene-il-snp.txt
+  for i in `ls data/$RAW/IL_SNP_gene`; do
+    N=$(cut -f 10 data/$RAW/IL_SNP_gene/$i | sed '/^$/d' | sort | uniq | wc -l)
+    echo -e "$i\t$N" >> output/summary/number-gene-il-snp.txt
+  done
   
   END_TIME=`date +%s`
   ELAPSED=`expr $END_TIME - $START_TIME + 18000`

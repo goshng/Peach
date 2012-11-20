@@ -20,3 +20,25 @@ Solyc05g012020.2.1
 
 data/raw/metabolite/IL_mat_62.txt
 
+x <- scan("x.1")
+x <- scan("x.1",what="character")
+head(x)
+y <- table(x)
+head(y)
+summary(y)
+head(y,n=10)
+head(y,n=20)
+lendth(y)
+length(y)
+
+520  cut -f 10 pen_SNP |head
+521  cut -f 9,10 pen_SNP |head
+522  cut -f 9,10,11 pen_SNP |head
+523  cut -f 10 pen_SNP |head
+524  less pen_SNP 
+525  cut -f 10 pen_SNP > x
+526  vi x
+527  sed '/^$/d' x > x.1
+528  vi x.1
+529  wc -l x.1
+530  tail x.1

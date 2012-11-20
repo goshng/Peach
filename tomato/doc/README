@@ -26,6 +26,8 @@ log - non-unique eQTL
 pen-snp-type.csv
 snp-uniq.csv
 
+number-gene-il-snp.txt - the total number of unique genes in IL_SNP_gene.
+
 ven-snp.txt
 ~~~~~~~~~~~
 Unique IL SNPs and PEN SNPs, the intersection set of them are counted.
