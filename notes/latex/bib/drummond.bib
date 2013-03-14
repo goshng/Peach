@@ -1,0 +1,464 @@
+% This file was created with JabRef 2.9.2.
+% Encoding: ISO8859_1
+
+@ARTICLE{Baele2012,
+  author = {Baele, Guy and Lemey, Philippe and Bedford, Trevor and Rambaut, Andrew
+	and Suchard, Marc A. and Alekseyenko, Alexander V.},
+  title = {Improving the accuracy of demographic and molecular clock model comparison
+	while accommodating phylogenetic uncertainty.},
+  journal = {Mol Biol Evol},
+  year = {2012},
+  volume = {29},
+  pages = {2157--2167},
+  number = {9},
+  month = {Sep},
+  abstract = {Recent developments in marginal likelihood estimation for model selection
+	in the field of Bayesian phylogenetics and molecular evolution have
+	emphasized the poor performance of the harmonic mean estimator (HME).
+	Although these studies have shown the merits of new approaches applied
+	to standard normally distributed examples and small real-world data
+	sets, not much is currently known concerning the performance and
+	computational issues of these methods when fitting complex evolutionary
+	and population genetic models to empirical real-world data sets.
+	Further, these approaches have not yet seen widespread application
+	in the field due to the lack of implementations of these computationally
+	demanding techniques in commonly used phylogenetic packages. We here
+	investigate the performance of some of these new marginal likelihood
+	estimators, specifically, path sampling (PS) and stepping-stone (SS)
+	sampling for comparing models of demographic change and relaxed molecular
+	clocks, using synthetic data and real-world examples for which unexpected
+	inferences were made using the HME. Given the drastically increased
+	computational demands of PS and SS sampling, we also investigate
+	a posterior simulation-based analogue of Akaike's information criterion
+	(AIC) through Markov chain Monte Carlo (MCMC), a model comparison
+	approach that shares with the HME the appealing feature of having
+	a low computational overhead over the original MCMC analysis. We
+	confirm that the HME systematically overestimates the marginal likelihood
+	and fails to yield reliable model classification and show that the
+	AICM performs better and may be a useful initial evaluation of model
+	choice but that it is also, to a lesser degree, unreliable. We show
+	that PS and SS sampling substantially outperform these estimators
+	and adjust the conclusions made concerning previous analyses for
+	the three real-world data sets that we reanalyzed. The methods used
+	in this article are now available in BEAST, a powerful user-friendly
+	software package to perform Bayesian evolutionary analyses.},
+  doi = {10.1093/molbev/mss084},
+  institution = {Department of Microbiology and Immunology, KU Leuven, Leuven, Belgium.
+	guy.baele@rega.kuleuven.be},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {mss084},
+  pmid = {22403239},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1093/molbev/mss084}
+}
+
+@ARTICLE{Drummond2006,
+  author = {Drummond, Alexei J. and Ho, Simon Y W. and Phillips, Matthew J. and
+	Rambaut, Andrew},
+  title = {Relaxed phylogenetics and dating with confidence.},
+  journal = {PLoS Biol},
+  year = {2006},
+  volume = {4},
+  pages = {e88},
+  number = {5},
+  month = {May},
+  __markedentry = {[goshng:]},
+  abstract = {In phylogenetics, the unrooted model of phylogeny and the strict molecular
+	clock model are two extremes of a continuum. Despite their dominance
+	in phylogenetic inference, it is evident that both are biologically
+	unrealistic and that the real evolutionary process lies between these
+	two extremes. Fortunately, intermediate models employing relaxed
+	molecular clocks have been described. These models open the gate
+	to a new field of "relaxed phylogenetics." Here we introduce a new
+	approach to performing relaxed phylogenetic analysis. We describe
+	how it can be used to estimate phylogenies and divergence times in
+	the face of uncertainty in evolutionary rates and calibration times.
+	Our approach also provides a means for measuring the clocklikeness
+	of datasets and comparing this measure between different genes and
+	phylogenies. We find no significant rate autocorrelation among branches
+	in three large datasets, suggesting that autocorrelated models are
+	not necessarily suitable for these data. In addition, we place these
+	datasets on the continuum of clocklikeness between a strict molecular
+	clock and the alternative unrooted extreme. Finally, we present analyses
+	of 102 bacterial, 106 yeast, 61 plant, 99 metazoan, and 500 primate
+	alignments. From these we conclude that our method is phylogenetically
+	more accurate and precise than the traditional unrooted model while
+	adding the ability to infer a timescale to evolution.},
+  doi = {10.1371/journal.pbio.0040088},
+  institution = {Department of Zoology, University of Oxford, Oxford, United Kingdom.},
+  keywords = {Animals; Bacteria, genetics; Bayes Theorem; Biological Evolution;
+	Computer Simulation; Dengue Virus, genetics; Fishes, genetics; Fungi,
+	genetics; Genetic Variation; Influenza A virus, genetics; Insects,
+	genetics; Markov Chains; Marsupialia, genetics; Models, Biological;
+	Monte Carlo Method; Phylogeny; Plants, genetics; Primates, genetics;
+	Time Factors},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {05-PLBI-RA-0392R4},
+  pmid = {16683862},
+  review = {One of the most promising recent advances in molecular phylogenetics
+	has been the introduction of relaxed molecular clock mod- els that
+	do not assume a constant rate across lineages [13- 20]. BEAST was
+	the first software package that allows inference of the actual phylogenetic
+	tree under such mod- els [21].},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1371/journal.pbio.0040088}
+}
+
+@ARTICLE{Drummond2007,
+  author = {Drummond, Alexei J. and Rambaut, Andrew},
+  title = {BEAST: Bayesian evolutionary analysis by sampling trees.},
+  journal = {BMC Evol Biol},
+  year = {2007},
+  volume = {7},
+  pages = {214},
+  abstract = {The evolutionary analysis of molecular sequence variation is a statistical
+	enterprise. This is reflected in the increased use of probabilistic
+	models for phylogenetic inference, multiple sequence alignment, and
+	molecular population genetics. Here we present BEAST: a fast, flexible
+	software architecture for Bayesian analysis of molecular sequences
+	related by an evolutionary tree. A large number of popular stochastic
+	models of sequence evolution are provided and tree-based models suitable
+	for both within- and between-species sequence data are implemented.BEAST
+	version 1.4.6 consists of 81000 lines of Java source code, 779 classes
+	and 81 packages. It provides models for DNA and protein sequence
+	evolution, highly parametric coalescent analysis, relaxed clock phylogenetics,
+	non-contemporaneous sequence data, statistical alignment and a wide
+	range of options for prior distributions. BEAST source code is object-oriented,
+	modular in design and freely available at http://beast-mcmc.googlecode.com/
+	under the GNU LGPL license.BEAST is a powerful and flexible evolutionary
+	analysis package for molecular sequence variation. It also provides
+	a resource for the further development of new models and statistical
+	methods of evolutionary analysis.},
+  doi = {10.1186/1471-2148-7-214},
+  file = {:/Users/goshng/Library/Mobile Documents/com~apple~Preview/Documents/drummond07.pdf:PDF},
+  institution = {Bioinformatics Institute, University of Auckland, Auckland, New Zealand.
+	alexei@cs.auckland.ac.nz},
+  keywords = {Bayes Theorem; Computational Biology, methods; Computer Simulation;
+	Evolution, Molecular; Models, Genetic; Models, Statistical; Phylogeny;
+	Sequence Analysis, DNA; Software},
+  language = {eng},
+  medline-pst = {epublish},
+  owner = {goshng},
+  pii = {1471-2148-7-214},
+  pmid = {17996036},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1186/1471-2148-7-214}
+}
+
+@ARTICLE{Drummond2010,
+  author = {Drummond, Alexei J. and Suchard, Marc A.},
+  title = {Bayesian random local clocks, or one rate to rule them all.},
+  journal = {BMC Biol},
+  year = {2010},
+  volume = {8},
+  pages = {114},
+  __markedentry = {[goshng:6]},
+  abstract = {Relaxed molecular clock models allow divergence time dating and "relaxed
+	phylogenetic" inference, in which a time tree is estimated in the
+	face of unequal rates across lineages. We present a new method for
+	relaxing the assumption of a strict molecular clock using Markov
+	chain Monte Carlo to implement Bayesian modeling averaging over random
+	local molecular clocks. The new method approaches the problem of
+	rate variation among lineages by proposing a series of local molecular
+	clocks, each extending over a subregion of the full phylogeny. Each
+	branch in a phylogeny (subtending a clade) is a possible location
+	for a change of rate from one local clock to a new one. Thus, including
+	both the global molecular clock and the unconstrained model results,
+	there are a total of 2(2n-2) possible rate models available for averaging
+	with 1, 2, ..., 2n - 2 different rate categories.We propose an efficient
+	method to sample this model space while simultaneously estimating
+	the phylogeny. The new method conveniently allows a direct test of
+	the strict molecular clock, in which one rate rules them all, against
+	a large array of alternative local molecular clock models. We illustrate
+	the method's utility on three example data sets involving mammal,
+	primate and influenza evolution. Finally, we explore methods to visualize
+	the complex posterior distribution that results from inference under
+	such models.The examples suggest that large sequence datasets may
+	only require a small number of local molecular clocks to reconcile
+	their branch lengths with a time scale. All of the analyses described
+	here are implemented in the open access software package BEAST 1.5.4
+	(http://beast-mcmc.googlecode.com/).},
+  doi = {10.1186/1741-7007-8-114},
+  institution = {Allan Wilson Centre for Molecular Ecology and Evolution, University
+	of Auckland, Private Bag 92019, Auckland, New Zealand. alexei@cs.auckland.ac.nz},
+  keywords = {Animals; Bayes Theorem; Computer Simulation; DNA, Mitochondrial, genetics;
+	Evolution, Molecular; Hemagglutinin Glycoproteins, Influenza Virus,
+	genetics; Internet; Mammals, genetics; Markov Chains; Models, Genetic;
+	Monte Carlo Method; Phylogeny; Software; Time Factors},
+  language = {eng},
+  medline-pst = {epublish},
+  owner = {goshng},
+  pii = {1741-7007-8-114},
+  pmid = {20807414},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1186/1741-7007-8-114}
+}
+
+@ARTICLE{Drummond2012,
+  author = {Drummond, Alexei J. and Suchard, Marc A. and Xie, Dong and Rambaut,
+	Andrew},
+  title = {Bayesian phylogenetics with BEAUti and the BEAST 1.7.},
+  journal = {Mol Biol Evol},
+  year = {2012},
+  volume = {29},
+  pages = {1969--1973},
+  number = {8},
+  month = {Aug},
+  abstract = {Computational evolutionary biology, statistical phylogenetics and
+	coalescent-based population genetics are becoming increasingly central
+	to the analysis and understanding of molecular sequence data. We
+	present the Bayesian Evolutionary Analysis by Sampling Trees (BEAST)
+	software package version 1.7, which implements a family of Markov
+	chain Monte Carlo (MCMC) algorithms for Bayesian phylogenetic inference,
+	divergence time dating, coalescent analysis, phylogeography and related
+	molecular evolutionary analyses. This package includes an enhanced
+	graphical user interface program called Bayesian Evolutionary Analysis
+	Utility (BEAUti) that enables access to advanced models for molecular
+	sequence and phenotypic trait evolution that were previously available
+	to developers only. The package also provides new tools for visualizing
+	and summarizing multispecies coalescent and phylogeographic analyses.
+	BEAUti and BEAST 1.7 are open source under the GNU lesser general
+	public license and available at http://beast-mcmc.googlecode.com
+	and http://beast.bio.ed.ac.uk.},
+  doi = {10.1093/molbev/mss075},
+  file = {:/Users/goshng/Library/Mobile Documents/com~apple~Preview/Documents/drummond12.pdf:PDF},
+  institution = {Department of Computer Science, University of Auckland, Auckland,
+	New Zealand. alexei@cs.auckland.ac.nz},
+  keywords = {Animals; Base Sequence; Bayes Theorem; Computational Biology, methods;
+	DNA, Mitochondrial, genetics; Finches, genetics; Molecular Sequence
+	Data; Phenotype; Phylogeny; Software; User-Computer Interface},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {mss075},
+  pmid = {22367748},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1093/molbev/mss075}
+}
+
+@ARTICLE{Heled2012,
+  author = {Heled, Joseph and Drummond, Alexei J.},
+  title = {Calibrated tree priors for relaxed phylogenetics and divergence time
+	estimation.},
+  journal = {Syst Biol},
+  year = {2012},
+  volume = {61},
+  pages = {138--149},
+  number = {1},
+  month = {Jan},
+  abstract = {The use of fossil evidence to calibrate divergence time estimation
+	has a long history. More recently, Bayesian Markov chain Monte Carlo
+	has become the dominant method of divergence time estimation, and
+	fossil evidence has been reinterpreted as the specification of prior
+	distributions on the divergence times of calibration nodes. These
+	so-called "soft calibrations" have become widely used but the statistical
+	properties of calibrated tree priors in a Bayesian setting hashave
+	not been carefully investigated. Here, we clarify that calibration
+	densities, such as those defined in BEAST 1.5, do not represent the
+	marginal prior distribution of the calibration node. We illustrate
+	this with a number of analytical results on small trees. We also
+	describe an alternative construction for a calibrated Yule prior
+	on trees that allows direct specification of the marginal prior distribution
+	of the calibrated divergence time, with or without the restriction
+	of monophyly. This method requires the computation of the Yule prior
+	conditional on the height of the divergence being calibrated. Unfortunately,
+	a practical solution for multiple calibrations remains elusive. Our
+	results suggest that direct estimation of the prior induced by specifying
+	multiple calibration densities should be a prerequisite of any divergence
+	time dating analysis.},
+  doi = {10.1093/sysbio/syr087},
+  file = {:/Users/goshng/Library/Mobile Documents/com~apple~Preview/Documents/heled12.pdf:PDF},
+  institution = {Department of Computer Science, University of Auckland, Auckland,
+	New Zealand. jheled@gmail.com},
+  keywords = {Animals; Bayes Theorem; Calibration; Classification, methods; Computer
+	Simulation; Evolution, Molecular; Fossils; Markov Chains; Marsupialia,
+	classification/genetics; Models, Genetic; Monte Carlo Method; Papio,
+	classification/genetics; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {syr087},
+  pmid = {21856631},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1093/sysbio/syr087}
+}
+
+@ARTICLE{Li2012,
+  author = {Li, Wai Lok Sibon and Drummond, Alexei J.},
+  title = {Model averaging and Bayes factor calculation of relaxed molecular
+	clocks in Bayesian phylogenetics.},
+  journal = {Mol Biol Evol},
+  year = {2012},
+  volume = {29},
+  pages = {751--761},
+  number = {2},
+  month = {Feb},
+  abstract = {We describe a procedure for model averaging of relaxed molecular clock
+	models in Bayesian phylogenetics. Our approach allows us to model
+	the distribution of rates of substitution across branches, averaged
+	over a set of models, rather than conditioned on a single model.
+	We implement this procedure and test it on simulated data to show
+	that our method can accurately recover the true underlying distribution
+	of rates. We applied the method to a set of alignments taken from
+	a data set of 12 mammalian species and uncovered evidence that lognormally
+	distributed rates better describe this data set than do exponentially
+	distributed rates. Additionally, our implementation of model averaging
+	permits accurate calculation of the Bayes factor(s) between two or
+	more relaxed molecular clock models. Finally, we introduce a new
+	computational approach for sampling rates of substitution across
+	branches that improves the convergence of our Markov chain Monte
+	Carlo algorithms in this context. Our methods are implemented under
+	the BEAST 1.6 software package, available at http://beast-mcmc.googlecode.com.},
+  doi = {10.1093/molbev/msr232},
+  file = {:/Users/goshng/Library/Mobile Documents/com~apple~Preview/Documents/lisibon12.pdf:PDF},
+  institution = {Computational Evolution Group, University of Auckland, Auckland,
+	New Zealand.},
+  keywords = {Algorithms; Animals; Bayes Theorem; Evolution, Molecular; Humans;
+	Mammals, genetics; Models, Genetic; Models, Theoretical; Phylogeny;
+	Sequence Alignment},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {msr232},
+  pmid = {21940644},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1093/molbev/msr232}
+}
+
+@ARTICLE{Suchard2009,
+  author = {Suchard, Marc A. and Rambaut, Andrew},
+  title = {Many-core algorithms for statistical phylogenetics.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {1370--1376},
+  number = {11},
+  month = {Jun},
+  abstract = {Statistical phylogenetics is computationally intensive, resulting
+	in considerable attention meted on techniques for parallelization.
+	Codon-based models allow for independent rates of synonymous and
+	replacement substitutions and have the potential to more adequately
+	model the process of protein-coding sequence evolution with a resulting
+	increase in phylogenetic accuracy. Unfortunately, due to the high
+	number of codon states, computational burden has largely thwarted
+	phylogenetic reconstruction under codon models, particularly at the
+	genomic-scale. Here, we describe novel algorithms and methods for
+	evaluating phylogenies under arbitrary molecular evolutionary models
+	on graphics processing units (GPUs), making use of the large number
+	of processing cores to efficiently parallelize calculations even
+	for large state-size models.We implement the approach in an existing
+	Bayesian framework and apply the algorithms to estimating the phylogeny
+	of 62 complete mitochondrial genomes of carnivores under a 60-state
+	codon model. We see a near 90-fold speed increase over an optimized
+	CPU-based computation and a >140-fold increase over the currently
+	available implementation, making this the first practical use of
+	codon models for phylogenetic inference over whole mitochondrial
+	or microorganism genomes.Source code provided in BEAGLE: Broad-platform
+	Evolutionary Analysis General Likelihood Evaluator, a cross-platform/processor
+	library for phylogenetic likelihood computation (http://beagle-lib.googlecode.com/).
+	We employ a BEAGLE-implementation using the Bayesian phylogenetics
+	framework BEAST (http://beast.bio.ed.ac.uk/).},
+  doi = {10.1093/bioinformatics/btp244},
+  institution = {Department of Biomathematics, University of California, Los Angeles,
+	CA 90095, USA. msuchard@ucla.edu},
+  keywords = {Algorithms; Bayes Theorem; Codon, genetics; Computational Biology,
+	methods; Evolution, Molecular; Genome, Mitochondrial, genetics; Phylogeny},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {btp244},
+  pmid = {19369496},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btp244}
+}
+
+@ARTICLE{Thomas2013,
+  author = {Thomas, Jessica A. and Trueman, John W H. and Rambaut, Andrew and
+	Welch, John J.},
+  title = {Relaxed phylogenetics and the palaeoptera problem: resolving deep
+	ancestral splits in the insect phylogeny.},
+  journal = {Syst Biol},
+  year = {2013},
+  volume = {62},
+  pages = {285--297},
+  number = {2},
+  month = {Mar},
+  abstract = {The order in which the 3 groups of winged insects (the Pterygota)
+	diverged from their common ancestor has important implications for
+	understanding the origin of insect flight. But despite this importance,
+	the split between the Odonata (dragonflies and damselflies), Ephemeroptera
+	(mayflies), and Neoptera (the other winged orders) remains very much
+	unresolved. Indeed, previous studies have obtained strong apparent
+	support for each of the 3 possible branching patterns. Here, we present
+	a systematic reinvestigation of the basal pterygote split. Our results
+	suggest that outgroup choice and limited taxon sampling have been
+	major sources of systematic error, even for data sets with a large
+	number of characters (e.g., in phylogenomic data sets). In particular,
+	a data set of 113 taxa provides consistent support for the Palaeoptera
+	hypothesis (the grouping of Odonata with Ephemeroptera), whereas
+	results from data sets with fewer taxa give inconsistent results
+	and are highly sensitive to minor changes in data and methods. We
+	also focus on recent methods that exploit temporal information using
+	fossil calibrations, combined with additional assumptions about the
+	evolutionary process, and so reduce the influence of outgroup choice.
+	These methods are shown to provide more consistent results, for example,
+	supporting Palaeoptera, even for data sets that previously supported
+	other hypotheses. Together, these results have implications for understanding
+	insect origins and for resolving other problematic splits in the
+	tree of life. [Bayesian phylogenetics; BEAST; Chiastomyaria; Metapterygota;
+	Pterygota.].},
+  doi = {10.1093/sysbio/sys093},
+  institution = {Department of Biology, University of York, York YO10 5DD, UK; Research
+	School of Biology, Australian National University, Canberra ACT 0200,
+	Australia; Institute for Evolutionary Biology, University of Edinburgh,
+	Kings Buildings, Edinburgh EH9 3JT, UK; and Department of Genetics,
+	University of Cambridge, Downing Street, Cambridge CB2 3EH, UK.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pii = {sys093},
+  pmid = {23220768},
+  timestamp = {2013.03.12},
+  url = {http://dx.doi.org/10.1093/sysbio/sys093}
+}
+
+@ARTICLE{Wilson1969,
+  author = {Wilson, A. C. and Sarich, V. M.},
+  title = {A molecular time scale for human evolution.},
+  journal = {Proc Natl Acad Sci U S A},
+  year = {1969},
+  volume = {63},
+  pages = {1088--1093},
+  number = {4},
+  month = {Aug},
+  __markedentry = {[goshng:6]},
+  abstract = {We discuss published molecular evidence concerning the relationship
+	of man to African apes and Old World monkeys. Quantitative comparisons
+	of their serum albumins, transferrins, hemoglobins, and DNA show
+	that man is genetically much more similar to the African apes than
+	to the Old World monkeys. The amino acid sequences of hemoglobins
+	from humans, chimpanzees, gorillas, and rhesus monkeys are consistent
+	with the hypothesis that the probability of an amino acid substitution
+	occurring in a given interval of time is the same for every hemoglobin
+	lineage. This allows the use of these data as a hemoglobin evolutionary
+	clock, just as we have previously done with the albumins. It is shown
+	that concordance exists between the hemoglobin and albumin results
+	and that both support the suggestion that the human lineage diverged
+	from that leading to the African apes far more recently than is generally
+	supposed. Considering both the albumin and hemoglobin data, we would
+	set the most probable date at 4 to 5 million years.},
+  file = {:/Users/goshng/Library/Mobile Documents/com~apple~Preview/Documents/wilson69.pdf:PDF},
+  keywords = {Amino Acid Sequence; Animals; Biological Evolution; Blood Proteins;
+	DNA; Haplorhini; Hemoglobins; Hominidae; Humans; Models, Biological;
+	Serum Albumin; Transferrin},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {4982244},
+  timestamp = {2013.03.12}
+}
+

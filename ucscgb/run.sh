@@ -12,6 +12,19 @@
 #########################################################################
 # Export these shell variables for easy access. You need to run them in the BASH
 # shell directly.
+# Create a directory, ucsc, at $HOME/Documents/Projects
+# git clone git://genome-source.cse.ucsc.edu/kent.git
+# Follow the instructions available at kent/src/product
+# Start a Apache Web server in Mac OSX (Mountain Lion)
+# $ sudo apachectl start
+# $ sudo defaults write /System/Library/LaunchDaemons/org.apache.httpd Disabled -bool false
+# See
+# http://reviews.cnet.com/8301-13727_7-57481978-263/how-to-enable-web-sharing-in-os-x-mountain-lion/
+# for detail of setting up a Web Server in Mac OSX Mountain Lion
+# Install MySQL
+# $ sudo /usr/local/mysql/support-files/mysql.server start
+# $ /usr/local/mysql/bin/mysqladmin -u root password 'yourpasswordhere'
+export UCSCDIR=/Users/goshng/Documents/Projects/ucsc
 export KENT=/Users/goshng/Documents/Projects/ucsc/kent
 export KENTPRODUCT=/Users/goshng/Documents/Projects/ucsc/kent/src/product
 export SQL_PASSWORD=$USER

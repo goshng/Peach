@@ -11,6 +11,10 @@ makeDb
 ------
 A local track DB.
 
+git
+---
+git clone git://genome-source.cse.ucsc.edu/kent.git
+
 Databases
 ---------
 strMut2: RNA-Seq data analysis database.

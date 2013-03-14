@@ -1,0 +1,31 @@
+Genomic architecture of rapid evolution in threespine stickleback
+
+Bill Cresko
+Institute of Ecology and Evolution
+Department of Biology
+
+Hohenlohe et al 2010 Int J Plant Sci 171:1059 - Rice?
+
+Freshwater population of stickleback was known to be derived from Seawater
+population. Selective sweep happens in a region of freshwater population
+indicated by low pi and large Fst. 
+
+RAD-seq, Restriction-site Associated DNA (RAD) - 22,830 Sbfl site x 2 -> 45,000
+RAD-tag. A software 'STACK'. Catchen et al. 2013 Mol Ecol. 
+
+GBS?
+
+590 individuals - 115000 SNPs each.
+
+Fst distance, NJ tree.
+
+Paper 2010
+----------
+Higher Fst compared with background Fst could indicate selection. Plots of Fst
+were used to search for potentially selected genomic regions. Genetic inversion
+could cause rapid evolutoin. 
+
+Ecology of organisms due to glacier movements.
+
+Moderate.
+Good intro.

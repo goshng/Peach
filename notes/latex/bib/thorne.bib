@@ -1,4 +1,4 @@
-% This file was created with JabRef 2.7.2.
+% This file was created with JabRef 2.9.2.
 % Encoding: ISO8859_1
 
 @ARTICLE{Akerborg2009,
@@ -44,6 +44,33 @@
   review = {similar to IMa2},
   timestamp = {2010.03.05},
   url = {http://dx.doi.org/10.1073/pnas.0806251106}
+}
+
+@ARTICLE{Allison1994,
+  author = {Allison, L. and Wallace, C. S.},
+  title = {The posterior probability distribution of alignments and its application
+	to parameter estimation of evolutionary trees and to optimization
+	of multiple alignments.},
+  journal = {J Mol Evol},
+  year = {1994},
+  volume = {39},
+  pages = {418--430},
+  number = {4},
+  month = {Oct},
+  __markedentry = {[goshng:6]},
+  abstract = {How to sample alignments from their posterior probability distribution
+	given two strings is shown. This is extended to sampling alignments
+	of more than two strings. The result is first applied to the estimation
+	of the edges of a given evolutionary tree over several strings. Second,
+	when used in conjunction with simulated annealing, it gives a stochastic
+	search method for an optimal multiple alignment.},
+  institution = {Department of Computer Science, Monash University, Australia.},
+  keywords = {Algorithms; Biological Evolution; Models, Biological; Sequence Alignment},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {goshng},
+  pmid = {7966371},
+  timestamp = {2013.03.13}
 }
 
 @ARTICLE{Aris-Brosou2007,
@@ -1239,7 +1266,7 @@
   pages = {877--885},
   number = {3},
   month = {Mar},
-  __markedentry = {[goshng:6]},
+  __markedentry = {[goshng:]},
   abstract = {The influence of phenotypic effects of genetic mutations on molecular
 	evolution is not well understood. Neutral and nearly neutral theories
 	of molecular evolution predict a negative relationship between the
@@ -1486,6 +1513,7 @@
 	lineages. The method can be used in conjunction with any of the widely
 	used models for nucleotide substitution or amino acid replacement.
 	It is illustrated by analyzing a data set of rbcL protein sequences.},
+  file = {:/Users/goshng/Library/Mobile Documents/com~apple~Preview/Documents/thorne98.pdf:PDF},
   institution = {Statistics Department, North Carolina State University, Raleigh 27695-8203,
 	USA. thorne@statgen.ncsu.edu},
   keywords = {Algorithms; Evolution; Evolution, Molecular; Models, Genetic; Models,
@@ -1495,7 +1523,8 @@
   medline-pst = {ppublish},
   owner = {goshng},
   pmid = {9866200},
-  timestamp = {2010.03.05}
+  timestamp = {2010.03.05},
+  url = {http://mbe.oxfordjournals.org/content/15/12/1647.full.pdf}
 }
 
 @ARTICLE{Wakeley:2005,
@@ -1785,6 +1814,61 @@
   url = {http://dx.doi.org/10.1093/bioinformatics/btl577}
 }
 
+@ARTICLE{Yang:2006,
+  author = {Ziheng Yang and Bruce Rannala},
+  title = {Bayesian estimation of species divergence times under a molecular
+	clock using multiple fossil calibrations with soft bounds.},
+  journal = {Mol Biol Evol},
+  year = {2006},
+  volume = {23},
+  pages = {212--226},
+  number = {1},
+  month = {Jan},
+  abstract = {We implement a Bayesian Markov chain Monte Carlo algorithm for estimating
+	species divergence times that uses heterogeneous data from multiple
+	gene loci and accommodates multiple fossil calibration nodes. A birth-death
+	process with species sampling is used to specify a prior for divergence
+	times, which allows easy assessment of the effects of that prior
+	on posterior time estimates. We propose a new approach for specifying
+	calibration points on the phylogeny, which allows the use of arbitrary
+	and flexible statistical distributions to describe uncertainties
+	in fossil dates. In particular, we use soft bounds, so that the probability
+	that the true divergence time is outside the bounds is small but
+	nonzero. A strict molecular clock is assumed in the current implementation,
+	although this assumption may be relaxed. We apply our new algorithm
+	to two data sets concerning divergences of several primate species,
+	to examine the effects of the substitution model and of the prior
+	for divergence times on Bayesian time estimation. We also conduct
+	computer simulation to examine the differences between soft and hard
+	bounds. We demonstrate that divergence time estimation is intrinsically
+	hampered by uncertainties in fossil calibrations, and the error in
+	Bayesian time estimates will not go to zero with increased amounts
+	of sequence data. Our analyses of both real and simulated data demonstrate
+	potentially large differences between divergence time estimates obtained
+	using soft versus hard bounds and a general superiority of soft bounds.
+	Our main findings are as follows. (1) When the fossils are consistent
+	with each other and with the molecular data, and the posterior time
+	estimates are well within the prior bounds, soft and hard bounds
+	produce similar results. (2) When the fossils are in conflict with
+	each other or with the molecules, soft and hard bounds behave very
+	differently; soft bounds allow sequence data to correct poor calibrations,
+	while poor hard bounds are impossible to overcome by any amount of
+	data. (3) Soft bounds eliminate the need for "safe" but unrealistically
+	high upper bounds, which may bias posterior time estimates. (4) Soft
+	bounds allow more reliable assessment of estimation errors, while
+	hard bounds generate misleadingly high precisions when fossils and
+	molecules are in conflict.},
+  doi = {10.1093/molbev/msj024},
+  keywords = {Animals; Bayes Theorem; Classification; Computer Simulation; Evolution,
+	Molecular; Fossils; Genetic Speciation; Models, Genetic; Phylogeny;
+	Primates},
+  owner = {goshng},
+  pii = {msj024},
+  pmid = {16177230},
+  timestamp = {2007.08.24},
+  url = {http://dx.doi.org/10.1093/molbev/msj024}
+}
+
 @ARTICLE{Yang2006,
   author = {Ziheng Yang and Bruce Rannala},
   title = {Bayesian estimation of species divergence times under a molecular
@@ -1841,61 +1925,6 @@
   pii = {msj024},
   pmid = {16177230},
   timestamp = {2010.03.05},
-  url = {http://dx.doi.org/10.1093/molbev/msj024}
-}
-
-@ARTICLE{Yang:2006,
-  author = {Ziheng Yang and Bruce Rannala},
-  title = {Bayesian estimation of species divergence times under a molecular
-	clock using multiple fossil calibrations with soft bounds.},
-  journal = {Mol Biol Evol},
-  year = {2006},
-  volume = {23},
-  pages = {212--226},
-  number = {1},
-  month = {Jan},
-  abstract = {We implement a Bayesian Markov chain Monte Carlo algorithm for estimating
-	species divergence times that uses heterogeneous data from multiple
-	gene loci and accommodates multiple fossil calibration nodes. A birth-death
-	process with species sampling is used to specify a prior for divergence
-	times, which allows easy assessment of the effects of that prior
-	on posterior time estimates. We propose a new approach for specifying
-	calibration points on the phylogeny, which allows the use of arbitrary
-	and flexible statistical distributions to describe uncertainties
-	in fossil dates. In particular, we use soft bounds, so that the probability
-	that the true divergence time is outside the bounds is small but
-	nonzero. A strict molecular clock is assumed in the current implementation,
-	although this assumption may be relaxed. We apply our new algorithm
-	to two data sets concerning divergences of several primate species,
-	to examine the effects of the substitution model and of the prior
-	for divergence times on Bayesian time estimation. We also conduct
-	computer simulation to examine the differences between soft and hard
-	bounds. We demonstrate that divergence time estimation is intrinsically
-	hampered by uncertainties in fossil calibrations, and the error in
-	Bayesian time estimates will not go to zero with increased amounts
-	of sequence data. Our analyses of both real and simulated data demonstrate
-	potentially large differences between divergence time estimates obtained
-	using soft versus hard bounds and a general superiority of soft bounds.
-	Our main findings are as follows. (1) When the fossils are consistent
-	with each other and with the molecular data, and the posterior time
-	estimates are well within the prior bounds, soft and hard bounds
-	produce similar results. (2) When the fossils are in conflict with
-	each other or with the molecules, soft and hard bounds behave very
-	differently; soft bounds allow sequence data to correct poor calibrations,
-	while poor hard bounds are impossible to overcome by any amount of
-	data. (3) Soft bounds eliminate the need for "safe" but unrealistically
-	high upper bounds, which may bias posterior time estimates. (4) Soft
-	bounds allow more reliable assessment of estimation errors, while
-	hard bounds generate misleadingly high precisions when fossils and
-	molecules are in conflict.},
-  doi = {10.1093/molbev/msj024},
-  keywords = {Animals; Bayes Theorem; Classification; Computer Simulation; Evolution,
-	Molecular; Fossils; Genetic Speciation; Models, Genetic; Phylogeny;
-	Primates},
-  owner = {goshng},
-  pii = {msj024},
-  pmid = {16177230},
-  timestamp = {2007.08.24},
   url = {http://dx.doi.org/10.1093/molbev/msj024}
 }
 

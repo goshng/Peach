@@ -1,6 +1,23 @@
 R Development
 =============
 
+.Things for Mac OS X Mountain Lion
+----
+$ wget http://r.research.att.com/tools/gcc-42-5666.3-darwin11.pkg
+$ [install gcc-4.2 (Apple build 5666.3) with GNU Fortran 4.2.4 for Mac OS X 10.7 (Lion)]
+$ tar zxf R-2.15.2.tar.gz
+$ cd b
+$ [create a file called config.site with the following content:
+   CC=gcc-4.2
+   CXX=g++-4.2
+   F77=gfortran-4.2
+   FC=gfortran-4.2
+   OBJC=gcc-4.2
+  ]
+$ ../R-2.15.2/configure --with-blas='-framework vecLib' --with-lapack --enable-R-framework=$HOME/usr
+$ make
+----
+
 .Things that I did for install R package into Mac OS X Snow Leopard 
 ----
 mkdir downloads/R-2.14.0/i
