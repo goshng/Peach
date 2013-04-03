@@ -1,0 +1,32 @@
+Lemming Analysis
+================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+Histories
+---------
+
+
+Tue Apr  2 12:46:37 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.Download the MEGA file of the mtDNA genome alignment
+---
+$LOCAL/data/raw/Mega_mtGenome_23112011_Fin.meg
+---
+
+.Download the annotation file
+---
+$LOCAL/data/raw/mtDNA genome.xls
+---
+
+.Export the alignment to a phylip alignment in interleaved format
+---
+$LOCAL/data/Mega_mtGenome_23112011_Fin-phylip.txt
+---
+
+.Export the annotation file to a CSV file
+---
+$LOCAL/data/mtDNA genome.csv
+---
+
+
+
