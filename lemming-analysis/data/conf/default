@@ -1,6 +1,10 @@
 PROJECTNAME=lemming
 PROJECTDIR=/Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data/projects
-OUTPUTDIR=$HOME/tmp/lemming-analysis/output
+PROJECTDATADIR=/Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data
+PROJECTOUTPUTDIR=$HOME/tmp/lemming-analysis/output
+
+# Programs
+JMODELTEST=$HOME/usr/local/bin/jmodeltest-2.1.3/jModelTest.jar
 
 # The following variables are not used.
 ROOTANALYSISDIR=$HOME/tmp/lemming-analysis

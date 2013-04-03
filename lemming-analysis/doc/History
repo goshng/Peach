@@ -14,6 +14,16 @@ MODELTEST is applied to each of the mtDNA genes.
 . See http://www.molecularevolution.org/resources/activities/jmodeltest_activity
 
 .Create FASTA sequence files from the mtDNA alignment
+. See +mainExtractPartOfPhylip+ in +sh/main.sh+ 
+
+.Use jModelTest
+. See +mainJModelTest+ in +sh/main.sh+
+. Could use the following options
+---
+java -jar jModelTest.jar --help
+java -jar jModelTest.jar -d ATP6.fas -o ATP6.out -s 11 -p -AICc
+---
+
 
 
 Tue Apr  2 12:46:37 AKDT 2013

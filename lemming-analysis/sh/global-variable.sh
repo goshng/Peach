@@ -24,7 +24,7 @@ function global-variable {
   # The subdirectory output contains directories named after the project file.
   # The output project directory would contain all of the results from the
   # analysis.
-  BASEDIR=$OUTPUTDIR/$PROJECT
+  BASEDIR=$PROJECTOUTPUTDIR/$PROJECT
   BASERUNANALYSIS=$BASEDIR/run-analysis
   NUMBERDIR=$BASEDIR/$REPETITION
   DATADIR=$NUMBERDIR/data

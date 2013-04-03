@@ -19,7 +19,8 @@ Configuration
 -------------
 Locate a file called +data/conf/default+. The file contains two kinds of lines:
 one for comment, and the other for variable assignment. Comments should start
-with # at the first column of a line.
+with # at the first column of a line. Note that shell variables can be used in
+the configuration file.
 
 .Your project name
 ---
@@ -31,9 +32,14 @@ PROJECTNAME=lemming
 PROJECTDIR=/Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data/projects
 ---
 
+.Your project data files
+---
+PROJECTDATADIR=/Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data
+---
+
 .Output directory
 ---
-OUTPUTDIR=$HOME/tmp/lemming-analysis/output
+PROJECTOUTPUTDIR=$HOME/tmp/lemming-analysis/output
 ---
 
 Installation
@@ -47,4 +53,19 @@ f
 Menus
 -----
 g
+
+main
+~~~~
+
+Use these variables.
+
+  BASEDIR=$PROJECTOUTPUTDIR/$PROJECT
+  BASERUNANALYSIS=$BASEDIR/run-analysis
+  NUMBERDIR=$BASEDIR/$REPETITION
+  DATADIR=$NUMBERDIR/data
+  BWADIR=$NUMBERDIR/bwa
+  RUNANALYSIS=$NUMBERDIR/run-analysis
+
+
+
 

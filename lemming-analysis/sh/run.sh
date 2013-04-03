@@ -28,6 +28,7 @@ source sh/global-variable.sh
 source sh/read-species.sh
 source sh/init-file-system.sh
 source sh/project.sh
+source sh/main.sh
 
 #####################################################################
 # Read configuration file
@@ -44,7 +45,7 @@ PROJECTS=$(ls $PROJECTDIR|grep -v ^sim)
 #####################################################################
 PS3="Select the menu : "
 CHOICES=( project \
-          batch \
+          main \
           warranty \
           copyright \
           quit )
@@ -63,3 +64,4 @@ else
     fi
   done
 fi
+

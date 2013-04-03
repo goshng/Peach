@@ -21,9 +21,13 @@ function conf {
   CONFFILE=data/conf/default
   PROJECTNAME=$(eval echo $(grep ^PROJECTNAME\= $CONFFILE | cut -d"=" -f2))
   PROJECTDIR=$(eval echo $(grep ^PROJECTDIR\= $CONFFILE | cut -d"=" -f2))
-  OUTPUTDIR=$(eval echo $(grep ^OUTPUTDIR\= $CONFFILE | cut -d"=" -f2))
+  PROJECTOUTPUTDIR=$(eval echo $(grep ^PROJECTOUTPUTDIR\= $CONFFILE | cut -d"=" -f2))
+  PROJECTDATADIR=$(eval echo $(grep ^PROJECTDATADIR\= $CONFFILE | cut -d"=" -f2))
 
   ROOTANALYSISDIR=$(eval echo $(grep ^ROOTANALYSISDIR\= $CONFFILE | cut -d"=" -f2))
+
+  # Programs
+  JMODELTEST=$(eval echo $(grep ^JMODELTEST\= $CONFFILE | cut -d"=" -f2))
 
   # The main base directory contains all the subdirectories.
   ROUTPUTDIR=$(eval echo $(grep ^ROUTPUTDIR\= $CONFFILE | cut -d"=" -f2))
