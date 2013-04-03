@@ -5,9 +5,23 @@ Sang Chul Choi <goshng@yahoo.co.kr>
 Histories
 ---------
 
+Wed Apr  3 10:54:19 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MODELTEST is applied to each of the mtDNA genes. 
+
+.Installation of JMODELTEST
+. Requires phyml
+. See http://www.molecularevolution.org/resources/activities/jmodeltest_activity
+
+.Create FASTA sequence files from the mtDNA alignment
+
 
 Tue Apr  2 12:46:37 AKDT 2013
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The multiple mtDNA alignment is partitioned into multiple regions. A MEGA
+formatted file is converted to a PHYLIP-format one. A PERL script is created to
+convert a PHYLIP-format file to another file with smaller part of the alignment.
+
 .Download the MEGA file of the mtDNA genome alignment
 ---
 $LOCAL/data/raw/Mega_mtGenome_23112011_Fin.meg
@@ -20,13 +34,19 @@ $LOCAL/data/raw/mtDNA genome.xls
 
 .Export the alignment to a phylip alignment in interleaved format
 ---
-$LOCAL/data/Mega_mtGenome_23112011_Fin-phylip.txt
+$LOCAL/data/Mega_mtGenome_23112011_Fin.phylip
 ---
+When exporting a MEGA file to a PHYLIP file, make sure that you uncheck the menu
+item "Display/Use Identical Symbol" so that all characters can be displayed
+rather masked by dots.
 
 .Export the annotation file to a CSV file
 ---
 $LOCAL/data/mtDNA genome.csv
 ---
 
-
+.Use an column extracter to extract parts of the PHYLIP alignment
+---
+pl/phyilp-part.pl
+---
 

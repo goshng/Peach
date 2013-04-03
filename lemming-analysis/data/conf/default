@@ -1,0 +1,7 @@
+PROJECTNAME=lemming
+PROJECTDIR=/Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data/projects
+OUTPUTDIR=$HOME/tmp/lemming-analysis/output
+
+# The following variables are not used.
+ROOTANALYSISDIR=$HOME/tmp/lemming-analysis
+ROUTPUTDIR=$HOME/tmp/lemming-analysis/routput

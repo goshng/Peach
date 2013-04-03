@@ -44,6 +44,7 @@ GetOptions( \%params,
             'version' => sub { print $VERSION."\n"; exit; },
             'start=i',
             'end=i',
+            'format=s',
             'in=s',
             'out=s',
             '<>' => \&process
@@ -76,12 +77,25 @@ else
 ###############################################################################
 if ($cmd eq "phylip")
 {
+  unless (exists $params{format})
+  {
+    $params{format} = $cmd;
+  }
+  $params{format} = lc $params{format};
   # print $params{in}, "\n";
   # print $params{start}, "\n";
   # print $params{end}, "\n";
  
   my $line = <$infile>;
   my ($numberOfSequences, $numberOfColumns) = split /\s+/, $line;
+  unless (exists $params{start})
+  {
+    $params{start} = 1;
+  }
+  unless (exists $params{end})
+  {
+    $params{end} = $numberOfColumns;
+  }
   # print $numberOfSequences, "\n";
   # print $numberOfColumns, "\n";
 
@@ -125,23 +139,84 @@ if ($cmd eq "phylip")
   }
 
   # Extract a part using start and end positions.
-  print $outfile "$numberOfSequences $numberOfColumns\n";
   my @extractedSequences;
   foreach (@sequences)
   {
     my $offset = $params{start} - 1;
     my $len = $params{end} - $params{start} + 1;
     push @extractedSequences, substr($_, $offset, $len);
-    #print $offset, " ", $len, "\n";
   }
 
-  # Print the part.
-  print $outfile "\n";
-  for (my $i = 0; $i < $numberOfSequences; $i++)
+  if ($params{format} eq "phylip")
   {
-    print $outfile $sequenceNames[$i];
-    print $outfile $extractedSequences[$i];
-    print $outfile "\n";
+    # Print the part out in PHYLIP format.
+    # 
+    # Segment 1  Segment 2  Segment 3
+    # AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA -> Chunk 1
+    # AAAAAAAAAA AAAAAAAAAA AAAA       -> Chunk 2
+    # Note that numberOfColumns is now the length of a part.
+    $numberOfColumns = $params{end} - $params{start} + 1;
+    print $outfile "$numberOfSequences $numberOfColumns\n";
+    my $numberOfChunks = int($numberOfColumns / 60);
+    if ($numberOfColumns % 60 != 0)
+    {
+      $numberOfChunks++;
+    }
+
+    for (my $i = 0; $i < $numberOfChunks; $i++)
+    {
+      print $outfile "\n";
+      for (my $j = 0; $j < $numberOfSequences; $j++)
+      {
+        if ($i == 0)
+        {
+          print $outfile $sequenceNames[$j];
+        }
+        else
+        {
+          print $outfile "          ";
+        }
+
+        my $chunkOfSequence = substr $extractedSequences[$j], 10*6*$i, 60;
+        my $lengthOfChunk = length($chunkOfSequence);
+        my $numberOfSegments = int($lengthOfChunk / 10);
+        if ($lengthOfChunk % 10 != 0)
+        {
+          $numberOfSegments++;
+        }
+
+        my $chunk = "";
+        for (my $k = 0; $k < $numberOfSegments; $k++)
+        {
+          $chunk .= substr $chunkOfSequence, 10*$k, 10;
+          if ($k < $numberOfSegments) 
+          {
+            $chunk .= " ";
+          }
+        }
+        print $outfile "$chunk\n";
+      }
+    }
+  }
+  elsif ($params{format} eq "fasta")
+  {
+    for (my $i = 0; $i < $numberOfSequences; $i++)
+    {
+      $sequenceNames[$i] =~ s/\s+//g;
+      print $outfile ">$sequenceNames[$i]\n";
+
+      $numberOfColumns = $params{end} - $params{start} + 1;
+      my $numberOfChunks = int($numberOfColumns / 60);
+      if ($numberOfColumns % 60 != 0)
+      {
+        $numberOfChunks++;
+      }
+      for (my $j = 0; $j < $numberOfChunks; $j++)
+      {
+        my $chunkOfSequence = substr $extractedSequences[$i], 10*6*$j, 60;
+        print $outfile "$chunkOfSequence\n";
+      }
+    }
   }
 }
 
@@ -168,13 +243,17 @@ perl phylip-part.pl phylip -in in.phylip -out out.phylip -start 10 -end 15
 
 perl pl/phyilp-part.pl phylip -in /Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data/Mega_mtGenome_23112011_Fin.txt -start 10 -end 15
 
+perl pl/phyilp-part.pl phylip -in Mega_mtGenome_23112011_Fin.txt -start 10 -end 15
+
+perl pl/phyilp-part.pl phylip -in Mega_mtGenome_23112011_Fin.txt -start 10 -end 15 -format fasta
+
 =head1 DESCRIPTION
 
 phylip-part will help you to extract something from or extract parts of a PHYLIP
 file.
 
 Command:
-  phylip - count short reads mapped on genes using shortreadfile and geneposfile.
+  phylip - convert a PHYLIP alignment file to another file.
 
 =head1 OPTIONS
 
@@ -192,11 +271,18 @@ unless an output file name is specified.
 
 =item B<-start> <number>
 
-A start position of a part in the PHYLIP alignment file.
+A start position of a part in the PHYLIP alignment file. The default is 1 unless
+the start is specified.
 
 =item B<-end> <number>
 
-A end position of a part in the PHYLIP alignment file.
+A end position of a part in the PHYLIP alignment file. The default is the length
+of the alignment if the end is not specified.
+
+=item B<-format> <string>
+
+The input foramt is given by the command of this PERL script. The output format
+is given using this option.
 
 =back
 

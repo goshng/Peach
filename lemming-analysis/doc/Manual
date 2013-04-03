@@ -1,0 +1,50 @@
+User Manual of Lemming Analysis
+===============================
+Sang Chul Choi <goshng@yahoo.co.kr>
+v0.1, March 2013
+
+Introduction
+------------
+a
+
+Getting Help
+------------
+b
+
+Kick Start
+----------
+c
+
+Configuration
+-------------
+Locate a file called +data/conf/default+. The file contains two kinds of lines:
+one for comment, and the other for variable assignment. Comments should start
+with # at the first column of a line.
+
+.Your project name
+---
+PROJECTNAME=lemming
+---
+
+.Your project files
+---
+PROJECTDIR=/Volumes/Elements/Documents/Projects/Peach/lemming-analysis/data/projects
+---
+
+.Output directory
+---
+OUTPUTDIR=$HOME/tmp/lemming-analysis/output
+---
+
+Installation
+------------
+e
+
+Project File
+------------
+f
+
+Menus
+-----
+g
+
