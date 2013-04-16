@@ -27,11 +27,16 @@ function project {
       project-repetition
       global-variable
       
-      echo -n "$FUNCNAME: creating data, bwa, and analysis directories ... "
-      mkdir -p $DATADIR
-      mkdir -p $BWADIR
-      mkdir -p $RUNANALYSIS
-      echo "done!"
+      if [ ! -d "$DATADIR" ]; then
+        echo -n "$FUNCNAME: creating data, bwa, and analysis directories ... "
+        mkdir -p $DATADIR
+        mkdir -p $BWADIR
+        mkdir -p $RUNANALYSIS
+        echo "done!"
+      fi
+
+      echo "  Project Data Directory: $PROJECTDATADIR"
+      echo "  Data Directory: $DATADIR"
 
       break
     fi

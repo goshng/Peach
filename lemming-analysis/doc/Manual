@@ -54,6 +54,12 @@ Menus
 -----
 g
 
+project
+~~~~~~~
+
+. Creates directories
+. Shows created directories
+
 main
 ~~~~
 

@@ -1,0 +1,11 @@
+Learn PASCAL using free pascal
+==============================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+See http://www.freepascal.org for a free PASCAL.
+
+.To create an executable
+---
+fpc hello.pas
+---
+

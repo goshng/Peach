@@ -1,0 +1,43 @@
+Matt Olson
+==========
+Populus genus - some phenotype, and some genotypes, a few studies in association
+mapping, photoperiod (larger effect), temperature (than this), 
+
+Department of Biological Sciences, Texas Tech U.
+
+Adaptation and acclimation potential of a boreal forest tree, Populus
+balsamifera, in a changing climate
+
+Lenski and Travisano 1994
+
+Levsen et al. 2012
+------------------
+Populus balsamifera
+Ne ~ 3K to 9K
+P. trichocarpa - genome seq.
+200kya between the two
+
+adaptation or random drift
+Qst vs. Fst.
+Whitlock 2008
+
+Keller et al. 2010
+Three populations
+
+Locally adapted alleles
+-----------------------
+Lewontin and Drakauer 1973
+Black et al. 2001
+Foll and Gagiotti 2008
+Excoffier et al. 2009
+
+BayeScan
+Keller et al. 2012
+
+Association mapping
+TASSEL 
+
+Worked with Matt Smith, who is in the office with Luis Alza.
+
+migrant from south. some genetic evidence. not from north to south. 
+

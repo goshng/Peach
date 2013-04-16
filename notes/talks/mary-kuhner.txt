@@ -1,0 +1,69 @@
+Mary Kuhner
+===========
+
+Title. A field guide to genealogy samplers
+
+.Three ways of getting unknown ancestral relationships
+. A correct relationship.
+. Sum over all possible relationships.
+. Compromise by summing over plausible relationships.
+
+.Genealogy sampler
+. Variability among trees for error bars
+
+.Sampler-based studies
+
+.Survey of genealogy sampler software
+. BEAST: relaxed-clock, skyline plot, starbeast
+. IM: useful for populations less than 4N generations old
+. LAMARC: models with recombination, SNP data
+. MIGRATE-N: skylineplot
+. GENETREE: specific mutation event  
+
+.Right data for a right research
+. Ancient DNA
+. Long sequence
+. Recently diverged pop'n
+. High or low polymorphism
+
+.What happen if I ignore
+. recombination:
+. growth:
+. recent population divergence:
+. natural selection:
+
+.Data requirement for sampler
+. random
+. appropriate mutation models
+. polymorphic
+. neutral or under purifying selection
+
+.What happen if I ignore
+. recombination:
+. growth:
+. recent population divergence:
+. natural selection:
+
+.Data requirement for sampler
+. random
+. appropriate mutation models
+. polymorphic
+. neutral or under purifying selection
+
+.How can we detect these problems?
+. error bars
+. behavior of program from run to run
+. visualize trees
+
+.case study I
+. K. McCracken
+ 
+.case study II
+. Brian Reid
+
+.case study III
+. Peter Bereli
+. mtDNA
+. Need nucleic loci, ancient sample, more sample
+
+Review paper for using these.

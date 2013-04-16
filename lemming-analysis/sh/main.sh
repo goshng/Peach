@@ -26,8 +26,8 @@ function main {
   else  
     project-repetition
     main-variable
-    # mainExtractPartOfPhylip
-    mainJModelTest
+    mainExtractPartOfPhylip
+    # mainJModelTest
     break
   fi
   done
@@ -59,39 +59,87 @@ function main-variable {
 }
 
 function mainExtractPartOfPhylip {
+  echo -n "  extracting parts of the PHYLIP alignment file ... "
+  GENES=(ND1 ND2 COI COII ATP8 ATP6 COIII ND3 ND4L ND4 ND5 cytB ND6 12SrRNA 16SrRna Dloop)
+  GENESTART=(2718 3882 5293 6976 7727 7888 8568 9421 9839 10129 11704 14111 13512 70 1088 15386)
+  GENEEND=(3677 4916 6837 7659 7930 8568 9351 9768 10135 11506 13515 15253 14036 1016 2645 16348)
   PHYLIPFILE=$PROJECTDATADIR/Mega_mtGenome_23112011_Fin.phylip
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND1.fas -start 2718 -end 3677
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND2.fas -start 3882 -end 4916
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/COI.fas -start 5293 -end 6837
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/COII.fas -start 6976 -end 7659
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ATP8.fas -start 7727 -end 7930
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ATP6.fas -start 7888 -end 8568
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/COIII.fas -start 8568 -end 9351
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND3.fas -start 9421 -end 9768
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND4L.fas -start 9839 -end 10135
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND4.fas -start 10129 -end 11506
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND5.fas -start 11704 -end 13515
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/cytB.fas -start 14111 -end 15253
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/ND6.fas -start 13512 -end 14036
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/12SrRNA.fas -start 70 -end 1016
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/16SrRNA.fas -start 1088 -end 2645
-  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
-    -out $DATADIR/Dloop.fas -start 15386 -end 16348
+
+  y=$((${#GENES[*]} - 1))
+  for i in $(eval echo {0..$y}); do
+    perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format nexus \
+      -out $DATADIR/${GENES[$i]}.nex -start ${GENESTART[$i]} -end ${GENEEND[$i]}
+
+    perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format fasta \
+      -out $DATADIR/${GENES[$i]}.fas -start ${GENESTART[$i]} -end ${GENEEND[$i]}
+  done 
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format nexus \
+    -subsetOfSequences Dt4Y,Dt1Y,Dt10Y,Dt5Y,Dt2Y,Dt3Y,Dt6Y,Dt7Y,Dt8Y,Dt9Y \
+    -out $DATADIR/region-n1.nex
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format nexus \
+    -subsetOfSequences Dt1T,Dt14T,Dt2T,Dt3T,Dt4T,Dt5T,Dt6T,Dt7T,Dt8T,Dt9T,Dt10T,Dt11T,Dt12T,Dt13T \
+    -out $DATADIR/region-n2.nex
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format nexus \
+    -subsetOfSequences Dt1LK,Dt3LK,Dt5LK,Dt2LK,Dt4LK,Dt6LK,Dt7LK,Dt8LK,Dt9LK,Dt10LK \
+    -out $DATADIR/region-n3.nex
+   
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format nexus \
+    -subsetOfSequences Dt1WB,Dt2WB,Dt3WB,Dt4WB,Dt5WB,Dt6WB,Dt7WB,Dt9WB,Dt8WB,Dt10WB,Dt11WB,Dt13WB,Dt12WB,Dt14WB,Dt15WB,Dt16WB \
+    -out $DATADIR/region-n4.nex
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format nexus \
+    -subsetOfSequences Dt4Y,Dt1Y,Dt10Y,Dt5Y,Dt2Y,Dt3Y,Dt6Y,Dt7Y,Dt8Y,Dt9Y \
+    -subsetOfSequences Dt1T,Dt14T,Dt2T,Dt3T,Dt4T,Dt5T,Dt6T,Dt7T,Dt8T,Dt9T,Dt10T,Dt11T,Dt12T,Dt13T \
+    -subsetOfSequences Dt1LK,Dt3LK,Dt5LK,Dt2LK,Dt4LK,Dt6LK,Dt7LK,Dt8LK,Dt9LK,Dt10LK \
+    -subsetOfSequences Dt1WB,Dt2WB,Dt3WB,Dt4WB,Dt5WB,Dt6WB,Dt7WB,Dt9WB,Dt8WB,Dt10WB,Dt11WB,Dt13WB,Dt12WB,Dt14WB,Dt15WB,Dt16WB \
+    -subsetOfSequences Dg1A,Dg2A,Dg4A,Dg6A,Dg3C,Dg5A \
+    -out $DATADIR/regions-5.nex
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format genepop \
+    -subsetOfSequences Dt4Y,Dt1Y,Dt10Y,Dt5Y,Dt2Y,Dt3Y,Dt6Y,Dt7Y,Dt8Y,Dt9Y \
+    -subsetOfSequences Dt1T,Dt14T,Dt2T,Dt3T,Dt4T,Dt5T,Dt6T,Dt7T,Dt8T,Dt9T,Dt10T,Dt11T,Dt12T,Dt13T \
+    -subsetOfSequences Dt1LK,Dt3LK,Dt5LK,Dt2LK,Dt4LK,Dt6LK,Dt7LK,Dt8LK,Dt9LK,Dt10LK \
+    -subsetOfSequences Dt1WB,Dt2WB,Dt3WB,Dt4WB,Dt5WB,Dt6WB,Dt7WB,Dt9WB,Dt8WB,Dt10WB,Dt11WB,Dt13WB,Dt12WB,Dt14WB,Dt15WB,Dt16WB \
+    -subsetOfSequences Dg1A,Dg2A,Dg4A,Dg6A,Dg3C,Dg5A \
+    -out $DATADIR/regions-5.genepop
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format genepop \
+    -subsetOfSequences Dt4Y,Dt1Y,Dt10Y,Dt5Y,Dt2Y,Dt3Y,Dt6Y,Dt7Y,Dt8Y,Dt9Y \
+    -out $DATADIR/region-n1.genepop
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format genepop \
+    -subsetOfSequences Dt1T,Dt14T,Dt2T,Dt3T,Dt4T,Dt5T,Dt6T,Dt7T,Dt8T,Dt9T,Dt10T,Dt11T,Dt12T,Dt13T \
+    -out $DATADIR/region-n2.genepop
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format genepop \
+    -subsetOfSequences Dt1LK,Dt3LK,Dt5LK,Dt2LK,Dt4LK,Dt6LK,Dt7LK,Dt8LK,Dt9LK,Dt10LK \
+    -out $DATADIR/region-n3.genepop
+   
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format genepop \
+    -subsetOfSequences Dt1WB,Dt2WB,Dt3WB,Dt4WB,Dt5WB,Dt6WB,Dt7WB,Dt9WB,Dt8WB,Dt10WB,Dt11WB,Dt13WB,Dt12WB,Dt14WB,Dt15WB,Dt16WB \
+    -out $DATADIR/region-n4.genepop
+
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format migrate-n \
+    -subsetOfSequences Dt4Y,Dt1Y,Dt10Y,Dt5Y,Dt2Y,Dt3Y,Dt6Y,Dt7Y,Dt8Y,Dt9Y \
+    -out $DATADIR/region-n1.migrate-n
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format migrate-n \
+    -subsetOfSequences Dt1T,Dt14T,Dt2T,Dt3T,Dt4T,Dt5T,Dt6T,Dt7T,Dt8T,Dt9T,Dt10T,Dt11T,Dt12T,Dt13T \
+    -out $DATADIR/region-n2.migrate-n
+
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format migrate-n \
+    -subsetOfSequences Dt1LK,Dt3LK,Dt5LK,Dt2LK,Dt4LK,Dt6LK,Dt7LK,Dt8LK,Dt9LK,Dt10LK \
+    -out $DATADIR/region-n3.migrate-n
+   
+  perl pl/phyilp-part.pl phylip -in $PHYLIPFILE -format migrate-n \
+    -subsetOfSequences Dt1WB,Dt2WB,Dt3WB,Dt4WB,Dt5WB,Dt6WB,Dt7WB,Dt9WB,Dt8WB,Dt10WB,Dt11WB,Dt13WB,Dt12WB,Dt14WB,Dt15WB,Dt16WB \
+    -out $DATADIR/region-n4.migrate-n
+
+  echo "done!" 
 }
 
 function mainJModelTest {

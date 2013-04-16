@@ -2,8 +2,71 @@ Lemming Analysis
 ================
 Sang Chul Choi <goshng@yahoo.co.kr>
 
+See the following directories:
+---
+lemming:Downloads/lemming for running BEAST with lemming data
+---
+
 Histories
 ---------
+
+
+Mon Apr 15 10:55:33 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Genepop
+. Easy to compile it, just a single g++ command
+. Put the executable in bin directory.
+. Not useful yet for DIYABC
+
+Fri Apr 12 15:55:19 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.DIYABC
+. Use Genepop to create an input file for DIYABC
+. Or I could create one using +pl/phylip-part.pl+.
+. Some rough guess for the prior setup
+. Find the rough guess using jModeltest. 
+. See http://www.molecularecologist.com/2012/09/approximate-bayesian-computation-without-the-wait/
+. Downloaded simulation version
+
+.Compile diyabc_sim
+---
+rm *.o
+for i in *pas ; do  fpc -Sd $i; done
+fpc -Sd -mDelphi diyabc_sim.dpr
+---
+
+.Comparison of two-population
+---
+Ne
+0 sample 1
+
+Ne
+0 sample 1
+ts varNe 1 N1
+---
+
+Mon Apr  8 16:05:47 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Test a skyline plot using migrate-n
+. See +Downloads/run/migrate-n+
+
+Fri Apr  5 09:18:40 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Create subsets of the mtDNA alignment
+. See option subsetOfSequences in +pl/phylip-part.pl+.
+ 
+.Add migrate-n input format option to +pl/phylip-part.pl+.
+
+Thu Apr  4 16:24:42 AKDT 2013
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Create NEXUS sequence files from the mtDNA alignment
+. Add one more option format for NEXUS output in +pl/phylip-part.pl+.
+. See +mainExtractPartOfPhylip+ in +sh/main.sh+ 
 
 Wed Apr  3 10:54:19 AKDT 2013
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
