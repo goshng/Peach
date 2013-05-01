@@ -1,0 +1,8 @@
+# gcc kseq_test.c -lz -o kseq
+
+gcc sc-paired-end.c -lz -o sc-paired-end
+
+# Under Mac
+# gcc sc-paired-end3.c sqlite3.c -lz -o sc-paired-end3
+# Under Linux
+# gcc sc-paired-end3.c sqlite3.c -lz -lpthread -ldl -o sc-paired-end3

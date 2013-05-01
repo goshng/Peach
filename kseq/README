@@ -1,0 +1,32 @@
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+README
+~~~~~~
+This file is the README.
+
+Source files
+~~~~~~~~~~~~
+kseq.h
+sc-paired-end.c
+
+compile
+~~~~~~~
+compiles the source code.
+
+kseq_test.c
+~~~~~~~~~~~
+The sample source code from Heng Li.
+
+run
+~~~
+runs the program.
+
+input files
+~~~~~~~~~~~
+R1.fastq.gz
+R2.fastq.gz
+
+output files
+~~~~~~~~~~~~
+R1.good.illumina.fastq.gz
+R2.good.illumina.fastq.gz

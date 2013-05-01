@@ -34,3 +34,12 @@ Uncertainty of transcript boundaries.
 pgf
 ~~~
 Tests of pgf
+
+kseq
+~~~~
+Paired-end FASTQ file.
+
+format
+~~~~~~
+A sequence data format.
+
