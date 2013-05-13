@@ -1,0 +1,67 @@
+Genetic Diversity and Population Size: Genomic Insights into an Old Riddle
+==========================================================================
+
+Jeffrey L. Peters
+
+Genetic Diversity within Population
+
+Heterozygosity vs. log Ne
+
+Leffler et al (2012) PLoS Biology
+
+Range of genetic diversity and range of population size?
+
+Matthew Hahn (2008) Evolution
+
+Neutral expectations of "Old Riddle"?
+
+Ducks from the genus Anas
+
+Genetic diversity/Population size in 41 species of ducks
+
+RADseq 3,300 loci
+
+log pi - N : an increasing line
+
+log pi - log N : ------- horizontal line
+
+Northern pintail - Anas acuta
+
+the Last Glacial Maximum ~21,000 ybp
+
+Brown pintail - Anas georgica
+
+Species distribution model - Genetic data
+
+log Theta vs. log N (census size) - an increasing line
+
+Expected changed in ...? what is it?
+
+the last interglacial (~110,000 ybp)
+
+mallards and mottled ducks ( 5 nuclear introns )
+Census <= Genetic Diversity ?
+
+Gray teal vs. Chestnut : weak migration
+
+Census size - 27 grey:1 chestnut
+Autosomal - 2.4
+Z-linked - 29
+
+Bamshad and Wooding 2003. NRG 4:99-111
+
+Coefficient of variation : sd/mean - data vs. simulation under neutral ->
+selection?
+
+Fixed differences/Shared polymorphisms
+
+Fixed differences - Mean proportion of sites vs. nucleotide diversity (negative
+correlation)
+Shared polymorphisms - (positive correlation)
+
+log pi vs. log N - balancing, neutral, selection in decreasing order of slopes
+
+Q&A:
+
+Any general conclusion in terms of biogeographic scale?
+

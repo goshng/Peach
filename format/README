@@ -1,1 +1,14 @@
-I wish to list all of possible data format that are used in biological sciences.
+Format of Biological Sequences
+==============================
+Sang Chul Choi <goshng@yahoo.co.kr>
+
+I wish to list data formats that are used in biological sciences. Some formats
+are used only in a particular software package. This directory contains sample
+data files. We would collate a C library of handling files in different data
+formats. This would allow users to easily incoporate the source code to deal
+with different sequence data.
+
+fasta
+fastq
+nexus
+
